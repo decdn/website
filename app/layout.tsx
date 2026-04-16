@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { links } from "@/lib/links";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,13 +13,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const SITE_URL = "https://decdn.example";
 const TITLE = "deCDN — A decentralized CDN paid per megabyte";
 const DESCRIPTION =
   "Stake-secured P2P nodes serve BLAKE3-addressed content over QUIC. Clients pay per MB in USDC through off-chain channels. No hyperscaler required.";
 
 export const metadata: Metadata = {
-  metadataBase: new URL(SITE_URL),
+  metadataBase: new URL(links.site),
   title: {
     default: TITLE,
     template: "%s · deCDN",
@@ -37,7 +37,8 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
   },
-  robots: { index: true, follow: true },
+  // Keep noindex while links.site is the placeholder origin.
+  robots: { index: false, follow: true },
 };
 
 export const viewport: Viewport = {
@@ -56,9 +57,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full motion-safe:scroll-smooth antialiased`}
     >
-      <body>{children}</body>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }
