@@ -5,7 +5,7 @@ import { links } from "@/lib/links";
 
 const SECTION_IDS = ["s-01", "s-02", "s-03", "s-04", "s-05"] as const;
 const NAV = [
-  { id: "s-02", label: "Problem" },
+  { id: "s-02", label: "Compare" },
   { id: "s-03", label: "Method" },
   { id: "s-04", label: "FAQ" },
   { id: "s-05", label: "Contact" },

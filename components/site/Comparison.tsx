@@ -1,7 +1,7 @@
 import { ComparisonRow } from "@/components/ui/ComparisonRow";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
-export function Problem() {
+export function Comparison() {
   return (
     <section
       id="s-02"
