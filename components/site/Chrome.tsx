@@ -83,22 +83,6 @@ export function Chrome() {
           <span aria-hidden>→</span>
         </a>
       </nav>
-
-      {/* left gutter — vertical meta */}
-      <div
-        aria-hidden
-        className="blend pointer-events-none fixed top-1/2 left-3 z-40 hidden -translate-y-1/2 md:block"
-      >
-        <div
-          className="meta whitespace-nowrap"
-          style={{
-            transform: "rotate(-90deg) translateY(-100%)",
-            transformOrigin: "top left",
-          }}
-        >
-          node-001 · lat 41.0082 · lon 28.9784 · built in rust
-        </div>
-      </div>
     </>
   );
 }
