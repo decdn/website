@@ -31,12 +31,12 @@ export function Comparison() {
             color: "rgb(255 255 255 / 0.75)",
             ["--reveal-delay" as string]: "120ms",
           }}
-          className="max-w-[62ch] text-[14px] leading-[1.7] sm:text-[15px]"
+          className="max-w-[62ch] text-[15px] leading-[1.7] sm:text-[17px]"
         >
           the pattern repeats whenever something big ships: mirrors fork, cdns
           rate-limit, small teams burn tens of thousands hosting bytes they
-          don&apos;t own. deCDN inverts every axis — same delivery, different
-          physics.
+          don&apos;t own. <span style={{ color: "var(--whisper)" }}>deCDN</span>{" "}
+          inverts every axis — same delivery, different physics.
         </p>
       </div>
 

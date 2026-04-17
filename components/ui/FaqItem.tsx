@@ -1,3 +1,17 @@
+import type { ReactNode } from "react";
+
+function highlightBrand(s: string): ReactNode[] {
+  return s.split(/(deCDN|decdn)/g).map((part, i) =>
+    part === "deCDN" || part === "decdn" ? (
+      <span key={i} style={{ color: "var(--whisper)" }}>
+        deCDN
+      </span>
+    ) : (
+      part
+    ),
+  );
+}
+
 export function FaqItem({
   q,
   a,
@@ -17,10 +31,10 @@ export function FaqItem({
         {q}
       </div>
       <p
-        className="max-w-[60ch] text-[14px] leading-[1.7] sm:col-span-7 sm:text-[15px]"
+        className="max-w-[60ch] text-[15px] leading-[1.7] sm:col-span-7 sm:text-[17px]"
         style={{ color: "rgb(255 255 255 / 0.75)" }}
       >
-        {a}
+        {highlightBrand(a)}
       </p>
     </div>
   );

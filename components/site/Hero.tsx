@@ -51,14 +51,15 @@ export function Hero() {
             <span className="rise rise-2 pl-[8vw]">information.</span>
           </h1>
 
-          <p className="rise rise-3 max-w-[64ch] text-[14px] leading-[1.65] sm:text-[15px]">
+          <p className="rise rise-3 max-w-[64ch] text-[15px] leading-[1.65] sm:text-[17px]">
             a 14-gigabyte file posted in berlin reaches a client in tokyo in
             under a second. the client streams from three peers at once,
             verifies every chunk with blake3, and pays per megabyte in usdc —
             whether the payload is a linux iso, an open dataset, a game patch, a
-            scientific archive, or an ai model. decdn is a peer-to-peer delivery
-            layer built for open information at scale. the code is open. the
-            network is open. the price is posted.
+            scientific archive, or an ai model.{" "}
+            <span style={{ color: "var(--whisper)" }}>deCDN</span> is a
+            peer-to-peer delivery layer built for open information at scale. the
+            code is open. the network is open. the price is posted.
           </p>
 
           <div className="rise rise-4 flex flex-col flex-wrap gap-x-8 gap-y-3 sm:flex-row sm:items-end">

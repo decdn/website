@@ -22,7 +22,7 @@ export function MethodRow({
       >
         {word}
       </div>
-      <p className="max-w-[56ch] text-[14px] leading-[1.65] sm:col-span-6 sm:text-[15px]">
+      <p className="max-w-[56ch] text-[15px] leading-[1.65] sm:col-span-6 sm:text-[17px]">
         {body}
       </p>
     </div>

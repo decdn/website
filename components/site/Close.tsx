@@ -9,7 +9,7 @@ export function Close() {
       aria-labelledby="s-05-h"
       className="relative flex min-h-[100svh] scroll-mt-[-48px] flex-col overflow-hidden bg-[var(--paper)] px-4 pt-24 pb-10 text-[var(--ink)] sm:px-10 sm:pt-28 sm:pb-12"
     >
-      <FleetStatus className="absolute top-44 right-16 z-0 hidden w-[min(54vw,640px)] sm:top-52 sm:right-36 md:block" />
+      <FleetStatus className="absolute top-44 right-6 z-0 hidden w-[min(54vw,640px)] sm:top-52 sm:right-20 md:block" />
 
       <div className="relative z-10 flex w-full flex-1 flex-col">
         <SectionHeader
@@ -37,13 +37,14 @@ export function Close() {
           <p
             data-reveal
             style={{ ["--reveal-delay" as string]: "120ms" }}
-            className="max-w-[64ch] text-[14px] leading-[1.7] sm:text-[15px]"
+            className="max-w-[64ch] text-[15px] leading-[1.7] sm:text-[17px]"
           >
-            decdn is a peer-to-peer delivery layer for large files — open
-            datasets, scientific archives, linux distros, game builds, video
-            libraries, open-weight ai models, anything meant to be pulled a
-            million times and that shouldn&apos;t depend on one bucket. the code
-            is open. the network is open. the price is posted.
+            <span style={{ color: "var(--whisper)" }}>deCDN</span> is a
+            peer-to-peer delivery layer for large files — open datasets,
+            scientific archives, linux distros, game builds, video libraries,
+            open-weight ai models, anything meant to be pulled a million times
+            and that shouldn&apos;t depend on one bucket. the code is open. the
+            network is open. the price is posted.
           </p>
 
           <div
