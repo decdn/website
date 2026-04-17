@@ -13,6 +13,13 @@
   --font-sans: var(--font-geist-sans);
 }
 
+html {
+  /* Opt out of browser / OS / extension forced-dark overrides. The page
+     declares its own per-section background; UA chrome (scrollbars, form
+     controls) should stay in the light scheme. */
+  color-scheme: light;
+}
+
 html,
 body {
   background: var(--ink);
