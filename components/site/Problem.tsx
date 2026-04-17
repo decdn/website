@@ -1,4 +1,4 @@
-import { Ledger } from "@/components/ui/Ledger";
+import { ComparisonRow } from "@/components/ui/ComparisonRow";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export function Problem() {
@@ -10,11 +10,11 @@ export function Problem() {
     >
       <SectionHeader
         index="02"
-        label="The delivery layer failed"
-        timestamp="problem · persistent"
+        label="Side by side"
+        timestamp="legacy vs decdn · seven axes"
       />
 
-      <div className="mt-14 flex flex-col gap-12">
+      <div className="mt-14 flex flex-col gap-10">
         <h2
           data-reveal
           id="s-02-h"
@@ -25,75 +25,111 @@ export function Problem() {
           <span className="pl-[3vw] opacity-60">its plumbing didn&apos;t.</span>
         </h2>
 
-        <div className="grid grid-cols-1 gap-8 sm:grid-cols-12 sm:gap-10">
-          <p
-            data-reveal
-            style={{
-              color: "rgb(255 255 255 / 0.75)",
-              ["--reveal-delay" as string]: "120ms",
-            }}
-            className="max-w-[62ch] text-[14px] leading-[1.7] sm:col-span-7 sm:text-[15px]"
-          >
-            the pattern repeats whenever something big ships. a fresh linux iso,
-            a 200-gigabyte game patch, an open-science dataset, the latest
-            open-weight ai model — the url gets hammered, mirrors fork, cdns
-            rate-limit. small teams burn tens of thousands a month hosting bytes
-            they don&apos;t own. cloudflare, aws, akamai run the pipes. their
-            pricing is a toll booth on open information:{" "}
-            <strong className="font-semibold">$0.085–$0.17 per gigabyte</strong>
-            , fixed provisioning, monthly minimums. the infrastructure layer
-            concentrates exactly where the apps promise to decentralise.
-          </p>
-
-          <ul
-            data-reveal
-            style={{ ["--reveal-delay" as string]: "220ms" }}
-            className="flex flex-col gap-3 text-[13px] sm:col-span-5"
-          >
-            <Ledger k="legacy price" v="$0.085–$0.17 / GB" />
-            <Ledger k="delivery model" v="fixed provisioning" />
-            <Ledger k="counterparties" v="3 hyperscalers" />
-            <Ledger k="subscription" v="monthly, flat" />
-            <Ledger k="sovereignty" v="custodial" />
-          </ul>
-        </div>
+        <p
+          data-reveal
+          style={{
+            color: "rgb(255 255 255 / 0.75)",
+            ["--reveal-delay" as string]: "120ms",
+          }}
+          className="max-w-[62ch] text-[14px] leading-[1.7] sm:text-[15px]"
+        >
+          the pattern repeats whenever something big ships: mirrors fork, cdns
+          rate-limit, small teams burn tens of thousands hosting bytes they
+          don&apos;t own. deCDN inverts every axis — same delivery, different
+          physics.
+        </p>
       </div>
 
-      <div data-reveal className="mt-auto flex flex-col gap-5 pt-12">
-        <div className="flex flex-col gap-2">
-          <span className="meta opacity-60">before</span>
-          <div
-            className="hug relative inline-flex font-semibold tracking-[-0.05em]"
-            style={{
-              fontSize: "clamp(40px, 8vw, 112px)",
-              lineHeight: "0.92",
-            }}
-          >
-            <span className="relative">
-              $0.085–$0.17/GB
+      <div className="mt-auto flex flex-col pt-12">
+        <div
+          data-reveal
+          style={{ ["--reveal-delay" as string]: "260ms" }}
+          className="grid grid-cols-1 gap-2 pb-3 sm:grid-cols-12 sm:gap-8"
+        >
+          <div className="meta opacity-0 sm:col-span-2 sm:block">axis</div>
+          <div className="meta opacity-55 sm:col-span-5">legacy cdn</div>
+          <div className="meta sm:col-span-5">
+            decdn
+            <span className="ml-2 opacity-60">/ peer-to-peer</span>
+          </div>
+        </div>
+
+        {/* big price row */}
+        <div
+          data-reveal
+          style={{ ["--reveal-delay" as string]: "340ms" }}
+          className="grid grid-cols-1 gap-3 border-t border-current/25 py-5 sm:grid-cols-12 sm:gap-8 sm:py-8"
+        >
+          <div className="meta opacity-60 sm:col-span-2 sm:pt-2">price</div>
+          <div className="sm:col-span-5">
+            <div
+              className="hug relative inline-flex font-semibold tracking-[-0.04em]"
+              style={{
+                fontSize: "clamp(26px, 5.5vw, 64px)",
+                lineHeight: "0.96",
+              }}
+            >
+              <span className="opacity-55">
+                $0.085–$0.17
+                <span className="meta ml-1 align-baseline opacity-70">/GB</span>
+              </span>
               <span
                 aria-hidden
-                className="absolute inset-x-0 top-1/2 h-[4px] -translate-y-1/2 sm:h-[6px]"
+                className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 sm:h-[4px]"
                 style={{ background: "var(--paper)" }}
               />
-            </span>
+            </div>
+          </div>
+          <div className="sm:col-span-5">
+            <div
+              className="hug font-semibold tracking-[-0.04em]"
+              style={{
+                fontSize: "clamp(26px, 5.5vw, 64px)",
+                lineHeight: "0.96",
+              }}
+            >
+              $0.01
+              <span className="meta ml-1 align-baseline opacity-70">/GB</span>
+            </div>
           </div>
         </div>
-        <div className="flex flex-col gap-2 pl-[4vw]">
-          <span className="meta">after · decdn</span>
-          <div
-            className="hug font-semibold tracking-[-0.05em]"
-            style={{
-              fontSize: "clamp(48px, 11vw, 160px)",
-              lineHeight: "0.9",
-            }}
-          >
-            <span aria-hidden className="pr-3 opacity-60">
-              →
-            </span>
-            $0.01/GB
-          </div>
-        </div>
+
+        <ComparisonRow
+          label="delivery"
+          legacy="fixed provisioning"
+          decdn="demand-shaped mesh"
+          delay={420}
+        />
+        <ComparisonRow
+          label="billing"
+          legacy="monthly minimums, annual contracts"
+          decdn="per megabyte, in usdc"
+          delay={480}
+        />
+        <ComparisonRow
+          label="operators"
+          legacy="three hyperscalers"
+          decdn="anyone with a node"
+          delay={540}
+        />
+        <ComparisonRow
+          label="integrity"
+          legacy="trust the origin"
+          decdn="blake3, verify every chunk"
+          delay={600}
+        />
+        <ComparisonRow
+          label="failure"
+          legacy="pop dies, region 503s"
+          decdn="peer drops, stream continues"
+          delay={660}
+        />
+        <ComparisonRow
+          label="scaling"
+          legacy="gets more expensive"
+          decdn="gets cheaper"
+          delay={720}
+        />
       </div>
     </section>
   );
