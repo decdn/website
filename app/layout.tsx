@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { links } from "@/lib/links";
-import { Chrome } from "@/components/Chrome";
-import { ScrollReveal } from "@/components/ScrollReveal";
+import { Chrome } from "@/components/site/Chrome";
+import { ScrollReveal } from "@/components/site/ScrollReveal";
 import "./globals.css";
 
 const geistSans = Geist({
