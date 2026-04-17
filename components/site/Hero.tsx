@@ -8,7 +8,7 @@ export function Hero() {
     <section
       id="s-01"
       aria-labelledby="s-01-h"
-      className="relative flex min-h-[100svh] scroll-mt-[-48px] flex-col overflow-hidden bg-[var(--paper)] px-4 pt-24 pb-12 text-[var(--ink)] sm:px-10 sm:pt-28 sm:pb-16"
+      className="relative flex min-h-[100svh] scroll-mt-[-48px] flex-col overflow-hidden bg-[var(--paper)] px-6 pt-24 pb-12 text-[var(--ink)] sm:px-16 sm:pt-28 sm:pb-16"
     >
       <HeroTerminal className="pointer-events-none absolute top-[24rem] right-4 z-0 hidden w-[min(44vw,520px)] sm:top-[30rem] sm:right-8 md:block" />
 

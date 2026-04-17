@@ -7,7 +7,7 @@ export function Close() {
     <section
       id="s-05"
       aria-labelledby="s-05-h"
-      className="relative flex min-h-[100svh] scroll-mt-[-48px] flex-col overflow-hidden bg-[var(--paper)] px-4 pt-24 pb-10 text-[var(--ink)] sm:px-10 sm:pt-28 sm:pb-12"
+      className="relative flex min-h-[100svh] scroll-mt-[-48px] flex-col overflow-hidden bg-[var(--paper)] px-6 pt-24 pb-10 text-[var(--ink)] sm:px-16 sm:pt-28 sm:pb-12"
     >
       <FleetStatus className="absolute top-44 right-6 z-0 hidden w-[min(54vw,640px)] sm:top-52 sm:right-20 md:block" />
 

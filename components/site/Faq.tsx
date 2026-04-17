@@ -6,7 +6,7 @@ export function Faq() {
     <section
       id="s-04"
       aria-labelledby="s-04-h"
-      className="relative flex min-h-[100svh] scroll-mt-[-48px] flex-col bg-[var(--ink)] px-4 pt-24 pb-12 text-[var(--paper)] sm:px-10 sm:pt-28 sm:pb-16"
+      className="relative flex min-h-[100svh] scroll-mt-[-48px] flex-col bg-[var(--ink)] px-6 pt-24 pb-12 text-[var(--paper)] sm:px-16 sm:pt-28 sm:pb-16"
     >
       <SectionHeader index="04" label="FAQ" timestamp="field notes" />
 
