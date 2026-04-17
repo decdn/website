@@ -9,8 +9,6 @@ export function Close() {
       aria-labelledby="s-05-h"
       className="relative flex min-h-[100svh] scroll-mt-[-48px] flex-col overflow-hidden bg-[var(--paper)] px-6 pt-24 pb-10 text-[var(--ink)] sm:px-16 sm:pt-28 sm:pb-12"
     >
-      <FleetStatus className="absolute top-44 right-6 z-0 hidden w-[min(54vw,640px)] sm:top-52 sm:right-20 md:block" />
-
       <div className="relative z-10 flex w-full flex-1 flex-col">
         <SectionHeader
           index="05"
@@ -81,6 +79,8 @@ export function Close() {
             </a>
           </div>
         </div>
+
+        <FleetStatus className="mt-10 block w-full md:absolute md:top-24 md:right-4 md:z-0 md:mt-0 md:w-[min(54vw,640px)]" />
 
         <footer className="mt-auto flex flex-col gap-3 pt-16">
           <span aria-hidden className="rule opacity-40" />

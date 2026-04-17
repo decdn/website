@@ -10,8 +10,6 @@ export function Hero() {
       aria-labelledby="s-01-h"
       className="relative flex min-h-[100svh] scroll-mt-[-48px] flex-col overflow-hidden bg-[var(--paper)] px-6 pt-24 pb-12 text-[var(--ink)] sm:px-16 sm:pt-28 sm:pb-16"
     >
-      <HeroTerminal className="pointer-events-none absolute top-[24rem] right-4 z-0 hidden w-[min(44vw,520px)] sm:top-[30rem] sm:right-8 md:block" />
-
       <div className="relative z-10 flex w-full flex-1 flex-col">
         <SectionHeader
           index="01"
@@ -92,6 +90,8 @@ export function Hero() {
             </a>
           </div>
         </div>
+
+        <HeroTerminal className="mt-10 block w-full md:pointer-events-none md:absolute md:top-[23rem] md:right-[-2rem] md:z-0 md:mt-0 md:w-[min(44vw,520px)]" />
 
         <div className="rise rise-5 mt-12 grid grid-cols-2 gap-y-4 sm:grid-cols-4">
           <Figure k="target price" v="$0.01/GB" />

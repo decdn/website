@@ -44,13 +44,15 @@ export function Comparison() {
         <div
           data-reveal
           style={{ ["--reveal-delay" as string]: "260ms" }}
-          className="grid grid-cols-1 gap-2 pb-3 sm:grid-cols-12 sm:gap-8"
+          className="grid gap-2 pb-3 sm:grid-cols-12 sm:gap-8"
         >
           <div className="meta opacity-0 sm:col-span-2 sm:block">axis</div>
-          <div className="meta opacity-55 sm:col-span-5">legacy cdn</div>
-          <div className="meta sm:col-span-5">
-            decdn
-            <span className="ml-2 opacity-60">/ peer-to-peer</span>
+          <div className="grid grid-cols-2 gap-4 sm:contents">
+            <div className="meta opacity-55 sm:col-span-5">legacy cdn</div>
+            <div className="meta sm:col-span-5">
+              decdn
+              <span className="ml-2 opacity-60">/ peer-to-peer</span>
+            </div>
           </div>
         </div>
 
@@ -58,38 +60,42 @@ export function Comparison() {
         <div
           data-reveal
           style={{ ["--reveal-delay" as string]: "340ms" }}
-          className="grid grid-cols-1 gap-3 border-t border-current/25 py-5 sm:grid-cols-12 sm:gap-8 sm:py-8"
+          className="grid gap-3 border-t border-current/25 py-5 sm:grid-cols-12 sm:gap-8 sm:py-8"
         >
           <div className="meta opacity-60 sm:col-span-2 sm:pt-2">price</div>
-          <div className="sm:col-span-5">
-            <div
-              className="hug relative inline-flex font-semibold tracking-[-0.04em]"
-              style={{
-                fontSize: "clamp(26px, 5.5vw, 64px)",
-                lineHeight: "0.96",
-              }}
-            >
-              <span className="opacity-55">
-                $0.085–$0.17
-                <span className="meta ml-1 align-baseline opacity-70">/GB</span>
-              </span>
-              <span
-                aria-hidden
-                className="absolute inset-x-0 top-1/2 h-[3px] -translate-y-1/2 sm:h-[4px]"
-                style={{ background: "var(--paper)" }}
-              />
+          <div className="grid grid-cols-2 gap-4 sm:contents">
+            <div className="sm:col-span-5">
+              <div
+                className="hug relative inline-flex font-semibold tracking-[-0.04em]"
+                style={{
+                  fontSize: "clamp(18px, 5vw, 64px)",
+                  lineHeight: "0.96",
+                }}
+              >
+                <span className="opacity-55">
+                  $0.085–$0.17
+                  <span className="meta ml-1 align-baseline opacity-70">
+                    /GB
+                  </span>
+                </span>
+                <span
+                  aria-hidden
+                  className="absolute inset-x-0 top-1/2 h-[2px] -translate-y-1/2 sm:h-[4px]"
+                  style={{ background: "var(--paper)" }}
+                />
+              </div>
             </div>
-          </div>
-          <div className="sm:col-span-5">
-            <div
-              className="hug font-semibold tracking-[-0.04em]"
-              style={{
-                fontSize: "clamp(26px, 5.5vw, 64px)",
-                lineHeight: "0.96",
-              }}
-            >
-              $0.01
-              <span className="meta ml-1 align-baseline opacity-70">/GB</span>
+            <div className="sm:col-span-5">
+              <div
+                className="hug font-semibold tracking-[-0.04em]"
+                style={{
+                  fontSize: "clamp(18px, 5vw, 64px)",
+                  lineHeight: "0.96",
+                }}
+              >
+                $0.01
+                <span className="meta ml-1 align-baseline opacity-70">/GB</span>
+              </div>
             </div>
           </div>
         </div>
