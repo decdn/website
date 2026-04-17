@@ -62,8 +62,9 @@ export function Chrome() {
                 <a
                   href={`#${item.id}`}
                   aria-current={isActive ? "true" : undefined}
-                  className="meta no-underline transition-opacity"
-                  style={{ opacity: isActive ? 1 : 0.55 }}
+                  className={`meta inline-block origin-center no-underline transition duration-200 hover:scale-[1.1] hover:opacity-100 ${
+                    isActive ? "opacity-100" : "opacity-55"
+                  }`}
                 >
                   {item.label}
                 </a>
