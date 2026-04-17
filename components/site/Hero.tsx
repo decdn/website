@@ -95,7 +95,7 @@ export function Hero() {
         <div className="rise rise-5 mt-12 grid grid-cols-2 gap-y-4 sm:grid-cols-4">
           <Figure k="target price" v="$0.01/GB" />
           <Figure k="p50 latency" v="50–100 ms" />
-          <Figure k="margin" v="64–83%" />
+          <Figure k="settlement" v="per-MB · usdc" />
           <Figure k="gas overhead" v="<1%" />
         </div>
       </div>
