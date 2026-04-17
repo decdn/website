@@ -1,12 +1,12 @@
-export function Figure({ k, v }: { k: string; v: string }) {
+export function Figure({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-1">
-      <span className="meta opacity-60">{k}</span>
+      <span className="meta opacity-60">{label}</span>
       <span
         className="text-[15px] font-medium tabular-nums sm:text-[17px]"
         style={{ letterSpacing: "-0.01em" }}
       >
-        {v}
+        {value}
       </span>
     </div>
   );

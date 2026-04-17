@@ -20,16 +20,34 @@ export function Chrome() {
     );
     if (nodes.length === 0) return;
 
+    // Track intersection ratio for every observed section across callbacks —
+    // IO only delivers entries whose intersection changed, so using `entries`
+    // alone can flicker when the most-visible section didn't change this tick.
+    const visibility = new Map<(typeof SECTION_IDS)[number], number>(
+      SECTION_IDS.map((id) => [id, 0]),
+    );
+
     const io = new IntersectionObserver(
       (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-        if (visible.length === 0) return;
-        const id = visible[0].target.id;
-        if ((SECTION_IDS as readonly string[]).includes(id)) {
-          setActive(id as (typeof SECTION_IDS)[number]);
+        for (const entry of entries) {
+          const { id } = entry.target;
+          if ((SECTION_IDS as readonly string[]).includes(id)) {
+            visibility.set(
+              id as (typeof SECTION_IDS)[number],
+              entry.isIntersecting ? entry.intersectionRatio : 0,
+            );
+          }
         }
+
+        let next: (typeof SECTION_IDS)[number] | null = null;
+        let maxRatio = 0;
+        visibility.forEach((ratio, id) => {
+          if (ratio > maxRatio) {
+            maxRatio = ratio;
+            next = id;
+          }
+        });
+        if (next !== null) setActive(next);
       },
       { threshold: [0.3, 0.6] },
     );

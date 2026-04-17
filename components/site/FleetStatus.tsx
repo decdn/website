@@ -42,7 +42,7 @@ export function FleetStatus({ className }: { className?: string }) {
               <span
                 className={
                   n.active
-                    ? `fleet-pulse fleet-pulse-active pulse-${i}`
+                    ? `fleet-pulse fleet-pulse-active pulse-${i % 6}`
                     : "fleet-pulse"
                 }
               />

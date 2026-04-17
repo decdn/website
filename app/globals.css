@@ -158,7 +158,10 @@ body {
 
 @supports (animation-timeline: view()) {
   [data-reveal] {
-    animation: reveal-wipe linear both;
+    /* Duration is nominally ignored when animation-timeline is active, but
+       some engines treat duration 0 as "animation not running," so keep an
+       explicit non-zero duration for safety. */
+    animation: reveal-wipe 1s linear both;
     animation-timeline: view();
     animation-range: entry 8% cover 28%;
     transition: none;
@@ -214,7 +217,7 @@ a.underline-brutal:hover .arrow {
 
 /* --- hero terminal -----------------------------------------------------
    Mocks a single decdn CLI session: probe → stream → verify → settle.
-   All lines share one 6.5s loop; each line fades in at its own delay.
+   All lines share one 4.5s loop; each line fades in at its own delay.
    Progress bar fills during the "streaming" phase. Cursor blinks
    independently. One terminal session restarts every cycle. */
 

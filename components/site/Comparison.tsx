@@ -27,11 +27,8 @@ export function Comparison() {
 
         <p
           data-reveal
-          style={{
-            color: "rgb(255 255 255 / 0.75)",
-            ["--reveal-delay" as string]: "120ms",
-          }}
-          className="max-w-[62ch] text-[15px] leading-[1.7] sm:text-[17px]"
+          style={{ ["--reveal-delay" as string]: "120ms" }}
+          className="max-w-[62ch] text-[15px] leading-[1.7] text-paper/75 sm:text-[17px]"
         >
           the pattern repeats whenever something big ships: mirrors fork, cdns
           rate-limit, small teams burn tens of thousands hosting bytes they

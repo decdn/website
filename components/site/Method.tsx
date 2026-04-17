@@ -65,10 +65,10 @@ export function Method() {
           <span>arbitrum</span>
         </div>
         <div className="mt-5 grid grid-cols-2 gap-y-4 sm:grid-cols-4">
-          <Figure k="language" v="rust" />
-          <Figure k="transport" v="quic / iroh" />
-          <Figure k="settlement" v="arbitrum" />
-          <Figure k="currency" v="usdc · token" />
+          <Figure label="language" value="rust" />
+          <Figure label="transport" value="quic / iroh" />
+          <Figure label="settlement" value="arbitrum" />
+          <Figure label="currency" value="usdc · token" />
         </div>
       </div>
     </section>
