@@ -1,49 +1,248 @@
 @import "tailwindcss";
 
 :root {
-  --color-canvas: #ffffff;
-  --color-surface: #fafafa;
-  --color-ink: #0a0a0b;
-  --color-muted: #5a5a63;
-  --color-line: #e6e6ea;
-  --color-accent: #0f9d6a;
-  --color-accent-fg: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-canvas: #0a0a0b;
-    --color-surface: #111114;
-    --color-ink: #ededee;
-    --color-muted: #8a8a93;
-    --color-line: #1f1f24;
-    --color-accent: #7cf6c4;
-    --color-accent-fg: #06231a;
-  }
+  --color-bg: #07120d;
+  --color-bg-elevated: #0c1a13;
+  --color-grid: #0f2219;
+  --color-line: #1a332a;
+  --color-line-strong: #27493b;
+  --color-ink: #d8f5e6;
+  --color-muted: #6f8d7c;
+  --color-phosphor: #7cf6c4;
+  --color-phosphor-dim: #2ea07a;
+  --color-amber: #f4c370;
+  --color-rose: #ff7a93;
 }
 
 @theme inline {
-  --color-canvas: var(--color-canvas);
-  --color-surface: var(--color-surface);
+  --color-bg: var(--color-bg);
+  --color-bg-elevated: var(--color-bg-elevated);
+  --color-grid: var(--color-grid);
+  --color-line: var(--color-line);
+  --color-line-strong: var(--color-line-strong);
   --color-ink: var(--color-ink);
   --color-muted: var(--color-muted);
-  --color-line: var(--color-line);
-  --color-accent: var(--color-accent);
-  --color-accent-fg: var(--color-accent-fg);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-phosphor: var(--color-phosphor);
+  --color-phosphor-dim: var(--color-phosphor-dim);
+  --color-amber: var(--color-amber);
+  --color-rose: var(--color-rose);
+  --font-display: var(--font-display);
+  --font-mono: var(--font-mono);
+}
+
+html,
+body {
+  background: var(--color-bg);
+  color: var(--color-ink);
 }
 
 body {
-  background: var(--color-canvas);
-  color: var(--color-ink);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
   font-feature-settings:
     "ss01" on,
-    "cv11" on;
+    "calt" on;
+  font-size: 14px;
+  line-height: 1.55;
+  letter-spacing: 0.01em;
+  position: relative;
+}
+
+/* Subtle phosphor grid backdrop. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--color-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: -1px -1px;
+  mask-image: radial-gradient(
+    ellipse at 50% 30%,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.35) 60%,
+    transparent 100%
+  );
+}
+
+/* CRT scanlines overlay. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(124, 246, 196, 0.045) 0px,
+    rgba(124, 246, 196, 0.045) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: screen;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  body::after {
+    animation: scan 9s linear infinite;
+  }
+}
+
+@keyframes scan {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 64px;
+  }
 }
 
 ::selection {
-  background: var(--color-accent);
-  color: var(--color-accent-fg);
+  background: var(--color-phosphor);
+  color: #04140c;
+}
+
+/* Reusable blinking block cursor. */
+.cursor::after {
+  content: "▮";
+  display: inline-block;
+  margin-left: 0.15em;
+  color: var(--color-phosphor);
+  transform: translateY(-0.05em);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cursor::after {
+    animation: blink 1.05s steps(1) infinite;
+  }
+}
+
+@keyframes blink {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Phosphor glow for display type. */
+.bloom {
+  text-shadow:
+    0 0 2px rgba(124, 246, 196, 0.8),
+    0 0 14px rgba(124, 246, 196, 0.35),
+    0 0 36px rgba(124, 246, 196, 0.18);
+}
+
+.bloom-amber {
+  text-shadow:
+    0 0 2px rgba(244, 195, 112, 0.75),
+    0 0 14px rgba(244, 195, 112, 0.3);
+}
+
+/* CRT display title with chromatic aberration. */
+.crt-title {
+  color: var(--color-phosphor);
+  text-shadow:
+    0 0 2px rgba(124, 246, 196, 0.9),
+    0 0 18px rgba(124, 246, 196, 0.4),
+    1px 0 0 rgba(255, 122, 147, 0.55),
+    -1px 0 0 rgba(108, 205, 255, 0.55);
+}
+
+/* Boot-sequence type-in lines. */
+.boot-line {
+  opacity: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .boot-line {
+    animation:
+      type-in 0.45s steps(48, end) forwards,
+      fade-in 0.2s linear forwards;
+  }
+  .boot-line[data-delay="1"] {
+    animation-delay: 0.1s, 0.1s;
+  }
+  .boot-line[data-delay="2"] {
+    animation-delay: 0.55s, 0.55s;
+  }
+  .boot-line[data-delay="3"] {
+    animation-delay: 1s, 1s;
+  }
+  .boot-line[data-delay="4"] {
+    animation-delay: 1.45s, 1.45s;
+  }
+  .boot-line[data-delay="5"] {
+    animation-delay: 1.9s, 1.9s;
+  }
+
+  .reveal {
+    opacity: 0;
+    animation: fade-in 0.4s ease-out forwards;
+    animation-delay: 2.3s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boot-line,
+  .reveal {
+    opacity: 1;
+  }
+}
+
+@keyframes type-in {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Cell hover phosphor bloom. */
+.cell {
+  transition:
+    background-color 180ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease;
+}
+
+.cell:hover {
+  background: var(--color-bg-elevated);
+  box-shadow:
+    inset 0 0 0 1px var(--color-phosphor-dim),
+    0 0 24px -8px rgba(124, 246, 196, 0.45);
+}
+
+/* ASCII diagram box — preserves whitespace, preserves rhythm. */
+.ascii {
+  font-family: var(--font-mono), monospace;
+  white-space: pre;
+  color: var(--color-phosphor-dim);
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+
+/* Focus ring reused across interactive elements. */
+.ring-phosphor:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--color-bg),
+    0 0 0 4px var(--color-phosphor);
 }

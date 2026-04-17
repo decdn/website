@@ -4,12 +4,15 @@ import { Mono } from "@/components/ui/Mono";
 type Step = {
   n: string;
   title: string;
+  proc: string;
   body: React.ReactNode;
+  gauge: string;
 };
 
 const steps: Step[] = [
   {
     n: "01",
+    proc: "stake.advertise",
     title: "Nodes stake and advertise",
     body: (
       <>
@@ -17,20 +20,24 @@ const steps: Step[] = [
         supported content over a gossip mesh. Slashing keeps them honest.
       </>
     ),
+    gauge: "████████████░░░░░░░░",
   },
   {
     n: "02",
+    proc: "probe.rank",
     title: "Clients probe and rank",
     body: (
       <>
         A client probes candidate nodes and picks the best by{" "}
-        <Mono>rate_per_mb × rtt_ms</Mono>. No central registry; the mesh
+        <Mono>rate_per_mb × rtt_ms</Mono>. No central registry — the mesh
         decides.
       </>
     ),
+    gauge: "█████████████████░░░",
   },
   {
     n: "03",
+    proc: "encrypt.deliver",
     title: "Encrypted delivery",
     body: (
       <>
@@ -38,9 +45,11 @@ const steps: Step[] = [
         <Mono>BLAKE3</Mono>-addressed ciphertext — they never see plaintext.
       </>
     ),
+    gauge: "██████████████░░░░░░",
   },
   {
     n: "04",
+    proc: "meter.settle",
     title: "Metered payment",
     body: (
       <>
@@ -48,29 +57,84 @@ const steps: Step[] = [
         Watchtowers monitor disputes non-custodially so settlement stays cheap.
       </>
     ),
+    gauge: "██████████████████░░",
   },
 ];
 
+const asciiFlow = String.raw`
+  ┌─────────┐        ┌───────────┐        ┌──────────────┐        ┌───────────┐
+  │ client  │ ─prb─▶ │ mesh probe│ ─rnk─▶ │ picked peer  │ ─get─▶ │ delivery  │
+  └─────────┘        └───────────┘        └──────────────┘        └───────────┘
+        │                                        │                       │
+        │                                        ▼                       ▼
+        │                                 ┌──────────────┐        ┌───────────┐
+        └────── pay-per-mb, off-chain ───▶│ usdc channel │ ─stl─▶ │ settle L2 │
+                                          └──────────────┘        └───────────┘
+`;
+
 export function HowItWorks() {
   return (
-    <Section id="how" eyebrow="How it works">
-      <h2 className="max-w-2xl text-3xl font-semibold leading-tight tracking-tight sm:text-4xl">
-        Cache-addressed content, metered delivery.
+    <Section id="how" eyebrow="02 · how it works">
+      <h2 className="font-display max-w-3xl text-4xl leading-[0.95] tracking-wide text-[color:var(--color-ink)] uppercase sm:text-6xl">
+        Cache-addressed content,
+        <br />
+        <span className="text-[color:var(--color-phosphor)] bloom">
+          metered delivery.
+        </span>
       </h2>
-      <div className="mt-16 grid gap-px overflow-hidden rounded-lg border border-line bg-line sm:grid-cols-2">
-        {steps.map((s) => (
-          <div
+
+      <pre
+        aria-hidden="true"
+        className="ascii mt-12 hidden overflow-x-auto border border-[color:var(--color-line)] bg-[color:var(--color-bg-elevated)]/60 p-6 text-[11px] md:block"
+      >
+        {asciiFlow.trim()}
+      </pre>
+
+      <div className="mt-10 grid gap-px border border-[color:var(--color-line)] bg-[color:var(--color-line)] sm:grid-cols-2">
+        {steps.map((s, i) => (
+          <article
             key={s.n}
-            className="flex flex-col gap-3 bg-canvas p-8 transition-colors hover:bg-surface"
+            className="cell flex flex-col gap-4 border-[color:var(--color-line)] bg-[color:var(--color-bg)] p-8"
           >
-            <span className="font-mono text-xs tracking-[0.18em] text-accent">
-              {s.n}
-            </span>
-            <h3 className="text-lg font-semibold tracking-tight text-ink">
+            <header className="flex items-center justify-between font-mono text-[11px] tracking-[0.18em] uppercase">
+              <span className="text-[color:var(--color-muted)]">
+                <span className="text-[color:var(--color-phosphor-dim)]">
+                  [
+                </span>
+                <span className="text-[color:var(--color-amber)]">
+                  {s.n}/04
+                </span>
+                <span className="text-[color:var(--color-phosphor-dim)]">
+                  ]
+                </span>
+                <span className="mx-2 text-[color:var(--color-muted)]">
+                  PROC
+                </span>
+                <span className="text-[color:var(--color-phosphor)]">
+                  {s.proc}
+                </span>
+              </span>
+              <span className="text-[color:var(--color-phosphor-dim)]">
+                pid·{1041 + i}
+              </span>
+            </header>
+            <h3 className="font-display text-2xl leading-tight tracking-wide text-[color:var(--color-ink)] uppercase">
               {s.title}
             </h3>
-            <p className="text-sm leading-relaxed text-muted">{s.body}</p>
-          </div>
+            <p className="text-[13px] leading-relaxed text-[color:var(--color-ink)]/80">
+              {s.body}
+            </p>
+            <div className="mt-auto flex items-center gap-3 pt-4 font-mono text-[10px] tracking-[0.18em] uppercase">
+              <span className="text-[color:var(--color-muted)]">load</span>
+              <span
+                aria-hidden="true"
+                className="text-[color:var(--color-phosphor)]"
+              >
+                {s.gauge}
+              </span>
+              <span className="text-[color:var(--color-phosphor-dim)]">OK</span>
+            </div>
+          </article>
         ))}
       </div>
     </Section>

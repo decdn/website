@@ -7,7 +7,9 @@ type Props = {
 
 export function Mono({ children, className }: Props) {
   return (
-    <span className={`font-mono text-[0.95em] ${className ?? ""}`}>
+    <span
+      className={`font-mono text-[0.95em] text-[color:var(--color-amber)] ${className ?? ""}`}
+    >
       {children}
     </span>
   );
