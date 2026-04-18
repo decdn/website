@@ -12,7 +12,7 @@ export function Method() {
       <SectionHeader
         index="03"
         label="How it works"
-        timestamp="probe · stream · settle"
+        timestamp="probe · swarm · settle"
       />
 
       <h2 id="s-03-h" className="sr-only">
@@ -24,19 +24,19 @@ export function Method() {
           n="01"
           word="probe"
           delay={0}
-          body="the client broadcasts a blake3 hash over quic 0-rtt. within thirty milliseconds every nearby node answers with what it has, what it charges, and how fast it can serve. the client picks one — or several in parallel — by reputation, stake, and the price the operator is willing to quote today."
+          body="a single quic 0-rtt handshake broadcasts the blake3 hash to a kademlia dht of nearby peers. each node answers with what it has cached, its current rate per megabyte, and how fast it can serve — p50 under 100 milliseconds. the client ranks the answers by price, latency, and reputation; the best-priced, fastest, most-reputable node wins the request, or several win in parallel for a large file."
         />
         <MethodRow
           n="02"
-          word="stream"
+          word="swarm"
           delay={120}
-          body="the winning node streams chunks as fast as its uplink can move them; for large payloads the client pulls from several nodes in parallel. each chunk is verified the moment it arrives — mismatched bytes are discarded and re-pulled from the next peer on the list. a node that returns garbage loses its staked token on the spot. trust no node — verify each one."
+          body="bytes flow over quic directly from the chosen node; for files over ten gigabytes the client opens parallel streams to several peers at once and aggregates their throughput — a 1 gbps origin turns into multi-gigabit delivery to the client. every chunk is verified against the blake3 tree hash the instant it lands; tampered bytes trigger immediate disconnect and a fraud proof against the node's stake. trust no node — verify every byte."
         />
         <MethodRow
           n="03"
           word="settle"
           delay={240}
-          body="payment happens per megabyte, in usdc, through an off-chain channel opened at session start. operators hold real stable currency they can spend on electricity and bandwidth. the channel settles on-chain at session close — chain-agnostic by design, gas a rounding error next to the bytes delivered."
+          body="you pay per megabyte in usdc, automatically, as the bytes arrive — no monthly invoice, no subscription, no whole-file minimum. pay for what you pulled, nothing more."
         />
       </div>
 
