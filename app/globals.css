@@ -1,49 +1,665 @@
 @import "tailwindcss";
 
 :root {
-  --color-canvas: #ffffff;
-  --color-surface: #fafafa;
-  --color-ink: #0a0a0b;
-  --color-muted: #5a5a63;
-  --color-line: #e6e6ea;
-  --color-accent: #0f9d6a;
-  --color-accent-fg: #ffffff;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-canvas: #0a0a0b;
-    --color-surface: #111114;
-    --color-ink: #ededee;
-    --color-muted: #8a8a93;
-    --color-line: #1f1f24;
-    --color-accent: #7cf6c4;
-    --color-accent-fg: #06231a;
-  }
+  --ink: #000000;
+  --paper: #ffffff;
+  --whisper: #0f9d6a;
 }
 
 @theme inline {
-  --color-canvas: var(--color-canvas);
-  --color-surface: var(--color-surface);
-  --color-ink: var(--color-ink);
-  --color-muted: var(--color-muted);
-  --color-line: var(--color-line);
-  --color-accent: var(--color-accent);
-  --color-accent-fg: var(--color-accent-fg);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-whisper: var(--whisper);
   --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
 }
 
+html {
+  /* Opt out of browser / OS / extension forced-dark overrides. The page
+     declares its own per-section background; UA chrome (scrollbars, form
+     controls) should stay in the light scheme. */
+  color-scheme: light;
+}
+
+html,
 body {
-  background: var(--color-canvas);
-  color: var(--color-ink);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  background: var(--ink);
+  color: var(--paper);
+  font-family:
+    var(--font-geist-sans),
+    ui-sans-serif,
+    system-ui,
+    -apple-system,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
   font-feature-settings:
     "ss01" on,
-    "cv11" on;
+    "ss02" on,
+    "zero" on,
+    "calt" on;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: var(--color-accent);
-  color: var(--color-accent-fg);
+  background: var(--whisper);
+  color: var(--ink);
+}
+
+/* --- utilities --------------------------------------------------------- */
+
+.rule {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+}
+
+.rule-2 {
+  height: 2px;
+}
+
+.meta {
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1.2;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.blend {
+  color: #ffffff;
+  mix-blend-mode: difference;
+  pointer-events: auto;
+}
+
+.hug {
+  font-feature-settings:
+    "ss01" on,
+    "zero" on;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.04em;
+}
+
+/* --- page-load cascade ------------------------------------------------- */
+
+@keyframes brutal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise {
+  opacity: 0;
+  animation: brutal-rise 700ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.rise-0 {
+  animation-delay: 0ms;
+}
+.rise-1 {
+  animation-delay: 120ms;
+}
+.rise-2 {
+  animation-delay: 180ms;
+}
+.rise-3 {
+  animation-delay: 260ms;
+}
+.rise-4 {
+  animation-delay: 340ms;
+}
+.rise-5 {
+  animation-delay: 420ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise,
+  .rise-0,
+  .rise-1,
+  .rise-2,
+  .rise-3,
+  .rise-4,
+  .rise-5 {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --- scroll-triggered reveals ----------------------------------------
+   Two-tier strategy:
+   1. Fallback: opacity+translate transition, fired once per element by
+      the ScrollReveal IntersectionObserver (sets data-revealed="true").
+   2. Modern browsers: animation-timeline: view() ties the reveal
+      progress directly to scroll position — text materialises as the
+      element crosses the viewport, not on a timer. */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+[data-reveal][data-revealed="true"] {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@supports (animation-timeline: view()) {
+  [data-reveal] {
+    /* Duration is nominally ignored when animation-timeline is active, but
+       some engines treat duration 0 as "animation not running," so keep an
+       explicit non-zero duration for safety. */
+    animation: reveal-wipe 1s linear both;
+    animation-timeline: view();
+    animation-range: entry 8% cover 28%;
+    transition: none;
+  }
+}
+
+@keyframes reveal-wipe {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 72px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal],
+  [data-reveal][data-revealed="true"] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+    animation: none;
+  }
+}
+
+/* --- link treatment ---------------------------------------------------- */
+
+a.underline-brutal {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: inherit;
+  text-decoration: none;
+  padding-bottom: 2px;
+  border-bottom: 1px solid currentColor;
+  transition: letter-spacing 220ms ease;
+}
+
+a.underline-brutal:hover {
+  letter-spacing: 0.02em;
+}
+
+a.underline-brutal .arrow {
+  transition: transform 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+a.underline-brutal:hover .arrow {
+  transform: translateX(4px);
+}
+
+/* --- hero terminal -----------------------------------------------------
+   Mocks a single decdn CLI session: probe → stream → verify → settle.
+   All lines share one 4.5s loop; each line fades in at its own delay.
+   Progress bar fills during the "streaming" phase. Cursor blinks
+   independently. One terminal session restarts every cycle. */
+
+.terminal {
+  font-family:
+    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
+    "Courier New", monospace;
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px dashed color-mix(in srgb, var(--ink) 30%, transparent);
+  box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--ink) 12%, transparent);
+}
+
+.terminal-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 30%, transparent);
+}
+
+.terminal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--ink) 20%, transparent);
+  display: inline-block;
+}
+
+.terminal-label {
+  margin-left: 8px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.terminal-body {
+  padding: 18px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.tl {
+  opacity: 0;
+  transform: translateY(2px);
+  animation: term-line 4.5s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+}
+
+.tl-0 {
+  animation-delay: 0s;
+}
+.tl-1 {
+  animation-delay: 0.4s;
+}
+.tl-2 {
+  animation-delay: 0.8s;
+}
+.tl-3 {
+  animation-delay: 1.1s;
+}
+.tl-4 {
+  animation-delay: 2.2s;
+}
+.tl-5 {
+  animation-delay: 2.45s;
+}
+.tl-6 {
+  animation-delay: 2.9s;
+}
+
+@keyframes term-line {
+  0%,
+  1% {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  3% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  80% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.prompt,
+.arrow,
+.ok {
+  color: var(--whisper);
+  margin-right: 6px;
+  font-weight: 600;
+}
+
+.hash {
+  opacity: 0.72;
+}
+
+.dim {
+  opacity: 0.45;
+}
+
+.amount {
+  font-weight: 600;
+}
+
+.progress {
+  display: inline-block;
+  width: 140px;
+  height: 8px;
+  margin-left: 4px;
+  vertical-align: middle;
+  border: 1px solid color-mix(in srgb, var(--ink) 35%, transparent);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill {
+  position: absolute;
+  inset: 0;
+  width: 0%;
+  background: var(--whisper);
+  animation: term-progress 4.5s linear infinite;
+  animation-delay: 1.1s;
+}
+
+@keyframes term-progress {
+  0%,
+  24% {
+    width: 0%;
+  }
+  44% {
+    width: 100%;
+  }
+  80% {
+    width: 100%;
+  }
+  88% {
+    width: 100%;
+    opacity: 0;
+  }
+  100% {
+    width: 0%;
+    opacity: 0;
+  }
+}
+
+.cursor {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  margin-left: 2px;
+  background: var(--ink);
+  vertical-align: text-bottom;
+  animation: term-cursor 1s steps(2, end) infinite;
+}
+
+@keyframes term-cursor {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tl,
+  .progress-fill,
+  .cursor {
+    animation: none;
+    opacity: 1;
+  }
+  .tl {
+    transform: none;
+  }
+  .progress-fill {
+    width: 100%;
+  }
+}
+
+/* --- fleet status panel (§05) -----------------------------------------
+   Sits on the black Close section. Shares the dashed-border "tool
+   panel" vocabulary with .terminal but with an ops-dashboard layout
+   instead of a CLI log: a list of nodes with pulsing serving
+   indicators plus two aggregate stat bars that breathe. */
+
+.fleet {
+  font-family:
+    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
+    "Courier New", monospace;
+  font-size: 11px;
+  line-height: 1.55;
+  color: var(--paper);
+  /* soft top-to-bottom gradient on a mid-charcoal base so the panel
+     reads as a lit surface rather than a heavy ink slab. */
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--paper) 18%, var(--ink)) 0%,
+    color-mix(in srgb, var(--paper) 12%, var(--ink)) 100%
+  );
+  border: 1px dashed color-mix(in srgb, var(--paper) 26%, transparent);
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow:
+    7px 7px 0 0 color-mix(in srgb, var(--ink) 12%, transparent),
+    inset 0 1px 0 0 color-mix(in srgb, var(--paper) 8%, transparent);
+  transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  cursor: default;
+}
+
+.fleet:hover {
+  transform: scale(1.03);
+}
+
+.fleet-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-bottom: 1px dashed color-mix(in srgb, var(--paper) 30%, transparent);
+}
+
+.fleet-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--paper) 20%, transparent);
+  display: inline-block;
+}
+
+.fleet-head-label {
+  margin-left: 8px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+
+.fleet-body {
+  padding: 14px 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.fleet-summary {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.fleet-summary .fleet-value {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.fleet-dim {
+  opacity: 0.5;
+}
+
+.fleet-row {
+  display: grid;
+  grid-template-columns: 56px 14px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 2px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.fleet-code {
+  opacity: 0.85;
+  font-weight: 500;
+}
+
+.fleet-pulse {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--paper) 45%, transparent);
+  display: inline-block;
+  justify-self: center;
+}
+
+.fleet-pulse-active {
+  background: var(--whisper);
+  border: none;
+  animation: fleet-pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes fleet-pulse {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(1);
+    box-shadow: 0 0 0 0 transparent;
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.25);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--whisper) 25%, transparent);
+  }
+}
+
+.pulse-0 {
+  animation-delay: 0s;
+}
+.pulse-1 {
+  animation-delay: 0.27s;
+}
+.pulse-2 {
+  animation-delay: 0.58s;
+}
+.pulse-3 {
+  animation-delay: 0.91s;
+}
+.pulse-4 {
+  animation-delay: 1.22s;
+}
+.pulse-5 {
+  animation-delay: 1.55s;
+}
+
+.fleet-rate {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-align: right;
+}
+
+.fleet-divider {
+  height: 1px;
+  background: color-mix(in srgb, var(--paper) 20%, transparent);
+  margin: 12px 0 6px;
+}
+
+.fleet-agg {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-top: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.fleet-agg .fleet-value {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  font-variant-numeric: tabular-nums;
+}
+
+.fleet-bar {
+  width: 100%;
+  height: 5px;
+  border: 1px solid color-mix(in srgb, var(--paper) 22%, transparent);
+  position: relative;
+  overflow: hidden;
+  margin: 4px 0 4px;
+}
+
+.fleet-bar-fill {
+  position: absolute;
+  inset: 0;
+  width: 70%;
+  background: var(--whisper);
+}
+
+.fb-throughput {
+  animation: fleet-wave 7s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+.fb-revenue {
+  animation: fleet-wave 8.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation-delay: 2.3s;
+}
+
+/* subtle live-data jitter around a steady-state value — not a dramatic
+   breathe. Bar stays in a 72–82% band; the two bars run on different
+   durations + a phase offset so they never sync. */
+@keyframes fleet-wave {
+  0%,
+  100% {
+    width: 74%;
+  }
+  15% {
+    width: 79%;
+  }
+  32% {
+    width: 73%;
+  }
+  48% {
+    width: 81%;
+  }
+  63% {
+    width: 76%;
+  }
+  80% {
+    width: 78%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fleet-pulse-active,
+  .fleet-bar-fill {
+    animation: none;
+  }
+  .fleet-pulse-active {
+    opacity: 1;
+    transform: none;
+    box-shadow: none;
+  }
+  .fleet-bar-fill {
+    width: 80%;
+  }
+}
+
+@media (min-width: 768px) {
+  .terminal {
+    font-size: 13px;
+  }
+  .fleet {
+    font-size: 12px;
+  }
 }

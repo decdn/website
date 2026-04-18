@@ -1,21 +1,19 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist } from "next/font/google";
 import { links } from "@/lib/links";
+import { Chrome } from "@/components/site/Chrome";
+import { ScrollReveal } from "@/components/site/ScrollReveal";
 import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const TITLE = "deCDN — A decentralized CDN paid per megabyte";
+const TITLE = "deCDN — The delivery layer for open information";
 const DESCRIPTION =
-  "Stake-secured P2P nodes serve BLAKE3-addressed content over QUIC. Clients pay per MB in USDC through off-chain channels. No hyperscaler required.";
+  "A peer-to-peer CDN. Anyone can serve bytes; clients pay per megabyte in USDC. ~$0.01/GB — up to 90% cheaper than legacy networks.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(links.site),
@@ -37,16 +35,12 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
   },
-  // Keep noindex while links.site is the placeholder origin.
   robots: { index: false, follow: true },
 };
 
 export const viewport: Viewport = {
-  colorScheme: "light dark",
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0b" },
-  ],
+  colorScheme: "light",
+  themeColor: "#000000",
 };
 
 export default function RootLayout({
@@ -57,9 +51,13 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full motion-safe:scroll-smooth antialiased`}
+      className={`${geistSans.variable} h-full motion-safe:scroll-smooth`}
     >
-      <body className="min-h-full">{children}</body>
+      <body className="min-h-full">
+        <Chrome />
+        <ScrollReveal />
+        {children}
+      </body>
     </html>
   );
 }

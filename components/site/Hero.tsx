@@ -1,44 +1,105 @@
-import { Button } from "@/components/ui/Button";
-import { Mono } from "@/components/ui/Mono";
 import { links } from "@/lib/links";
+import { Figure } from "@/components/ui/Figure";
+import { SectionHeader } from "@/components/ui/SectionHeader";
+import { HeroTerminal } from "@/components/site/HeroTerminal";
 
 export function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.35]"
-        style={{
-          backgroundImage:
-            "radial-gradient(600px circle at 20% 10%, var(--color-accent) 0%, transparent 45%), radial-gradient(500px circle at 85% 40%, var(--color-line) 0%, transparent 55%)",
-        }}
-      />
-      <div className="mx-auto w-full max-w-5xl px-6 pt-24 pb-32 sm:px-8 sm:pt-32 sm:pb-40">
-        <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 font-mono text-xs text-muted">
-          <span
-            className="h-1.5 w-1.5 rounded-full bg-accent"
-            aria-hidden="true"
-          />
-          PoC live on Arbitrum Sepolia
+    <section
+      id="s-01"
+      aria-labelledby="s-01-h"
+      className="relative flex min-h-[100svh] scroll-mt-[-48px] flex-col overflow-hidden bg-[var(--paper)] px-6 pt-24 pb-12 text-[var(--ink)] sm:px-16 sm:pt-28 sm:pb-16"
+    >
+      <div className="relative z-10 flex w-full flex-1 flex-col">
+        <SectionHeader
+          index="01"
+          label="Hero"
+          timestamp="2026-04 · devnet v0.0.0"
+        />
+
+        <div className="mt-auto flex flex-col gap-8 sm:gap-12">
+          <div className="rise rise-0 flex flex-wrap items-center gap-3">
+            <span className="meta inline-flex items-center gap-2">
+              <span
+                aria-hidden
+                className="inline-block h-[8px] w-[8px] rounded-full"
+                style={{ background: "var(--whisper)" }}
+              />
+              <span>live</span>
+            </span>
+            <span className="meta opacity-50" aria-hidden>
+              ·
+            </span>
+            <span className="meta opacity-70">epoch 00042</span>
+            <span className="meta opacity-50" aria-hidden>
+              ·
+            </span>
+            <span className="meta opacity-70">quic / blake3</span>
+          </div>
+
+          <h1
+            id="s-01-h"
+            className="hug flex flex-col font-semibold leading-[0.9] tracking-[-0.04em]"
+            style={{ fontSize: "clamp(40px, 8.4vw, 124px)" }}
+          >
+            <span className="rise rise-1">the delivery layer</span>
+            <span className="rise rise-2 pl-[4vw]">
+              for open<span style={{ color: "var(--whisper)" }}>.</span>
+            </span>
+            <span className="rise rise-2 pl-[8vw]">information.</span>
+          </h1>
+
+          <p className="rise rise-3 max-w-[64ch] text-[15px] leading-[1.65] sm:text-[17px]">
+            a 14-gigabyte file posted in berlin reaches a client in tokyo in
+            under a second. the client streams from three peers at once,
+            verifies every chunk with blake3, and pays per megabyte in usdc —
+            whether the payload is a linux iso, an open dataset, a game patch, a
+            scientific archive, or an ai model.{" "}
+            <span style={{ color: "var(--whisper)" }}>deCDN</span> is
+            demand-shaped, locality-optimised delivery for large files at scale:
+            supply forms around demand, cost collapses as regional traffic
+            concentrates. the code is open. the network is open. the price is
+            posted.
+          </p>
+
+          <div className="rise rise-4 flex flex-col flex-wrap gap-x-8 gap-y-3 sm:flex-row sm:items-end">
+            <a
+              className="underline-brutal text-[12px] font-semibold tracking-[0.14em] uppercase sm:text-[13px]"
+              href={links.whitepaper}
+            >
+              read the whitepaper
+              <span className="arrow" aria-hidden>
+                →
+              </span>
+            </a>
+            <a
+              className="underline-brutal text-[12px] font-semibold tracking-[0.14em] uppercase sm:text-[13px]"
+              href={links.runNode}
+            >
+              run a node
+              <span className="arrow" aria-hidden>
+                →
+              </span>
+            </a>
+            <a
+              className="underline-brutal text-[12px] font-semibold tracking-[0.14em] uppercase opacity-55 hover:opacity-100 sm:text-[13px]"
+              href={links.github}
+            >
+              source
+              <span className="arrow" aria-hidden>
+                →
+              </span>
+            </a>
+          </div>
         </div>
-        <h1 className="max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
-          A decentralized CDN
-          <br className="hidden sm:block" />{" "}
-          <span className="text-muted">paid per megabyte.</span>
-        </h1>
-        <p className="mt-8 max-w-2xl text-lg leading-relaxed text-muted">
-          Stake-secured nodes cache and serve <Mono>BLAKE3</Mono>-addressed
-          content over <Mono>QUIC</Mono>. Clients pay per&nbsp;MB in{" "}
-          <Mono>USDC</Mono> through off-chain payment channels. No hyperscaler
-          required.
-        </p>
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-          <Button href={links.whitepaper} variant="primary">
-            Read the whitepaper
-          </Button>
-          <Button href={links.github} variant="secondary">
-            View on GitHub →
-          </Button>
+
+        <HeroTerminal className="mt-10 block w-full min-[1400px]:pointer-events-none min-[1400px]:absolute min-[1400px]:top-[23rem] min-[1400px]:right-[-2rem] min-[1400px]:z-0 min-[1400px]:mt-0 min-[1400px]:w-[min(44vw,520px)]" />
+
+        <div className="rise rise-5 mt-12 grid grid-cols-2 gap-y-4 sm:grid-cols-4">
+          <Figure label="target price" value="$0.01/GB" />
+          <Figure label="p50 latency" value="50–100 ms" />
+          <Figure label="settlement" value="per-MB · usdc" />
+          <Figure label="gas overhead" value="<1%" />
         </div>
       </div>
     </section>
