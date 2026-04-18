@@ -80,7 +80,7 @@ export function Close() {
           </div>
         </div>
 
-        <FleetStatus className="mt-10 block w-full md:absolute md:top-24 md:right-4 md:z-0 md:mt-0 md:w-[min(54vw,640px)]" />
+        <FleetStatus className="mt-10 block w-full min-[1400px]:absolute min-[1400px]:top-24 min-[1400px]:right-4 min-[1400px]:z-0 min-[1400px]:mt-0 min-[1400px]:w-[min(38vw,540px)]" />
 
         <footer className="mt-auto flex flex-col gap-3 pt-16">
           <span aria-hidden className="rule opacity-40" />

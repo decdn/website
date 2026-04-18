@@ -11,6 +11,15 @@ const NAV = [
   { id: "s-05", label: "Contact" },
 ] as const;
 
+// Ids of sections that paint on a dark background — used to flip the
+// navbar text color per-section instead of relying on
+// `mix-blend-mode: difference`, which silently fails on Safari / iOS
+// when applied to `position: fixed` elements (the nav would vanish).
+const DARK_SECTIONS: ReadonlySet<(typeof SECTION_IDS)[number]> = new Set([
+  "s-02",
+  "s-04",
+]);
+
 export function Chrome() {
   const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("s-01");
 
@@ -56,12 +65,17 @@ export function Chrome() {
     return () => io.disconnect();
   }, []);
 
+  const onDark = DARK_SECTIONS.has(active);
+
   return (
     <>
-      {/* top navbar */}
+      {/* top navbar — text color flips per active section to avoid Safari's
+          mix-blend-mode-on-fixed-element bug. */}
       <nav
         aria-label="Primary"
-        className="blend fixed inset-x-0 top-0 z-50 flex items-center justify-between gap-4 px-4 py-3 sm:px-8 sm:py-4"
+        className={`fixed inset-x-0 top-0 z-50 flex items-center justify-between gap-4 px-4 py-3 transition-colors duration-300 sm:px-8 sm:py-4 ${
+          onDark ? "text-[var(--paper)]" : "text-[var(--ink)]"
+        }`}
       >
         <a href="#s-01" className="flex items-baseline gap-3 no-underline">
           <span className="text-[15px] font-semibold tracking-[-0.02em] lowercase">

@@ -91,7 +91,7 @@ export function Hero() {
           </div>
         </div>
 
-        <HeroTerminal className="mt-10 block w-full md:pointer-events-none md:absolute md:top-[23rem] md:right-[-2rem] md:z-0 md:mt-0 md:w-[min(44vw,520px)]" />
+        <HeroTerminal className="mt-10 block w-full min-[1400px]:pointer-events-none min-[1400px]:absolute min-[1400px]:top-[23rem] min-[1400px]:right-[-2rem] min-[1400px]:z-0 min-[1400px]:mt-0 min-[1400px]:w-[min(44vw,520px)]" />
 
         <div className="rise rise-5 mt-12 grid grid-cols-2 gap-y-4 sm:grid-cols-4">
           <Figure label="target price" value="$0.01/GB" />
