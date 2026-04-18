@@ -421,11 +421,19 @@ a.underline-brutal:hover .arrow {
   font-size: 11px;
   line-height: 1.55;
   color: var(--paper);
-  background: color-mix(in srgb, var(--paper) 3%, var(--ink));
-  border: 1px dashed color-mix(in srgb, var(--paper) 30%, transparent);
+  /* soft top-to-bottom gradient on a mid-charcoal base so the panel
+     reads as a lit surface rather than a heavy ink slab. */
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--paper) 18%, var(--ink)) 0%,
+    color-mix(in srgb, var(--paper) 12%, var(--ink)) 100%
+  );
+  border: 1px dashed color-mix(in srgb, var(--paper) 26%, transparent);
   border-radius: 14px;
   overflow: hidden;
-  box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--paper) 8%, transparent);
+  box-shadow:
+    7px 7px 0 0 color-mix(in srgb, var(--ink) 12%, transparent),
+    inset 0 1px 0 0 color-mix(in srgb, var(--paper) 8%, transparent);
   transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
   cursor: default;
 }
@@ -599,27 +607,36 @@ a.underline-brutal:hover .arrow {
 }
 
 .fb-throughput {
-  animation: fleet-breathe 6s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation: fleet-wave 7s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 .fb-revenue {
-  animation: fleet-breathe 6.4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-  animation-delay: 1.8s;
+  animation: fleet-wave 8.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  animation-delay: 2.3s;
 }
 
-/* slow forward → pause at peak → slow rewind → pause at base → loop */
-@keyframes fleet-breathe {
+/* subtle live-data jitter around a steady-state value — not a dramatic
+   breathe. Bar stays in a 72–82% band; the two bars run on different
+   durations + a phase offset so they never sync. */
+@keyframes fleet-wave {
   0%,
-  8% {
-    width: 32%;
-  }
-  42%,
-  58% {
-    width: 88%;
-  }
-  92%,
   100% {
-    width: 32%;
+    width: 74%;
+  }
+  15% {
+    width: 79%;
+  }
+  32% {
+    width: 73%;
+  }
+  48% {
+    width: 81%;
+  }
+  63% {
+    width: 76%;
+  }
+  80% {
+    width: 78%;
   }
 }
 
