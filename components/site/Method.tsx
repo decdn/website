@@ -36,7 +36,7 @@ export function Method() {
           n="03"
           word="settle"
           delay={240}
-          body="payment happens per megabyte, in usdc, through an off-chain channel opened at session start. operators hold real stable currency they can spend on electricity and bandwidth. the channel settles on arbitrum at session close — gas is a rounding error next to the bytes delivered."
+          body="payment happens per megabyte, in usdc, through an off-chain channel opened at session start. operators hold real stable currency they can spend on electricity and bandwidth. the channel settles on-chain at session close — chain-agnostic by design, gas a rounding error next to the bytes delivered."
         />
       </div>
 
@@ -62,12 +62,12 @@ export function Method() {
           <span aria-hidden className="opacity-30">
             ·
           </span>
-          <span>arbitrum</span>
+          <span>evm</span>
         </div>
         <div className="mt-5 grid grid-cols-2 gap-y-4 sm:grid-cols-4">
           <Figure label="language" value="rust" />
           <Figure label="transport" value="quic / iroh" />
-          <Figure label="settlement" value="arbitrum" />
+          <Figure label="settlement" value="chain-agnostic" />
           <Figure label="currency" value="usdc · token" />
         </div>
       </div>

@@ -48,8 +48,8 @@ export function Faq() {
           />
           <FaqItem
             delay={400}
-            q="Can I just use S3 and skip all this?"
-            a="Sure, until the traffic piles on — a surprise open dataset, a hyped game patch, a trending ai model, a press mention that breaks the server — and you're paying AWS $0.09 per gigabyte to 200,000 downloaders in forty-eight hours. deCDN is built for the moment the origin can't keep up — the network self-heals around demand instead of collapsing under it, and the per-request price goes down, not up."
+            q="Does this work well for AI models?"
+            a="Yes — AI is where deCDN's primitives compound. Clients pull large weights from several peers in parallel and saturate their own uplink instead of a single origin's. BLAKE3 chunk addressing lets teams grab one quantisation variant or a single layer without downloading the full checkpoint. And when a model drops and every region pulls it at once, the mesh warms around the demand instead of choking at a central bucket."
           />
         </dl>
       </div>
