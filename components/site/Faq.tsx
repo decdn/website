@@ -24,7 +24,7 @@ export function Faq() {
           <FaqItem
             delay={0}
             q="How is it 90% cheaper?"
-            a="Legacy CDNs provision for peak traffic and amortise that cost across long contracts, so a popular release gets expensive fast. deCDN's supply forms around demand — nodes cache what's hot, clients pay only for what they pull, and cost per gigabyte decreases as regional demand concentrates instead of increasing. Target price today: ~$0.01/GB, one cent, per actual gigabyte delivered."
+            a="Legacy CDNs provision for peak traffic and amortise that cost across long contracts, so a popular release gets expensive fast. deCDN is demand-shaped: supply forms around traffic, nodes cache what's hot, and bandwidth gets reused across many pulls. Cost per gigabyte collapses as regional demand concentrates — the opposite of how fixed-provisioning CDNs behave. Target price today: ~$0.01/GB, one cent, per actual gigabyte delivered."
           />
           <FaqItem
             delay={80}
@@ -44,7 +44,7 @@ export function Faq() {
           <FaqItem
             delay={320}
             q="What happens if a node lies?"
-            a="The client detects the BLAKE3 mismatch on the very next chunk, drops the connection, and files a Merkle proof against the node's stake. The good node further down the list keeps streaming — the client barely notices. The bad node loses TOKEN on-chain within minutes. Misbehaviour is expensive by construction."
+            a="The client detects the BLAKE3 mismatch on the very next chunk, drops the connection, and files a non-custodial Merkle proof against the node's stake. The good node further down the list keeps streaming — the client barely notices. The bad node loses TOKEN on-chain within minutes. There is no central arbiter; the math is the arbiter."
           />
           <FaqItem
             delay={400}

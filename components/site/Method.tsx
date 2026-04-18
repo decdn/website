@@ -24,13 +24,13 @@ export function Method() {
           n="01"
           word="probe"
           delay={0}
-          body="the client broadcasts a blake3 hash over quic 0-rtt. within about thirty milliseconds every nearby node replies with a price and a latency estimate. the client picks one — or several in parallel — by reputation, stake, and the number the operator is willing to quote today."
+          body="the client broadcasts a blake3 hash over quic 0-rtt. within thirty milliseconds every nearby node answers with what it has, what it charges, and how fast it can serve. the client picks one — or several in parallel — by reputation, stake, and the price the operator is willing to quote today."
         />
         <MethodRow
           n="02"
           word="stream"
           delay={120}
-          body="the winning node streams chunks as fast as its uplink can move them. the client verifies each chunk the moment it arrives; mismatched bytes get discarded and re-pulled from the next peer on the list. a node that returns garbage loses its staked token on the spot. trust no node — verify each one."
+          body="the winning node streams chunks as fast as its uplink can move them; for large payloads the client pulls from several nodes in parallel. each chunk is verified the moment it arrives — mismatched bytes are discarded and re-pulled from the next peer on the list. a node that returns garbage loses its staked token on the spot. trust no node — verify each one."
         />
         <MethodRow
           n="03"

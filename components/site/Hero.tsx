@@ -55,9 +55,11 @@ export function Hero() {
             verifies every chunk with blake3, and pays per megabyte in usdc —
             whether the payload is a linux iso, an open dataset, a game patch, a
             scientific archive, or an ai model.{" "}
-            <span style={{ color: "var(--whisper)" }}>deCDN</span> is a
-            peer-to-peer delivery layer built for open information at scale. the
-            code is open. the network is open. the price is posted.
+            <span style={{ color: "var(--whisper)" }}>deCDN</span> is
+            demand-shaped, locality-optimised delivery for large files at scale:
+            supply forms around demand, cost collapses as regional traffic
+            concentrates. the code is open. the network is open. the price is
+            posted.
           </p>
 
           <div className="rise rise-4 flex flex-col flex-wrap gap-x-8 gap-y-3 sm:flex-row sm:items-end">

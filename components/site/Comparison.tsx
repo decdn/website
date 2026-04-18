@@ -33,7 +33,7 @@ export function Comparison() {
           the pattern repeats whenever something big ships: mirrors fork, cdns
           rate-limit, small teams burn tens of thousands hosting bytes they
           don&apos;t own. <span style={{ color: "var(--whisper)" }}>deCDN</span>{" "}
-          inverts every axis — same delivery, different physics.
+          inverts every axis — supply forms around demand, not allocated to it.
         </p>
       </div>
 
