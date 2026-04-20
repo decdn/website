@@ -3,8 +3,8 @@ export function Figure({ label, value }: { label: string; value: string }) {
     <div className="flex flex-col gap-1">
       <span className="meta opacity-60">{label}</span>
       <span
-        className="text-[15px] font-medium tabular-nums sm:text-[17px]"
-        style={{ letterSpacing: "-0.01em" }}
+        className="font-medium tabular-nums"
+        style={{ fontSize: "var(--fs-body)", letterSpacing: "-0.01em" }}
       >
         {value}
       </span>

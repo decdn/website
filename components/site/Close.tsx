@@ -1,22 +1,24 @@
 import { links } from "@/lib/links";
+import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { FleetStatus } from "@/components/site/FleetStatus";
 
 export function Close() {
   return (
-    <section
+    <Frame
       id="s-05"
-      aria-labelledby="s-05-h"
-      className="relative flex min-h-[100svh] scroll-mt-[-48px] flex-col overflow-hidden bg-[var(--paper)] px-6 pt-24 pb-10 text-[var(--ink)] sm:px-16 sm:pt-28 sm:pb-12"
+      ariaLabelledBy="s-05-h"
+      tone="paper"
+      className="overflow-hidden"
     >
-      <div className="relative z-10 flex w-full flex-1 flex-col">
-        <SectionHeader
-          index="05"
-          label="Contact"
-          timestamp="open source · open network"
-        />
+      <SectionHeader
+        index="05"
+        label="Contact"
+        timestamp="open source · open network"
+      />
 
-        <div className="mt-14 flex flex-col gap-12">
+      <div className="mt-14 grid gap-12 @lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] @lg:items-start @lg:gap-14">
+        <div className="flex flex-col gap-12">
           <h2 id="s-05-h" className="sr-only">
             Contact
           </h2>
@@ -24,7 +26,7 @@ export function Close() {
           <div
             data-reveal
             className="hug flex items-baseline gap-2 font-semibold tracking-[-0.05em]"
-            style={{ fontSize: "clamp(56px, 14vw, 200px)", lineHeight: "0.86" }}
+            style={{ fontSize: "var(--fs-display)", lineHeight: "0.86" }}
           >
             <span>decdn</span>
             <span aria-hidden style={{ color: "var(--whisper)" }}>
@@ -34,8 +36,11 @@ export function Close() {
 
           <p
             data-reveal
-            style={{ ["--reveal-delay" as string]: "120ms" }}
-            className="max-w-[64ch] text-[15px] leading-[1.7] sm:text-[17px]"
+            style={{
+              ["--reveal-delay" as string]: "120ms",
+              fontSize: "var(--fs-body)",
+            }}
+            className="max-w-[64ch] leading-[1.7]"
           >
             <span style={{ color: "var(--whisper)" }}>deCDN</span> is a
             peer-to-peer delivery layer for large files — open datasets,
@@ -48,10 +53,11 @@ export function Close() {
           <div
             data-reveal
             style={{ ["--reveal-delay" as string]: "220ms" }}
-            className="flex flex-col flex-wrap gap-x-10 gap-y-4 sm:flex-row sm:items-baseline"
+            className="flex flex-col flex-wrap gap-x-10 gap-y-4 @md:flex-row @md:items-baseline"
           >
             <a
-              className="underline-brutal text-[14px] font-semibold tracking-[0.02em] sm:text-[16px]"
+              className="underline-brutal font-semibold tracking-[0.02em]"
+              style={{ fontSize: "var(--fs-lead)" }}
               href={links.whitepaper}
             >
               read the whitepaper
@@ -60,7 +66,8 @@ export function Close() {
               </span>
             </a>
             <a
-              className="underline-brutal text-[14px] font-semibold tracking-[0.02em] sm:text-[16px]"
+              className="underline-brutal font-semibold tracking-[0.02em]"
+              style={{ fontSize: "var(--fs-lead)" }}
               href={links.runNode}
             >
               run a node
@@ -69,7 +76,8 @@ export function Close() {
               </span>
             </a>
             <a
-              className="underline-brutal text-[14px] font-semibold tracking-[0.02em] sm:text-[16px]"
+              className="underline-brutal font-semibold tracking-[0.02em]"
+              style={{ fontSize: "var(--fs-lead)" }}
               href={links.github}
             >
               source on github
@@ -80,21 +88,22 @@ export function Close() {
           </div>
         </div>
 
-        <FleetStatus className="mt-10 block w-full min-[1400px]:absolute min-[1400px]:top-24 min-[1400px]:right-4 min-[1400px]:z-0 min-[1400px]:mt-0 min-[1400px]:w-[min(38vw,540px)]" />
-
-        <footer className="mt-auto flex flex-col gap-3 pt-16">
-          <span aria-hidden className="rule opacity-40" />
-          <div className="grid grid-cols-1 gap-2 text-[11px] tracking-[0.2em] uppercase opacity-80 sm:grid-cols-3 sm:items-center">
-            <span>© mmxxvi · decdn labs</span>
-            <span className="sm:text-center">
-              built in rust · rendered in geist
-            </span>
-            <span className="tabular-nums sm:text-right">
-              node-001 / v0.0.0
-            </span>
-          </div>
-        </footer>
+        <FleetStatus className="block w-full" />
       </div>
-    </section>
+
+      <footer className="mt-auto flex flex-col gap-3 pt-16">
+        <span aria-hidden className="rule opacity-40" />
+        <div
+          className="grid grid-cols-1 gap-2 tracking-[0.2em] uppercase opacity-80 @md:grid-cols-3 @md:items-center"
+          style={{ fontSize: "var(--fs-micro)" }}
+        >
+          <span>© mmxxvi · decdn labs</span>
+          <span className="@md:text-center">
+            built in rust · rendered in geist
+          </span>
+          <span className="tabular-nums @md:text-right">node-001 / v0.0.0</span>
+        </div>
+      </footer>
+    </Frame>
   );
 }
