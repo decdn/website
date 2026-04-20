@@ -246,7 +246,7 @@ a.underline-brutal:hover .arrow {
   font-family:
     ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
     "Courier New", monospace;
-  font-size: clamp(11px, 0.85vw, 13px);
+  font-size: clamp(11px, 1.2vw, 13px);
   line-height: 1.65;
   color: var(--ink);
   background: var(--paper);
@@ -439,7 +439,7 @@ a.underline-brutal:hover .arrow {
   font-family:
     ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
     "Courier New", monospace;
-  font-size: clamp(11px, 0.75vw, 12px);
+  font-size: clamp(11px, 1.1vw, 12px);
   line-height: 1.55;
   color: var(--paper);
   /* soft top-to-bottom gradient on a mid-charcoal base so the panel

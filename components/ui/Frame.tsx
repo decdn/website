@@ -31,7 +31,7 @@ export function Frame({
     <section
       id={id}
       aria-labelledby={ariaLabelledBy}
-      className={`relative flex min-h-[100svh] scroll-mt-12 flex-col ${TONE_CLASS[tone]} ${className}`}
+      className={`relative flex min-h-[100svh] scroll-mt-0 flex-col ${TONE_CLASS[tone]} ${className}`}
       style={{
         paddingInline: "var(--frame-gutter)",
         paddingBlock: "var(--frame-pad-y)",
