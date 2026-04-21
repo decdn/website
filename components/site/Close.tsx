@@ -5,12 +5,7 @@ import { FleetStatus } from "@/components/site/FleetStatus";
 
 export function Close() {
   return (
-    <Frame
-      id="s-05"
-      ariaLabelledBy="s-05-h"
-      tone="paper"
-      className="overflow-hidden"
-    >
+    <Frame id="s-05" tone="paper" className="overflow-hidden">
       <SectionHeader
         index="05"
         label="Contact"

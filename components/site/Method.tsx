@@ -5,7 +5,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export function Method() {
   return (
-    <Frame id="s-03" ariaLabelledBy="s-03-h" tone="paper">
+    <Frame id="s-03" tone="paper">
       <SectionHeader
         index="03"
         label="How it works"

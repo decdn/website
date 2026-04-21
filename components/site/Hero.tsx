@@ -6,12 +6,7 @@ import { HeroTerminal } from "@/components/site/HeroTerminal";
 
 export function Hero() {
   return (
-    <Frame
-      id="s-01"
-      ariaLabelledBy="s-01-h"
-      tone="paper"
-      className="overflow-hidden"
-    >
+    <Frame id="s-01" tone="paper" className="overflow-hidden">
       <SectionHeader
         index="01"
         label="Hero"

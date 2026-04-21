@@ -4,7 +4,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export function Faq() {
   return (
-    <Frame id="s-04" ariaLabelledBy="s-04-h" tone="ink">
+    <Frame id="s-04" tone="ink">
       <SectionHeader index="04" label="FAQ" timestamp="field notes" />
 
       <div className="mt-14 flex flex-col gap-10">

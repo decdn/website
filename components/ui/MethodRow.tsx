@@ -18,7 +18,7 @@ export function MethodRow({
       <div className="meta tabular-nums opacity-60 @xl:col-span-1">{n}</div>
       <div
         className="hug font-semibold tracking-[-0.05em] @xl:col-span-5"
-        style={{ fontSize: "var(--fs-h2-row)", lineHeight: "0.9" }}
+        style={{ fontSize: "var(--fs-method-row)", lineHeight: "0.9" }}
       >
         {word}
       </div>

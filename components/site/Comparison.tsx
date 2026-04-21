@@ -4,7 +4,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export function Comparison() {
   return (
-    <Frame id="s-02" ariaLabelledBy="s-02-h" tone="ink">
+    <Frame id="s-02" tone="ink">
       <SectionHeader
         index="02"
         label="Side by side"

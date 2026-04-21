@@ -1,16 +1,12 @@
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
 type Tone = "ink" | "paper";
 
 type FrameProps = {
   id: string;
-  ariaLabelledBy?: string;
-  tone?: Tone;
-  /** Extra classes for the outer <section> only — used for overflow,
-      stacking context, etc. Layout/padding live in this primitive. */
+  tone: Tone;
+  /** Extra classes on the outer <section>. */
   className?: string;
-  /** Extra inline styles for the outer <section> (e.g. custom backgrounds). */
-  style?: CSSProperties;
   children: ReactNode;
 };
 
@@ -19,23 +15,15 @@ const TONE_CLASS: Record<Tone, string> = {
   paper: "bg-[var(--paper)] text-[var(--ink)]",
 };
 
-export function Frame({
-  id,
-  ariaLabelledBy,
-  tone = "ink",
-  className = "",
-  style,
-  children,
-}: FrameProps) {
+export function Frame({ id, tone, className = "", children }: FrameProps) {
   return (
     <section
       id={id}
-      aria-labelledby={ariaLabelledBy}
+      aria-labelledby={`${id}-h`}
       className={`relative flex min-h-[100svh] scroll-mt-0 flex-col ${TONE_CLASS[tone]} ${className}`}
       style={{
         paddingInline: "var(--frame-gutter)",
         paddingBlock: "var(--frame-pad-y)",
-        ...style,
       }}
     >
       <div
