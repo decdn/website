@@ -1,14 +1,11 @@
 import { Figure } from "@/components/ui/Figure";
+import { Frame } from "@/components/ui/Frame";
 import { MethodRow } from "@/components/ui/MethodRow";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export function Method() {
   return (
-    <section
-      id="s-03"
-      aria-labelledby="s-03-h"
-      className="relative flex min-h-[100svh] scroll-mt-[-48px] flex-col bg-[var(--paper)] px-6 pt-24 pb-12 text-[var(--ink)] sm:px-16 sm:pt-28 sm:pb-16"
-    >
+    <Frame id="s-03" tone="paper">
       <SectionHeader
         index="03"
         label="How it works"
@@ -44,7 +41,7 @@ export function Method() {
         <span className="meta mb-3 block opacity-60">stack</span>
         <div
           className="hug flex flex-wrap items-baseline gap-x-5 gap-y-2 font-semibold tracking-[-0.03em]"
-          style={{ fontSize: "clamp(22px, 4vw, 56px)" }}
+          style={{ fontSize: "var(--fs-h3)" }}
         >
           <span>blake3</span>
           <span aria-hidden className="opacity-30">
@@ -64,13 +61,13 @@ export function Method() {
           </span>
           <span>evm</span>
         </div>
-        <div className="mt-5 grid grid-cols-2 gap-y-4 sm:grid-cols-4">
+        <div className="mt-5 grid grid-cols-2 gap-y-4 @xl:grid-cols-4">
           <Figure label="language" value="rust" />
           <Figure label="transport" value="quic / iroh" />
           <Figure label="settlement" value="chain-agnostic" />
           <Figure label="currency" value="usdc · token" />
         </div>
       </div>
-    </section>
+    </Frame>
   );
 }

@@ -1,23 +1,20 @@
 import { links } from "@/lib/links";
 import { Figure } from "@/components/ui/Figure";
+import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { HeroTerminal } from "@/components/site/HeroTerminal";
 
 export function Hero() {
   return (
-    <section
-      id="s-01"
-      aria-labelledby="s-01-h"
-      className="relative flex min-h-[100svh] scroll-mt-[-48px] flex-col overflow-hidden bg-[var(--paper)] px-6 pt-24 pb-12 text-[var(--ink)] sm:px-16 sm:pt-28 sm:pb-16"
-    >
-      <div className="relative z-10 flex w-full flex-1 flex-col">
-        <SectionHeader
-          index="01"
-          label="Hero"
-          timestamp="2026-04 · devnet v0.0.0"
-        />
+    <Frame id="s-01" tone="paper" className="overflow-hidden">
+      <SectionHeader
+        index="01"
+        label="Hero"
+        timestamp="2026-04 · devnet v0.0.0"
+      />
 
-        <div className="mt-auto flex flex-col gap-8 sm:gap-12">
+      <div className="mt-auto grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-end @4xl:gap-12">
+        <div className="flex flex-col gap-8 @4xl:gap-12">
           <div className="rise rise-0 flex flex-wrap items-center gap-3">
             <span className="meta inline-flex items-center gap-2">
               <span
@@ -40,7 +37,7 @@ export function Hero() {
           <h1
             id="s-01-h"
             className="hug flex flex-col font-semibold leading-[0.9] tracking-[-0.04em]"
-            style={{ fontSize: "clamp(40px, 8.4vw, 124px)" }}
+            style={{ fontSize: "var(--fs-h1)" }}
           >
             <span className="rise rise-1">the delivery layer</span>
             <span className="rise rise-2 pl-[4vw]">
@@ -49,7 +46,10 @@ export function Hero() {
             <span className="rise rise-2 pl-[8vw]">information.</span>
           </h1>
 
-          <p className="rise rise-3 max-w-[64ch] text-[15px] leading-[1.65] sm:text-[17px]">
+          <p
+            className="rise rise-3 max-w-[64ch] leading-[1.65]"
+            style={{ fontSize: "var(--fs-body)" }}
+          >
             a 14-gigabyte file posted in berlin reaches a client in tokyo in
             under a second. the client streams from three peers at once,
             verifies every chunk with blake3, and pays per megabyte in usdc —
@@ -62,9 +62,10 @@ export function Hero() {
             posted.
           </p>
 
-          <div className="rise rise-4 flex flex-col flex-wrap gap-x-8 gap-y-3 sm:flex-row sm:items-end">
+          <div className="rise rise-4 flex flex-col flex-wrap gap-x-8 gap-y-3 @md:flex-row @md:items-end">
             <a
-              className="underline-brutal text-[12px] font-semibold tracking-[0.14em] uppercase sm:text-[13px]"
+              className="underline-brutal font-semibold tracking-[0.14em] uppercase"
+              style={{ fontSize: "var(--fs-cta)" }}
               href={links.whitepaper}
             >
               read the whitepaper
@@ -73,7 +74,8 @@ export function Hero() {
               </span>
             </a>
             <a
-              className="underline-brutal text-[12px] font-semibold tracking-[0.14em] uppercase sm:text-[13px]"
+              className="underline-brutal font-semibold tracking-[0.14em] uppercase"
+              style={{ fontSize: "var(--fs-cta)" }}
               href={links.runNode}
             >
               run a node
@@ -82,7 +84,8 @@ export function Hero() {
               </span>
             </a>
             <a
-              className="underline-brutal text-[12px] font-semibold tracking-[0.14em] uppercase opacity-55 hover:opacity-100 sm:text-[13px]"
+              className="underline-brutal font-semibold tracking-[0.14em] uppercase opacity-55 hover:opacity-100"
+              style={{ fontSize: "var(--fs-cta)" }}
               href={links.github}
             >
               source
@@ -91,17 +94,17 @@ export function Hero() {
               </span>
             </a>
           </div>
+
+          <div className="rise rise-5 grid grid-cols-2 gap-y-4 @xl:grid-cols-4">
+            <Figure label="target price" value="$0.01/GB" />
+            <Figure label="p50 latency" value="50–100 ms" />
+            <Figure label="settlement" value="per-MB · usdc" />
+            <Figure label="gas overhead" value="<1%" />
+          </div>
         </div>
 
-        <HeroTerminal className="mt-10 block w-full min-[1400px]:pointer-events-none min-[1400px]:absolute min-[1400px]:top-[23rem] min-[1400px]:right-[-2rem] min-[1400px]:z-0 min-[1400px]:mt-0 min-[1400px]:w-[min(44vw,520px)]" />
-
-        <div className="rise rise-5 mt-12 grid grid-cols-2 gap-y-4 sm:grid-cols-4">
-          <Figure label="target price" value="$0.01/GB" />
-          <Figure label="p50 latency" value="50–100 ms" />
-          <Figure label="settlement" value="per-MB · usdc" />
-          <Figure label="gas overhead" value="<1%" />
-        </div>
+        <HeroTerminal className="block w-full" />
       </div>
-    </section>
+    </Frame>
   );
 }

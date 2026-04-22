@@ -11,6 +11,23 @@
   --color-paper: var(--paper);
   --color-whisper: var(--whisper);
   --font-sans: var(--font-geist-sans);
+
+  /* Shared content rail: every Frame centers within --frame-max. */
+  --frame-max: 1280px;
+  --frame-gutter: clamp(1.5rem, 4vw, 4rem);
+  --frame-pad-y: clamp(4rem, 9vw, 7rem);
+
+  /* Type scale: micro and CTA are fixed; body and headlines scale with viewport. */
+  --fs-micro: 0.6875rem;
+  --fs-cta: 0.8125rem;
+  --fs-body: clamp(0.9375rem, 0.55vw + 0.78rem, 1.0625rem);
+  --fs-lead: clamp(1rem, 0.6vw + 0.82rem, 1.125rem);
+  --fs-h3: clamp(1.375rem, 4vw, 3.5rem);
+  --fs-h2: clamp(2.125rem, 7vw, 6.5rem);
+  --fs-method-row: clamp(2rem, 6.5vw, 6rem);
+  --fs-h1: clamp(2.5rem, 8.4vw, 7.75rem);
+  --fs-display: clamp(3.5rem, 14vw, 12.5rem);
+  --fs-price: clamp(1.125rem, 5vw, 4rem);
 }
 
 html {
@@ -225,7 +242,7 @@ a.underline-brutal:hover .arrow {
   font-family:
     ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
     "Courier New", monospace;
-  font-size: 11px;
+  font-size: clamp(11px, 1.2vw, 13px);
   line-height: 1.65;
   color: var(--ink);
   background: var(--paper);
@@ -418,7 +435,7 @@ a.underline-brutal:hover .arrow {
   font-family:
     ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
     "Courier New", monospace;
-  font-size: 11px;
+  font-size: clamp(11px, 1.1vw, 12px);
   line-height: 1.55;
   color: var(--paper);
   /* soft top-to-bottom gradient on a mid-charcoal base so the panel
@@ -652,14 +669,5 @@ a.underline-brutal:hover .arrow {
   }
   .fleet-bar-fill {
     width: 80%;
-  }
-}
-
-@media (min-width: 768px) {
-  .terminal {
-    font-size: 13px;
-  }
-  .fleet {
-    font-size: 12px;
   }
 }
