@@ -5,10 +5,10 @@ import { links } from "@/lib/links";
 
 const SECTION_IDS = ["s-01", "s-02", "s-03", "s-04", "s-05"] as const;
 const NAV = [
-  { id: "s-02", num: "02", label: "compare" },
-  { id: "s-03", num: "03", label: "method" },
-  { id: "s-04", num: "04", label: "faq" },
-  { id: "s-05", num: "05", label: "contact" },
+  { id: "s-02", label: "compare" },
+  { id: "s-03", label: "method" },
+  { id: "s-04", label: "faq" },
+  { id: "s-05", label: "contact" },
 ] as const;
 
 // Ids of sections that paint on a dark background — used to flip the
@@ -80,7 +80,7 @@ export function Chrome() {
       aria-label="Primary"
       data-scrolled={scrolled ? "true" : undefined}
       data-tone={onDark ? "ink" : "paper"}
-      className={`chrome-nav fixed inset-x-0 top-0 z-50 py-3 ${
+      className={`chrome-nav fixed inset-x-0 top-0 z-50 py-5 ${
         onDark ? "text-[var(--paper)]" : "text-[var(--ink)]"
       }`}
       style={{ paddingInline: "var(--frame-gutter)" }}
@@ -108,9 +108,6 @@ export function Chrome() {
                   aria-current={isActive ? "true" : undefined}
                   className="nav-item"
                 >
-                  <span className="nav-num" aria-hidden>
-                    §{item.num}
-                  </span>
                   <span className="nav-label">{item.label}</span>
                   <span aria-hidden className="nav-underline" />
                 </a>
