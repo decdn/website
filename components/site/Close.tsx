@@ -12,7 +12,7 @@ export function Close() {
         timestamp="open source · open network"
       />
 
-      <div className="mt-14 grid gap-12 @lg:grid-cols-[minmax(0,1fr)_minmax(0,460px)] @lg:items-start @lg:gap-14">
+      <div className="mt-14 grid gap-12 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,460px)] @4xl:items-start @4xl:gap-14">
         <div className="flex flex-col gap-12">
           <h2 id="s-05-h" className="sr-only">
             Contact

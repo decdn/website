@@ -61,7 +61,7 @@ export function Method() {
           </span>
           <span>evm</span>
         </div>
-        <div className="mt-5 grid grid-cols-2 gap-y-4 @md:grid-cols-4">
+        <div className="mt-5 grid grid-cols-2 gap-y-4 @xl:grid-cols-4">
           <Figure label="language" value="rust" />
           <Figure label="transport" value="quic / iroh" />
           <Figure label="settlement" value="chain-agnostic" />

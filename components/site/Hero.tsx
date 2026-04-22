@@ -13,8 +13,8 @@ export function Hero() {
         timestamp="2026-04 · devnet v0.0.0"
       />
 
-      <div className="mt-auto grid gap-10 @lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @lg:items-end @lg:gap-12">
-        <div className="flex flex-col gap-8 @lg:gap-12">
+      <div className="mt-auto grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-end @4xl:gap-12">
+        <div className="flex flex-col gap-8 @4xl:gap-12">
           <div className="rise rise-0 flex flex-wrap items-center gap-3">
             <span className="meta inline-flex items-center gap-2">
               <span
@@ -95,7 +95,7 @@ export function Hero() {
             </a>
           </div>
 
-          <div className="rise rise-5 grid grid-cols-2 gap-y-4 @md:grid-cols-4">
+          <div className="rise rise-5 grid grid-cols-2 gap-y-4 @xl:grid-cols-4">
             <Figure label="target price" value="$0.01/GB" />
             <Figure label="p50 latency" value="50–100 ms" />
             <Figure label="settlement" value="per-MB · usdc" />
