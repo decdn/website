@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
   <rect width="64" height="64" rx="12" fill="#000000" />
   <!-- lowercase d, Geist-Bold glyph path (1000-unit em), scaled 0.055. -->
   <g transform="translate(8 51.5) scale(0.055)" fill="#ffffff" fill-rule="nonzero">
