@@ -13,33 +13,14 @@ export function Hero() {
         timestamp="2026-04 · devnet v0.0.0"
       />
 
-      <div className="mt-auto flex flex-col gap-8 @4xl:gap-12">
-        <div className="rise rise-0 flex flex-wrap items-center gap-3">
-          <span className="meta inline-flex items-center gap-2">
-            <span
-              aria-hidden
-              className="inline-block h-[8px] w-[8px] rounded-full"
-              style={{ background: "var(--whisper)" }}
-            />
-            <span>live</span>
-          </span>
-          <span className="meta opacity-50" aria-hidden>
-            ·
-          </span>
-          <span className="meta opacity-70">epoch 00042</span>
-          <span className="meta opacity-50" aria-hidden>
-            ·
-          </span>
-          <span className="meta opacity-70">quic / blake3</span>
-        </div>
-
+      <div className="mt-10 flex flex-col gap-8 @4xl:gap-12">
         <h1
           id="intro-h"
           className="hug flex flex-col font-semibold leading-[0.9] tracking-[-0.04em]"
           style={{ fontSize: "var(--fs-h1)" }}
         >
-          <span className="rise rise-1">the delivery layer</span>
-          <span className="rise rise-2 pl-[4vw]">
+          <span className="rise rise-0">the delivery layer</span>
+          <span className="rise rise-1 pl-[4vw]">
             anyone can serve
             <span aria-hidden style={{ color: "var(--whisper)" }}>
               .

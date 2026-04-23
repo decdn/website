@@ -16,6 +16,7 @@
   --frame-max: 1280px;
   --frame-gutter: clamp(1.5rem, 4vw, 4rem);
   --frame-pad-y: clamp(4rem, 9vw, 7rem);
+  --frame-min-h-cap: 54rem;
 
   /* Type scale: micro and CTA are fixed; body and headlines scale with viewport. */
   --fs-micro: 0.6875rem;
