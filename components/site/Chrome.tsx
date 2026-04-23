@@ -126,13 +126,13 @@ export function Chrome() {
             <span aria-hidden>→</span>
           </a>
           <a
-            href={links.whitepaper}
+            href={links.litepaper}
             target="_blank"
             rel="noopener noreferrer"
             className="meta flex items-center gap-2 no-underline"
             style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
           >
-            <span>Whitepaper</span>
+            <span>Litepaper</span>
             <span aria-hidden>→</span>
           </a>
         </div>

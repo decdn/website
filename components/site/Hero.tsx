@@ -67,11 +67,11 @@ export function Hero() {
               <a
                 className="underline-brutal font-semibold tracking-[0.14em] uppercase"
                 style={{ fontSize: "var(--fs-cta)" }}
-                href={links.whitepaper}
+                href={links.litepaper}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                read the whitepaper
+                read the litepaper
                 <span className="arrow" aria-hidden>
                   →
                 </span>

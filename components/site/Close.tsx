@@ -49,11 +49,11 @@ export function Close() {
             <a
               className="underline-brutal font-semibold tracking-[0.02em]"
               style={{ fontSize: "var(--fs-lead)" }}
-              href={links.whitepaper}
+              href={links.litepaper}
               target="_blank"
               rel="noopener noreferrer"
             >
-              read the whitepaper
+              read the litepaper
               <span className="arrow" aria-hidden>
                 →
               </span>
