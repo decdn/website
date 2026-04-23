@@ -116,16 +116,26 @@ export function Chrome() {
           })}
         </ul>
 
-        <a
-          href={links.whitepaper}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="meta flex items-center gap-2 no-underline"
-          style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
-        >
-          <span>Whitepaper</span>
-          <span aria-hidden>→</span>
-        </a>
+        <div className="flex items-center gap-5">
+          <a
+            href={links.docs}
+            className="meta flex items-center gap-2 no-underline"
+            style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
+          >
+            <span>Docs</span>
+            <span aria-hidden>→</span>
+          </a>
+          <a
+            href={links.whitepaper}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="meta flex items-center gap-2 no-underline"
+            style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
+          >
+            <span>Whitepaper</span>
+            <span aria-hidden>→</span>
+          </a>
+        </div>
       </div>
     </nav>
   );
