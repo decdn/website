@@ -11,7 +11,7 @@ const geistSans = Geist({
   weight: ["400", "500", "600", "700"],
 });
 
-const TITLE = "deCDN — The delivery layer for open information";
+const TITLE = "deCDN — A peer-to-peer delivery layer for bytes at scale";
 const DESCRIPTION =
   "A peer-to-peer CDN. Anyone can serve bytes; clients pay per megabyte in USDC. ~$0.01/GB — up to 90% cheaper than legacy networks.";
 

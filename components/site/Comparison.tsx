@@ -18,8 +18,8 @@ export function Comparison() {
           className="hug flex flex-col font-semibold leading-[0.92] tracking-[-0.04em]"
           style={{ fontSize: "var(--fs-h2)" }}
         >
-          <span>open information scaled.</span>
-          <span className="pl-[3vw] opacity-60">its plumbing didn&apos;t.</span>
+          <span>information scaled.</span>
+          <span className="pl-[3vw] opacity-60">supply didn&apos;t.</span>
         </h2>
 
         <p

@@ -48,6 +48,11 @@ export function Faq() {
             q="Does this work well for AI models?"
             a="Yes — AI is where deCDN's primitives compound. Clients pull large weights from several peers in parallel and saturate their own uplink instead of a single origin's. BLAKE3 chunk addressing lets teams grab one quantisation variant or a single layer without downloading the full checkpoint. And when a model drops and every region pulls it at once, the mesh warms around the demand instead of choking at a central bucket."
           />
+          <FaqItem
+            delay={480}
+            q="Can you serve private or subscription content?"
+            a="Yes. Content is addressed by the BLAKE3 hash of the ciphertext, so nodes cache and serve encrypted blobs without ever seeing the plaintext. Your app holds the keys and hands them to clients over a separate, authenticated channel — subscription, paywall, whatever logic fits. One network serves both your public archives and your paying subscribers; only the keys tell them apart."
+          />
         </dl>
       </div>
     </Frame>

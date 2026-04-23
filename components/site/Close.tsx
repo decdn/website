@@ -38,11 +38,10 @@ export function Close() {
             className="max-w-[64ch] leading-[1.7]"
           >
             <span style={{ color: "var(--whisper)" }}>deCDN</span> is a
-            peer-to-peer delivery layer for large files — open datasets,
-            scientific archives, linux distros, game builds, video libraries,
-            open-weight ai models, anything meant to be pulled a million times
-            and that shouldn&apos;t depend on one bucket. the code is open. the
-            network is open. the price is posted.
+            peer-to-peer delivery layer for large files — software releases,
+            datasets, media libraries, ai models, anything meant to be pulled a
+            million times and that shouldn&apos;t depend on one bucket. the code
+            is open. the network is open. the price is posted.
           </p>
 
           <div

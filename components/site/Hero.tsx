@@ -41,9 +41,9 @@ export function Hero() {
           >
             <span className="rise rise-1">the delivery layer</span>
             <span className="rise rise-2 pl-[4vw]">
-              for open<span style={{ color: "var(--whisper)" }}>.</span>
+              for information<span style={{ color: "var(--whisper)" }}>.</span>
             </span>
-            <span className="rise rise-2 pl-[8vw]">information.</span>
+            <span className="rise rise-2 pl-[8vw]">shaped by demand.</span>
           </h1>
 
           <p
@@ -54,7 +54,7 @@ export function Hero() {
             under a second. the client streams from three peers at once,
             verifies every chunk with blake3, and pays per megabyte in usdc —
             whether the payload is a linux iso, an open dataset, a game patch, a
-            scientific archive, or an ai model.{" "}
+            media library, or an ai model.{" "}
             <span style={{ color: "var(--whisper)" }}>deCDN</span> is
             demand-shaped, locality-optimised delivery for large files at scale:
             supply forms around demand, cost collapses as regional traffic
