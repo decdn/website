@@ -40,7 +40,10 @@ export function Hero() {
         >
           <span className="rise rise-1">the delivery layer</span>
           <span className="rise rise-2 pl-[4vw]">
-            for information<span style={{ color: "var(--whisper)" }}>.</span>
+            for information
+            <span aria-hidden style={{ color: "var(--whisper)" }}>
+              .
+            </span>
           </span>
           <span className="rise rise-2 pl-[8vw]">shaped by demand.</span>
         </h1>
@@ -54,8 +57,8 @@ export function Hero() {
               a 14-gigabyte file posted in berlin reaches a client in tokyo in
               under a second. the client streams from three peers at once,
               verifies every chunk with blake3, and pays per megabyte in usdc —
-              whether the payload is a linux iso, an open dataset, a game patch,
-              a media library, or an ai model.{" "}
+              whether the payload is a linux iso, a dataset, a game patch, a
+              media library, or an ai model.{" "}
               <span style={{ color: "var(--whisper)" }}>deCDN</span> is
               demand-shaped, locality-optimised delivery for large files at
               scale: supply forms around demand, cost collapses as regional
