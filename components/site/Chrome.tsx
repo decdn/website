@@ -119,8 +119,6 @@ export function Chrome() {
         <div className="flex items-center gap-5">
           <a
             href={links.docs}
-            target="_blank"
-            rel="noopener noreferrer"
             className="meta flex items-center gap-2 no-underline"
             style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
           >
