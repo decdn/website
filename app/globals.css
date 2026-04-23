@@ -784,7 +784,11 @@ a.underline-brutal:hover .arrow {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .chrome-nav {
+    transition: background-color 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .nav-item .nav-label,
   .nav-item .nav-underline {
-    transition: background-color 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: none;
   }
 }
