@@ -112,7 +112,7 @@ export function Comparison() {
         <ComparisonRow
           label="operators"
           legacy="three hyperscalers"
-          decdn="anyone with a node"
+          decdn="home labs to datacenters"
           delay={540}
         />
         <ComparisonRow
