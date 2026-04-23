@@ -3,12 +3,12 @@
 import { useEffect, useState } from "react";
 import { links } from "@/lib/links";
 
-const SECTION_IDS = ["s-01", "s-02", "s-03", "s-04", "s-05"] as const;
+const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
 const NAV = [
-  { id: "s-02", label: "compare" },
-  { id: "s-03", label: "method" },
-  { id: "s-04", label: "faq" },
-  { id: "s-05", label: "contact" },
+  { id: "compare", label: "compare" },
+  { id: "method", label: "method" },
+  { id: "faq", label: "faq" },
+  { id: "contact", label: "contact" },
 ] as const;
 
 // Ids of sections that paint on a dark background — used to flip the
@@ -16,12 +16,12 @@ const NAV = [
 // `mix-blend-mode: difference`, which silently fails on Safari / iOS
 // when applied to `position: fixed` elements (the nav would vanish).
 const DARK_SECTIONS: ReadonlySet<(typeof SECTION_IDS)[number]> = new Set([
-  "s-02",
-  "s-04",
+  "compare",
+  "faq",
 ]);
 
 export function Chrome() {
-  const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("s-01");
+  const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -89,7 +89,7 @@ export function Chrome() {
         className="mx-auto flex w-full items-center justify-between gap-4"
         style={{ maxWidth: "var(--frame-max)" }}
       >
-        <a href="#s-01" className="flex items-baseline gap-3 no-underline">
+        <a href="#intro" className="flex items-baseline gap-3 no-underline">
           <span className="text-[15px] font-semibold tracking-[-0.02em] lowercase">
             deCDN
           </span>
@@ -116,16 +116,26 @@ export function Chrome() {
           })}
         </ul>
 
-        <a
-          href={links.whitepaper}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="meta flex items-center gap-2 no-underline"
-          style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
-        >
-          <span>Whitepaper</span>
-          <span aria-hidden>→</span>
-        </a>
+        <div className="flex items-center gap-5">
+          <a
+            href={links.docs}
+            className="meta flex items-center gap-2 no-underline"
+            style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
+          >
+            <span>Docs</span>
+            <span aria-hidden>→</span>
+          </a>
+          <a
+            href={links.litepaper}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="meta flex items-center gap-2 no-underline"
+            style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
+          >
+            <span>Litepaper</span>
+            <span aria-hidden>→</span>
+          </a>
+        </div>
       </div>
     </nav>
   );

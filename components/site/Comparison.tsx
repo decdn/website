@@ -4,7 +4,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export function Comparison() {
   return (
-    <Frame id="s-02" tone="ink">
+    <Frame id="compare" tone="ink">
       <SectionHeader
         index="02"
         label="Side by side"
@@ -14,12 +14,12 @@ export function Comparison() {
       <div className="mt-14 flex flex-col gap-10">
         <h2
           data-reveal
-          id="s-02-h"
+          id="compare-h"
           className="hug flex flex-col font-semibold leading-[0.92] tracking-[-0.04em]"
           style={{ fontSize: "var(--fs-h2)" }}
         >
-          <span>open information scaled.</span>
-          <span className="pl-[3vw] opacity-60">its plumbing didn&apos;t.</span>
+          <span>information scaled.</span>
+          <span className="pl-[3vw] opacity-60">supply didn&apos;t.</span>
         </h2>
 
         <p
@@ -112,7 +112,7 @@ export function Comparison() {
         <ComparisonRow
           label="operators"
           legacy="three hyperscalers"
-          decdn="anyone with a node"
+          decdn="home labs to datacenters"
           delay={540}
         />
         <ComparisonRow

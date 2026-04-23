@@ -4,13 +4,13 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export function Faq() {
   return (
-    <Frame id="s-04" tone="ink">
+    <Frame id="faq" tone="ink">
       <SectionHeader index="04" label="FAQ" timestamp="field notes" />
 
       <div className="mt-14 flex flex-col gap-10">
         <h2
           data-reveal
-          id="s-04-h"
+          id="faq-h"
           className="hug font-semibold leading-[0.92] tracking-[-0.04em]"
           style={{ fontSize: "var(--fs-h2)" }}
         >
@@ -30,18 +30,18 @@ export function Faq() {
           />
           <FaqItem
             delay={160}
+            q="Can content be gated or taken down?"
+            a="Both. For gating: upload ciphertext instead of plaintext — nodes cache the encrypted blob without ever seeing inside, and your app holds the keys, handing them to clients over a separate authenticated channel. Subscription, paywall, whatever logic fits. For takedown: governance can flag specific BLAKE3 hashes as non-servable, and nodes that keep serving them past a short compliance window lose staked TOKEN — slashing is on-chain, not a human call. Both the key gate and the flag list are auditable; compliance runs end-to-end, from origin onboarding to peer-level slashing, governance-owned and auditable throughout."
+          />
+          <FaqItem
+            delay={240}
             q="Why does the network need a token?"
             a="TOKEN secures the network — operators stake it to participate, and they lose it if they misbehave. Payments, though, happen in USDC, because operators want stable currency they can pay power bills with. Twenty percent of protocol fees flow into a Balancer V3 80/20 TOKEN/USDC buyback, tying token demand to network throughput."
           />
           <FaqItem
-            delay={240}
-            q="Who actually pays?"
-            a="The client pulling the bytes. When a session starts, the client opens an off-chain USDC channel and streams payment per megabyte as chunks arrive. No subscription, no account, no invoice — when the download finishes, the channel closes and settles. You pay for what you pulled, nothing more."
-          />
-          <FaqItem
             delay={320}
-            q="What happens if a node lies?"
-            a="The client detects the BLAKE3 mismatch on the very next chunk, drops the connection, and files a non-custodial Merkle proof against the node's stake. The good node further down the list keeps streaming — the client barely notices. The bad node loses TOKEN on-chain within minutes. There is no central arbiter; the math is the arbiter."
+            q="Can publishers pay on behalf of users?"
+            a="Yes. Account abstraction lets a publisher fund a payment channel for their audience, so users pull content with no wallet and no subscription — same free-to-download experience as a public mirror, except the publisher pays peers per megabyte instead of one cloud's egress bill. Default flow is client-pays; publisher-pays is the flag you flip when you want to ship widely without per-user payment friction."
           />
           <FaqItem
             delay={400}
