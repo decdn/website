@@ -21,13 +21,13 @@ export function Method() {
           n="01"
           word="probe"
           delay={0}
-          body="a single quic 0-rtt handshake broadcasts the blake3 hash to a kademlia dht of nearby peers. each node answers with what it has cached, its current rate per megabyte, and how fast it can serve — p50 under 100 milliseconds. the client ranks the answers by price, latency, and reputation; the best-priced, fastest, most-reputable node wins the request, or several win in parallel for a large file."
+          body="in a single handshake, the client asks nearby peers who has the file. peers answer with what they've cached, their rate per megabyte, and how fast they can serve — the roundtrip averages under 100 milliseconds. the client ranks the answers by price, latency, and reputation; the best-priced, fastest, most-reputable peer wins, or several win in parallel for a large file."
         />
         <MethodRow
           n="02"
           word="swarm"
           delay={120}
-          body="bytes flow over quic directly from the chosen node; for files over ten gigabytes the client opens parallel streams to several peers at once and aggregates their throughput — a 1 gbps origin turns into multi-gigabit delivery to the client. every chunk is verified against the blake3 tree hash the instant it lands; tampered bytes trigger immediate disconnect and a fraud proof against the node's stake. trust no node — verify every byte."
+          body="bytes flow directly from the chosen node; for files over ten gigabytes the client opens parallel streams to several peers at once and aggregates their throughput — a 1 gbps origin turns into multi-gigabit delivery to the client. every chunk is verified against the blake3 tree hash the instant it lands; tampered bytes trigger immediate disconnect and a fraud proof against the node's stake. trust no node — verify every byte."
         />
         <MethodRow
           n="03"
