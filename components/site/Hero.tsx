@@ -6,7 +6,7 @@ import { HeroTerminal } from "@/components/site/HeroTerminal";
 
 export function Hero() {
   return (
-    <Frame id="s-01" tone="paper" className="overflow-hidden">
+    <Frame id="intro" tone="paper" className="overflow-hidden">
       <SectionHeader
         index="01"
         label="Hero"
@@ -35,7 +35,7 @@ export function Hero() {
           </div>
 
           <h1
-            id="s-01-h"
+            id="intro-h"
             className="hug flex flex-col font-semibold leading-[0.9] tracking-[-0.04em]"
             style={{ fontSize: "var(--fs-h1)" }}
           >

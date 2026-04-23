@@ -4,13 +4,13 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export function Faq() {
   return (
-    <Frame id="s-04" tone="ink">
+    <Frame id="faq" tone="ink">
       <SectionHeader index="04" label="FAQ" timestamp="field notes" />
 
       <div className="mt-14 flex flex-col gap-10">
         <h2
           data-reveal
-          id="s-04-h"
+          id="faq-h"
           className="hug font-semibold leading-[0.92] tracking-[-0.04em]"
           style={{ fontSize: "var(--fs-h2)" }}
         >
@@ -40,18 +40,18 @@ export function Faq() {
           />
           <FaqItem
             delay={320}
-            q="What happens if a node lies?"
-            a="The client detects the BLAKE3 mismatch on the very next chunk, drops the connection, and files a non-custodial Merkle proof against the node's stake. The good node further down the list keeps streaming — the client barely notices. The bad node loses TOKEN on-chain within minutes. There is no central arbiter; the math is the arbiter."
-          />
-          <FaqItem
-            delay={400}
             q="Does this work well for AI models?"
             a="Yes — AI is where deCDN's primitives compound. Clients pull large weights from several peers in parallel and saturate their own uplink instead of a single origin's. BLAKE3 chunk addressing lets teams grab one quantisation variant or a single layer without downloading the full checkpoint. And when a model drops and every region pulls it at once, the mesh warms around the demand instead of choking at a central bucket."
           />
           <FaqItem
-            delay={480}
+            delay={400}
             q="Can you serve private or subscription content?"
             a="Yes. Content is addressed by the BLAKE3 hash of the ciphertext, so nodes cache and serve encrypted blobs without ever seeing the plaintext. Your app holds the keys and hands them to clients over a separate, authenticated channel — subscription, paywall, whatever logic fits. One network serves both your public archives and your paying subscribers; only the keys tell them apart."
+          />
+          <FaqItem
+            delay={480}
+            q="How does content takedown work?"
+            a="Governance can flag specific BLAKE3 hashes as non-servable. Nodes that keep serving them past a short compliance window lose staked TOKEN — the slashing is on-chain, not a human call. The flag list is public and auditable, every operator runs against the same rules, and no single entity can quietly block content without everyone seeing it. Compliance is a first-class part of the protocol, not an afterthought."
           />
         </dl>
       </div>

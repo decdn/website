@@ -5,14 +5,14 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export function Method() {
   return (
-    <Frame id="s-03" tone="paper">
+    <Frame id="method" tone="paper">
       <SectionHeader
         index="03"
         label="How it works"
         timestamp="probe · swarm · settle"
       />
 
-      <h2 id="s-03-h" className="sr-only">
+      <h2 id="method-h" className="sr-only">
         How it works
       </h2>
 

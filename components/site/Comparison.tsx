@@ -4,7 +4,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export function Comparison() {
   return (
-    <Frame id="s-02" tone="ink">
+    <Frame id="compare" tone="ink">
       <SectionHeader
         index="02"
         label="Side by side"
@@ -14,7 +14,7 @@ export function Comparison() {
       <div className="mt-14 flex flex-col gap-10">
         <h2
           data-reveal
-          id="s-02-h"
+          id="compare-h"
           className="hug flex flex-col font-semibold leading-[0.92] tracking-[-0.04em]"
           style={{ fontSize: "var(--fs-h2)" }}
         >

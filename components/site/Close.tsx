@@ -5,7 +5,7 @@ import { FleetStatus } from "@/components/site/FleetStatus";
 
 export function Close() {
   return (
-    <Frame id="s-05" tone="paper" className="overflow-hidden">
+    <Frame id="contact" tone="paper" className="overflow-hidden">
       <SectionHeader
         index="05"
         label="Contact"
@@ -14,7 +14,7 @@ export function Close() {
 
       <div className="mt-14 grid gap-12 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,460px)] @4xl:items-start @4xl:gap-14">
         <div className="flex flex-col gap-12">
-          <h2 id="s-05-h" className="sr-only">
+          <h2 id="contact-h" className="sr-only">
             Contact
           </h2>
 
@@ -29,6 +29,7 @@ export function Close() {
             </span>
           </div>
 
+          {/* prettier-ignore */}
           <p
             data-reveal
             style={{
@@ -37,11 +38,7 @@ export function Close() {
             }}
             className="max-w-[64ch] leading-[1.7]"
           >
-            <span style={{ color: "var(--whisper)" }}>deCDN</span> is a
-            peer-to-peer delivery layer for large files — software releases,
-            datasets, media libraries, ai models, anything meant to be pulled a
-            million times and that shouldn&apos;t depend on one bucket. the code
-            is open. the network is open. the price is posted.
+            <span style={{ color: "var(--whisper)" }}>deCDN</span>{" "}is a peer-to-peer delivery layer for large files — software releases, datasets, media libraries, ai models, anything meant to be pulled a million times and that shouldn&apos;t depend on one bucket. the code is open. the network is open. the price is posted.
           </p>
 
           <div
