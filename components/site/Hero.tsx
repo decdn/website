@@ -19,20 +19,20 @@ export function Hero() {
           className="hug flex flex-col font-semibold leading-[0.9] tracking-[-0.04em]"
           style={{ fontSize: "var(--fs-h1)" }}
         >
-          <span className="rise rise-1">the delivery layer</span>
-          <span className="rise rise-2 pl-[4vw]">
+          <span className="rise rise-0">the delivery layer</span>
+          <span className="rise rise-1 pl-[4vw]">
             anyone can serve
             <span aria-hidden style={{ color: "var(--whisper)" }}>
               .
             </span>
           </span>
-          <span className="rise rise-2 pl-[8vw]">priced, not quoted.</span>
+          <span className="rise rise-1 pl-[8vw]">priced, not quoted.</span>
         </h1>
 
         <div className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-end @4xl:gap-12">
           <div className="flex flex-col gap-8 @4xl:gap-12">
             <p
-              className="rise rise-3 max-w-[64ch] leading-[1.65]"
+              className="rise rise-2 max-w-[64ch] leading-[1.65]"
               style={{ fontSize: "var(--fs-body)" }}
             >
               a 14-gigabyte file posted in berlin reaches a client in tokyo in
@@ -47,7 +47,7 @@ export function Hero() {
               price is posted.
             </p>
 
-            <div className="rise rise-4 flex flex-col flex-wrap gap-x-8 gap-y-3 @md:flex-row @md:items-end">
+            <div className="rise rise-3 flex flex-col flex-wrap gap-x-8 gap-y-3 @md:flex-row @md:items-end">
               <a
                 className="underline-brutal font-semibold tracking-[0.14em] uppercase"
                 style={{ fontSize: "var(--fs-cta)" }}
@@ -82,7 +82,7 @@ export function Hero() {
               </a>
             </div>
 
-            <div className="rise rise-5 grid grid-cols-2 gap-y-4 @xl:grid-cols-4">
+            <div className="rise rise-4 grid grid-cols-2 gap-y-4 @xl:grid-cols-4">
               <Figure label="target price" value="$0.01/GB" />
               <Figure label="p50 latency" value="50–100 ms" />
               <Figure label="settlement" value="per-MB · usdc" />
