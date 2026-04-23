@@ -1,13 +1,13 @@
-// TODO: replace all placeholder URLs before launch.
-// When `site` is swapped to a real origin, flip `robots` to
-// `index: true` in app/layout.tsx.
+// TODO: replace remaining placeholder URLs before launch.
+// When `site`, `whitepaper`, and `runNode` are swapped to real origins,
+// flip `robots` to `index: true` in app/layout.tsx.
 export const links = {
   site: "https://decdn.example",
-  github: "https://github.com/REPLACE_ME/decdn",
+  github: "https://github.com/decdn",
   whitepaper: "https://decdn.example/whitepaper.pdf",
-  docs: "https://decdn.example/docs",
+  docs: "https://docs.decdn.org/overview/introduction",
   runNode: "https://decdn.example/docs/run-a-node",
-  contact: "mailto:hello@decdn.example",
+  contact: "mailto:info@decdn.org",
 } as const;
 
 export type LinkKey = keyof typeof links;

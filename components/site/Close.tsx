@@ -54,6 +54,8 @@ export function Close() {
               className="underline-brutal font-semibold tracking-[0.02em]"
               style={{ fontSize: "var(--fs-lead)" }}
               href={links.whitepaper}
+              target="_blank"
+              rel="noopener noreferrer"
             >
               read the whitepaper
               <span className="arrow" aria-hidden>
