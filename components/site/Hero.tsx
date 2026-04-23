@@ -19,8 +19,8 @@ export function Hero() {
           className="hug flex flex-col font-semibold leading-[0.9] tracking-[-0.04em]"
           style={{ fontSize: "var(--fs-h1)" }}
         >
-          <span className="rise rise-0">the delivery layer</span>
-          <span className="rise rise-1 pl-[4vw]">
+          <span className="rise rise-1">the delivery layer</span>
+          <span className="rise rise-2 pl-[4vw]">
             anyone can serve
             <span aria-hidden style={{ color: "var(--whisper)" }}>
               .
