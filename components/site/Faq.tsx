@@ -51,7 +51,7 @@ export function Faq() {
           <FaqItem
             delay={480}
             q="How does content takedown work?"
-            a="Governance can flag specific BLAKE3 hashes as non-servable. Nodes that keep serving them past a short compliance window lose staked TOKEN — the slashing is on-chain, not a human call. The flag list is public and auditable, every operator runs against the same rules, and no single entity can quietly block content without everyone seeing it. Compliance is a first-class part of the protocol, not an afterthought."
+            a="Governance can flag specific BLAKE3 hashes as non-servable. Nodes that keep serving them past a short compliance window lose staked TOKEN — the slashing is on-chain, not a human call. The flag list is public and auditable, every operator runs against the same rules, and no single entity can quietly block content without everyone seeing it. Compliance is a first-class part of the protocol, not an afterthought — it starts at origin onboarding, ends at peer-level slashing, governance-owned and auditable throughout."
           />
         </dl>
       </div>
