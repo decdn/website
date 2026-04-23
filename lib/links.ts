@@ -7,7 +7,7 @@ export const links = {
   whitepaper: "https://decdn.example/whitepaper.pdf",
   docs: "https://docs.decdn.org/overview/introduction",
   runNode: "https://decdn.example/docs/run-a-node",
-  contact: "mailto:hello@decdn.example",
+  contact: "mailto:info@decdn.org",
 } as const;
 
 export type LinkKey = keyof typeof links;

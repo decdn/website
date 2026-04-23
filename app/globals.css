@@ -675,11 +675,12 @@ a.underline-brutal:hover .arrow {
 /* --- chrome nav -------------------------------------------------------
    Top navbar affordances. The bar is transparent over the hero and
    fades in a tone-matched frosted backdrop once the user scrolls past
-   the threshold. Active section gets a whisper-green §0X number and a
-   full-width underline that scales from the left; hover shows a quiet
-   preview; focus paints a dashed outline that matches the terminal /
-   fleet border vocabulary. No mix-blend-mode is used — the parent nav
-   toggles `data-tone` per-section to work around Safari's bug with
+   the threshold. The active section's nav item shows a full-width
+   whisper-green underline (scales in from the left) and a brighter
+   label opacity; hover shows a short underline preview. Focus paints
+   a dashed outline that matches the terminal / fleet border
+   vocabulary. No mix-blend-mode is used — the parent nav toggles
+   `data-tone` per-section to work around Safari's bug with
    `mix-blend-mode: difference` on `position: fixed` elements
    (see components/site/Chrome.tsx). */
 
