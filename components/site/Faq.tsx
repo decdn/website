@@ -35,8 +35,8 @@ export function Faq() {
           />
           <FaqItem
             delay={240}
-            q="Who actually pays?"
-            a="The client pulling the bytes. When a session starts, the client opens an off-chain USDC channel and streams payment per megabyte as chunks arrive. No subscription, no account, no invoice — when the download finishes, the channel closes and settles. You pay for what you pulled, nothing more."
+            q="Can publishers pay on behalf of users?"
+            a="Yes. Account abstraction lets a publisher fund a payment channel for their audience, so users pull content with no wallet and no subscription — same free-to-download experience as a public mirror, except the publisher pays peers per megabyte instead of one cloud's egress bill. Default flow is client-pays; publisher-pays is the flag you flip when you want to ship widely without per-user payment friction."
           />
           <FaqItem
             delay={320}
@@ -45,13 +45,8 @@ export function Faq() {
           />
           <FaqItem
             delay={400}
-            q="Can you serve private or subscription content?"
-            a="Yes — content is addressed by the BLAKE3 hash of the ciphertext, so nodes cache and serve encrypted blobs without ever seeing the plaintext. Your app holds the keys and hands them to clients over a separate, authenticated channel — subscription, paywall, whatever logic fits. One network serves both your public archives and your paying subscribers; only the keys tell them apart."
-          />
-          <FaqItem
-            delay={480}
-            q="How does content takedown work?"
-            a="Governance can flag specific BLAKE3 hashes as non-servable. Nodes that keep serving them past a short compliance window lose staked TOKEN — the slashing is on-chain, not a human call. The flag list is public and auditable, every operator runs against the same rules, and no single entity can quietly block content without everyone seeing it. Compliance is a first-class part of the protocol, not an afterthought — it starts at origin onboarding, ends at peer-level slashing, governance-owned and auditable throughout."
+            q="Can content be gated or taken down?"
+            a="Both. For gating: upload ciphertext instead of plaintext — nodes cache the encrypted blob without ever seeing inside, and your app holds the keys, handing them to clients over a separate authenticated channel. Subscription, paywall, whatever logic fits. For takedown: governance can flag specific BLAKE3 hashes as non-servable, and nodes that keep serving them past a short compliance window lose staked TOKEN — slashing is on-chain, not a human call. Both the key gate and the flag list are auditable; compliance runs end-to-end, from origin onboarding to peer-level slashing, governance-owned and auditable throughout."
           />
         </dl>
       </div>
