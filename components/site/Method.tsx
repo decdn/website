@@ -37,7 +37,7 @@ export function Method() {
         />
       </div>
 
-      <div data-reveal className="mt-auto pt-12">
+      <div data-reveal className="mt-auto pt-20">
         <span className="meta mb-3 block opacity-60">stack</span>
         <div
           className="hug flex flex-wrap items-baseline gap-x-5 gap-y-2 font-semibold tracking-[-0.03em]"

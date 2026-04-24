@@ -28,7 +28,7 @@ export function Comparison() {
             ["--reveal-delay" as string]: "120ms",
             fontSize: "var(--fs-body)",
           }}
-          className="max-w-[62ch] leading-[1.7] text-paper/75"
+          className="mt-6 max-w-[62ch] leading-[1.7] text-paper/75"
         >
           the pattern repeats whenever something big ships: mirrors fork, cdns
           rate-limit, small teams burn tens of thousands hosting bytes they
@@ -37,7 +37,7 @@ export function Comparison() {
         </p>
       </div>
 
-      <div className="mt-auto flex flex-col pt-12">
+      <div className="mt-auto flex flex-col pt-20">
         <div
           data-reveal
           style={{ ["--reveal-delay" as string]: "260ms" }}

@@ -27,7 +27,6 @@ export function Frame({
   children,
 }: FrameProps) {
   const style: CSSProperties = {
-    minHeight: "min(100svh, var(--frame-min-h-cap))",
     paddingInline: "var(--frame-gutter)",
     paddingTop: "var(--frame-pad-top)",
     paddingBottom: "var(--frame-pad-y)",

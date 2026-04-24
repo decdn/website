@@ -17,7 +17,7 @@ export function Faq() {
           frequently asked.
         </h2>
 
-        <dl className="flex flex-col divide-y divide-current/20">
+        <dl className="mt-6 flex flex-col divide-y divide-current/20">
           <FaqItem
             delay={0}
             q="How is it 90% cheaper?"

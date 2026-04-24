@@ -34,7 +34,7 @@ export function Hero() {
           <span className="rise rise-2 pl-[8vw]">priced, not quoted.</span>
         </h1>
 
-        <div className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-end @4xl:gap-12">
+        <div className="mt-6 grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-end @4xl:gap-12">
           <div className="flex flex-col gap-8 @4xl:gap-12">
             <p
               className="rise rise-3 max-w-[64ch] leading-[1.65]"
