@@ -20,8 +20,8 @@
   --frame-gutter: clamp(1.5rem, 4vw, 4rem);
   /* Symmetric top/bottom section padding — sections size to their
      content and this sets the breathing room at each end. */
-  --frame-pad-top: clamp(2.5rem, 5vw, 4rem);
-  --frame-pad-y: clamp(2.5rem, 5vw, 4rem);
+  --frame-pad-top: clamp(2.75rem, 5.5vw, 4.5rem);
+  --frame-pad-y: clamp(2.75rem, 5.5vw, 4.5rem);
 
   /* Type scale: micro and CTA are fixed; body and headlines scale with viewport. */
   --fs-micro: 0.6875rem;
