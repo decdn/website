@@ -19,6 +19,10 @@
   --frame-max: 1280px;
   --frame-gutter: clamp(1.5rem, 4vw, 4rem);
   --frame-pad-y: clamp(4rem, 9vw, 7rem);
+  /* Top padding is ~68% of --frame-pad-y: each section's header sits
+     closer to the divider from the previous block, matching the
+     tightened hero. Bottom padding keeps the full --frame-pad-y. */
+  --frame-pad-top: clamp(2.75rem, 6vw, 4.75rem);
   --frame-min-h-cap: 54rem;
 
   /* Type scale: micro and CTA are fixed; body and headlines scale with viewport. */

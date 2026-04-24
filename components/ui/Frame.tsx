@@ -7,9 +7,9 @@ type FrameProps = {
   tone: Tone;
   /** Extra classes on the outer <section>. */
   className?: string;
-  /** Override the section's top padding (default: var(--frame-pad-y)).
+  /** Override the section's top padding (default: var(--frame-pad-top)).
       The first section passes a tighter value so it sits just below the
-      fixed Chrome nav instead of leaving a full frame-pad gap above. */
+      fixed Chrome nav instead of leaving a --frame-pad-top gap above. */
   paddingTop?: string;
   children: ReactNode;
 };
@@ -29,7 +29,8 @@ export function Frame({
   const style: CSSProperties = {
     minHeight: "min(100svh, var(--frame-min-h-cap))",
     paddingInline: "var(--frame-gutter)",
-    paddingBlock: "var(--frame-pad-y)",
+    paddingTop: "var(--frame-pad-top)",
+    paddingBottom: "var(--frame-pad-y)",
   };
   if (paddingTop !== undefined) {
     style.paddingTop = paddingTop;
