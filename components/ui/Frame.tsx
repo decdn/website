@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 type Tone = "ink" | "paper";
 
@@ -7,6 +7,10 @@ type FrameProps = {
   tone: Tone;
   /** Extra classes on the outer <section>. */
   className?: string;
+  /** Override the section's top padding (default: var(--frame-pad-y)).
+      The first section passes a tighter value so it sits just below the
+      fixed Chrome nav instead of leaving a full frame-pad gap above. */
+  paddingTop?: string;
   children: ReactNode;
 };
 
@@ -15,17 +19,28 @@ const TONE_CLASS: Record<Tone, string> = {
   paper: "bg-[var(--paper)] text-[var(--ink)]",
 };
 
-export function Frame({ id, tone, className = "", children }: FrameProps) {
+export function Frame({
+  id,
+  tone,
+  className = "",
+  paddingTop,
+  children,
+}: FrameProps) {
+  const style: CSSProperties = {
+    minHeight: "min(100svh, var(--frame-min-h-cap))",
+    paddingInline: "var(--frame-gutter)",
+    paddingBlock: "var(--frame-pad-y)",
+  };
+  if (paddingTop !== undefined) {
+    style.paddingTop = paddingTop;
+  }
+
   return (
     <section
       id={id}
       aria-labelledby={`${id}-h`}
       className={`relative flex scroll-mt-0 flex-col ${TONE_CLASS[tone]} ${className}`}
-      style={{
-        minHeight: "min(100svh, var(--frame-min-h-cap))",
-        paddingInline: "var(--frame-gutter)",
-        paddingBlock: "var(--frame-pad-y)",
-      }}
+      style={style}
     >
       <div
         className="@container relative z-10 mx-auto flex w-full flex-1 flex-col"

@@ -6,7 +6,12 @@ import { HeroTerminal } from "@/components/site/HeroTerminal";
 
 export function Hero() {
   return (
-    <Frame id="intro" tone="paper" className="overflow-hidden">
+    <Frame
+      id="intro"
+      tone="paper"
+      paddingTop="calc(var(--nav-h) + 1rem)"
+      className="overflow-hidden"
+    >
       <SectionHeader
         index="01"
         label="Hero"

@@ -4,6 +4,9 @@
   --ink: #000000;
   --paper: #ffffff;
   --whisper: #0f9d6a;
+  /* Visual height of the fixed Chrome nav — used by the first section
+     to sit flush under the bar instead of inheriting --frame-pad-y. */
+  --nav-h: 3.75rem;
 }
 
 @theme inline {
