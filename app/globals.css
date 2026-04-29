@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --ink: #1d1d1f;
+  --ink: #000000;
   --paper: #ffffff;
   --whisper: #ebd0d0;
   /* Visual height of the fixed Chrome nav. Frame uses it as scroll-margin
