@@ -20,7 +20,7 @@ export function Frame({ id, tone, className = "", children }: FrameProps) {
     <section
       id={id}
       aria-labelledby={`${id}-h`}
-      className={`relative flex scroll-mt-0 flex-col ${TONE_CLASS[tone]} ${className}`}
+      className={`relative flex scroll-mt-[var(--nav-h)] flex-col ${TONE_CLASS[tone]} ${className}`}
       style={{
         minHeight: "min(100svh, var(--frame-min-h-cap))",
         paddingInline: "var(--frame-gutter)",
