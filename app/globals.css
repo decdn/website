@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --ink: #000000;
+  --ink: #0f1f35;
   --paper: #ffffff;
-  --whisper: #0f9d6a;
+  --whisper: #ebd0d0;
   /* Visual height of the fixed Chrome nav. Frame uses it as scroll-margin
      so anchor jumps don't land with the section header clipped. */
   --nav-h: 3rem;
