@@ -92,6 +92,9 @@ export function Chrome() {
         <a href="#intro" className="flex items-baseline gap-3 no-underline">
           <span className="text-[15px] font-semibold tracking-[-0.02em] lowercase">
             deCDN
+            <span aria-hidden style={{ color: "var(--whisper)" }}>
+              _
+            </span>
           </span>
           <span className="meta hidden opacity-70 sm:inline">
             labs · mmxxvi
