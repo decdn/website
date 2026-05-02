@@ -33,4 +33,4 @@ pnpm format           # prettier --write .
 - **Static export only.** `next.config.ts` has `output: "export"`. No SSR, route handlers, ISR, middleware, or Image Optimization API. Build output lands in `out/`.
 - **Tailwind v4.** `globals.css` uses `@import "tailwindcss"` and `@theme inline { … }`. There is no `tailwind.config.*` — theme tokens live in CSS. Don't reach for v3 directives.
 - **Conventional commits required.** `commitlint` runs in the `commit-msg` husky hook; non-conforming messages are rejected.
-- **Placeholder links.** `lib/links.ts` points at `decdn.example`. `app/layout.tsx` keeps `robots: { index: false }` until that is swapped. Flip both together, never one alone.
+- **`metadataBase` is live.** `lib/links.ts` `site` is the real origin and `robots: { index: true }`. Anything that absolutizes through `metadataBase` (OG, JSON-LD, canonical) ships to production — keep payloads accurate.
