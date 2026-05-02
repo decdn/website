@@ -1,5 +1,4 @@
-// `litepaper` is wired same-origin; the PDF is intentionally not in public/ yet,
-// so the link 404s until the PDF is published.
+// `litepaper` 404s until the PDF lands in public/ — see #26.
 export const links = {
   site: "https://decdn.org",
   github: "https://github.com/decdn",

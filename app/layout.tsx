@@ -35,6 +35,7 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
   },
+  alternates: { canonical: "/" },
   robots: { index: true, follow: true },
 };
 
@@ -43,6 +44,9 @@ export const viewport: Viewport = {
   themeColor: "#000000",
 };
 
+// Trailing-slash base: lets us concat `${SITE_URL}icon.svg` and stable-fragment
+// @ids (`${SITE_URL}#organization`) without manual joins. trailingSlash: true
+// is set in next.config.ts; keep these consistent.
 const SITE_URL = new URL("/", links.site).toString();
 const ORG_ID = `${SITE_URL}#organization`;
 const SITE_ID = `${SITE_URL}#website`;
@@ -79,16 +83,13 @@ export default function RootLayout({
       className={`${geistSans.variable} h-full motion-safe:scroll-smooth`}
     >
       <body className="min-h-full">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationSchema),
-          }}
-        />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
-        />
+        {[organizationSchema, websiteSchema].map((schema) => (
+          <script
+            key={schema["@id"]}
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+          />
+        ))}
         <Chrome />
         <ScrollReveal />
         {children}
