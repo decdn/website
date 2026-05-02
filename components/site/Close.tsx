@@ -25,7 +25,7 @@ export function Close() {
           >
             <span>decdn</span>
             <span aria-hidden style={{ color: "var(--whisper)" }}>
-              .
+              _
             </span>
           </div>
 
