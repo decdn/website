@@ -43,16 +43,17 @@ export const viewport: Viewport = {
   themeColor: "#000000",
 };
 
-const ORG_ID = `${links.site}/#organization`;
-const SITE_ID = `${links.site}/#website`;
+const SITE_URL = new URL("/", links.site).toString();
+const ORG_ID = `${SITE_URL}#organization`;
+const SITE_ID = `${SITE_URL}#website`;
 
 const organizationSchema = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "@id": ORG_ID,
   name: "deCDN",
-  url: links.site,
-  logo: `${links.site}/icon.svg`,
+  url: SITE_URL,
+  logo: `${SITE_URL}icon.svg`,
   description: DESCRIPTION,
   sameAs: [links.github],
 };
@@ -61,7 +62,7 @@ const websiteSchema = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "@id": SITE_ID,
-  url: links.site,
+  url: SITE_URL,
   name: "deCDN",
   description: DESCRIPTION,
   publisher: { "@id": ORG_ID },
