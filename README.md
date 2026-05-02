@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# deCDN — marketing site
 
-## Getting Started
+A peer-to-peer delivery layer for bytes at scale. Anyone can serve bytes; clients pay per megabyte in USDC.
 
-First, run the development server:
+![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
+![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
+![Tailwind CSS v4](https://img.shields.io/badge/Tailwind%20CSS-v4-06B6D4?logo=tailwindcss&logoColor=white)
+![TypeScript 5](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white)
+![Cloudflare Pages](https://img.shields.io/badge/Cloudflare%20Pages-deployed-F38020?logo=cloudflarepages&logoColor=white)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-FE5196?logo=conventionalcommits&logoColor=white)](https://www.conventionalcommits.org)
+![Code style: Prettier](https://img.shields.io/badge/code%20style-Prettier-F7B93E?logo=prettier&logoColor=black)
+
+This is the source for the static one-page deCDN marketing site.
+
+## Stack
+
+Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · TypeScript · pnpm. Static export, deployed to Cloudflare Pages.
+
+## Getting started
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install   # required (not npm/yarn) — husky hooks shell out to `pnpm exec`
+pnpm dev       # dev server on :3000
+pnpm build     # static export → ./out
+pnpm lint      # eslint (flat config)
+pnpm format    # prettier --write .
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project layout
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `app/` — App Router entry (`layout.tsx`, `page.tsx`, `globals.css`).
+- `components/site/` — page sections composed by `app/page.tsx` (Hero, Comparison, Method, Faq, Close).
+- `components/ui/` — low-level primitives (Frame, SectionHeader, Figure, …).
+- `lib/` — shared helpers (currently just `links.ts`).
+- Path alias: `@/*` maps to the project root (e.g. `@/lib/links`, not `@/src/...`).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Gotchas
 
-## Learn More
+- **Static export only.** `next.config.ts` sets `output: "export"`; the build emits `./out`. No SSR, route handlers, ISR, middleware, or Image Optimization API.
+- **Tailwind v4.** Theme tokens live in `app/globals.css` under `@theme inline { … }` — there is no `tailwind.config.*`.
+- **Conventional commits enforced.** `commitlint` runs in the `commit-msg` husky hook; non-conforming messages are rejected.
+- **Placeholder links.** `lib/links.ts` points at `decdn.example`, and `app/layout.tsx` keeps `robots: { index: false }`. Flip both together, never one alone.
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Cloudflare Pages serves the `out/` directory produced by `pnpm build`.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Agent contributors
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [`AGENTS.md`](./AGENTS.md) for the full ruleset (`CLAUDE.md` is a one-line include of it).
