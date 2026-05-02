@@ -72,6 +72,12 @@ const websiteSchema = {
   publisher: { "@id": ORG_ID },
 };
 
+// Inline JSON in <script> must escape `<` so a stray `</script>` in any field
+// can't close the tag and create an XSS sink. < decodes back to `<` in
+// every JSON parser, so structured-data consumers are unaffected.
+const safeJSONLD = (data: unknown) =>
+  JSON.stringify(data).replace(/</g, "\\u003c");
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -87,7 +93,7 @@ export default function RootLayout({
           <script
             key={schema["@id"]}
             type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+            dangerouslySetInnerHTML={{ __html: safeJSONLD(schema) }}
           />
         ))}
         <Chrome />
