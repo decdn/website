@@ -23,8 +23,8 @@ Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · TypeScript · pnpm. St
 pnpm install   # required (not npm/yarn) — husky hooks shell out to `pnpm exec`
 pnpm dev       # dev server on :3000
 pnpm build     # static export → ./out
-pnpm lint
-pnpm format
+pnpm lint      # eslint (flat config)
+pnpm format    # prettier --write .
 ```
 
 ## Project layout
