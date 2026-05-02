@@ -59,7 +59,7 @@ const organizationSchema = {
   url: SITE_URL,
   logo: `${SITE_URL}icon.svg`,
   description: DESCRIPTION,
-  sameAs: [links.github],
+  sameAs: [links.github, links.x],
 };
 
 const websiteSchema = {
