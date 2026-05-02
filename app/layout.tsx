@@ -35,12 +35,36 @@ export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
   },
-  robots: { index: false, follow: true },
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
   colorScheme: "light",
   themeColor: "#000000",
+};
+
+const ORG_ID = `${links.site}/#organization`;
+const SITE_ID = `${links.site}/#website`;
+
+const organizationSchema = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "@id": ORG_ID,
+  name: "deCDN",
+  url: links.site,
+  logo: `${links.site}/icon.svg`,
+  description: DESCRIPTION,
+  sameAs: [links.github],
+};
+
+const websiteSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": SITE_ID,
+  url: links.site,
+  name: "deCDN",
+  description: DESCRIPTION,
+  publisher: { "@id": ORG_ID },
 };
 
 export default function RootLayout({
@@ -54,6 +78,16 @@ export default function RootLayout({
       className={`${geistSans.variable} h-full motion-safe:scroll-smooth`}
     >
       <body className="min-h-full">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationSchema),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
         <Chrome />
         <ScrollReveal />
         {children}

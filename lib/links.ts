@@ -1,9 +1,7 @@
-// TODO: replace placeholder `site` URL before launch.
-// When swapped to real origin, flip `robots` to `index: true` in app/layout.tsx.
 // `litepaper` is wired same-origin; the PDF is intentionally not in public/ yet,
 // so the link 404s until the PDF is published.
 export const links = {
-  site: "https://decdn.example",
+  site: "https://decdn.org",
   github: "https://github.com/decdn",
   litepaper: "/litepaper-v0.pdf",
   docs: "https://docs.decdn.org/overview/introduction",
