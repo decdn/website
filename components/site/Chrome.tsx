@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { links } from "@/lib/links";
 
 const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
@@ -23,47 +23,44 @@ const DARK_SECTIONS: ReadonlySet<(typeof SECTION_IDS)[number]> = new Set([
 export function Chrome() {
   const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
   const [scrolled, setScrolled] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
 
+  // Active section = the one whose vertical span includes the navbar's bottom
+  // edge. This makes the tone flip happen exactly when a section's top crosses
+  // under the navbar — synchronous with the visual background change behind it.
   useEffect(() => {
     const nodes = SECTION_IDS.map((id) => document.getElementById(id)).filter(
       (n): n is HTMLElement => n !== null,
     );
     if (nodes.length === 0) return;
 
-    // Track intersection ratio for every observed section across callbacks —
-    // IO only delivers entries whose intersection changed, so using `entries`
-    // alone can flicker when the most-visible section didn't change this tick.
-    const visibility = new Map<(typeof SECTION_IDS)[number], number>(
-      SECTION_IDS.map((id) => [id, 0]),
-    );
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const { id } = entry.target;
-          if ((SECTION_IDS as readonly string[]).includes(id)) {
-            visibility.set(
-              id as (typeof SECTION_IDS)[number],
-              entry.isIntersecting ? entry.intersectionRatio : 0,
-            );
-          }
+    let raf = 0;
+    const compute = () => {
+      raf = 0;
+      const line = (navRef.current?.offsetHeight ?? 0) + 1;
+      let next: (typeof SECTION_IDS)[number] | null = null;
+      for (const node of nodes) {
+        const rect = node.getBoundingClientRect();
+        if (rect.top <= line && rect.bottom > line) {
+          next = node.id as (typeof SECTION_IDS)[number];
+          break;
         }
+      }
+      if (next !== null) setActive(next);
+    };
 
-        let next: (typeof SECTION_IDS)[number] | null = null;
-        let maxRatio = 0;
-        visibility.forEach((ratio, id) => {
-          if (ratio > maxRatio) {
-            maxRatio = ratio;
-            next = id;
-          }
-        });
-        if (next !== null) setActive(next);
-      },
-      { threshold: [0.3, 0.6] },
-    );
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(compute);
+    };
 
-    nodes.forEach((n) => io.observe(n));
-    return () => io.disconnect();
+    compute();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (raf) cancelAnimationFrame(raf);
+    };
   }, []);
 
   useEffect(() => {
@@ -77,6 +74,7 @@ export function Chrome() {
 
   return (
     <nav
+      ref={navRef}
       aria-label="Primary"
       data-scrolled={scrolled ? "true" : undefined}
       data-tone={onDark ? "ink" : "paper"}
@@ -89,13 +87,28 @@ export function Chrome() {
         className="mx-auto flex w-full items-center justify-between gap-4"
         style={{ maxWidth: "var(--frame-max)" }}
       >
-        <a href="#intro" className="flex items-baseline gap-3 no-underline">
-          <span className="text-[15px] font-semibold tracking-[-0.02em] lowercase">
-            deCDN
-            <span aria-hidden style={{ color: "var(--whisper)" }}>
-              _
-            </span>
-          </span>
+        <a href="#intro" className="flex items-center gap-3 no-underline">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/white-nav-logo.png"
+            alt="decdn_"
+            style={{
+              height: "20px",
+              width: "auto",
+              display: onDark ? "none" : "block",
+            }}
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/black-nav-logo.png"
+            alt=""
+            aria-hidden="true"
+            style={{
+              height: "20px",
+              width: "auto",
+              display: onDark ? "block" : "none",
+            }}
+          />
           <span className="meta hidden opacity-70 sm:inline">
             labs · mmxxvi
           </span>
