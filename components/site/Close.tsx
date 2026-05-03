@@ -24,7 +24,14 @@ export function Close() {
             style={{ fontSize: "var(--fs-display)", lineHeight: "0.86" }}
           >
             <span>decdn</span>
-            <span aria-hidden style={{ color: "var(--whisper)" }}>
+            <span
+              aria-hidden
+              className="inline-block"
+              style={{
+                color: "var(--whisper)",
+                transform: "translateY(-0.108em)",
+              }}
+            >
               _
             </span>
           </div>
