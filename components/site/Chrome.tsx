@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { links } from "@/lib/links";
 
 const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
@@ -23,47 +23,47 @@ const DARK_SECTIONS: ReadonlySet<(typeof SECTION_IDS)[number]> = new Set([
 export function Chrome() {
   const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
   const [scrolled, setScrolled] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
 
+  // Active section = whichever one paints the strip directly under the
+  // navbar. We collapse the IO root into a 1px horizontal slice at y =
+  // navbar.offsetHeight via rootMargin — the section currently
+  // intersecting that slice is the one whose background sits behind the
+  // nav, so the tone flip happens exactly when its top crosses under.
+  // Rebuilt on resize because rootMargin is static and the bottom inset
+  // depends on window.innerHeight.
   useEffect(() => {
     const nodes = SECTION_IDS.map((id) => document.getElementById(id)).filter(
       (n): n is HTMLElement => n !== null,
     );
     if (nodes.length === 0) return;
 
-    // Track intersection ratio for every observed section across callbacks —
-    // IO only delivers entries whose intersection changed, so using `entries`
-    // alone can flicker when the most-visible section didn't change this tick.
-    const visibility = new Map<(typeof SECTION_IDS)[number], number>(
-      SECTION_IDS.map((id) => [id, 0]),
-    );
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const { id } = entry.target;
-          if ((SECTION_IDS as readonly string[]).includes(id)) {
-            visibility.set(
-              id as (typeof SECTION_IDS)[number],
-              entry.isIntersecting ? entry.intersectionRatio : 0,
-            );
+    let io: IntersectionObserver | null = null;
+    const build = () => {
+      io?.disconnect();
+      const navH = navRef.current?.offsetHeight ?? 0;
+      const margin = `-${navH}px 0px -${window.innerHeight - navH - 1}px 0px`;
+      io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const { id } = entry.target;
+            if ((SECTION_IDS as readonly string[]).includes(id)) {
+              setActive(id as (typeof SECTION_IDS)[number]);
+            }
           }
-        }
+        },
+        { rootMargin: margin, threshold: 0 },
+      );
+      nodes.forEach((n) => io!.observe(n));
+    };
 
-        let next: (typeof SECTION_IDS)[number] | null = null;
-        let maxRatio = 0;
-        visibility.forEach((ratio, id) => {
-          if (ratio > maxRatio) {
-            maxRatio = ratio;
-            next = id;
-          }
-        });
-        if (next !== null) setActive(next);
-      },
-      { threshold: [0.3, 0.6] },
-    );
-
-    nodes.forEach((n) => io.observe(n));
-    return () => io.disconnect();
+    build();
+    window.addEventListener("resize", build, { passive: true });
+    return () => {
+      window.removeEventListener("resize", build);
+      io?.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -77,6 +77,7 @@ export function Chrome() {
 
   return (
     <nav
+      ref={navRef}
       aria-label="Primary"
       data-scrolled={scrolled ? "true" : undefined}
       data-tone={onDark ? "ink" : "paper"}

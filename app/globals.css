@@ -4,9 +4,10 @@
   --ink: #000000;
   --paper: #ffffff;
   --whisper: #0f9d6a;
-  /* Visual height of the fixed Chrome nav. Frame uses it as scroll-margin
-     so anchor jumps don't land with the section header clipped. */
-  --nav-h: 3rem;
+  /* Anchor jumps park sections at the navbar's bottom line. Frame consumes
+     this via scroll-mt-[var(--nav-h)]; --frame-pad-y inside the section
+     keeps the section header clear of the fixed nav. */
+  --nav-h: 0;
 }
 
 @theme inline {
