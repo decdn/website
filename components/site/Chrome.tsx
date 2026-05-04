@@ -90,13 +90,32 @@ export function Chrome() {
         className="mx-auto flex w-full items-center justify-between gap-4"
         style={{ maxWidth: "var(--frame-max)" }}
       >
-        <a href="#intro" className="flex items-baseline gap-3 no-underline">
-          <span className="text-[15px] font-semibold tracking-[-0.02em] lowercase">
-            deCDN
-            <span aria-hidden style={{ color: "var(--whisper)" }}>
-              _
-            </span>
-          </span>
+        <a href="#intro" className="flex items-center gap-3 no-underline">
+          {/* Both variants stay mounted and toggle via `display` so the tone
+              flip never flashes a blank — the dark variant is already
+              decoded when its turn comes. `display: none` keeps the hidden
+              image out of the a11y tree, so duplicate alts don't double-
+              announce. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/wordmark-light.svg"
+            alt="decdn_"
+            style={{
+              height: "15px",
+              width: "auto",
+              display: onDark ? "none" : "block",
+            }}
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/wordmark-dark.svg"
+            alt="decdn_"
+            style={{
+              height: "15px",
+              width: "auto",
+              display: onDark ? "block" : "none",
+            }}
+          />
           <span className="meta hidden opacity-70 sm:inline">
             labs · mmxxvi
           </span>
