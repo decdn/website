@@ -30,8 +30,15 @@ export function Chrome() {
   // navbar.offsetHeight via rootMargin — the section currently
   // intersecting that slice is the one whose background sits behind the
   // nav, so the tone flip happens exactly when its top crosses under.
-  // Rebuilt on resize because rootMargin is static and the bottom inset
-  // depends on window.innerHeight.
+  //
+  // The slice depends on window.innerHeight AND navbar.offsetHeight, so
+  // the IO is rebuilt on (a) window resize and (b) nav-size changes
+  // (e.g. webfont swap). Rebuilds are rAF-coalesced so a resize burst
+  // collapses to one rebuild per frame. When two adjacent sections
+  // share the slice (subpixel rounding at boundaries), we pick the
+  // entry with the largest boundingClientRect.top — the section whose
+  // top has just crossed under the nav, matching the boundary-precise
+  // intent.
   useEffect(() => {
     const nodes = SECTION_IDS.map((id) => document.getElementById(id)).filter(
       (n): n is HTMLElement => n !== null,
@@ -42,26 +49,46 @@ export function Chrome() {
     const build = () => {
       io?.disconnect();
       const navH = navRef.current?.offsetHeight ?? 0;
-      const margin = `-${navH}px 0px -${window.innerHeight - navH - 1}px 0px`;
+      const bottomInset = Math.max(0, window.innerHeight - navH - 1);
+      const margin = `-${navH}px 0px -${bottomInset}px 0px`;
       io = new IntersectionObserver(
         (entries) => {
+          let bestId: (typeof SECTION_IDS)[number] | null = null;
+          let bestTop = -Infinity;
           for (const entry of entries) {
             if (!entry.isIntersecting) continue;
             const { id } = entry.target;
-            if ((SECTION_IDS as readonly string[]).includes(id)) {
-              setActive(id as (typeof SECTION_IDS)[number]);
+            if (!(SECTION_IDS as readonly string[]).includes(id)) continue;
+            const top = entry.boundingClientRect.top;
+            if (top > bestTop) {
+              bestTop = top;
+              bestId = id as (typeof SECTION_IDS)[number];
             }
           }
+          if (bestId !== null) setActive(bestId);
         },
         { rootMargin: margin, threshold: 0 },
       );
       nodes.forEach((n) => io!.observe(n));
     };
 
+    let resizeRaf = 0;
+    const onResize = () => {
+      if (resizeRaf) return;
+      resizeRaf = requestAnimationFrame(() => {
+        resizeRaf = 0;
+        build();
+      });
+    };
+
     build();
-    window.addEventListener("resize", build, { passive: true });
+    const ro = new ResizeObserver(onResize);
+    if (navRef.current) ro.observe(navRef.current);
+    window.addEventListener("resize", onResize, { passive: true });
     return () => {
-      window.removeEventListener("resize", build);
+      window.removeEventListener("resize", onResize);
+      if (resizeRaf) cancelAnimationFrame(resizeRaf);
+      ro.disconnect();
       io?.disconnect();
     };
   }, []);
