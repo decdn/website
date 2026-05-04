@@ -48,7 +48,8 @@ export function Chrome() {
     let io: IntersectionObserver | null = null;
     const build = () => {
       io?.disconnect();
-      const navH = navRef.current?.offsetHeight ?? 0;
+      const rawNavH = navRef.current?.offsetHeight ?? 0;
+      const navH = Math.min(rawNavH, Math.max(0, window.innerHeight - 1));
       const bottomInset = Math.max(0, window.innerHeight - navH - 1);
       const margin = `-${navH}px 0px -${bottomInset}px 0px`;
       io = new IntersectionObserver(
@@ -127,21 +128,17 @@ export function Chrome() {
           <img
             src="/wordmark-light.svg"
             alt="decdn_"
-            style={{
-              height: "15px",
-              width: "auto",
-              display: onDark ? "none" : "block",
-            }}
+            width={56}
+            height={15}
+            className={onDark ? "hidden" : "block"}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/wordmark-dark.svg"
             alt="decdn_"
-            style={{
-              height: "15px",
-              width: "auto",
-              display: onDark ? "block" : "none",
-            }}
+            width={56}
+            height={15}
+            className={onDark ? "block" : "hidden"}
           />
           <span className="meta hidden opacity-70 sm:inline">
             labs · mmxxvi
