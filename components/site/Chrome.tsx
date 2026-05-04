@@ -37,8 +37,7 @@ export function Chrome() {
   // collapses to one rebuild per frame. When two adjacent sections
   // share the slice (subpixel rounding at boundaries), we pick the
   // entry with the largest boundingClientRect.top — the section whose
-  // top has just crossed under the nav, matching the boundary-precise
-  // intent.
+  // top has just crossed under the nav.
   useEffect(() => {
     const nodes = SECTION_IDS.map((id) => document.getElementById(id)).filter(
       (n): n is HTMLElement => n !== null,
@@ -49,6 +48,8 @@ export function Chrome() {
     const build = () => {
       io?.disconnect();
       const rawNavH = navRef.current?.offsetHeight ?? 0;
+      // Clamp prevents an inverted rootMargin in pathological viewports
+      // (rawNavH ≥ innerHeight); IO would otherwise stop firing.
       const navH = Math.min(rawNavH, Math.max(0, window.innerHeight - 1));
       const bottomInset = Math.max(0, window.innerHeight - navH - 1);
       const margin = `-${navH}px 0px -${bottomInset}px 0px`;
@@ -122,12 +123,9 @@ export function Chrome() {
         style={{ maxWidth: "var(--frame-max)" }}
       >
         <a href="#intro" className="flex items-center gap-3 no-underline">
-          {/* Both variants stay mounted and toggle via `display`. Browsers
-              fetch hidden <img> tags eagerly (priority is UA-defined, but
-              the SVGs are tiny enough that the swap-in variant is in cache
-              well before any tone flip in practice). `hidden` (display:
-              none) keeps the off-tone image out of the a11y tree so
-              duplicate alts don't double-announce. */}
+          {/* Both variants stay mounted and toggled via `display` so the
+              tone flip never flashes — browsers fetch hidden <img> tags
+              eagerly enough that the swap-in variant is already in cache. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/wordmark-light.svg"
