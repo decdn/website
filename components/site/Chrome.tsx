@@ -83,13 +83,16 @@ export function Chrome() {
     };
 
     build();
-    const ro = new ResizeObserver(onResize);
-    if (navRef.current) ro.observe(navRef.current);
+    const ro =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(onResize)
+        : null;
+    if (ro && navRef.current) ro.observe(navRef.current);
     window.addEventListener("resize", onResize, { passive: true });
     return () => {
       window.removeEventListener("resize", onResize);
       if (resizeRaf) cancelAnimationFrame(resizeRaf);
-      ro.disconnect();
+      ro?.disconnect();
       io?.disconnect();
     };
   }, []);
@@ -119,11 +122,12 @@ export function Chrome() {
         style={{ maxWidth: "var(--frame-max)" }}
       >
         <a href="#intro" className="flex items-center gap-3 no-underline">
-          {/* Both variants stay mounted and toggle via `display` so the tone
-              flip never flashes a blank — the dark variant is already
-              decoded when its turn comes. `display: none` keeps the hidden
-              image out of the a11y tree, so duplicate alts don't double-
-              announce. */}
+          {/* Both variants stay mounted and toggle via `display`. Browsers
+              fetch hidden <img> tags eagerly (priority is UA-defined, but
+              the SVGs are tiny enough that the swap-in variant is in cache
+              well before any tone flip in practice). `hidden` (display:
+              none) keeps the off-tone image out of the a11y tree so
+              duplicate alts don't double-announce. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/wordmark-light.svg"
