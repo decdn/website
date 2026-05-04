@@ -4,9 +4,13 @@
   --ink: #000000;
   --paper: #ffffff;
   --whisper: #0f9d6a;
-  /* Visual height of the fixed Chrome nav. Frame uses it as scroll-margin
-     so anchor jumps don't land with the section header clipped. */
-  --nav-h: 3rem;
+  /* Intentionally 0: anchor jumps land flush at viewport top (under
+     the fixed nav). Section headers don't get clipped because every
+     Frame's --frame-pad-y is already large enough to clear the nav
+     on its own. The variable still exists so a future non-zero
+     override (taller nav, sticky banner) can restore an offset
+     without touching every Frame call site. */
+  --nav-h: 0;
 }
 
 @theme inline {

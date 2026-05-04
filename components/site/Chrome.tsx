@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { links } from "@/lib/links";
 
 const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
@@ -23,47 +23,79 @@ const DARK_SECTIONS: ReadonlySet<(typeof SECTION_IDS)[number]> = new Set([
 export function Chrome() {
   const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
   const [scrolled, setScrolled] = useState(false);
+  const navRef = useRef<HTMLElement>(null);
 
+  // Active section = whichever one paints the strip directly under the
+  // navbar. We collapse the IO root into a 1px horizontal slice at y =
+  // navbar.offsetHeight via rootMargin — the section currently
+  // intersecting that slice is the one whose background sits behind the
+  // nav, so the tone flip happens exactly when its top crosses under.
+  //
+  // The slice depends on window.innerHeight AND navbar.offsetHeight, so
+  // the IO is rebuilt on (a) window resize and (b) nav-size changes
+  // (e.g. webfont swap). Rebuilds are rAF-coalesced so a resize burst
+  // collapses to one rebuild per frame. When two adjacent sections
+  // share the slice (subpixel rounding at boundaries), we pick the
+  // entry with the largest boundingClientRect.top — the section whose
+  // top has just crossed under the nav.
   useEffect(() => {
     const nodes = SECTION_IDS.map((id) => document.getElementById(id)).filter(
       (n): n is HTMLElement => n !== null,
     );
     if (nodes.length === 0) return;
 
-    // Track intersection ratio for every observed section across callbacks —
-    // IO only delivers entries whose intersection changed, so using `entries`
-    // alone can flicker when the most-visible section didn't change this tick.
-    const visibility = new Map<(typeof SECTION_IDS)[number], number>(
-      SECTION_IDS.map((id) => [id, 0]),
-    );
-
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          const { id } = entry.target;
-          if ((SECTION_IDS as readonly string[]).includes(id)) {
-            visibility.set(
-              id as (typeof SECTION_IDS)[number],
-              entry.isIntersecting ? entry.intersectionRatio : 0,
-            );
+    let io: IntersectionObserver | null = null;
+    const build = () => {
+      io?.disconnect();
+      const rawNavH = navRef.current?.offsetHeight ?? 0;
+      // Clamp prevents an inverted rootMargin in pathological viewports
+      // (rawNavH ≥ innerHeight); IO would otherwise stop firing.
+      const navH = Math.min(rawNavH, Math.max(0, window.innerHeight - 1));
+      const bottomInset = Math.max(0, window.innerHeight - navH - 1);
+      const margin = `-${navH}px 0px -${bottomInset}px 0px`;
+      io = new IntersectionObserver(
+        (entries) => {
+          let bestId: (typeof SECTION_IDS)[number] | null = null;
+          let bestTop = -Infinity;
+          for (const entry of entries) {
+            if (!entry.isIntersecting) continue;
+            const { id } = entry.target;
+            if (!(SECTION_IDS as readonly string[]).includes(id)) continue;
+            const top = entry.boundingClientRect.top;
+            if (top > bestTop) {
+              bestTop = top;
+              bestId = id as (typeof SECTION_IDS)[number];
+            }
           }
-        }
+          if (bestId !== null) setActive(bestId);
+        },
+        { rootMargin: margin, threshold: 0 },
+      );
+      nodes.forEach((n) => io!.observe(n));
+    };
 
-        let next: (typeof SECTION_IDS)[number] | null = null;
-        let maxRatio = 0;
-        visibility.forEach((ratio, id) => {
-          if (ratio > maxRatio) {
-            maxRatio = ratio;
-            next = id;
-          }
-        });
-        if (next !== null) setActive(next);
-      },
-      { threshold: [0.3, 0.6] },
-    );
+    let resizeRaf = 0;
+    const onResize = () => {
+      if (resizeRaf) return;
+      resizeRaf = requestAnimationFrame(() => {
+        resizeRaf = 0;
+        build();
+      });
+    };
 
-    nodes.forEach((n) => io.observe(n));
-    return () => io.disconnect();
+    build();
+    const ro =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(onResize)
+        : null;
+    if (ro && navRef.current) ro.observe(navRef.current);
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => {
+      window.removeEventListener("resize", onResize);
+      if (resizeRaf) cancelAnimationFrame(resizeRaf);
+      ro?.disconnect();
+      io?.disconnect();
+    };
   }, []);
 
   useEffect(() => {
@@ -77,6 +109,7 @@ export function Chrome() {
 
   return (
     <nav
+      ref={navRef}
       aria-label="Primary"
       data-scrolled={scrolled ? "true" : undefined}
       data-tone={onDark ? "ink" : "paper"}
@@ -89,13 +122,26 @@ export function Chrome() {
         className="mx-auto flex w-full items-center justify-between gap-4"
         style={{ maxWidth: "var(--frame-max)" }}
       >
-        <a href="#intro" className="flex items-baseline gap-3 no-underline">
-          <span className="text-[15px] font-semibold tracking-[-0.02em] lowercase">
-            deCDN
-            <span aria-hidden style={{ color: "var(--whisper)" }}>
-              _
-            </span>
-          </span>
+        <a href="#intro" className="flex items-center gap-3 no-underline">
+          {/* Both variants stay mounted and toggled via `display` so the
+              tone flip never flashes — browsers fetch hidden <img> tags
+              eagerly enough that the swap-in variant is already in cache. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/wordmark-light.svg"
+            alt="decdn_"
+            width={56}
+            height={15}
+            className={onDark ? "hidden" : "block"}
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/wordmark-dark.svg"
+            alt="decdn_"
+            width={56}
+            height={15}
+            className={onDark ? "block" : "hidden"}
+          />
           <span className="meta hidden opacity-70 sm:inline">
             labs · mmxxvi
           </span>
