@@ -9,11 +9,12 @@
      Frame's --frame-pad-y floor (5rem = 80px) sits comfortably above
      the current fixed-nav height (py-5 + 30px wordmark ≈ 70px),
      leaving ~10px of breathing room below the nav. If the nav grows
-     past 5rem, switch to the decoupled path: set --nav-h to the
-     measured nav height and apply scroll-mt-[var(--nav-h)] on each
-     Frame. (Bumping the 5rem floor on --frame-pad-y only helps below
-     ~889px — above that the clamp's 9vw term already exceeds 5rem,
-     so a bigger floor does nothing on desktop.) */
+     past 5rem, set --nav-h to the measured nav height — Frame already
+     applies scroll-mt-[var(--nav-h)] on every section, so anchor
+     offsets pick it up automatically. (Bumping the 5rem floor on
+     --frame-pad-y only helps below ~889px — above that the clamp's
+     9vw term already exceeds 5rem, so a bigger floor does nothing on
+     desktop.) */
   --nav-h: 0;
 }
 
