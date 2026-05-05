@@ -113,16 +113,19 @@ export function Chrome() {
       aria-label="Primary"
       data-scrolled={scrolled ? "true" : undefined}
       data-tone={onDark ? "ink" : "paper"}
-      className={`chrome-nav fixed inset-x-0 top-0 z-50 py-5 ${
+      className={`chrome-nav fixed inset-x-0 top-0 z-50 py-6 ${
         onDark ? "text-[var(--paper)]" : "text-[var(--ink)]"
       }`}
       style={{ paddingInline: "var(--frame-gutter)" }}
     >
       <div
-        className="mx-auto flex w-full items-center justify-between gap-4"
+        className="mx-auto grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4"
         style={{ maxWidth: "var(--frame-max)" }}
       >
-        <a href="#intro" className="flex items-center gap-3 no-underline">
+        <a
+          href="#intro"
+          className="col-start-1 flex items-center gap-3 justify-self-start no-underline"
+        >
           {/* Both variants stay mounted and toggled via `display` so the
               tone flip never flashes — browsers fetch hidden <img> tags
               eagerly enough that the swap-in variant is already in cache. */}
@@ -130,16 +133,16 @@ export function Chrome() {
           <img
             src="/wordmark-light.svg"
             alt="decdn_"
-            width={56}
-            height={15}
+            width={120}
+            height={32}
             className={onDark ? "hidden" : "block"}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/wordmark-dark.svg"
             alt="decdn_"
-            width={56}
-            height={15}
+            width={120}
+            height={32}
             className={onDark ? "block" : "hidden"}
           />
           <span className="meta hidden opacity-70 sm:inline">
@@ -147,7 +150,7 @@ export function Chrome() {
           </span>
         </a>
 
-        <ul className="hidden items-center gap-7 md:flex">
+        <ul className="col-start-2 hidden items-center gap-7 justify-self-center md:flex">
           {NAV.map((item) => {
             const isActive = active === item.id;
             return (
@@ -165,7 +168,7 @@ export function Chrome() {
           })}
         </ul>
 
-        <div className="flex items-center gap-5">
+        <div className="col-start-3 flex items-center gap-5 justify-self-end">
           <a
             href={links.docs}
             className="meta flex items-center gap-2 no-underline"

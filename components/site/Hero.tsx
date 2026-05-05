@@ -20,13 +20,13 @@ export function Hero() {
           style={{ fontSize: "var(--fs-h1)" }}
         >
           <span className="rise rise-1">the delivery layer</span>
-          <span className="rise rise-2 pl-[4vw]">
+          <span className="rise rise-2 pl-[7vw]">
             anyone can serve
             <span aria-hidden style={{ color: "var(--whisper)" }}>
               .
             </span>
           </span>
-          <span className="rise rise-2 pl-[8vw]">priced, not quoted.</span>
+          <span className="rise rise-2 pl-[12vw]">priced, not quoted.</span>
         </h1>
 
         <div className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-end @4xl:gap-12">
