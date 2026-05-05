@@ -6,9 +6,10 @@
   --whisper: #0f9d6a;
   /* Intentionally 0: anchor jumps land flush at viewport top (under
      the fixed nav). Section headers don't get clipped because every
-     Frame's --frame-pad-y floor (5rem = 80px) matches the current
-     fixed-nav height (py-6 + 32px wordmark ≈ 80px). If the nav grows
-     again, raise the --frame-pad-y floor in lockstep — or set
+     Frame's --frame-pad-y floor (5rem = 80px) sits comfortably above
+     the current fixed-nav height (py-5 + 30px wordmark ≈ 70px),
+     leaving ~10px of breathing room below the nav. If the nav grows
+     past 5rem, raise the --frame-pad-y floor in lockstep — or set
      --nav-h to the measured nav height and add scroll-mt-[var(--nav-h)]
      on each Frame so the two stay decoupled. */
   --nav-h: 0;

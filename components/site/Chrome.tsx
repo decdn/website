@@ -113,7 +113,7 @@ export function Chrome() {
       aria-label="Primary"
       data-scrolled={scrolled ? "true" : undefined}
       data-tone={onDark ? "ink" : "paper"}
-      className={`chrome-nav fixed inset-x-0 top-0 z-50 py-6 ${
+      className={`chrome-nav fixed inset-x-0 top-0 z-50 py-5 ${
         onDark ? "text-[var(--paper)]" : "text-[var(--ink)]"
       }`}
       style={{ paddingInline: "var(--frame-gutter)" }}
@@ -133,16 +133,16 @@ export function Chrome() {
           <img
             src="/wordmark-light.svg"
             alt="decdn_"
-            width={120}
-            height={32}
+            width={112}
+            height={30}
             className={onDark ? "hidden" : "block"}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/wordmark-dark.svg"
             alt="decdn_"
-            width={120}
-            height={32}
+            width={112}
+            height={30}
             className={onDark ? "block" : "hidden"}
           />
           <span className="meta hidden opacity-70 sm:inline">
