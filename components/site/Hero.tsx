@@ -10,7 +10,7 @@ export function Hero() {
       <SectionHeader
         index="01"
         label="Hero"
-        timestamp="2026-04 · devnet v0.0.0"
+        timestamp="2026-04 · testnet · v0"
       />
 
       <div className="mt-10 flex flex-col gap-8 @4xl:gap-12">

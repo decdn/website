@@ -24,7 +24,7 @@ export function FleetStatus({ className }: { className?: string }) {
           <span className="fleet-dot" />
           <span className="fleet-dot" />
           <span className="fleet-dot" />
-          <span className="fleet-head-label">decdn · fleet · live</span>
+          <span className="fleet-head-label">decdn · fleet · test</span>
         </div>
 
         <div className="fleet-body">

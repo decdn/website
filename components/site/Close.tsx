@@ -94,7 +94,7 @@ export function Close() {
           <span className="@md:text-center">
             built in rust · rendered in geist
           </span>
-          <span className="tabular-nums @md:text-right">node-001 / v0.0.0</span>
+          <span className="tabular-nums @md:text-right">node-001 / v0</span>
         </div>
       </footer>
     </Frame>
