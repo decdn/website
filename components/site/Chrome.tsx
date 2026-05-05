@@ -119,10 +119,13 @@ export function Chrome() {
       style={{ paddingInline: "var(--frame-gutter)" }}
     >
       <div
-        className="mx-auto flex w-full items-center justify-between gap-4"
+        className="mx-auto grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4"
         style={{ maxWidth: "var(--frame-max)" }}
       >
-        <a href="#intro" className="flex items-center gap-3 no-underline">
+        <a
+          href="#intro"
+          className="col-start-1 flex items-center gap-3 no-underline"
+        >
           {/* Both variants stay mounted and toggled via `display` so the
               tone flip never flashes — browsers fetch hidden <img> tags
               eagerly enough that the swap-in variant is already in cache. */}
@@ -130,21 +133,19 @@ export function Chrome() {
           <img
             src="/wordmark-light.svg"
             alt="decdn_"
-            width={56}
-            height={15}
+            width={112}
+            height={30}
             className={onDark ? "hidden" : "block"}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/wordmark-dark.svg"
             alt="decdn_"
-            width={56}
-            height={15}
+            width={112}
+            height={30}
             className={onDark ? "block" : "hidden"}
           />
-          <span className="meta hidden opacity-70 sm:inline">
-            labs · mmxxvi
-          </span>
+          <span className="meta hidden opacity-70 sm:inline">labs</span>
         </a>
 
         <ul className="hidden items-center gap-7 md:flex">
@@ -165,7 +166,7 @@ export function Chrome() {
           })}
         </ul>
 
-        <div className="flex items-center gap-5">
+        <div className="col-start-3 flex items-center gap-5 justify-self-end">
           <a
             href={links.docs}
             className="meta flex items-center gap-2 no-underline"

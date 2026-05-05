@@ -10,7 +10,7 @@ export function Hero() {
       <SectionHeader
         index="01"
         label="Hero"
-        timestamp="2026-04 · devnet v0.0.0"
+        timestamp="2026-04 · testnet · v0"
       />
 
       <div className="mt-10 flex flex-col gap-8 @4xl:gap-12">
@@ -20,13 +20,13 @@ export function Hero() {
           style={{ fontSize: "var(--fs-h1)" }}
         >
           <span className="rise rise-1">the delivery layer</span>
-          <span className="rise rise-2 pl-[4vw]">
+          <span className="rise rise-2 pl-[7vw]">
             anyone can serve
             <span aria-hidden style={{ color: "var(--whisper)" }}>
               .
             </span>
           </span>
-          <span className="rise rise-2 pl-[8vw]">priced, not quoted.</span>
+          <span className="rise rise-2 pl-[12vw]">priced, not quoted.</span>
         </h1>
 
         <div className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-end @4xl:gap-12">
