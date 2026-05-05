@@ -26,7 +26,6 @@ pnpm format           # prettier --write .
 - `components/site/` — page sections composed by `app/page.tsx` (Hero, Problem, …).
 - `components/ui/` — low-level primitives (Button, Section, Stat, Mono).
 - `lib/` — shared helpers (currently just `links.ts`).
-- `app/sitemap.ts` & `app/robots.ts` — file-based SEO metadata (Next.js convention). Adding a new page = append an entry to `app/sitemap.ts`; do not add config elsewhere. Both reuse `links.site` so the origin only lives in one place.
 - Path alias `@/*` → project root (e.g. `@/lib/links`, not `@/src/...`).
 
 ## Gotchas
@@ -34,4 +33,4 @@ pnpm format           # prettier --write .
 - **Static export only.** `next.config.ts` has `output: "export"`. No SSR, route handlers, ISR, middleware, or Image Optimization API. Build output lands in `out/`.
 - **Tailwind v4.** `globals.css` uses `@import "tailwindcss"` and `@theme inline { … }`. There is no `tailwind.config.*` — theme tokens live in CSS. Don't reach for v3 directives.
 - **Conventional commits required.** `commitlint` runs in the `commit-msg` husky hook; non-conforming messages are rejected.
-- **`metadataBase` is live.** `lib/links.ts` `site` is the real origin and `robots: { index: true }`. Anything that absolutizes through `metadataBase` (OG, JSON-LD, canonical) ships to production — keep payloads accurate.
+- **`metadataBase` is live.** `lib/links.ts` `site` is the real origin and `robots: { index: true }`. Anything that absolutizes through `metadataBase` — OG, JSON-LD, canonical, `app/sitemap.ts`, `app/robots.ts` — ships to production. Adding a new page = append an entry to `app/sitemap.ts`; don't add config elsewhere.
