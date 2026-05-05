@@ -91,7 +91,9 @@ export function Close() {
           style={{ fontSize: "var(--fs-micro)" }}
         >
           <span>© decdn labs · open source</span>
-          <span className="@md:text-center">probably over-engineered</span>
+          <span className="@md:text-center">
+            built in rust · over-engineered, deliberately
+          </span>
           <span className="tabular-nums @md:text-right">node-001 / v0</span>
         </div>
       </footer>
