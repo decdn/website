@@ -6,10 +6,11 @@
   --whisper: #0f9d6a;
   /* Intentionally 0: anchor jumps land flush at viewport top (under
      the fixed nav). Section headers don't get clipped because every
-     Frame's --frame-pad-y is already large enough to clear the nav
-     on its own. The variable still exists so a future non-zero
-     override (taller nav, sticky banner) can restore an offset
-     without touching every Frame call site. */
+     Frame's --frame-pad-y floor (5rem = 80px) matches the current
+     fixed-nav height (py-6 + 32px wordmark ≈ 80px). If the nav grows
+     again, raise the --frame-pad-y floor in lockstep — or set
+     --nav-h to the measured nav height and add scroll-mt-[var(--nav-h)]
+     on each Frame so the two stay decoupled. */
   --nav-h: 0;
 }
 
@@ -22,7 +23,7 @@
   /* Shared content rail: every Frame centers within --frame-max. */
   --frame-max: 1280px;
   --frame-gutter: clamp(1.5rem, 4vw, 4rem);
-  --frame-pad-y: clamp(4rem, 9vw, 7rem);
+  --frame-pad-y: clamp(5rem, 9vw, 7rem);
   --frame-min-h-cap: 54rem;
 
   /* Type scale: micro and CTA are fixed; body and headlines scale with viewport. */
