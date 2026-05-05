@@ -92,7 +92,7 @@ export function Close() {
         >
           <span>© decdn labs · open source</span>
           <span className="@md:text-center">
-            built in rust · over-engineered, deliberately
+            built in rust · probably over-engineered
           </span>
           <span className="tabular-nums @md:text-right">node-001 / v0</span>
         </div>
