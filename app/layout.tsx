@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
-import { links } from "@/lib/links";
+import { links, SITE_URL } from "@/lib/links";
 import { Chrome } from "@/components/site/Chrome";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
 import "./globals.css";
@@ -44,10 +44,6 @@ export const viewport: Viewport = {
   themeColor: "#000000",
 };
 
-// Trailing-slash base: lets us concat `${SITE_URL}icon.svg` and stable-fragment
-// @ids (`${SITE_URL}#organization`) without manual joins. trailingSlash: true
-// is set in next.config.ts; keep these consistent.
-const SITE_URL = new URL("/", links.site).toString();
 const ORG_ID = `${SITE_URL}#organization`;
 const SITE_ID = `${SITE_URL}#website`;
 

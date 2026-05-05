@@ -1,7 +1,5 @@
 import type { MetadataRoute } from "next";
-import { links } from "@/lib/links";
-
-const SITE_URL = new URL("/", links.site).toString();
+import { SITE_URL } from "@/lib/links";
 
 // Required by Next 16 under `output: "export"` for metadata route handlers.
 export const dynamic = "force-static";

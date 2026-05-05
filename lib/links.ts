@@ -10,3 +10,8 @@ export const links = {
 } as const;
 
 export type LinkKey = keyof typeof links;
+
+// Trailing-slash base: lets callers concat `${SITE_URL}icon.svg` and
+// stable-fragment @ids (`${SITE_URL}#organization`) without manual joins.
+// `trailingSlash: true` is set in next.config.ts; keep these consistent.
+export const SITE_URL = new URL("/", links.site).toString();
