@@ -15,3 +15,9 @@ export type LinkKey = keyof typeof links;
 // stable-fragment @ids (`${SITE_URL}#organization`) without manual joins.
 // `trailingSlash: true` is set in next.config.ts; keep these consistent.
 export const SITE_URL = new URL("/", links.site).toString();
+
+// Single source of truth for crawl policy. The page-level meta tag in
+// `app/layout.tsx` and the site-level rules in `app/robots.ts` both derive
+// from this so they can't drift (e.g. a future preview deploy flipping one
+// to noindex but leaving the other allow-all).
+export const INDEXABLE = true;

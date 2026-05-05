@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
-import { links, SITE_URL } from "@/lib/links";
+import { links, SITE_URL, INDEXABLE } from "@/lib/links";
 import { Chrome } from "@/components/site/Chrome";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
 import "./globals.css";
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
   },
   alternates: { canonical: "/" },
-  robots: { index: true, follow: true },
+  robots: { index: INDEXABLE, follow: INDEXABLE },
 };
 
 export const viewport: Viewport = {
