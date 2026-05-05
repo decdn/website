@@ -9,9 +9,11 @@
      Frame's --frame-pad-y floor (5rem = 80px) sits comfortably above
      the current fixed-nav height (py-5 + 30px wordmark ≈ 70px),
      leaving ~10px of breathing room below the nav. If the nav grows
-     past 5rem, raise the --frame-pad-y floor in lockstep — or set
-     --nav-h to the measured nav height and add scroll-mt-[var(--nav-h)]
-     on each Frame so the two stay decoupled. */
+     past 5rem, switch to the decoupled path: set --nav-h to the
+     measured nav height and apply scroll-mt-[var(--nav-h)] on each
+     Frame. (Bumping the 5rem floor on --frame-pad-y only helps below
+     ~889px — above that the clamp's 9vw term already exceeds 5rem,
+     so a bigger floor does nothing on desktop.) */
   --nav-h: 0;
 }
 
@@ -24,7 +26,11 @@
   /* Shared content rail: every Frame centers within --frame-max. */
   --frame-max: 1280px;
   --frame-gutter: clamp(1.5rem, 4vw, 4rem);
-  --frame-pad-y: clamp(5rem, 9vw, 7rem);
+  --frame-pad-y: clamp(
+    5rem,
+    9vw,
+    7rem
+  ); /* floor coupled to nav height — see --nav-h note above */
   --frame-min-h-cap: 54rem;
 
   /* Type scale: micro and CTA are fixed; body and headlines scale with viewport. */
@@ -707,9 +713,7 @@ a.underline-brutal:hover .arrow {
     color 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-/* Scoped bump: nav typography reads a hair larger than the shared
-   .meta / .nav-label defaults used elsewhere on the page. Keeping the
-   override local avoids growing every section header and stat label. */
+/* Scoped to .chrome-nav so the bump doesn't ripple to every section header / stat label. */
 .chrome-nav .meta,
 .chrome-nav .nav-item .nav-label {
   font-size: 12px;

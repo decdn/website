@@ -124,7 +124,7 @@ export function Chrome() {
       >
         <a
           href="#intro"
-          className="col-start-1 flex items-center gap-3 justify-self-start no-underline"
+          className="col-start-1 flex items-center gap-3 no-underline"
         >
           {/* Both variants stay mounted and toggled via `display` so the
               tone flip never flashes — browsers fetch hidden <img> tags
@@ -148,7 +148,7 @@ export function Chrome() {
           <span className="meta hidden opacity-70 sm:inline">labs</span>
         </a>
 
-        <ul className="col-start-2 hidden items-center gap-7 justify-self-center md:flex">
+        <ul className="hidden items-center gap-7 md:flex">
           {NAV.map((item) => {
             const isActive = active === item.id;
             return (
