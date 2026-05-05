@@ -26,6 +26,7 @@ pnpm format           # prettier --write .
 - `components/site/` — page sections composed by `app/page.tsx` (Hero, Problem, …).
 - `components/ui/` — low-level primitives (Button, Section, Stat, Mono).
 - `lib/` — shared helpers (currently just `links.ts`).
+- `app/sitemap.ts` & `app/robots.ts` — file-based SEO metadata (Next.js convention). Adding a new page = append an entry to `app/sitemap.ts`; do not add config elsewhere. Both reuse `links.site` so the origin only lives in one place.
 - Path alias `@/*` → project root (e.g. `@/lib/links`, not `@/src/...`).
 
 ## Gotchas
