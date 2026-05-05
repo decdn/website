@@ -16,8 +16,9 @@ export type LinkKey = keyof typeof links;
 // `trailingSlash: true` is set in next.config.ts; keep these consistent.
 export const SITE_URL = new URL("/", links.site).toString();
 
-// Single source of truth for crawl policy. The page-level meta tag in
-// `app/layout.tsx` and the site-level rules in `app/robots.ts` both derive
-// from this so they can't drift (e.g. a future preview deploy flipping one
-// to noindex but leaving the other allow-all).
+// Whether the site is indexable. Drives `<meta name="robots">` in
+// `app/layout.tsx` (`index, follow` ↔ `noindex, nofollow`). `robots.txt`
+// always allows crawling regardless — Disallow + noindex is an anti-pattern
+// that strands URLs in search results because the crawler never fetches the
+// page and so never sees the noindex directive.
 export const INDEXABLE = true;
