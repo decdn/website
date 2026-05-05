@@ -145,9 +145,7 @@ export function Chrome() {
             height={30}
             className={onDark ? "block" : "hidden"}
           />
-          <span className="meta hidden opacity-70 sm:inline">
-            labs · mmxxvi
-          </span>
+          <span className="meta hidden opacity-70 sm:inline">labs</span>
         </a>
 
         <ul className="col-start-2 hidden items-center gap-7 justify-self-center md:flex">

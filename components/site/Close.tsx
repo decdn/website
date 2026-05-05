@@ -90,10 +90,8 @@ export function Close() {
           className="grid grid-cols-1 gap-2 tracking-[0.2em] uppercase opacity-80 @md:grid-cols-3 @md:items-center"
           style={{ fontSize: "var(--fs-micro)" }}
         >
-          <span>© mmxxvi · decdn labs</span>
-          <span className="@md:text-center">
-            built in rust · rendered in geist
-          </span>
+          <span>© decdn labs · open source</span>
+          <span className="@md:text-center">probably over-engineered</span>
           <span className="tabular-nums @md:text-right">node-001 / v0</span>
         </div>
       </footer>
