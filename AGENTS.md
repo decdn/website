@@ -26,6 +26,7 @@ pnpm format           # prettier --write .
 - `components/site/` — page sections composed by `app/page.tsx` (Hero, Problem, …).
 - `components/ui/` — low-level primitives (Button, Section, Stat, Mono).
 - `lib/` — shared helpers (currently just `links.ts`).
+- `docs/` — Mintlify source for `docs.decdn.org` (separate build pipeline, not part of the static export).
 - Path alias `@/*` → project root (e.g. `@/lib/links`, not `@/src/...`).
 
 ## Gotchas
@@ -34,3 +35,4 @@ pnpm format           # prettier --write .
 - **Tailwind v4.** `globals.css` uses `@import "tailwindcss"` and `@theme inline { … }`. There is no `tailwind.config.*` — theme tokens live in CSS. Don't reach for v3 directives.
 - **Conventional commits required.** `commitlint` runs in the `commit-msg` husky hook; non-conforming messages are rejected.
 - **`metadataBase` is live.** `lib/links.ts` `site` is the real origin and `INDEXABLE` is `true`. Anything anchored on this origin — OG and canonical (via `metadataBase`); JSON-LD, `app/sitemap.ts`, `app/robots.ts` (via `SITE_URL`) — ships to production. Adding a new page = append an entry to `app/sitemap.ts`; don't add config elsewhere. Flip `INDEXABLE` to take the site out of search; only the meta tag flips (see `lib/links.ts` for why `robots.txt` stays unconditional).
+- **`docs/` is a different product.** Mintlify Cloud builds it from `docs/docs.json` and serves it at `docs.decdn.org` — independent of `pnpm build`. The website code must not import from `docs/`; ESLint and the website CI workflow ignore it. Edits to MDX go through the `docs` workflow (Prettier + `markdownlint-cli2` + `mintlify broken-links`).

@@ -17,9 +17,9 @@ A **node** is a staked QUIC endpoint that caches and serves content-addressed bl
 
 Two deployment shapes:
 
-| Shape | What's different | When to run |
-| --- | --- | --- |
-| **Pure cache** | No origin backend. Pulls missed blobs from other nodes. | You want to earn on popular content; you don't control any origin. |
+| Shape             | What's different                                                                                                            | When to run                                                                              |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| **Pure cache**    | No origin backend. Pulls missed blobs from other nodes.                                                                     | You want to earn on popular content; you don't control any origin.                       |
 | **Origin-backed** | Configured with an S3-compatible backend, NFS mount, or local disk. The hash→object-key mapping is a local content catalog. | You are the content provider, or you are running a "last-mile" seed node for a provider. |
 
 "Origin-backed" is a deployment choice, not a protocol distinction — the network cannot tell them apart at runtime.
@@ -45,8 +45,8 @@ An S3 bucket, R2 bucket, MinIO instance, NFS mount, or local disk. Holds the can
 
 ## Who stakes, who pays
 
-| Participant | Stakes? | Pays? | Earns? |
-| --- | --- | --- | --- |
-| Pure cache node | ✅ TOKEN | ✅ Pays upstream on cache miss | ✅ Per-MB voucher revenue |
-| Origin-backed node | ✅ TOKEN | ❌ | ✅ Per-MB voucher revenue |
-| Client | ❌ | ✅ Per-MB voucher | ❌ |
+| Participant        | Stakes?  | Pays?                          | Earns?                    |
+| ------------------ | -------- | ------------------------------ | ------------------------- |
+| Pure cache node    | ✅ TOKEN | ✅ Pays upstream on cache miss | ✅ Per-MB voucher revenue |
+| Origin-backed node | ✅ TOKEN | ❌                             | ✅ Per-MB voucher revenue |
+| Client             | ❌       | ✅ Per-MB voucher              | ❌                        |

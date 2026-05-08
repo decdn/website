@@ -19,12 +19,12 @@ Gossip-only blacklists fail all three. On-chain entries with governance gating m
 
 ## Entry types
 
-| Type | Added by | Active at | Auto-expiry |
-| --- | --- | --- | --- |
-| Standard governance | Governor | 24 h after vote execution (compliance window) | None (governance can remove) |
-| Regional | Regional governance body | 24 h | None |
-| Emergency | 3-of-5 multisig | Immediately (with 2 h slash grace) | 14 days |
-| Emergency (CSAM / terrorist) | 3-of-5 multisig | Immediately | 90 days |
+| Type                         | Added by                 | Active at                                     | Auto-expiry                  |
+| ---------------------------- | ------------------------ | --------------------------------------------- | ---------------------------- |
+| Standard governance          | Governor                 | 24 h after vote execution (compliance window) | None (governance can remove) |
+| Regional                     | Regional governance body | 24 h                                          | None                         |
+| Emergency                    | 3-of-5 multisig          | Immediately (with 2 h slash grace)            | 14 days                      |
+| Emergency (CSAM / terrorist) | 3-of-5 multisig          | Immediately                                   | 90 days                      |
 
 Emergency entries **auto-expire unless ratified by governance** before the deadline — preventing the multisig from maintaining a permanent de-facto blacklist without oversight.
 

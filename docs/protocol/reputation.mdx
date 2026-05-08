@@ -23,12 +23,12 @@ A report's weight is a function of the reporter's track record and counterparty 
 
 Interaction outcomes generate reports. Examples:
 
-| Event | Local score change | Gossip report? |
-| --- | --- | --- |
-| Clean delivery, valid voucher accepted | Small positive | Optional |
-| Hash mismatch mid-stream | Large negative | Yes |
-| Probe claimed availability but stream failed | Negative | Yes (candidate for phantom-announcement slashing) |
-| Charged rate ≠ advertised rate | Negative | Yes (candidate for rate-manipulation slashing) |
+| Event                                        | Local score change | Gossip report?                                    |
+| -------------------------------------------- | ------------------ | ------------------------------------------------- |
+| Clean delivery, valid voucher accepted       | Small positive     | Optional                                          |
+| Hash mismatch mid-stream                     | Large negative     | Yes                                               |
+| Probe claimed availability but stream failed | Negative           | Yes (candidate for phantom-announcement slashing) |
+| Charged rate ≠ advertised rate               | Negative           | Yes (candidate for rate-manipulation slashing)    |
 
 ## Why not purely on-chain?
 

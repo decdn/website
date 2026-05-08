@@ -64,12 +64,12 @@ If pull-through is disabled in the node's config, the node returns a redirect po
 
 ## Where the boundary sits
 
-| Layer | Trust |
-| --- | --- |
-| Bytes delivered | **Verified** against known hash |
-| Node availability | Trusted — slashed if phantom-announced |
-| Node rate honesty | Trusted — slashed if advertised rate contradicts charged rate |
-| Origin backend correctness | **Assumed** — outside protocol scope (operator concern) |
-| L2 RPC provider honesty | **Assumed** — mitigated via multi-source bootstrap |
+| Layer                      | Trust                                                         |
+| -------------------------- | ------------------------------------------------------------- |
+| Bytes delivered            | **Verified** against known hash                               |
+| Node availability          | Trusted — slashed if phantom-announced                        |
+| Node rate honesty          | Trusted — slashed if advertised rate contradicts charged rate |
+| Origin backend correctness | **Assumed** — outside protocol scope (operator concern)       |
+| L2 RPC provider honesty    | **Assumed** — mitigated via multi-source bootstrap            |
 
 See [privacy](/protocol/privacy) for the adversary model.

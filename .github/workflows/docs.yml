@@ -1,0 +1,42 @@
+name: docs
+
+on:
+  pull_request:
+    paths:
+      - "docs/**"
+      - ".github/workflows/docs.yml"
+      - ".markdownlint-cli2.jsonc"
+      - "package.json"
+      - "pnpm-lock.yaml"
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - ".github/workflows/docs.yml"
+      - ".markdownlint-cli2.jsonc"
+      - "package.json"
+      - "pnpm-lock.yaml"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Prettier check
+        run: pnpm exec prettier --check "docs/**/*.{md,mdx,json}"
+      - name: markdownlint
+        run: pnpm exec markdownlint-cli2
+      - name: Mintlify broken-link check
+        working-directory: docs
+        run: npx -y mintlify@4.2.555 broken-links

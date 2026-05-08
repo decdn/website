@@ -9,12 +9,12 @@ Privacy is treated as an **accountability-first** design: probes are public, on-
 
 ## Adversary model (four tiers)
 
-| Tier | Example adversary | What they can observe |
-| --- | --- | --- |
-| **Passive observer** | On-path network middlebox | QUIC metadata (IPs, SNI unless ECH is deployed), timing, volume |
-| **Active participant** | Malicious node or client | Probes, gossip activity, payment channel open/close |
-| **Infrastructure operator** | L2 RPC provider, relay host | On-chain events at read time; relay endpoints see encrypted QUIC flows |
-| **Compromised endpoint** | Malicious origin or content-provider infrastructure | Plaintext bytes, client subscription identity |
+| Tier                        | Example adversary                                   | What they can observe                                                  |
+| --------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------- |
+| **Passive observer**        | On-path network middlebox                           | QUIC metadata (IPs, SNI unless ECH is deployed), timing, volume        |
+| **Active participant**      | Malicious node or client                            | Probes, gossip activity, payment channel open/close                    |
+| **Infrastructure operator** | L2 RPC provider, relay host                         | On-chain events at read time; relay endpoints see encrypted QUIC flows |
+| **Compromised endpoint**    | Malicious origin or content-provider infrastructure | Plaintext bytes, client subscription identity                          |
 
 ## Privacy surfaces
 

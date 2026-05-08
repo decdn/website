@@ -16,12 +16,12 @@ A unified on-chain judge adjudicates all four and triggers stake slashing on res
 
 ## Immediate vs. deferred
 
-| Offense | Counter window | Rationale |
-| --- | --- | --- |
-| Phantom announcement | None — immediate | Probe response + stream failure is self-contained evidence |
-| Blacklist violation | None — immediate | Serving a blacklisted hash is self-evident |
-| Corrupted delivery | Counter window | The accused can submit a counter-receipt |
-| Rate manipulation | Counter window | The accused can submit the legitimate rate change between disputed timestamps |
+| Offense              | Counter window   | Rationale                                                                     |
+| -------------------- | ---------------- | ----------------------------------------------------------------------------- |
+| Phantom announcement | None — immediate | Probe response + stream failure is self-contained evidence                    |
+| Blacklist violation  | None — immediate | Serving a blacklisted hash is self-evident                                    |
+| Corrupted delivery   | Counter window   | The accused can submit a counter-receipt                                      |
+| Rate manipulation    | Counter window   | The accused can submit the legitimate rate change between disputed timestamps |
 
 For high-value disputes the corruption evidence path upgrades to an interactive Merkle proof matching the hash-tree leaf size used for verified streaming ([content addressing](/protocol/content-addressing)).
 
