@@ -22,7 +22,7 @@ The on-chain corruption evidence path uses the same chunking ([slashing](/protoc
 
 Origin backends speak their own namespace: S3 objects are addressed by key, NFS by path, local disk by filename. Blobs are addressed by BLAKE3 hash. The mapping lives in a **content catalog** — a small database (PostgreSQL or SQLite) maintained by the operator:
 
-```
+```text
 catalog: hash → { s3_bucket, s3_key, size_bytes, content_type }
 ```
 
@@ -36,8 +36,8 @@ This also protects origin operators from direct egress cost attacks: an adversar
 
 ## What clients verify vs. trust
 
-| Property | Verified | Trusted |
-| --- | --- | --- |
-| Byte correctness | BLAKE3 hash tree | — |
-| Blob availability | — | Node's signed availability claim (slashable via phantom-announcement path) |
-| Origin durability | — | Origin operator's S3/NFS configuration (off-protocol) |
+| Property          | Verified         | Trusted                                                                    |
+| ----------------- | ---------------- | -------------------------------------------------------------------------- |
+| Byte correctness  | BLAKE3 hash tree | —                                                                          |
+| Blob availability | —                | Node's signed availability claim (slashable via phantom-announcement path) |
+| Origin durability | —                | Origin operator's S3/NFS configuration (off-protocol)                      |

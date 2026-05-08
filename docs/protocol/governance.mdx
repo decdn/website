@@ -11,13 +11,13 @@ OpenZeppelin Governor with TOKEN voting, **4% quorum**, and a **2-day timelock**
 
 Even governance cannot set parameters outside these bounds:
 
-| Parameter | Bounds |
-| --- | --- |
-| Slash percentage | 5% – 50% |
-| Dispute window | 12 h – 72 h |
-| Min stake | > 0 |
-| Protocol fee | < 100% |
-| Channel close delay | > 0 |
+| Parameter           | Bounds      |
+| ------------------- | ----------- |
+| Slash percentage    | 5% – 50%    |
+| Dispute window      | 12 h – 72 h |
+| Min stake           | > 0         |
+| Protocol fee        | < 100%      |
+| Channel close delay | > 0         |
 
 Bounds are enforced in `require()` checks in the setter functions. A malicious governance proposal that attempts to set stake to zero simply reverts.
 

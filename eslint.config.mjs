@@ -13,6 +13,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Mintlify docs source: not part of the website build.
+    "docs/**",
   ]),
   prettier,
 ]);

@@ -1,0 +1,15 @@
+{
+  "config": {
+    "default": true,
+    // Line length — Mintlify pages mix prose with long inline links.
+    "MD013": false,
+    // Inline HTML — MDX components are inline JSX.
+    "MD033": false,
+    // Bare URLs — allowed in prose; Mintlify auto-renders them as links.
+    "MD034": false,
+    // First-line h1 — Mintlify uses `title:` frontmatter, not an h1.
+    "MD041": false,
+  },
+  "globs": ["docs/**/*.{md,mdx}"],
+  "ignores": ["**/node_modules/**", "docs/.mintlify/**"],
+}

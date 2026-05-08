@@ -5,3 +5,4 @@ node_modules/
 pnpm-lock.yaml
 next-env.d.ts
 .husky/_/
+.claude/settings.local.json

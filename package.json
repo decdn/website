@@ -16,7 +16,10 @@
       "eslint --fix",
       "prettier --write"
     ],
-    "*.{json,md,css,yaml,yml}": [
+    "docs/**/*.{md,mdx}": [
+      "markdownlint-cli2 --fix"
+    ],
+    "*.{json,md,mdx,css,yaml,yml}": [
       "prettier --write"
     ]
   },
@@ -43,6 +46,7 @@
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "lint-staged": "^16.4.0",
+    "markdownlint-cli2": "^0.22.1",
     "prettier": "^3.8.3",
     "tailwindcss": "^4",
     "typescript": "^6"
