@@ -1,0 +1,26 @@
+---
+title: Network topology
+description: Flat peer mesh. Gossip for node discovery; DHT for content discovery; probing for availability confirmation.
+---
+
+## Decision
+
+All staked nodes form a **flat mesh**. Node metadata propagates over a gossip overlay on regional and global topics. Content discovery uses a Kademlia-subset DHT, with broadcast probe fan-out as bootstrap/emergency fallback.
+
+## Selection
+
+Clients and nodes both rank candidates by a unified score combining advertised price, observed latency, and reputation. Lower is better. The exact weighting is part of the protocol implementation.
+
+## On-chain registration
+
+Nodes register through an on-chain staking registry that binds a network identity to an Ethereum address. Registration requires proof of control of both keys — preventing identity squatting and ensuring every staked node is slashable. Key rotation remains available post-registration.
+
+## Regional topics
+
+Nodes subscribe to a region topic plus the global topic. Regional topics reduce gossip noise for latency-sensitive selection: a client in Frankfurt typically prefers DE/NL/AT candidates over US ones, and the regional topic surfaces those preferentially.
+
+Clients subscribe but do not publish.
+
+## NAT traversal
+
+The transport handles hole-punching automatically; nodes update their registered addresses when their public-facing address changes. When direct P2P fails, traffic routes through a stateless, content-blind QUIC relay. Relays are protocol infrastructure (treasury-funded), not an incentivized network role — paying relays per byte would create a perverse incentive to prevent direct connections.

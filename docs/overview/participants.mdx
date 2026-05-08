@@ -1,0 +1,52 @@
+---
+title: Participants
+description: Who does what, who stakes, who pays, and who is on- or off-protocol.
+---
+
+deCDN has two protocol roles (nodes and clients) plus one external component (origin backends). Only nodes and clients speak CDN protocols.
+
+## Nodes
+
+A **node** is a staked QUIC endpoint that caches and serves content-addressed blobs.
+
+- **Identity.** A network keypair bound on-chain to an Ethereum address at registration ([network](/protocol/network)).
+- **Stake.** Required to join the mesh.
+- **Gossip.** Publishes node metadata on a global topic and a regional topic. Also emits rate-change updates.
+- **Delivery.** Serves the paid-delivery protocol — the sole rail for both client→node and node→node traffic.
+- **Earnings.** Per-MB voucher revenue in the channel's token — any governance-allowlisted ERC-20.
+
+Two deployment shapes:
+
+| Shape | What's different | When to run |
+| --- | --- | --- |
+| **Pure cache** | No origin backend. Pulls missed blobs from other nodes. | You want to earn on popular content; you don't control any origin. |
+| **Origin-backed** | Configured with an S3-compatible backend, NFS mount, or local disk. The hash→object-key mapping is a local content catalog. | You are the content provider, or you are running a "last-mile" seed node for a provider. |
+
+"Origin-backed" is a deployment choice, not a protocol distinction — the network cannot tell them apart at runtime.
+
+## Clients
+
+A **client** is a lightweight QUIC endpoint that consumes content and pays for it.
+
+- **Identity.** Ephemeral network keypair — no stake, no on-chain registration.
+- **Gossip.** Subscribes to topics but does not publish.
+- **Payment.** Opens an on-chain ERC-20 payment channel with each node it buys from, then signs off-chain vouchers as bytes flow ([payments](/protocol/payments)).
+- **Trust model.** Verifies hashes on all bytes received. Trusts nodes for availability (slashable if claimed and not delivered), not for content.
+
+Clients can run a multi-node parallel download for large files and resume crashed transfers from the last verified byte.
+
+## External components
+
+These are **not CDN protocol participants**. They ride the same QUIC transport but do not gossip, probe, or stake.
+
+### Origin backend
+
+An S3 bucket, R2 bucket, MinIO instance, NFS mount, or local disk. Holds the canonical bytes. Origin-backed nodes query it on cache miss. Never exposed to the network — the hash→object-key mapping is a private catalog held by the operator.
+
+## Who stakes, who pays
+
+| Participant | Stakes? | Pays? | Earns? |
+| --- | --- | --- | --- |
+| Pure cache node | ✅ TOKEN | ✅ Pays upstream on cache miss | ✅ Per-MB voucher revenue |
+| Origin-backed node | ✅ TOKEN | ❌ | ✅ Per-MB voucher revenue |
+| Client | ❌ | ✅ Per-MB voucher | ❌ |

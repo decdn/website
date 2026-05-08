@@ -1,0 +1,54 @@
+---
+title: Governance
+description: Token-weighted governance with safety bounds and a sunsetted emergency multisig.
+---
+
+## Decision
+
+OpenZeppelin Governor with TOKEN voting, **4% quorum**, and a **2-day timelock**. All governable parameters have hardcoded safety bounds that governance cannot override. A **3-of-5 emergency multisig** can only pause contracts and add emergency blacklist entries, and has a **12-month sunset** enforced via an immutable constructor deadline. Governance can vote to extend the sunset by capped increments.
+
+## Hardcoded safety bounds
+
+Even governance cannot set parameters outside these bounds:
+
+| Parameter | Bounds |
+| --- | --- |
+| Slash percentage | 5% – 50% |
+| Dispute window | 12 h – 72 h |
+| Min stake | > 0 |
+| Protocol fee | < 100% |
+| Channel close delay | > 0 |
+
+Bounds are enforced in `require()` checks in the setter functions. A malicious governance proposal that attempts to set stake to zero simply reverts.
+
+## Emergency multisig
+
+3-of-5 signers. Can only:
+
+- **Pause** any contract (`Pausable`)
+- **Add emergency blacklist entries** (with 14-day auto-expiry or 90-day for CSAM/terrorist categories — see [takedown](/protocol/takedown))
+
+Can **not**:
+
+- Move funds
+- Change parameters
+- Grant roles
+
+**12-month sunset** is enforced in the multisig's constructor — after the deadline, the emergency functions are unreachable on-chain. Governance can vote to extend the deadline by capped increments, preserving the anti-centralization default while retaining emergency capability.
+
+## Proposal flow
+
+1. Proposer holds ≥ proposal threshold TOKEN.
+2. `propose()` with target, calldata, description.
+3. Voting period (default 3 days).
+4. Quorum check (4% of circulating TOKEN).
+5. Queue in timelock (2 days).
+6. Execute.
+
+## Why 4% quorum
+
+Low enough that realistic participation can reach quorum; high enough that a single whale cannot unilaterally pass a proposal. 4% maps to established DAO practice (Compound, Uniswap) and works in conjunction with the hardcoded safety bounds — the bounds mean a bad quorum can still only move parameters within the safe range.
+
+## Regional governance bodies
+
+[Content takedown](/protocol/takedown) introduces regional governance bodies with region-scoped blacklist authority. This is the only role that's partitioned by jurisdiction; all other roles are single-tier global governance.

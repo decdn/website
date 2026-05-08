@@ -1,0 +1,42 @@
+---
+title: Privacy analysis
+description: A consolidated privacy surface inventory, four-tier adversary model, and mitigation roadmap.
+---
+
+## Decision
+
+Privacy is treated as an **accountability-first** design: probes are public, on-chain channels enable disputes, gossip enables discovery. Most privacy surfaces are accepted as inherent. Five concrete mitigations are specified below; deeper techniques (dummy probes, channel mixing) are future work.
+
+## Adversary model (four tiers)
+
+| Tier | Example adversary | What they can observe |
+| --- | --- | --- |
+| **Passive observer** | On-path network middlebox | QUIC metadata (IPs, SNI unless ECH is deployed), timing, volume |
+| **Active participant** | Malicious node or client | Probes, gossip activity, payment channel open/close |
+| **Infrastructure operator** | L2 RPC provider, relay host | On-chain events at read time; relay endpoints see encrypted QUIC flows |
+| **Compromised endpoint** | Malicious origin or content-provider infrastructure | Plaintext bytes, client subscription identity |
+
+## Privacy surfaces
+
+The protocol inventories its distinct privacy surfaces with explicit dispositions (accept or mitigate). Highlights:
+
+- **On-chain settlement volume leakage.** Anyone can read channel open/close amounts on-chain. Accepted: disputes require public channel state.
+- **Signed protocol messages as non-repudiable content commitments.** A node that signs an availability response has provably committed to serving that hash. Accepted: the same signature is what enables on-chain accountability.
+- **Probe traffic.** Who probes what is visible to the probed node. Accepted: selection depends on probing; fully private probing would require PIR at O(log N) blow-up.
+
+## Mitigations
+
+1. **Client NodeId rotation.** Clients rotate NodeIds on session boundaries to break linkability across subscription sessions.
+2. **Bounded availability hints.** Probe responses include only a small number of additional cached hashes, lowering the precision of per-node content fingerprinting.
+3. **Client key encryption via platform keychain.** Clients store Ethereum keys in macOS Keychain, Windows Credential Manager, or Gnome Keyring — not plaintext files.
+4. **Multi-source RPC.** Clients and nodes use multiple independent RPC providers to reduce single-vendor deanonymization surface.
+
+## Future work
+
+- **Dummy probes.** Inject cover-traffic probes to obscure real content interest. Unresolved cost/benefit.
+- **Payment channel mixing.** Route settlements through a mixing contract. Regulatory complexity.
+
+## Scope clarifications
+
+- **Content plaintext** is a content-provider concern. If sensitivity requires it, the content provider encrypts before publishing.
+- **Client IP addresses** are visible to peers. Tor-style relaying is out of scope — adding a layer of indirection conflicts with the pay-per-byte accountability model.

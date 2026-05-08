@@ -1,0 +1,22 @@
+---
+title: Glossary
+description: Core terms used across the deCDN protocol and this documentation.
+---
+
+| Term | Definition |
+| --- | --- |
+| **Blob** | A content-addressed byte sequence. Every blob is identified by its hash; clients verify received bytes against the known hash. |
+| **Channel (payment)** | On-chain escrow between client and node that backs off-chain vouchers. Opens with a deposit; settles with the latest voucher. |
+| **Client** | A lightweight QUIC endpoint that streams content and pays per MB. No stake, no gossip publish. |
+| **DHT** | Kademlia-subset content discovery. Nodes self-publish records when caching a blob. |
+| **Gossip** | Epidemic broadcast over topic channels for node metadata and rate updates. |
+| **Hash sequence** | An ordered collection of blob hashes (a directory or manifest equivalent). |
+| **Node** | A staked QUIC endpoint that caches and delivers blobs. Some are origin-backed; others are pure caches. |
+| **Origin-backed node** | A node configured with an S3-compatible store, NFS mount, or local disk — the canonical source for specific blobs. Never experiences a true cache miss. |
+| **Origin backend** | The opaque storage behind an origin-backed node (S3, R2, B2, MinIO, NFS, local disk). Never exposed to the network. |
+| **Peer mesh** | The flat set of all staked nodes. Discovery via gossip; content location via DHT. |
+| **Probe** | Parallel latency + availability check that runs before any delivery commitment. |
+| **Selection score** | A combined ranking over advertised price, observed latency, and reputation. Lower is better. |
+| **Stake** | TOKEN locked on-chain by a node to join the mesh. Returned on deregistration after an unbonding period. |
+| **TOKEN** | The deCDN governance and staking token. Not used for payments. |
+| **Voucher** | A signed off-chain payment message. The primary payment instrument between client and node. |

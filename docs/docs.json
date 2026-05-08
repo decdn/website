@@ -1,0 +1,78 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "maple",
+  "name": "deCDN",
+  "description": "Decentralized CDN — staked nodes cache and serve content over QUIC, paid per-MB via off-chain USDC channels.",
+  "colors": {
+    "primary": "#0f9d6a",
+    "light": "#1dc889",
+    "dark": "#0a7250"
+  },
+  "favicon": "/favicon.svg",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "appearance": {
+    "default": "dark"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Overview",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "overview/introduction",
+              "overview/architecture",
+              "overview/participants",
+              "overview/how-it-works",
+              "overview/glossary"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Protocol",
+        "groups": [
+          {
+            "group": "Foundations",
+            "pages": ["protocol/content-addressing", "protocol/network"]
+          },
+          {
+            "group": "Payments",
+            "pages": ["protocol/payments"]
+          },
+          {
+            "group": "Privacy",
+            "pages": ["protocol/privacy"]
+          },
+          {
+            "group": "Accountability & Governance",
+            "pages": [
+              "protocol/reputation",
+              "protocol/slashing",
+              "protocol/governance",
+              "protocol/takedown"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "footer": {
+    "socials": {
+      "github": "https://github.com/decdn",
+      "x": "https://x.com/decdnorg"
+    },
+    "links": [
+      {
+        "header": "Contact",
+        "items": [
+          { "label": "info@decdn.org", "href": "mailto:info@decdn.org" }
+        ]
+      }
+    ]
+  }
+}

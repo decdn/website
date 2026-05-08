@@ -1,0 +1,43 @@
+---
+title: Content addressing
+description: BLAKE3 hashes. Node backends are opaque to the network.
+---
+
+## Decision
+
+Every blob is identified by its **BLAKE3 hash**. Clients and nodes verify received bytes against the known hash on every transfer. The hash→backend mapping is internal to each origin-backed node and never shared — no participant in the network can learn or bypass the node's backing storage.
+
+## Why BLAKE3
+
+- **Fast.** Several GB/s on modern hardware — faster than SHA-256, often limited by memory bandwidth rather than CPU.
+- **Tree-structured.** The BLAKE3 hash tree enables streaming verification: a client can verify chunks as they arrive rather than waiting for the full blob.
+
+## Verified streaming
+
+Blobs are transmitted in chunks, each accompanied by the sibling hashes needed to prove inclusion in the root hash the client expects. The client accepts bytes only after verification, so a malicious node cannot insert a single corrupt byte and still earn — the client rejects the stream before paying for that chunk.
+
+The on-chain corruption evidence path uses the same chunking ([slashing](/protocol/slashing)).
+
+## Hash-to-object-key mapping
+
+Origin backends speak their own namespace: S3 objects are addressed by key, NFS by path, local disk by filename. Blobs are addressed by BLAKE3 hash. The mapping lives in a **content catalog** — a small database (PostgreSQL or SQLite) maintained by the operator:
+
+```
+catalog: hash → { s3_bucket, s3_key, size_bytes, content_type }
+```
+
+The catalog is not on-chain; it is an operational concern. Origin-backed nodes query it on cache miss to locate the pull URL.
+
+## Why the origin is hidden
+
+Leaking the origin URL would bypass the pay-per-byte economic model — anyone could download directly from S3 and skip the CDN entirely. Redirects point to other nodes, never to an external URL. The origin backend is not addressable from outside the node process.
+
+This also protects origin operators from direct egress cost attacks: an adversary cannot generate S3 traffic by pointing clients at the bucket URL.
+
+## What clients verify vs. trust
+
+| Property | Verified | Trusted |
+| --- | --- | --- |
+| Byte correctness | BLAKE3 hash tree | — |
+| Blob availability | — | Node's signed availability claim (slashable via phantom-announcement path) |
+| Origin durability | — | Origin operator's S3/NFS configuration (off-protocol) |

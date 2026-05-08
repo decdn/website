@@ -1,0 +1,75 @@
+---
+title: How it works
+description: A walkthrough of cache-hit and cache-miss delivery paths.
+---
+
+## Cache hit
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Client
+    participant N as Node
+
+    C->>N: Probe(hash)
+    N-->>C: Probe response (has blob, rate)
+    C->>N: Open on-chain channel (USDC)
+    C->>N: Stream request(hash)
+    N-->>C: Bytes (hash-verified on receipt)
+    C-->>N: Voucher (signed, off-chain)
+    C->>N: Channel close / settle
+```
+
+The client picks the candidate with the best combination of price, latency, and reputation. After settling on a node, it opens a channel in an allowlisted ERC-20 and streams. Vouchers cover every byte delivered; the node can settle any voucher on-chain later.
+
+## Cache miss with pull-through
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant C as Client
+    participant N as Node (serving)
+    participant D as DHT peers
+    participant P as Peer with blob
+    participant O as Origin-backed node
+
+    C->>N: Stream request(hash)
+    N->>D: DHT lookup(hash)
+    D-->>N: Candidate peers
+    N->>P: Probe (parallel)
+    P-->>N: Has blob
+    N->>P: Stream request — N pays P
+    P-->>N: Bytes (verified)
+    N-->>C: Stream bytes while pulling (N charges C)
+    N->>O: Falls back to origin-backed node if no peer has the blob
+```
+
+Paid delivery is one protocol — used both client→node and node→node. Every byte of the node-to-node pull is paid by the serving node, which amortizes that cost across many downstream client deliveries.
+
+If pull-through is disabled in the node's config, the node returns a redirect pointing to a peer (never an origin URL). The client opens a channel with that peer directly.
+
+## Payment channels in three lines
+
+1. **Open** — client opens a channel on-chain. Deposit is escrowed in the `PaymentChannel` contract.
+2. **Vouchers** — off-chain signed messages updating the cumulative amount owed. Cadence is negotiable per stream.
+3. **Close** — either party submits the latest voucher on-chain. A dispute window lets the counterparty submit a later-nonce voucher if the close is stale.
+
+## What keeps the network honest
+
+- **Hash verification.** Clients verify every chunk against the known blob hash. A bad byte voids payment.
+- **On-chain evidence.** Protocol messages are signed in a form that can be verified on-chain as evidence of corrupted delivery, phantom announcements, rate manipulation, or blacklist violations ([slashing](/protocol/slashing)).
+- **Challenge-response.** Submit evidence; the counterparty has a window to submit counter-evidence. The on-chain judge adjudicates after the window.
+- **Reputation.** A 0.0–1.0 score combining direct experience and signed gossip from staked nodes ([reputation](/protocol/reputation)).
+- **Content blacklist.** Governance-managed on-chain hash blacklist. Serving a blacklisted hash after the compliance window is slashable ([takedown](/protocol/takedown)).
+
+## Where the boundary sits
+
+| Layer | Trust |
+| --- | --- |
+| Bytes delivered | **Verified** against known hash |
+| Node availability | Trusted — slashed if phantom-announced |
+| Node rate honesty | Trusted — slashed if advertised rate contradicts charged rate |
+| Origin backend correctness | **Assumed** — outside protocol scope (operator concern) |
+| L2 RPC provider honesty | **Assumed** — mitigated via multi-source bootstrap |
+
+See [privacy](/protocol/privacy) for the adversary model.

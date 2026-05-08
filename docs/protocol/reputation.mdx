@@ -1,0 +1,35 @@
+---
+title: Reputation
+description: Interaction-weighted scoring with gossip propagation.
+---
+
+## Decision
+
+Nodes are ranked by a **reputation score** in `[0.0, 1.0]` derived from a combination of direct local observation and signed gossip reports from staked nodes. Local experience dominates; gossip sharpens the picture for nodes you have not yet interacted with.
+
+Only staked nodes may submit gossip reports. Clients contribute to local scores only.
+
+## Reporter weighting
+
+A report's weight is a function of the reporter's track record and counterparty diversity, computed against on-chain settlement history. A node that has only ever settled with itself and a few colluders is heavily down-weighted; a node that has settled fairly with many counterparties is trusted more. Reporter weight is bounded so no single party dominates.
+
+## Clamping and cold-start
+
+- **Per-report clamp.** A single report can move a target's score by at most a bounded amount, preventing flash-crashes from coordinated negatives.
+- **Decay toward neutral.** In the absence of fresh reports, scores drift toward a neutral value over time.
+- **Cold-start bootstrap.** New nodes get a small initial reputation bonus so they can earn their first traffic. The bootstrap is one-time per operator address — re-staking under a new identity does not replay it.
+
+## What triggers reports
+
+Interaction outcomes generate reports. Examples:
+
+| Event | Local score change | Gossip report? |
+| --- | --- | --- |
+| Clean delivery, valid voucher accepted | Small positive | Optional |
+| Hash mismatch mid-stream | Large negative | Yes |
+| Probe claimed availability but stream failed | Negative | Yes (candidate for phantom-announcement slashing) |
+| Charged rate ≠ advertised rate | Negative | Yes (candidate for rate-manipulation slashing) |
+
+## Why not purely on-chain?
+
+On-chain reputation scales poorly — thousands of report transactions per hour would be cost-prohibitive. Reports stay in gossip and only escalate to on-chain slashing when the evidentiary bar is crossed. Reporter weighting still anchors to on-chain settlement history, so it remains auditable.

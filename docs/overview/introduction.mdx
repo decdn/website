@@ -1,0 +1,19 @@
+---
+title: Introduction
+description: What deCDN is and what it isn't.
+---
+
+deCDN is a **decentralized content delivery network**. Instead of a single provider operating all edge servers, staked independent **nodes** cache content and deliver it to clients over peer-to-peer QUIC connections. Clients pay nodes directly, per megabyte, over off-chain payment channels.
+
+## Core properties
+
+- **Content-addressed.** Every blob is identified by its BLAKE3 hash. Clients verify the bytes they receive — they do not trust any node to return the right content.
+- **Paid per megabyte.** Every byte delivered is paid, including node-to-node cache-miss pulls. Payments run on off-chain channels in governance-allowlisted ERC-20s, with on-chain settlement only at channel open and close.
+- **Origin-hidden.** Origin backends (S3, R2, B2, NFS, local disk) are opaque per-node configuration. No external origin URL is ever exposed to the network.
+- **Staked and slashable.** Nodes stake TOKEN to join the peer mesh. Slashable offenses have on-chain evidence paths that anyone can challenge.
+- **No single operator.** Gossip for discovery. A DHT for content location. Optimistic challenge-response for disputes. Token-weighted governance with a timelock for parameter updates.
+
+## What it isn't
+
+- Not a blockchain or storage network — durability relies on cheap, reliable object storage (S3-class) owned by origin operators.
+- Not a transcoding or search service — delivery only.
