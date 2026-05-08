@@ -16,6 +16,9 @@
       "eslint --fix",
       "prettier --write"
     ],
+    "docs/**/*.{md,mdx}": [
+      "markdownlint-cli2 --fix"
+    ],
     "*.{json,md,mdx,css,yaml,yml}": [
       "prettier --write"
     ]

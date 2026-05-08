@@ -6,6 +6,8 @@ on:
       - "docs/**"
       - ".github/workflows/docs.yml"
       - ".markdownlint-cli2.jsonc"
+      - ".prettierrc.json"
+      - ".prettierignore"
       - "package.json"
       - "pnpm-lock.yaml"
   push:
@@ -14,6 +16,8 @@ on:
       - "docs/**"
       - ".github/workflows/docs.yml"
       - ".markdownlint-cli2.jsonc"
+      - ".prettierrc.json"
+      - ".prettierignore"
       - "package.json"
       - "pnpm-lock.yaml"
 
