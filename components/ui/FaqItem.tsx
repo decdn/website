@@ -24,7 +24,7 @@ export function FaqItem({
   return (
     <div
       data-reveal
-      style={{ ["--reveal-delay" as string]: `${delay}ms` }}
+      style={{ "--reveal-delay": `${delay}ms` }}
       className="grid grid-cols-1 gap-3 py-6 @xl:grid-cols-12 @xl:gap-8 @xl:py-8"
     >
       <div
