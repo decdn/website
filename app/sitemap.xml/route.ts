@@ -4,9 +4,8 @@ import { SITE_URL, links } from "@/lib/links";
 // static files at build time. GET-only is the only verb supported in export.
 export const dynamic = "force-static";
 
-// Sitemap index. Marketing URLs live in `sitemap-pages.xml`; docs are served
-// by Mintlify at `docs.decdn.org/sitemap.xml`. Cross-host entries require
-// both hosts to be verified in Search Console for Google to honor them.
+// Cross-host sitemap entries are only honored by Google when both hosts are
+// verified in Search Console.
 const DOCS_SITEMAP = `${new URL(links.docs).origin}/sitemap.xml`;
 
 const BODY = `<?xml version="1.0" encoding="UTF-8"?>
