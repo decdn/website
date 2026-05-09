@@ -18,16 +18,19 @@ export function Close() {
             Contact
           </h2>
 
-          <div
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             data-reveal
-            className="hug flex items-baseline gap-2 font-semibold tracking-[-0.05em]"
-            style={{ fontSize: "var(--fs-display)", lineHeight: "0.86" }}
-          >
-            <span>decdn</span>
-            <span aria-hidden style={{ color: "var(--whisper)" }}>
-              _
-            </span>
-          </div>
+            src="/wordmark-light.svg"
+            alt="decdn_"
+            className="block"
+            style={{
+              ["--wordmark-h" as string]: "clamp(4.75rem, 14vw, 11.5rem)",
+              height: "var(--wordmark-h)",
+              width: "auto",
+              marginLeft: "calc(var(--wordmark-h) * -0.18)",
+            }}
+          />
 
           {/* prettier-ignore */}
           <p
