@@ -23,6 +23,8 @@ export function Close() {
             data-reveal
             src="/wordmark-light.svg"
             alt="decdn"
+            width={411}
+            height={110}
             className="block"
             style={{
               ["--wordmark-h" as string]: "clamp(4.75rem, 14vw, 11.5rem)",
