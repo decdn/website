@@ -27,7 +27,7 @@ export function Close() {
             height={110}
             className="block"
             style={{
-              ["--wordmark-h" as string]: "clamp(4.75rem, 14vw, 11.5rem)",
+              "--wordmark-h": "clamp(4.75rem, 14vw, 11.5rem)",
               height: "var(--wordmark-h)",
               width: "auto",
               marginLeft: "calc(var(--wordmark-h) * -0.18)",
@@ -38,7 +38,7 @@ export function Close() {
           <p
             data-reveal
             style={{
-              ["--reveal-delay" as string]: "120ms",
+              "--reveal-delay": "120ms",
               fontSize: "var(--fs-body)",
             }}
             className="max-w-[64ch] leading-[1.7]"
@@ -48,7 +48,7 @@ export function Close() {
 
           <div
             data-reveal
-            style={{ ["--reveal-delay" as string]: "220ms" }}
+            style={{ "--reveal-delay": "220ms" }}
             className="flex flex-col flex-wrap gap-x-10 gap-y-4 @md:flex-row @md:items-baseline"
           >
             <a
