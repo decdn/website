@@ -132,7 +132,7 @@ export function Chrome() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/wordmark-light.svg"
-            alt="decdn_"
+            alt="decdn"
             width={112}
             height={30}
             className={onDark ? "hidden" : "block"}
@@ -140,7 +140,7 @@ export function Chrome() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/wordmark-dark.svg"
-            alt="decdn_"
+            alt="decdn"
             width={112}
             height={30}
             className={onDark ? "block" : "hidden"}
