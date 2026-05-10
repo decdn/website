@@ -71,7 +71,7 @@ export function Hero() {
                 </span>
               </a>
               <a
-                className="underline-brutal font-semibold tracking-[0.14em] uppercase opacity-55 hover:opacity-100"
+                className="underline-brutal font-semibold tracking-[0.14em] uppercase"
                 style={{ fontSize: "var(--fs-cta)" }}
                 href={links.github}
               >
