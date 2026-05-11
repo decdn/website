@@ -45,6 +45,11 @@ const FOCUSABLE_SELECTOR =
 // browser's default smooth-scroll, but linear so the page doesn't
 // burst forward and then slow to a crawl the way ease-out curves do
 // (especially noticeable behind the drawer's slide-close).
+// `<html>` scroll-behavior is forced to `auto` for the lifetime of
+// the rAF: without it, each per-frame `window.scrollTo` defers to
+// the page's `motion-safe:scroll-smooth` CSS and queues yet another
+// browser-managed smooth animation, which fights the rAF and reads
+// as a lumpy "slow then sudden" scroll.
 // Reduced-motion path jumps instantly via scrollIntoView (still
 // honours the element's scroll-margin-top).
 function scrollToAnchor(el: HTMLElement) {
@@ -58,12 +63,19 @@ function scrollToAnchor(el: HTMLElement) {
   const targetY = startY + el.getBoundingClientRect().top - marginTop;
   const distance = targetY - startY;
   if (distance === 0) return;
+  const html = document.documentElement;
+  const prevScrollBehavior = html.style.scrollBehavior;
+  html.style.scrollBehavior = "auto";
   const duration = 600;
   const startTime = performance.now();
   const tick = (now: number) => {
     const t = Math.min(1, (now - startTime) / duration);
     window.scrollTo(0, startY + distance * t);
-    if (t < 1) requestAnimationFrame(tick);
+    if (t < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      html.style.scrollBehavior = prevScrollBehavior;
+    }
   };
   requestAnimationFrame(tick);
 }
