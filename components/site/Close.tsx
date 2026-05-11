@@ -89,20 +89,6 @@ export function Close() {
 
         <FleetStatus className="block w-full" />
       </div>
-
-      <footer className="mt-auto flex flex-col gap-3 pt-16">
-        <span aria-hidden className="rule opacity-40" />
-        <div
-          className="grid grid-cols-1 gap-2 tracking-[0.2em] uppercase opacity-80 @md:grid-cols-3 @md:items-center"
-          style={{ fontSize: "var(--fs-micro)" }}
-        >
-          <span>© decdn labs · open source</span>
-          <span className="@md:text-center">
-            built in rust · probably over-engineered
-          </span>
-          <span className="tabular-nums @md:text-right">node-001 / v0</span>
-        </div>
-      </footer>
     </Frame>
   );
 }

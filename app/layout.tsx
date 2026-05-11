@@ -2,7 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { links, SITE_URL, INDEXABLE } from "@/lib/links";
 import { Chrome } from "@/components/site/Chrome";
+import { Footer } from "@/components/site/Footer";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
+import { FAQ_ITEMS } from "@/lib/faq";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -46,6 +48,8 @@ export const viewport: Viewport = {
 
 const ORG_ID = `${SITE_URL}#organization`;
 const SITE_ID = `${SITE_URL}#website`;
+const SERVICE_ID = `${SITE_URL}#service`;
+const FAQ_ID = `${SITE_URL}#faq`;
 
 const organizationSchema = {
   "@context": "https://schema.org",
@@ -53,8 +57,9 @@ const organizationSchema = {
   "@id": ORG_ID,
   name: "deCDN",
   url: SITE_URL,
-  logo: `${SITE_URL}icon.svg`,
-  description: DESCRIPTION,
+  logo: `${SITE_URL}d_logo.png`,
+  description:
+    "Organization developing deCDN, a peer-to-peer content delivery network with per-megabyte settlement in USDC.",
   sameAs: [links.github, links.x],
 };
 
@@ -66,6 +71,29 @@ const websiteSchema = {
   name: "deCDN",
   description: DESCRIPTION,
   publisher: { "@id": ORG_ID },
+};
+
+const serviceSchema = {
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "@id": SERVICE_ID,
+  name: "deCDN",
+  url: SITE_URL,
+  serviceType: "Content Delivery Network",
+  provider: { "@id": ORG_ID },
+  areaServed: "Worldwide",
+  description: DESCRIPTION,
+};
+
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": FAQ_ID,
+  mainEntity: FAQ_ITEMS.map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
 };
 
 // Inline JSON in <script> must escape `<` so a stray `</script>` in any field
@@ -84,17 +112,22 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} h-full motion-safe:scroll-smooth`}
     >
+      <head>
+        {[organizationSchema, websiteSchema, serviceSchema, faqSchema].map(
+          (schema) => (
+            <script
+              key={schema["@id"]}
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: safeJSONLD(schema) }}
+            />
+          ),
+        )}
+      </head>
       <body className="min-h-full">
-        {[organizationSchema, websiteSchema].map((schema) => (
-          <script
-            key={schema["@id"]}
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: safeJSONLD(schema) }}
-          />
-        ))}
         <Chrome />
         <ScrollReveal />
         {children}
+        <Footer />
       </body>
     </html>
   );

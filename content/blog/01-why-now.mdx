@@ -1,0 +1,71 @@
+---
+title: "Why now"
+slug: why-now
+date: 2026-05-11
+summary: "Decentralized CDN attempts have been blocked for a decade by missing prerequisites — transport, addressing, settlement, L2s. All four finally landed."
+bucket: pillar
+---
+
+Decentralized CDNs have been attempted for a decade. Most got stuck before they shipped. The thing that's different now isn't ambition — it's that the four prerequisite layers all became production-grade in the last 24–36 months. Until they did, every serious attempt was structurally blocked by problems outside its own protocol: the transport wasn't fast enough, the settlement layer was too expensive, the unit of account was too volatile, or the legal posture made compliance a single point of failure.
+
+**decdn** is the first attempt that gets to design _only_ the protocol, because the rails it runs on are finally ready. This is what changed.
+
+## transport: QUIC stopped being a research project
+
+QUIC was an IETF draft until 2021. By 2024 it carried roughly a third of public web traffic and shipped natively in every major OS. The properties that matter for a delivery network are now load-bearing parts of the public internet, not a thing we have to build.
+
+- **0-RTT connection establishment.** A repeat connection sends application data in the first packet, no handshake round-trip. For a CDN where probe fan-out is the critical-path latency — a cache-miss probes ~30 peers in parallel — this collapses inter-continental discovery from ~250–500ms down to one-way RTT. We use 0-RTT on `cdn/probe/v1` and `cdn/dht/v1`. Five years ago we'd have had to build it on top of TCP+TLS ourselves and accept 2× the discovery latency.
+- **NAT traversal as a library function.** iroh ships hole-punching, relay fallback, and direct-path upgrade as a single `Endpoint` API. The fraction of node operators behind residential NAT we can usefully include just went from ~10% to ~95% without us writing networking code.
+- **Connection migration.** A node operator's IP changing mid-stream — laptop sleep, mobile handoff, ISP renegotiation — doesn't kill the delivery session. This is the difference between "you need a static IP and a real datacenter" and "your spare 1U at home counts."
+
+QUIC plus iroh isn't incremental. It's the difference between "CDN-grade transport requires CDN-grade infrastructure" and "CDN-grade transport runs on a $5 VPS."
+
+## addressing: BLAKE3 made verification free
+
+Earlier networks (BitTorrent, IPFS, Filecoin retrieval) used SHA-256 or SHA-1 piece hashes. Verification was either expensive enough to skip on commodity hardware (SHA-256 at multi-gigabit) or insecure enough to need a separate proof oracle. BLAKE3 changed that.
+
+- ~3–10× faster than SHA-256 on a single core, and trivially parallelizable across cores via its tree structure.
+- The hash _is_ a Merkle tree by construction, so subrange proofs come for free — a node serving bytes 5MB–6MB of a 50GB file can prove integrity of just that range without re-streaming the rest.
+- iroh treats BLAKE3 as the native blob ID, so the wire protocol and the storage layer share one hash. No translation layer, no second proof system.
+
+Result: every byte we deliver is verified by the receiving client at line rate. We do not need a separate proof-of-delivery oracle. The retrieval problem Filecoin had to design a whole sub-protocol around — proving you delivered the right bytes — is just not a problem we have to solve.
+
+## settlement: stablecoins are now load-bearing financial infrastructure
+
+USDC and USDT cleared north of $10T of on-chain volume in 2024 and are settled by Circle / Tether against actual reserves with monthly attestations. They are no longer "crypto experiments" — they are how dollars move on public chains. For a network of node operators with real infrastructure costs (VPS, bandwidth, storage), this is the difference between a viable business and a casino.
+
+A node operator who books $300/month in earnings keeps $300/month of buying power for their server bill, regardless of token-market conditions. USDC payment channels can be opened, topped up, and settled using the same primitives as any other ERC-20 — battle-tested, audited, with mature tooling.
+
+Five years ago the only way to pay node operators on-chain was a volatile native token. Every prior decentralized delivery network priced bandwidth in something whose value could halve overnight. We don't.
+
+## L2s: payment channels are finally cheap enough to bother with
+
+Per-MB delivery payments are on the order of $0.00001 — six orders of magnitude below any L1 transaction fee. Without an off-chain channel mechanism the economics never close. But payment channels need to _open_ and _settle_ on-chain, which on Ethereum mainnet costs $5–50 per transaction. That kills the channel before it starts.
+
+The current generation of low-cost EVM L2s brought execution costs to ~$0.05–0.10 per transaction while keeping Ethereum-grade security via fraud proofs. A full channel lifecycle on our target L2 — open + close + settle — costs ~$0.23, a 2.3% overhead on a recommended 10 USDC default deposit, amortizing toward zero across long-lived channels. That's the number that makes the unit economics work. It did not exist in production before 2023.
+
+The same maturity wave gave us:
+
+- **ERC-4337 account abstraction**, so node operators and clients can use Safe smart wallets with batched approvals and gas paid in USDC instead of ETH.
+- **OpenZeppelin SignatureChecker** supporting both EOA and ERC-1271 smart-account signatures uniformly across all our contracts.
+- **Circle's CCTP** for native USDC bridging across L2s, removing the trust assumption of wrapped-token bridges.
+
+## demand caught up at the same time
+
+The supply-side primitives matured in parallel with a demand shock that didn't exist in 2020. Payload sizes grew an order of magnitude — modern open-source ML weights run 10–700GB; high-bitrate media, container images, and dataset distributions all push hundreds of GB; package archives are a hundred-fold larger than they were a decade ago. Legacy CDN list pricing didn't move: Cloudflare R2, AWS CloudFront, and Akamai are still in the $0.04–$0.20/GB band, the same as ten years ago. The teams shipping these payloads cannot run that math.
+
+Centralized risk got worse, not better. A handful of hosts carry the load for industries whose entire pitch is openness. Every major release throttles incumbent CDNs within hours.
+
+The demand-side market existed at this scale for the first time around 2023. The supply-side primitives became viable around the same time. The intersection is the wedge.
+
+## the window
+
+The supply-side primitives are ready. The demand-side pain is acute. The category has no incumbent. Three things have to be true at once for a decentralized delivery network to work, and for the first time, all three are.
+
+1. **The transport stack is fast enough** that a residential or commodity-VPS node can serve at CDN-comparable latency. (QUIC + iroh + BLAKE3.)
+2. **The settlement stack is cheap enough** that per-MB delivery economics close. (USDC + L2 payment channels.)
+3. **The demand exists at scale** so the supply side has something worth showing up for.
+
+Each leg of that tripod arrived in its current form within the last 24–36 months. The team that ships now has a window before either a hyperscaler retrofits delivery onto a storage DePIN or a well-funded entrant starts from scratch. After that, network effects in the operator fleet and content cache state lock in the first competent shipper.
+
+This is what "why now" actually means. Not "the market is hot," but "the prerequisite layers are done, the demand is visible, and nobody has composed them yet."
