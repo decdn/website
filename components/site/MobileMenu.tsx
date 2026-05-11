@@ -14,6 +14,7 @@ type SectionId = "intro" | "compare" | "method" | "faq" | "contact";
 
 type Props = {
   activeSection: SectionId;
+  tone: "ink" | "paper";
   onOpenChange?: (open: boolean) => void;
 };
 
@@ -40,7 +41,7 @@ const noopSubscribe = () => () => {};
 const getHydratedSnapshot = () => true;
 const getServerSnapshot = () => false;
 
-export function MobileMenu({ activeSection, onOpenChange }: Props) {
+export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   const [open, setOpen] = useState(false);
   // Gate the portal until after hydration so the static export's
   // server-rendered HTML matches what React first renders on the
@@ -75,11 +76,7 @@ export function MobileMenu({ activeSection, onOpenChange }: Props) {
     const focusFirst = () => {
       const panel = panelRef.current;
       if (!panel) return;
-      const focusables =
-        panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR);
-      // Skip the close button (first focusable) — landing on the first
-      // menu link is the more useful initial position.
-      const first = focusables[1] ?? focusables[0];
+      const first = panel.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
       first?.focus({ preventScroll: true });
     };
     // requestAnimationFrame so the panel's open transition is started
@@ -134,15 +131,43 @@ export function MobileMenu({ activeSection, onOpenChange }: Props) {
     wasOpenRef.current = open;
   }, [open]);
 
+  // Close the drawer when crossing into desktop. Without this the CSS
+  // hides the panel but `open` stays true, leaving body scroll locked
+  // and the nav stuck in forced-paper tone after a resize.
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 768px)");
+    const onChange = (e: MediaQueryListEvent) => {
+      if (e.matches) setOpen(false);
+    };
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, []);
+
   const close = useCallback(() => setOpen(false), []);
 
-  // Portal target: the .chrome-nav sets `backdrop-filter: blur(0)`
-  // as its base, which creates a containing block for `position: fixed`
-  // descendants. Rendering the overlay + panel as children of <nav>
-  // therefore clips them to the nav's box. Portal to <body> so their
-  // fixed positioning is resolved against the viewport instead.
+  // Portal target: the .chrome-nav sets `backdrop-filter: blur(0)` as
+  // its base, which creates a containing block for `position: fixed`
+  // descendants. We also need the toggle to sit above the drawer (so
+  // the morphed × can close it) while leaving the wordmark inside the
+  // nav untouched — raising the nav's z-index would lift the wordmark
+  // above the drawer too, which it shouldn't be. Portalling everything
+  // (toggle + overlay + panel) to <body> solves both: fixed positioning
+  // resolves against the viewport, and the toggle's z-index sits above
+  // the panel while the nav (and wordmark) stay underneath.
   const drawer = (
     <>
+      <button
+        ref={toggleRef}
+        type="button"
+        className="mm-toggle"
+        data-open={open ? "true" : undefined}
+        data-tone={tone}
+        aria-expanded={open}
+        aria-controls="mm-panel"
+        aria-label={open ? "Close menu" : "Open menu"}
+        onClick={() => setOpen((v) => !v)}
+      />
+
       <div
         className="mm-overlay"
         data-open={open ? "true" : undefined}
@@ -157,16 +182,18 @@ export function MobileMenu({ activeSection, onOpenChange }: Props) {
         data-open={open ? "true" : undefined}
         aria-label="Mobile menu"
         aria-hidden={!open}
-        tabIndex={-1}
+        inert={!open}
       >
-        <button
-          type="button"
-          className="mm-close"
-          onClick={close}
-          aria-label="Close menu"
-        >
-          <span aria-hidden>×</span>
-        </button>
+        <header className="mm-head">
+          <a
+            href="#intro"
+            className="mm-head-link meta"
+            onClick={close}
+            aria-current={activeSection === "intro" ? "true" : undefined}
+          >
+            home
+          </a>
+        </header>
 
         <ul className="mm-list">
           {SECTIONS.map((s, i) => {
@@ -182,7 +209,7 @@ export function MobileMenu({ activeSection, onOpenChange }: Props) {
                   onClick={close}
                 >
                   <span className="mm-label">{s.label}</span>
-                  <span aria-hidden className="mm-dot" />
+                  <span aria-hidden className="mm-mark" />
                 </a>
               </li>
             );
@@ -217,19 +244,5 @@ export function MobileMenu({ activeSection, onOpenChange }: Props) {
     </>
   );
 
-  return (
-    <>
-      <button
-        ref={toggleRef}
-        type="button"
-        className="mm-toggle"
-        data-open={open ? "true" : undefined}
-        aria-expanded={open}
-        aria-controls="mm-panel"
-        aria-label={open ? "Close menu" : "Open menu"}
-        onClick={() => setOpen((v) => !v)}
-      />
-      {isHydrated ? createPortal(drawer, document.body) : null}
-    </>
-  );
+  return isHydrated ? createPortal(drawer, document.body) : null;
 }

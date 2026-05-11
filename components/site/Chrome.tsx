@@ -199,6 +199,7 @@ export function Chrome() {
           </a>
           <MobileMenu
             activeSection={active}
+            tone={navTone}
             onOpenChange={handleMobileOpenChange}
           />
         </div>
