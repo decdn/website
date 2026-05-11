@@ -117,14 +117,11 @@ export function Chrome() {
   }, []);
 
   const onDark = DARK_SECTIONS.has(active);
-  // Only the portalled toggle sits on top of the paper drawer while
-  // the menu is open (z-65 above the panel's z-60). Everything else
-  // in the nav — wordmark, labs span, the tinted backdrop — stays at
-  // z-50 behind the drawer and is only visible in the left strip the
-  // drawer doesn't cover, where it paints on top of the underlying
-  // section's own background. So the nav itself tracks `onDark`
-  // directly; only the toggle gets the menu-open paper override via
-  // the `toggleTone` prop forwarded to MobileMenu.
+  // The toggle is portalled to <body> (see MobileMenu.tsx), so it
+  // paints on top of the white panel while the drawer is open — force
+  // it to paper then. The rest of the nav stays at z-50 behind the
+  // drawer, visible only in the strip the panel doesn't cover, and
+  // keeps tracking `onDark`.
   const toggleTone = mobileOpen ? "paper" : onDark ? "ink" : "paper";
 
   return (
