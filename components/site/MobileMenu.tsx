@@ -249,11 +249,11 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
     wasOpenRef.current = open;
   }, [open]);
 
-  // Close on resize to desktop. Without this the CSS hides the panel
-  // but `open` stays true, leaving body scroll locked and the nav
-  // stuck in forced-paper tone.
+  // Close on resize to desktop (≥1280px, matches the CSS gate).
+  // Without this the CSS hides the panel but `open` stays true,
+  // leaving body scroll locked and the nav stuck in forced-paper tone.
   useEffect(() => {
-    const mql = window.matchMedia("(min-width: 768px)");
+    const mql = window.matchMedia("(min-width: 1280px)");
     const onChange = (e: MediaQueryListEvent) => {
       if (e.matches) setOpen(false);
     };
