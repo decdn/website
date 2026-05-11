@@ -1,19 +1,43 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import Link from "next/link";
 import { Frame } from "@/components/ui/Frame";
 import { listPosts } from "@/lib/blog";
 
-export const metadata: Metadata = {
-  title: "field notes",
-  description: "long-form posts on the deCDN protocol.",
-  alternates: { canonical: "/blog/" },
-  openGraph: {
-    title: "field notes",
-    description: "long-form posts on the deCDN protocol.",
-    url: "/blog/",
-    type: "website",
-  },
-};
+const TITLE = "field notes";
+const DESCRIPTION = "long-form posts on the deCDN protocol.";
+
+// Inherit the root file-convention og image (app/opengraph-image.png).
+// Next merges flat fields but shallow-replaces nested objects like
+// `openGraph`, so declaring an `openGraph` here without re-including
+// `images` strips the root image — which previously left every blog
+// route sharing a blank card. We reuse `ogImages` for twitter too:
+// the parent `twitter.images` field is empty here (no app/twitter-image
+// convention exists) and Next's "fall back to og for twitter" only
+// fires at the final resolution step, not via `parent`.
+export async function generateMetadata(
+  _: unknown,
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
+  const ogImages = (await parent).openGraph?.images ?? [];
+  return {
+    title: TITLE,
+    description: DESCRIPTION,
+    alternates: { canonical: "/blog/" },
+    openGraph: {
+      title: TITLE,
+      description: DESCRIPTION,
+      url: "/blog/",
+      type: "website",
+      images: ogImages,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: TITLE,
+      description: DESCRIPTION,
+      images: ogImages,
+    },
+  };
+}
 
 export default function BlogIndex() {
   const posts = listPosts();

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
@@ -18,14 +18,17 @@ export function generateStaticParams() {
 
 type Params = { slug: string };
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<Params>;
-}): Promise<Metadata> {
+export async function generateMetadata(
+  { params }: { params: Promise<Params> },
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { slug } = await params;
   const post = getPost(slug);
-  if (!post) return {};
+  if (!post) notFound();
+  // Inherit the root file-convention og image so post shares get the
+  // site card instead of a blank one; see app/blog/page.tsx for the
+  // pattern and the reason we reuse ogImages for twitter.
+  const ogImages = (await parent).openGraph?.images ?? [];
   return {
     title: post.title,
     description: post.summary,
@@ -36,11 +39,13 @@ export async function generateMetadata({
       url: `/blog/${post.slug}/`,
       type: "article",
       publishedTime: post.date,
+      images: ogImages,
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.summary,
+      images: ogImages,
     },
   };
 }

@@ -5,6 +5,11 @@ import Link from "next/link";
 import { links } from "@/lib/links";
 
 const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
+// Hash anchors below are written `/#section`, not `#section`. The
+// leading slash is load-bearing: this nav also renders on `/blog/*`,
+// where a bare `#section` would resolve relative to the current path
+// and land on `/blog/#section` (which doesn't exist) instead of
+// `/#section` on the home page.
 const NAV = [
   { id: "compare", label: "compare" },
   { id: "method", label: "method" },

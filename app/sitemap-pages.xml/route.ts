@@ -7,6 +7,10 @@ export const dynamic = "force-static";
 
 // Same source as `generateStaticParams` in app/blog/[slug]/page.tsx, so the
 // sitemap can never list a URL the build didn't actually emit.
+// Raw-interpolating slug into XML is safe only because `SLUG_RE` in
+// lib/blog.ts forbids `&`, `<`, `>`; if that regex ever loosens this
+// must move to an XML-encoder, or search engines silently reject the
+// sitemap.
 const postUrls = listPosts()
   .map((p) => `  <url><loc>${SITE_URL}blog/${p.slug}/</loc></url>`)
   .join("\n");
