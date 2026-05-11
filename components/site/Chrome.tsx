@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { links } from "@/lib/links";
+import { MobileMenu } from "@/components/site/MobileMenu";
 
 const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
 // Hash anchors are written `/#section`. Required because this nav also
@@ -27,7 +28,13 @@ const DARK_SECTIONS: ReadonlySet<(typeof SECTION_IDS)[number]> = new Set([
 export function Chrome() {
   const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
+
+  const handleMobileOpenChange = useCallback(
+    (open: boolean) => setMobileOpen(open),
+    [],
+  );
 
   // Active section = whichever one paints the strip directly under the
   // navbar. We collapse the IO root into a 1px horizontal slice at y =
@@ -110,6 +117,15 @@ export function Chrome() {
   }, []);
 
   const onDark = DARK_SECTIONS.has(active);
+  // Only the portalled toggle sits on top of the paper drawer while
+  // the menu is open (z-65 above the panel's z-60). Everything else
+  // in the nav — wordmark, labs span, the tinted backdrop — stays at
+  // z-50 behind the drawer and is only visible in the left strip the
+  // drawer doesn't cover, where it paints on top of the underlying
+  // section's own background. So the nav itself tracks `onDark`
+  // directly; only the toggle gets the menu-open paper override via
+  // the `toggleTone` prop forwarded to MobileMenu.
+  const toggleTone = mobileOpen ? "paper" : onDark ? "ink" : "paper";
 
   return (
     <nav
@@ -175,14 +191,14 @@ export function Chrome() {
         <div className="col-start-3 flex items-center gap-5 justify-self-end">
           <a
             href={links.docs}
-            className="meta flex items-center gap-2 no-underline border-b border-current pb-[2px]"
+            className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] md:flex"
           >
             <span>Docs</span>
             <span aria-hidden>→</span>
           </a>
           <Link
             href={links.blog}
-            className="meta flex items-center gap-2 no-underline border-b border-current pb-[2px]"
+            className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] md:flex"
           >
             <span>Blog</span>
             <span aria-hidden>→</span>
@@ -191,12 +207,17 @@ export function Chrome() {
             href={links.litepaper}
             target="_blank"
             rel="noopener noreferrer"
-            className="meta flex items-center gap-2 no-underline"
+            className="meta hidden items-center gap-2 no-underline md:flex"
             style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
           >
             <span>Litepaper</span>
             <span aria-hidden>→</span>
           </a>
+          <MobileMenu
+            activeSection={active}
+            tone={toggleTone}
+            onOpenChange={handleMobileOpenChange}
+          />
         </div>
       </div>
     </nav>
