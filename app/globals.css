@@ -736,14 +736,10 @@ a.underline-brutal:hover .arrow {
   border-bottom-color: color-mix(in srgb, var(--paper) 26%, transparent);
 }
 
-/* Drawer open: lift the nav above the overlay (55) but leave it below
-   the panel (60) so the panel still covers it. Drop the translucent
-   backdrop for a fully opaque section-toned bar with a soft drop
-   shadow — without the shadow, an opaque paper nav on a paper
-   section (or ink on ink) reads as no nav at all, because the band
-   has no contrast against the section behind it. The shadow gives
-   the band depth so it reads as an elevated header. Tone keeps
-   tracking the section behind the nav. */
+/* Drawer open: lift the nav above the overlay (55) and below the
+   panel (60), and swap the translucent backdrop for an opaque
+   section-toned bar. The shadow is load-bearing — without it, paper
+   nav on paper section (or ink on ink) reads as no nav at all. */
 .chrome-nav[data-mobile-open="true"] {
   backdrop-filter: none;
   -webkit-backdrop-filter: none;

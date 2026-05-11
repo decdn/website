@@ -142,16 +142,8 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
     return () => {
       cancelAnimationFrame(raf);
       document.removeEventListener("keydown", onKey);
-      // Removing `position: fixed` snaps the page back to y=0 because
-      // the negative `top` was the only thing holding the viewport in
-      // place. Restore the prior scroll synchronously and **instantly**
-      // — `behavior: "instant"` bypasses the page's
-      // `motion-safe:scroll-smooth`, which would otherwise animate
-      // from y=0 back to the saved position and read as "the page
-      // jumped to the top and scrolled down again" on close. With the
-      // instant restore in place, close-only stays put and anchor taps
-      // become a clean smooth ride from the prior position to the
-      // target instead of a jump-then-descent.
+      // Removing `position: fixed` leaves the viewport at y=0 — the
+      // negative `top` was the only thing holding it.
       const prev = prevBodyStyleRef.current!;
       const style = document.body.style;
       style.position = prev.position;
@@ -161,27 +153,37 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
       style.width = prev.width;
       style.overflow = prev.overflow;
       prevBodyStyleRef.current = null;
-      window.scrollTo({
-        top: scrollYRef.current,
-        left: 0,
-        behavior: "instant",
-      });
 
       const anchor = pendingAnchorRef.current;
       pendingAnchorRef.current = null;
-      if (anchor) {
-        const el = document.getElementById(anchor);
-        if (el) {
-          // history.replaceState doesn't scroll; scrollIntoView rides
-          // on the just-restored scroll position via the page's
-          // `motion-safe:scroll-smooth` (honours reduced-motion).
-          history.replaceState(null, "", `#${anchor}`);
-          el.scrollIntoView({ block: "start" });
-        } else {
-          // Anchor target lives on another route (drawer opened from
-          // /blog/*). Let the browser navigate to home + hash.
-          window.location.assign(`/#${anchor}`);
-        }
+      const targetEl = anchor ? document.getElementById(anchor) : null;
+
+      if (anchor && !targetEl) {
+        // Drawer opened from a different route (e.g. /blog/*); the
+        // new page handles the hash scroll. Skip the local restore —
+        // any scroll on this page would be a visible artefact on the
+        // way out.
+        window.location.assign(`/#${anchor}`);
+        return;
+      }
+
+      // Restore the prior scroll position synchronously. We bypass
+      // `<html>`'s motion-safe:scroll-smooth manually instead of
+      // passing `behavior: "instant"` — Safari only honoured the
+      // "instant" enum from 18.4; older versions silently fall back
+      // to "auto", which re-introduces the smooth scroll from y=0
+      // we're trying to suppress.
+      const html = document.documentElement;
+      const prevScrollBehavior = html.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
+      window.scrollTo(0, scrollYRef.current);
+      html.style.scrollBehavior = prevScrollBehavior;
+
+      if (anchor && targetEl) {
+        // replaceState doesn't scroll; scrollIntoView smooth-scrolls
+        // from the just-restored position via motion-safe:scroll-smooth.
+        history.replaceState(null, "", `#${anchor}`);
+        targetEl.scrollIntoView({ block: "start" });
       }
     };
   }, [open]);

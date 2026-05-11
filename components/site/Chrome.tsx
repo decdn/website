@@ -119,10 +119,7 @@ export function Chrome() {
   const onDark = DARK_SECTIONS.has(active);
   // The toggle is portalled to <body> (see MobileMenu.tsx) and lives
   // on top of the paper panel while the drawer is open — force it to
-  // paper then so its × reads against the white panel. The rest of
-  // the nav stays section-toned; data-mobile-open just lifts it above
-  // the overlay and turns its translucent backdrop opaque so section
-  // content stops bleeding through the visible left strip.
+  // paper then so its × reads against the white panel.
   const toggleTone = mobileOpen ? "paper" : onDark ? "ink" : "paper";
 
   return (
