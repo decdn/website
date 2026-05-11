@@ -41,6 +41,34 @@ const EXTERNAL: readonly DrawerLink[] = [
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+// Slow, editorial scroll to an anchor — matches the drawer's 720ms
+// open and 850ms brutal-rise reveals rather than the browser's
+// snappy default smooth-scroll. easeOutExpo gives the heavy
+// settling-into-place feel the rest of the page uses.
+// Reduced-motion path jumps instantly via scrollIntoView (still
+// honours the element's scroll-margin-top).
+function scrollToAnchor(el: HTMLElement) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    el.scrollIntoView({ block: "start" });
+    return;
+  }
+  const startY = window.scrollY;
+  const marginTop =
+    parseFloat(getComputedStyle(el).scrollMarginTop || "0") || 0;
+  const targetY = startY + el.getBoundingClientRect().top - marginTop;
+  const distance = targetY - startY;
+  if (distance === 0) return;
+  const duration = 900;
+  const startTime = performance.now();
+  const tick = (now: number) => {
+    const t = Math.min(1, (now - startTime) / duration);
+    const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
+    window.scrollTo(0, startY + distance * eased);
+    if (t < 1) requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
 // Hydration gate for the createPortal target. Reads false on the
 // server and true after hydration, without a useState+useEffect
 // round-trip that would trip the react-hooks/set-state-in-effect rule.
@@ -183,10 +211,11 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
       html.style.scrollBehavior = prevScrollBehavior;
 
       if (anchor && targetEl) {
-        // replaceState doesn't scroll; scrollIntoView smooth-scrolls
-        // from the just-restored position via motion-safe:scroll-smooth.
+        // replaceState doesn't scroll; scrollToAnchor rides from the
+        // just-restored position to the target over 900ms — slow
+        // enough to feel of-a-piece with the drawer's slide-close.
         history.replaceState(null, "", `#${anchor}`);
-        targetEl.scrollIntoView({ block: "start" });
+        scrollToAnchor(targetEl);
       }
     };
   }, [open, router]);
