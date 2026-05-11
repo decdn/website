@@ -843,7 +843,7 @@ a.underline-brutal:hover .arrow {
   border: 0;
   padding: 0;
   cursor: pointer;
-  transition: color 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: color 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .mm-toggle[data-tone="ink"] {
   color: var(--paper);
@@ -858,8 +858,8 @@ a.underline-brutal:hover .arrow {
   height: 1px;
   background: currentColor;
   transition:
-    transform 280ms cubic-bezier(0.16, 1, 0.3, 1),
-    top 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform 460ms cubic-bezier(0.16, 1, 0.3, 1),
+    top 460ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mm-toggle::before {
@@ -893,7 +893,7 @@ a.underline-brutal:hover .arrow {
   -webkit-backdrop-filter: blur(6px) saturate(1.05);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: opacity 480ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .mm-overlay[data-open="true"] {
   opacity: 1;
@@ -912,7 +912,7 @@ a.underline-brutal:hover .arrow {
   border-left: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
   box-shadow: -12px 0 28px -16px color-mix(in srgb, var(--ink) 32%, transparent);
   transform: translate3d(100%, 0, 0);
-  transition: transform 380ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
   padding: clamp(4.25rem, 16vw, 5.5rem) clamp(1.5rem, 6vw, 2rem)
     clamp(1.5rem, 6vw, 2rem);
   overflow-y: auto;
@@ -933,8 +933,8 @@ a.underline-brutal:hover .arrow {
   transform: translateY(8px);
 }
 .mm-panel[data-open="true"] .mm-head {
-  animation: mm-rise 520ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: 80ms;
+  animation: mm-rise 760ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 140ms;
 }
 
 .mm-head-link {
@@ -973,8 +973,8 @@ a.underline-brutal:hover .arrow {
 }
 
 .mm-panel[data-open="true"] .mm-row {
-  animation: mm-rise 520ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: calc(var(--mm-i, 0) * 55ms + 120ms);
+  animation: mm-rise 760ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: calc(var(--mm-i, 0) * 80ms + 220ms);
 }
 
 @keyframes mm-rise {
@@ -1001,8 +1001,8 @@ a.underline-brutal:hover .arrow {
   opacity: 0;
   transform: translateX(-6px);
   transition:
-    opacity 280ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 280ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 540ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 540ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .mm-row[data-active="true"] .mm-mark {
   opacity: 1;
