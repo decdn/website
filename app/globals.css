@@ -1003,10 +1003,8 @@ a.underline-brutal:hover .arrow {
   color: var(--whisper);
 }
 
-.mm-divider {
-  height: 1px;
-  background: color-mix(in srgb, var(--ink) 14%, transparent);
-  margin: 1.25rem 0 0.5rem;
+.mm-list-external {
+  margin-top: 2.5rem;
 }
 
 .mm-foot {

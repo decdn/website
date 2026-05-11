@@ -189,8 +189,6 @@ export function MobileMenu({ activeSection, onOpenChange }: Props) {
           })}
         </ul>
 
-        <div className="mm-divider" aria-hidden />
-
         <ul className="mm-list mm-list-external">
           {EXTERNAL.map((e, i) => (
             <li key={e.label}>
