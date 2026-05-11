@@ -34,7 +34,8 @@ export default function BlogIndex() {
             style={{ fontSize: "var(--fs-lead)" }}
           >
             long-form posts on the deCDN protocol — what it is, why now, and how
-            the pieces fit together. published every two weeks.
+            the pieces fit together. published when something&apos;s worth
+            saying.
           </p>
         </header>
 
