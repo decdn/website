@@ -85,7 +85,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} h-full motion-safe:scroll-smooth`}
     >
-      <body className="min-h-full">
+      <head>
         {[organizationSchema, websiteSchema].map((schema) => (
           <script
             key={schema["@id"]}
@@ -93,6 +93,8 @@ export default function RootLayout({
             dangerouslySetInnerHTML={{ __html: safeJSONLD(schema) }}
           />
         ))}
+      </head>
+      <body className="min-h-full">
         <Chrome />
         <ScrollReveal />
         {children}
