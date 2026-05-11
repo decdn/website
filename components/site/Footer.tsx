@@ -1,3 +1,5 @@
+import { links } from "@/lib/links";
+
 export function Footer() {
   return (
     <footer
@@ -8,6 +10,22 @@ export function Footer() {
         className="@container mx-auto flex flex-col gap-3"
         style={{ maxWidth: "var(--frame-max)" }}
       >
+        <div className="flex justify-end">
+          <a
+            href={links.presskit}
+            download
+            className="inline-flex items-baseline gap-2 tracking-[0.2em] uppercase opacity-80 no-underline hover:opacity-100"
+            style={{
+              fontSize: "var(--fs-micro)",
+              borderBottom: "1px solid currentColor",
+              paddingBottom: 2,
+            }}
+          >
+            <span>presskit</span>
+            <span aria-hidden>↓</span>
+            <span>download</span>
+          </a>
+        </div>
         <span aria-hidden className="rule opacity-40" />
         <div
           className="grid grid-cols-1 gap-2 tracking-[0.2em] uppercase opacity-80 @md:grid-cols-3 @md:items-center"

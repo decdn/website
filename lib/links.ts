@@ -4,6 +4,7 @@ export const links = {
   x: "https://x.com/deCDNorg",
   linkedin: "https://www.linkedin.com/company/decdn",
   litepaper: "/decdn_litepaper.pdf",
+  presskit: "/presskit/decdn-presskit.zip",
   docs: "https://docs.decdn.org/overview/introduction",
   blog: "/blog/",
   contact: "mailto:info@decdn.org",
