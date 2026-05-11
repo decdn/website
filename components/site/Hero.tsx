@@ -63,9 +63,9 @@ export function Hero() {
               <a
                 className="underline-brutal font-semibold tracking-[0.14em] uppercase"
                 style={{ fontSize: "var(--fs-cta)" }}
-                href={links.runNode}
+                href={links.docs}
               >
-                run a node
+                read the docs
                 <span className="arrow" aria-hidden>
                   →
                 </span>
