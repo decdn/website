@@ -13,17 +13,28 @@ const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 // Branded slug: once a `Slug` is produced, callers can rely on
-// SLUG_RE having held. The only constructor sites are this module's
-// own `parseEntry` (throws on failure) and `parseSlug` (returns null).
-export type Slug = string & { readonly __brand: "Slug" };
+// SLUG_RE having held. `unique symbol` makes the brand unfakeable
+// across modules — no external caller can write `"foo" as Slug`
+// because they can't reference this module-local symbol.
+declare const __slug: unique symbol;
+export type Slug = string & { readonly [__slug]: true };
 
 export const parseSlug = (s: unknown): Slug | null =>
   typeof s === "string" && SLUG_RE.test(s) ? (s as Slug) : null;
 
+// IsoDate mirrors Slug — parseEntry validates against ISO_DATE_RE, and
+// downstream consumers (RSS feed, archive page) can rely on the brand
+// rather than re-testing the regex.
+declare const __isoDate: unique symbol;
+export type IsoDate = string & { readonly [__isoDate]: true };
+
+const parseIsoDate = (s: string): IsoDate | null =>
+  ISO_DATE_RE.test(s) ? (s as IsoDate) : null;
+
 export type PostMeta = {
   slug: Slug;
   title: string;
-  date: string;
+  date: IsoDate;
   summary: string;
   bucket?: string;
 };
@@ -86,8 +97,8 @@ const parseEntry = (filename: string): PostSource | null => {
   }
   const title = data.title.trim();
 
-  const date = formatDate(data.date);
-  if (!ISO_DATE_RE.test(date)) {
+  const date = parseIsoDate(formatDate(data.date));
+  if (date === null) {
     throw new Error(
       data.date === undefined
         ? `[blog] ${filename}: frontmatter \`date\` is required`

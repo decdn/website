@@ -95,14 +95,12 @@ export default function BlogIndex() {
                     >
                       {post.title}
                     </h2>
-                    {post.summary ? (
-                      <p
-                        className="max-w-[60ch] leading-[1.6] opacity-75"
-                        style={{ fontSize: "var(--fs-body)" }}
-                      >
-                        {post.summary}
-                      </p>
-                    ) : null}
+                    <p
+                      className="max-w-[60ch] leading-[1.6] opacity-75"
+                      style={{ fontSize: "var(--fs-body)" }}
+                    >
+                      {post.summary}
+                    </p>
                   </div>
                 </Link>
               </li>
