@@ -28,6 +28,7 @@ const postUrls = listPosts()
 const BODY = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${SITE_URL}</loc></url>
+  <url><loc>${SITE_URL}decdn_litepaper.pdf</loc></url>
   <url><loc>${SITE_URL}blog/</loc></url>
 ${postUrls}
 </urlset>
