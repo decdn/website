@@ -123,9 +123,15 @@ let cache: PostSource[] | undefined;
 
 const readEntries = (): PostSource[] => {
   if (cache) return cache;
+  // The directory's presence is part of the project's contract — every
+  // statically wired blog route depends on it. Falling back to `[]`
+  // would silently regress to "nothing yet." in prod. If you really
+  // want zero posts, leave a `.gitkeep` in `content/blog/`.
   if (!fs.existsSync(POSTS_DIR)) {
-    cache = [];
-    return cache;
+    throw new Error(
+      `[blog] posts directory not found at ${POSTS_DIR}. ` +
+        `If you intentionally have zero posts, create the directory with a .gitkeep.`,
+    );
   }
   cache = fs
     .readdirSync(POSTS_DIR)
