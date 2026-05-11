@@ -41,10 +41,10 @@ const EXTERNAL: readonly DrawerLink[] = [
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-// Slow, editorial scroll to an anchor — matches the drawer's 720ms
-// open and 850ms brutal-rise reveals rather than the browser's
-// snappy default smooth-scroll. easeOutExpo gives the heavy
-// settling-into-place feel the rest of the page uses.
+// Constant-velocity scroll to an anchor at 600ms — slower than the
+// browser's default smooth-scroll, but linear so the page doesn't
+// burst forward and then slow to a crawl the way ease-out curves do
+// (especially noticeable behind the drawer's slide-close).
 // Reduced-motion path jumps instantly via scrollIntoView (still
 // honours the element's scroll-margin-top).
 function scrollToAnchor(el: HTMLElement) {
@@ -58,12 +58,11 @@ function scrollToAnchor(el: HTMLElement) {
   const targetY = startY + el.getBoundingClientRect().top - marginTop;
   const distance = targetY - startY;
   if (distance === 0) return;
-  const duration = 900;
+  const duration = 600;
   const startTime = performance.now();
   const tick = (now: number) => {
     const t = Math.min(1, (now - startTime) / duration);
-    const eased = t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-    window.scrollTo(0, startY + distance * eased);
+    window.scrollTo(0, startY + distance * t);
     if (t < 1) requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
@@ -212,8 +211,7 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
 
       if (anchor && targetEl) {
         // replaceState doesn't scroll; scrollToAnchor rides from the
-        // just-restored position to the target over 900ms — slow
-        // enough to feel of-a-piece with the drawer's slide-close.
+        // just-restored position to the target at constant velocity.
         history.replaceState(null, "", `#${anchor}`);
         scrollToAnchor(targetEl);
       }
