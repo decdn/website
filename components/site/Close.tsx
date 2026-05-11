@@ -3,6 +3,8 @@ import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { FleetStatus } from "@/components/site/FleetStatus";
 
+const wordmarkH = "clamp(4.75rem, 14vw, 11.5rem)";
+
 export function Close() {
   return (
     <Frame id="contact" tone="paper" className="overflow-hidden">
@@ -27,10 +29,9 @@ export function Close() {
             height={110}
             className="block"
             style={{
-              "--wordmark-h": "clamp(4.75rem, 14vw, 11.5rem)",
-              height: "var(--wordmark-h)",
+              height: wordmarkH,
               width: "auto",
-              marginLeft: "calc(var(--wordmark-h) * -0.18)",
+              marginLeft: `calc(${wordmarkH} * -0.18)`,
             }}
           />
 
