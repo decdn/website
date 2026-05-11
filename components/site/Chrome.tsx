@@ -117,11 +117,12 @@ export function Chrome() {
   }, []);
 
   const onDark = DARK_SECTIONS.has(active);
-  // The toggle is portalled to <body> (see MobileMenu.tsx), so it
-  // paints on top of the white panel while the drawer is open — force
-  // it to paper then. The rest of the nav stays at z-50 behind the
-  // drawer, visible only in the strip the panel doesn't cover, and
-  // keeps tracking `onDark`.
+  // The toggle is portalled to <body> (see MobileMenu.tsx) and lives
+  // on top of the paper panel while the drawer is open — force it to
+  // paper then so its × reads against the white panel. The rest of
+  // the nav stays section-toned; data-mobile-open just lifts it above
+  // the overlay and turns its translucent backdrop opaque so section
+  // content stops bleeding through the visible left strip.
   const toggleTone = mobileOpen ? "paper" : onDark ? "ink" : "paper";
 
   return (
@@ -130,6 +131,7 @@ export function Chrome() {
       aria-label="Primary"
       data-scrolled={scrolled ? "true" : undefined}
       data-tone={onDark ? "ink" : "paper"}
+      data-mobile-open={mobileOpen ? "true" : undefined}
       className={`chrome-nav fixed inset-x-0 top-0 z-50 py-5 ${
         onDark ? "text-paper" : "text-ink"
       }`}
