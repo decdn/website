@@ -8,7 +8,6 @@ import {
   useSyncExternalStore,
 } from "react";
 import { createPortal } from "react-dom";
-import { useRouter } from "next/navigation";
 import { links } from "@/lib/links";
 
 type SectionId = "intro" | "compare" | "method" | "faq" | "contact";
@@ -41,43 +40,54 @@ const EXTERNAL: readonly DrawerLink[] = [
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-// Constant-velocity scroll to an anchor at 600ms — slower than the
-// browser's default smooth-scroll, but linear so the page doesn't
-// burst forward and then slow to a crawl the way ease-out curves do
-// (especially noticeable behind the drawer's slide-close).
 // `<html>` scroll-behavior is forced to `auto` for the lifetime of
 // the rAF: without it, each per-frame `window.scrollTo` defers to
-// the page's `motion-safe:scroll-smooth` CSS and queues yet another
-// browser-managed smooth animation, which fights the rAF and reads
-// as a lumpy "slow then sudden" scroll.
-// Reduced-motion path jumps instantly via scrollIntoView (still
-// honours the element's scroll-margin-top).
+// `motion-safe:scroll-smooth` and queues yet another browser
+// smooth-scroll per tick, which fights the rAF and reads as a
+// lumpy "slow then sudden" scroll. The loop is single-flight — a
+// new call cancels any in-flight rAF and eagerly restores its
+// captured scroll-behavior so we never snapshot the polluted
+// "auto" value (which would otherwise survive past the helper and
+// permanently override the page's CSS scroll-smooth).
+let scrollAnchorRaf = 0;
+let scrollAnchorRestore: (() => void) | null = null;
+
 function scrollToAnchor(el: HTMLElement) {
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     el.scrollIntoView({ block: "start" });
     return;
   }
+  if (scrollAnchorRaf !== 0) {
+    cancelAnimationFrame(scrollAnchorRaf);
+    scrollAnchorRestore?.();
+    scrollAnchorRaf = 0;
+    scrollAnchorRestore = null;
+  }
   const startY = window.scrollY;
-  const marginTop =
-    parseFloat(getComputedStyle(el).scrollMarginTop || "0") || 0;
+  const marginTop = parseFloat(getComputedStyle(el).scrollMarginTop);
   const targetY = startY + el.getBoundingClientRect().top - marginTop;
   const distance = targetY - startY;
   if (distance === 0) return;
   const html = document.documentElement;
   const prevScrollBehavior = html.style.scrollBehavior;
   html.style.scrollBehavior = "auto";
+  scrollAnchorRestore = () => {
+    html.style.scrollBehavior = prevScrollBehavior;
+  };
   const duration = 600;
   const startTime = performance.now();
   const tick = (now: number) => {
     const t = Math.min(1, (now - startTime) / duration);
     window.scrollTo(0, startY + distance * t);
     if (t < 1) {
-      requestAnimationFrame(tick);
+      scrollAnchorRaf = requestAnimationFrame(tick);
     } else {
-      html.style.scrollBehavior = prevScrollBehavior;
+      scrollAnchorRestore?.();
+      scrollAnchorRestore = null;
+      scrollAnchorRaf = 0;
     }
   };
-  requestAnimationFrame(tick);
+  scrollAnchorRaf = requestAnimationFrame(tick);
 }
 
 // Hydration gate for the createPortal target. Reads false on the
@@ -88,7 +98,6 @@ const getHydratedSnapshot = () => true;
 const getServerSnapshot = () => false;
 
 export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   // Static export: document.body isn't available during prerender. Gate
   // the portal until after hydration so the first client render matches
@@ -200,12 +209,12 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
       const targetEl = anchor ? document.getElementById(anchor) : null;
 
       if (anchor && !targetEl) {
-        // Drawer opened from a different route (e.g. /blog/*); the
-        // new page handles the hash scroll. Use router.push so the
-        // transition stays client-side instead of a full reload.
-        // Skip the local restore — any scroll on this page would be
-        // a visible artefact on the way out.
-        router.push(`/#${anchor}`);
+        // Drawer opened from a different route (e.g. /blog/*); a
+        // full reload to /#anchor lets the new page handle the hash
+        // scroll deterministically (Next 16 App Router's soft-nav
+        // hash behaviour under output: "export" isn't documented).
+        // Skip the local restore — the page is about to unload.
+        window.location.assign(`/#${anchor}`);
         return;
       }
 
@@ -222,13 +231,13 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
       html.style.scrollBehavior = prevScrollBehavior;
 
       if (anchor && targetEl) {
-        // replaceState doesn't scroll; scrollToAnchor rides from the
-        // just-restored position to the target at constant velocity.
+        // replaceState updates the URL without scrolling;
+        // scrollToAnchor does the visible scroll.
         history.replaceState(null, "", `#${anchor}`);
         scrollToAnchor(targetEl);
       }
     };
-  }, [open, router]);
+  }, [open]);
 
   // Skipped on the initial render (when `open` is already false) via
   // the wasOpenRef guard.
@@ -268,9 +277,10 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
 
   // Portal target: toggle/overlay/panel all live in <body> so the
   // toggle can sit above the panel (z-65 > z-60) while the wordmark
-  // stays inside the nav at z-50 and is naturally covered when the
-  // drawer opens. Raising the nav's z-index would lift the wordmark
-  // above the drawer too, which it shouldn't be.
+  // stays inside the nav (z-50 resting, z-58 when the drawer opens
+  // — see Chrome.tsx + globals.css's data-mobile-open block). The
+  // nav always sits below the panel, so the wordmark is naturally
+  // covered when the drawer opens.
   const drawer = (
     <>
       <button
