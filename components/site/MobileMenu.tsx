@@ -9,7 +9,8 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { links } from "@/lib/links";
-import { NAV_SECTIONS as SECTIONS, type SectionId } from "@/lib/sections";
+
+type SectionId = "intro" | "compare" | "method" | "faq" | "contact";
 
 type Props = {
   activeSection: SectionId;
@@ -17,9 +18,17 @@ type Props = {
   onOpenChange?: (open: boolean) => void;
 };
 
+const SECTIONS: readonly { id: SectionId; label: string }[] = [
+  { id: "compare", label: "compare" },
+  { id: "method", label: "method" },
+  { id: "faq", label: "faq" },
+  { id: "contact", label: "contact" },
+] as const;
+
 const EXTERNAL: readonly { href: string; label: string; external: boolean }[] =
   [
     { href: links.docs, label: "Docs", external: false },
+    { href: links.blog, label: "Blog", external: false },
     { href: links.litepaper, label: "Litepaper", external: true },
   ] as const;
 

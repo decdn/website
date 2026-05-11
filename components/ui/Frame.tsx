@@ -11,8 +11,8 @@ type FrameProps = {
 };
 
 const TONE_CLASS: Record<Tone, string> = {
-  ink: "bg-[var(--ink)] text-[var(--paper)]",
-  paper: "bg-[var(--paper)] text-[var(--ink)]",
+  ink: "bg-ink text-paper",
+  paper: "bg-paper text-ink",
 };
 
 export function Frame({ id, tone, className = "", children }: FrameProps) {

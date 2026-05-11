@@ -3,6 +3,8 @@ import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { FleetStatus } from "@/components/site/FleetStatus";
 
+const wordmarkH = "clamp(4.75rem, 14vw, 11.5rem)";
+
 export function Close() {
   return (
     <Frame id="contact" tone="paper" className="overflow-hidden">
@@ -27,10 +29,9 @@ export function Close() {
             height={110}
             className="block"
             style={{
-              "--wordmark-h": "clamp(4.75rem, 14vw, 11.5rem)",
-              height: "var(--wordmark-h)",
+              height: wordmarkH,
               width: "auto",
-              marginLeft: "calc(var(--wordmark-h) * -0.18)",
+              marginLeft: `calc(${wordmarkH} * -0.18)`,
             }}
           />
 
@@ -43,7 +44,7 @@ export function Close() {
             }}
             className="max-w-[64ch] leading-[1.7]"
           >
-            <span style={{ color: "var(--whisper)" }}>deCDN</span>{" "}is a peer-to-peer delivery layer for large files — software releases, datasets, media libraries, ai models, anything meant to be pulled a million times and that shouldn&apos;t depend on one bucket. the code is open. the network is open. the price is posted.
+            <span className="text-whisper">deCDN</span>{" "}is a peer-to-peer delivery layer for large files — software releases, datasets, media libraries, ai models, anything meant to be pulled a million times and that shouldn&apos;t depend on one bucket. the code is open. the network is open. the price is posted.
           </p>
 
           <div
@@ -66,9 +67,9 @@ export function Close() {
             <a
               className="underline-brutal font-semibold tracking-[0.02em]"
               style={{ fontSize: "var(--fs-lead)" }}
-              href={links.runNode}
+              href={links.docs}
             >
-              run a node
+              read the docs
               <span className="arrow" aria-hidden>
                 →
               </span>
@@ -88,20 +89,6 @@ export function Close() {
 
         <FleetStatus className="block w-full" />
       </div>
-
-      <footer className="mt-auto flex flex-col gap-3 pt-16">
-        <span aria-hidden className="rule opacity-40" />
-        <div
-          className="grid grid-cols-1 gap-2 tracking-[0.2em] uppercase opacity-80 @md:grid-cols-3 @md:items-center"
-          style={{ fontSize: "var(--fs-micro)" }}
-        >
-          <span>© decdn labs · open source</span>
-          <span className="@md:text-center">
-            built in rust · probably over-engineered
-          </span>
-          <span className="tabular-nums @md:text-right">node-001 / v0</span>
-        </div>
-      </footer>
     </Frame>
   );
 }

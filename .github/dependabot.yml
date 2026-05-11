@@ -5,7 +5,20 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/" # Location of package manifests
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    groups:
+      dev-dependencies:
+        dependency-type: "development"
+    ignore:
+      # eslint-config-next@16 pulls in eslint-plugin-react@7.37, which only
+      # peers eslint ^9 and crashes on v10 (context.getFilename() removed).
+      # Unblock when Next ships an eslint-plugin-react that supports v10.
+      - dependency-name: "eslint"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: "github-actions"
+    directory: "/"
     schedule:
       interval: "monthly"

@@ -1,31 +1,33 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { links } from "@/lib/links";
-import { MobileMenu } from "@/components/site/MobileMenu";
-import {
-  DARK_SECTIONS,
-  NAV_SECTIONS as NAV,
-  SECTION_IDS,
-  type SectionId,
-} from "@/lib/sections";
 
-// Sections that paint on a dark background drive the navbar's
-// per-section tone flip — `DARK_SECTIONS` from lib/sections. We
-// avoid `mix-blend-mode: difference` because it silently fails on
-// Safari / iOS when applied to `position: fixed` elements (the nav
-// would vanish).
+const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
+// Hash anchors are written `/#section`. Required because this nav also
+// renders on /blog/*, where a bare `#section` resolves against the
+// current URL (e.g. /blog/foo/#section) instead of the home page.
+const NAV = [
+  { id: "compare", label: "compare" },
+  { id: "method", label: "method" },
+  { id: "faq", label: "faq" },
+  { id: "contact", label: "contact" },
+] as const;
+
+// Ids of sections that paint on a dark background — used to flip the
+// navbar text color per-section instead of relying on
+// `mix-blend-mode: difference`, which silently fails on Safari / iOS
+// when applied to `position: fixed` elements (the nav would vanish).
+const DARK_SECTIONS: ReadonlySet<(typeof SECTION_IDS)[number]> = new Set([
+  "compare",
+  "faq",
+]);
 
 export function Chrome() {
-  const [active, setActive] = useState<SectionId>("intro");
+  const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
   const [scrolled, setScrolled] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
-
-  const handleMobileOpenChange = useCallback(
-    (open: boolean) => setMobileOpen(open),
-    [],
-  );
 
   // Active section = whichever one paints the strip directly under the
   // navbar. We collapse the IO root into a 1px horizontal slice at y =
@@ -57,7 +59,7 @@ export function Chrome() {
       const margin = `-${navH}px 0px -${bottomInset}px 0px`;
       io = new IntersectionObserver(
         (entries) => {
-          let bestId: SectionId | null = null;
+          let bestId: (typeof SECTION_IDS)[number] | null = null;
           let bestTop = -Infinity;
           for (const entry of entries) {
             if (!entry.isIntersecting) continue;
@@ -66,7 +68,7 @@ export function Chrome() {
             const top = entry.boundingClientRect.top;
             if (top > bestTop) {
               bestTop = top;
-              bestId = id as SectionId;
+              bestId = id as (typeof SECTION_IDS)[number];
             }
           }
           if (bestId !== null) setActive(bestId);
@@ -108,16 +110,6 @@ export function Chrome() {
   }, []);
 
   const onDark = DARK_SECTIONS.has(active);
-  // Only the portalled toggle sits on top of the paper drawer while
-  // the menu is open (z-65 above the panel's z-60). Everything else
-  // in the nav — wordmark, labs span, the tinted backdrop — stays at
-  // z-50 behind the drawer and is only visible in the left strip the
-  // drawer doesn't cover, where it paints on top of the underlying
-  // section's own background. So the nav itself tracks `onDark`
-  // directly; only the toggle gets the menu-open paper override via
-  // the `toggleTone` prop forwarded to MobileMenu.
-  const toggleTone = mobileOpen ? "paper" : onDark ? "ink" : "paper";
-  const navTextClass = onDark ? "text-[var(--paper)]" : "text-[var(--ink)]";
 
   return (
     <nav
@@ -125,20 +117,24 @@ export function Chrome() {
       aria-label="Primary"
       data-scrolled={scrolled ? "true" : undefined}
       data-tone={onDark ? "ink" : "paper"}
-      className={`chrome-nav fixed inset-x-0 top-0 z-50 py-5 ${navTextClass}`}
+      className={`chrome-nav fixed inset-x-0 top-0 z-50 py-5 ${
+        onDark ? "text-paper" : "text-ink"
+      }`}
       style={{ paddingInline: "var(--frame-gutter)" }}
     >
       <div
         className="mx-auto grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4"
         style={{ maxWidth: "var(--frame-max)" }}
       >
-        <a
-          href="#intro"
+        <Link
+          href="/#intro"
           className="col-start-1 flex items-center gap-3 no-underline"
         >
           {/* Both variants stay mounted and toggled via `display` so the
               tone flip never flashes — browsers fetch hidden <img> tags
-              eagerly enough that the swap-in variant is already in cache. */}
+              eagerly enough that the swap-in variant is already in cache.
+              Only one variant carries alt text; the duplicate stays alt=""
+              so screen readers announce "decdn" once, not twice. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/wordmark-light.svg"
@@ -150,27 +146,27 @@ export function Chrome() {
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/wordmark-dark.svg"
-            alt="decdn"
+            alt=""
             width={112}
             height={30}
             className={onDark ? "block" : "hidden"}
           />
           <span className="meta hidden opacity-70 sm:inline">labs</span>
-        </a>
+        </Link>
 
         <ul className="hidden items-center gap-7 md:flex">
           {NAV.map((item) => {
             const isActive = active === item.id;
             return (
               <li key={item.id}>
-                <a
-                  href={`#${item.id}`}
+                <Link
+                  href={`/#${item.id}`}
                   aria-current={isActive ? "true" : undefined}
                   className="nav-item"
                 >
                   <span className="nav-label">{item.label}</span>
                   <span aria-hidden className="nav-underline" />
-                </a>
+                </Link>
               </li>
             );
           })}
@@ -179,27 +175,28 @@ export function Chrome() {
         <div className="col-start-3 flex items-center gap-5 justify-self-end">
           <a
             href={links.docs}
-            className="meta hidden items-center gap-2 no-underline md:flex"
-            style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
+            className="meta flex items-center gap-2 no-underline border-b border-current pb-[2px]"
           >
             <span>Docs</span>
             <span aria-hidden>→</span>
           </a>
+          <Link
+            href={links.blog}
+            className="meta flex items-center gap-2 no-underline border-b border-current pb-[2px]"
+          >
+            <span>Blog</span>
+            <span aria-hidden>→</span>
+          </Link>
           <a
             href={links.litepaper}
             target="_blank"
             rel="noopener noreferrer"
-            className="meta hidden items-center gap-2 no-underline md:flex"
+            className="meta flex items-center gap-2 no-underline"
             style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
           >
             <span>Litepaper</span>
             <span aria-hidden>→</span>
           </a>
-          <MobileMenu
-            activeSection={active}
-            tone={toggleTone}
-            onOpenChange={handleMobileOpenChange}
-          />
         </div>
       </div>
     </nav>

@@ -2,8 +2,9 @@
   "name": "website",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.33.0",
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=24"
   },
   "scripts": {
     "dev": "next dev",
@@ -12,6 +13,7 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "test": "vitest run",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -27,9 +29,12 @@
     ]
   },
   "dependencies": {
+    "gray-matter": "^4.0.3",
     "next": "16.2.6",
-    "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "next-mdx-remote": "^6.0.0",
+    "react": "19.2.6",
+    "react-dom": "19.2.6",
+    "remark-gfm": "^4.0.1"
   },
   "pnpm": {
     "ignoredBuiltDependencies": [
@@ -38,8 +43,8 @@
     ]
   },
   "devDependencies": {
-    "@commitlint/cli": "^20.5.3",
-    "@commitlint/config-conventional": "^20.5.3",
+    "@commitlint/cli": "^21.0.0",
+    "@commitlint/config-conventional": "^21.0.0",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^25",
     "@types/react": "^19",
@@ -48,10 +53,11 @@
     "eslint-config-next": "16.2.6",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
-    "lint-staged": "^16.4.0",
+    "lint-staged": "^17.0.4",
     "markdownlint-cli2": "^0.22.1",
     "prettier": "^3.8.3",
     "tailwindcss": "^4",
-    "typescript": "^6"
+    "typescript": "^6",
+    "vitest": "^4.1.6"
   }
 }

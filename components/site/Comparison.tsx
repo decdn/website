@@ -32,8 +32,8 @@ export function Comparison() {
         >
           the pattern repeats whenever something big ships: mirrors fork, cdns
           rate-limit, small teams burn tens of thousands hosting bytes they
-          don&apos;t own. <span style={{ color: "var(--whisper)" }}>deCDN</span>{" "}
-          inverts every axis — supply forms around demand, not allocated to it.
+          don&apos;t own. <span className="text-whisper">deCDN</span> inverts
+          every axis — supply forms around demand, not allocated to it.
         </p>
       </div>
 
@@ -77,8 +77,7 @@ export function Comparison() {
                 </span>
                 <span
                   aria-hidden
-                  className="absolute inset-x-0 top-1/2 h-[2px] -translate-y-1/2 @xl:h-[4px]"
-                  style={{ background: "var(--paper)" }}
+                  className="absolute inset-x-0 top-1/2 h-[2px] -translate-y-1/2 bg-paper @xl:h-[4px]"
                 />
               </div>
             </div>
