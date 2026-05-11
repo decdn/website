@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { links } from "@/lib/links";
 
 const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
@@ -122,8 +123,8 @@ export function Chrome() {
         className="mx-auto grid w-full grid-cols-[1fr_auto_1fr] items-center gap-4"
         style={{ maxWidth: "var(--frame-max)" }}
       >
-        <a
-          href="#intro"
+        <Link
+          href="/#intro"
           className="col-start-1 flex items-center gap-3 no-underline"
         >
           {/* Both variants stay mounted and toggled via `display` so the
@@ -146,21 +147,21 @@ export function Chrome() {
             className={onDark ? "block" : "hidden"}
           />
           <span className="meta hidden opacity-70 sm:inline">labs</span>
-        </a>
+        </Link>
 
         <ul className="hidden items-center gap-7 md:flex">
           {NAV.map((item) => {
             const isActive = active === item.id;
             return (
               <li key={item.id}>
-                <a
-                  href={`#${item.id}`}
+                <Link
+                  href={`/#${item.id}`}
                   aria-current={isActive ? "true" : undefined}
                   className="nav-item"
                 >
                   <span className="nav-label">{item.label}</span>
                   <span aria-hidden className="nav-underline" />
-                </a>
+                </Link>
               </li>
             );
           })}
@@ -175,6 +176,14 @@ export function Chrome() {
             <span>Docs</span>
             <span aria-hidden>→</span>
           </a>
+          <Link
+            href={links.blog}
+            className="meta flex items-center gap-2 no-underline"
+            style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
+          >
+            <span>Blog</span>
+            <span aria-hidden>→</span>
+          </Link>
           <a
             href={links.litepaper}
             target="_blank"

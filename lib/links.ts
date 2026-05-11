@@ -5,6 +5,7 @@ export const links = {
   litepaper: "/decdn_litepaper.pdf",
   docs: "https://docs.decdn.org/overview/introduction",
   runNode: "https://docs.decdn.org/overview/introduction",
+  blog: "/blog/",
   contact: "mailto:info@decdn.org",
 } as const;
 
