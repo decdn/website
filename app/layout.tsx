@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { links, SITE_URL, INDEXABLE } from "@/lib/links";
 import { Chrome } from "@/components/site/Chrome";
+import { Footer } from "@/components/site/Footer";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
 import "./globals.css";
 
@@ -95,6 +96,7 @@ export default function RootLayout({
         <Chrome />
         <ScrollReveal />
         {children}
+        <Footer />
       </body>
     </html>
   );
