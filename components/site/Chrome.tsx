@@ -118,7 +118,7 @@ export function Chrome() {
       data-scrolled={scrolled ? "true" : undefined}
       data-tone={onDark ? "ink" : "paper"}
       className={`chrome-nav fixed inset-x-0 top-0 z-50 py-5 ${
-        onDark ? "text-[var(--paper)]" : "text-[var(--ink)]"
+        onDark ? "text-paper" : "text-ink"
       }`}
       style={{ paddingInline: "var(--frame-gutter)" }}
     >
@@ -173,16 +173,14 @@ export function Chrome() {
         <div className="col-start-3 flex items-center gap-5 justify-self-end">
           <a
             href={links.docs}
-            className="meta flex items-center gap-2 no-underline"
-            style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
+            className="meta flex items-center gap-2 no-underline border-b border-current pb-[2px]"
           >
             <span>Docs</span>
             <span aria-hidden>→</span>
           </a>
           <Link
             href={links.blog}
-            className="meta flex items-center gap-2 no-underline"
-            style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
+            className="meta flex items-center gap-2 no-underline border-b border-current pb-[2px]"
           >
             <span>Blog</span>
             <span aria-hidden>→</span>

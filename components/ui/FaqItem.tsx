@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 function highlightBrand(s: string): ReactNode[] {
   return s.split(/(decdn)/gi).map((part, i) =>
     part.toLowerCase() === "decdn" ? (
-      <span key={i} style={{ color: "var(--whisper)" }}>
+      <span key={i} className="text-whisper">
         deCDN
       </span>
     ) : (
