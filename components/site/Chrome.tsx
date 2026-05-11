@@ -132,7 +132,9 @@ export function Chrome() {
         >
           {/* Both variants stay mounted and toggled via `display` so the
               tone flip never flashes — browsers fetch hidden <img> tags
-              eagerly enough that the swap-in variant is already in cache. */}
+              eagerly enough that the swap-in variant is already in cache.
+              Only one variant carries alt text; the duplicate stays alt=""
+              so screen readers announce "decdn" once, not twice. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/wordmark-light.svg"
@@ -141,7 +143,6 @@ export function Chrome() {
             height={30}
             className={onDark ? "hidden" : "block"}
           />
-          {/* Decorative pair — accessible name comes from the light variant. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/wordmark-dark.svg"

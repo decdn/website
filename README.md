@@ -38,7 +38,7 @@ pnpm format    # prettier --write .
 
 ## Gotchas
 
-- **Static export only.** `next.config.ts` sets `output: "export"`; the build emits `./out`. No SSR, route handlers, ISR, middleware, or Image Optimization API.
+- **Static export only.** `next.config.ts` sets `output: "export"`; the build emits `./out`. No SSR, ISR, middleware, or Image Optimization API. Route handlers must be `dynamic = "force-static"` and GET-only (used for `sitemap.xml`, `sitemap-pages.xml`, `robots`).
 - **Tailwind v4.** Theme tokens live in `app/globals.css` under `@theme inline { … }` — there is no `tailwind.config.*`.
 - **Conventional commits enforced.** `commitlint` runs in the `commit-msg` husky hook; non-conforming messages are rejected.
 - **`metadataBase` is live.** `lib/links.ts` `site` is the real origin and `robots: { index: true }`. Anything that absolutizes through `metadataBase` (OG, JSON-LD, canonical) ships to production — keep payloads accurate.

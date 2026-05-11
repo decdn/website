@@ -8,6 +8,7 @@ import { SITE_URL } from "@/lib/links";
 const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
+  "@id": `${SITE_URL}blog/#breadcrumbs`,
   itemListElement: [
     { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
     {

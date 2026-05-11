@@ -7,8 +7,8 @@ import { FAQ_ITEMS } from "@/lib/faq";
 import { JsonLd } from "@/lib/jsonld";
 import { SITE_URL } from "@/lib/links";
 
-// FAQPage schema only ships on the route that actually renders the FAQ.
-// Google flags structured data that doesn't match visible page content.
+// FAQPage structured data must match visible content; only the route that
+// renders <Faq /> may emit it (Google's structured-data policy).
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",

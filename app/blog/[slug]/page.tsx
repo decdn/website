@@ -6,9 +6,7 @@ import { Frame } from "@/components/ui/Frame";
 import { Prose } from "@/components/ui/Prose";
 import { getPost, listPosts } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
-import { SITE_URL } from "@/lib/links";
-
-const ORG_ID = `${SITE_URL}#organization`;
+import { ORG_ID, SITE_URL } from "@/lib/links";
 
 // Static export: enumerate every slug at build time and refuse anything
 // outside that set. `dynamicParams = false` mirrors the closed-world
@@ -80,6 +78,7 @@ export default async function BlogPost({
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
+    "@id": `${postUrl}#breadcrumbs`,
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
       {

@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
-import { links, SITE_URL, INDEXABLE } from "@/lib/links";
+import { links, SITE_URL, INDEXABLE, ORG_ID, X_HANDLE } from "@/lib/links";
 import { Chrome } from "@/components/site/Chrome";
 import { Footer } from "@/components/site/Footer";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
@@ -37,8 +37,8 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
-    site: "@deCDNorg",
-    creator: "@deCDNorg",
+    site: X_HANDLE,
+    creator: X_HANDLE,
   },
   alternates: { canonical: "/" },
   robots: { index: INDEXABLE, follow: INDEXABLE },
@@ -49,7 +49,6 @@ export const viewport: Viewport = {
   themeColor: "#000000",
 };
 
-const ORG_ID = `${SITE_URL}#organization`;
 const SITE_ID = `${SITE_URL}#website`;
 const SERVICE_ID = `${SITE_URL}#service`;
 
