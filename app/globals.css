@@ -1090,6 +1090,15 @@ a.underline-brutal:hover .arrow {
   transform: translate3d(0, 0, 0);
 }
 
+/* Tablet widths up to the desktop gate (1280px) get a wider panel.
+   The clamp floor matches the phone cap (380px) so the panel never
+   shrinks across the 768px crossover. */
+@media (min-width: 768px) {
+  .mm-panel {
+    width: clamp(380px, 48vw, 520px);
+  }
+}
+
 .mm-head {
   display: flex;
   align-items: center;
@@ -1237,10 +1246,10 @@ a.underline-brutal:hover .arrow {
   }
 }
 
-/* Phones only. Gated in CSS instead of Tailwind's md:hidden because
+/* Phones and tablets. Gated in CSS instead of Tailwind's xl:hidden because
    these custom rules are unlayered and would beat the utilities layer,
    leaking the toggle onto desktop. */
-@media (min-width: 768px) {
+@media (min-width: 1280px) {
   .mm-toggle,
   .mm-overlay,
   .mm-panel {

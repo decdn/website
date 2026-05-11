@@ -253,7 +253,7 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   // but `open` stays true, leaving body scroll locked and the nav
   // stuck in forced-paper tone.
   useEffect(() => {
-    const mql = window.matchMedia("(min-width: 768px)");
+    const mql = window.matchMedia("(min-width: 1280px)");
     const onChange = (e: MediaQueryListEvent) => {
       if (e.matches) setOpen(false);
     };

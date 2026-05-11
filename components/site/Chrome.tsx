@@ -166,7 +166,7 @@ export function Chrome() {
           <span className="meta hidden opacity-70 sm:inline">labs</span>
         </Link>
 
-        <ul className="hidden items-center gap-7 md:flex">
+        <ul className="hidden items-center gap-7 xl:flex">
           {NAV.map((item) => {
             const isActive = active === item.id;
             return (
@@ -187,14 +187,14 @@ export function Chrome() {
         <div className="col-start-3 flex items-center gap-5 justify-self-end">
           <a
             href={links.docs}
-            className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] md:flex"
+            className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
           >
             <span>Docs</span>
             <span aria-hidden>→</span>
           </a>
           <Link
             href={links.blog}
-            className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] md:flex"
+            className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
           >
             <span>Blog</span>
             <span aria-hidden>→</span>
@@ -203,7 +203,7 @@ export function Chrome() {
             href={links.litepaper}
             target="_blank"
             rel="noopener noreferrer"
-            className="meta hidden items-center gap-2 no-underline md:flex"
+            className="meta hidden items-center gap-2 no-underline xl:flex"
             style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
           >
             <span>Litepaper</span>
