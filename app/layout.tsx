@@ -60,7 +60,7 @@ const organizationSchema = {
   logo: `${SITE_URL}d_logo.png`,
   description:
     "Organization developing deCDN, a peer-to-peer content delivery network with per-megabyte settlement in USDC.",
-  sameAs: [links.github, links.x],
+  sameAs: [links.github, links.x, links.linkedin],
 };
 
 const websiteSchema = {

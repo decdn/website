@@ -2,6 +2,7 @@ export const links = {
   site: "https://decdn.org",
   github: "https://github.com/decdn",
   x: "https://x.com/deCDNorg",
+  linkedin: "https://www.linkedin.com/company/decdn",
   litepaper: "/decdn_litepaper.pdf",
   docs: "https://docs.decdn.org/overview/introduction",
   blog: "/blog/",
