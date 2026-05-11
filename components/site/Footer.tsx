@@ -1,3 +1,5 @@
+import { links } from "@/lib/links";
+
 export function Footer() {
   return (
     <footer
@@ -17,7 +19,19 @@ export function Footer() {
           <span className="@md:text-center">
             built in rust · probably over-engineered
           </span>
-          <span className="tabular-nums @md:text-right">node-001 / v0</span>
+          <a
+            href={links.presskit}
+            download
+            aria-label="Download presskit"
+            className="inline-flex items-baseline gap-2 no-underline hover:opacity-100 @md:justify-self-end"
+            style={{
+              borderBottom: "1px solid currentColor",
+              paddingBottom: 2,
+            }}
+          >
+            <span>presskit</span>
+            <span aria-hidden>↓</span>
+          </a>
         </div>
       </div>
     </footer>
