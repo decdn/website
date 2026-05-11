@@ -203,8 +203,7 @@ export function Chrome() {
             href={links.litepaper}
             target="_blank"
             rel="noopener noreferrer"
-            className="meta hidden items-center gap-2 no-underline xl:flex"
-            style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
+            className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
           >
             <span>Litepaper</span>
             <span aria-hidden>→</span>
