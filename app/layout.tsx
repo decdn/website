@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import { links, SITE_URL, INDEXABLE } from "@/lib/links";
 import { Chrome } from "@/components/site/Chrome";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
+import { SiteFooter } from "@/components/site/SiteFooter";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -95,6 +96,7 @@ export default function RootLayout({
         <Chrome />
         <ScrollReveal />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );
