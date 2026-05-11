@@ -822,11 +822,15 @@ a.underline-brutal:hover .arrow {
 /* --- mobile menu ------------------------------------------------------
    Phone-only (<md) slide-out drawer. The toggle replaces the Docs /
    Litepaper cluster on mobile; the drawer holds the section anchors
-   plus the external links. Drawer is paper (white) so the toggle —
-   which stays inside .chrome-nav — reads in ink against it; while
-   the drawer is open Chrome.tsx forces data-tone="paper" so the rest
-   of the nav strip also reads in ink. The overlay still dims with
-   ink (it sits over the page sections, not the drawer). */
+   plus the external links. Drawer is paper (white). The toggle is
+   portalled to <body> alongside the overlay and panel (see the
+   `position: fixed; z-index: 65` on `.mm-toggle` below and the
+   comment in MobileMenu.tsx) so it sits above the drawer at z-65
+   while the wordmark stays inside the nav at z-50 and is naturally
+   covered when the drawer opens. While the drawer is open Chrome.tsx
+   forces data-tone="paper" so the entire nav strip reads in ink. The
+   overlay dims with ink (it sits over the page sections, not the
+   drawer). */
 
 .mm-toggle {
   /* Portalled to <body> alongside the overlay/panel — see MobileMenu.tsx
@@ -1041,12 +1045,25 @@ a.underline-brutal:hover .arrow {
   .mm-toggle::after {
     transition: none;
   }
+  /* Replace the slide with a short opacity fade. The overlay was
+     already opacity-based — just shorten its duration. The panel
+     drops its translate3d and animates opacity instead, so reduced-
+     motion users still get a soft transition rather than an abrupt
+     appearance. */
   .mm-overlay {
-    transition: opacity 0ms;
+    transition: opacity 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
   .mm-panel {
-    transition: transform 0ms;
+    transform: none;
+    opacity: 0;
+    transition: opacity 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
+  .mm-panel[data-open="true"] {
+    transform: none;
+    opacity: 1;
+  }
+  /* Header, rows, and the active mark settle into their final state
+     without the stagger/slide-in. */
   .mm-panel[data-open="true"] .mm-head,
   .mm-panel[data-open="true"] .mm-row {
     animation: none;

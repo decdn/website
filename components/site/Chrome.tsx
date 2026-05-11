@@ -108,20 +108,23 @@ export function Chrome() {
   }, []);
 
   const onDark = DARK_SECTIONS.has(active);
-  // While the mobile drawer is open the top-right corner of the nav
-  // sits visually on top of the paper drawer, so force a paper tone
-  // (ink text) so the toggle / wordmark stay legible regardless of
-  // which section is hiding behind the overlay.
-  const navTone = mobileOpen ? "paper" : onDark ? "ink" : "paper";
-  const navTextClass =
-    !mobileOpen && onDark ? "text-[var(--paper)]" : "text-[var(--ink)]";
+  // Only the portalled toggle sits on top of the paper drawer while
+  // the menu is open (z-65 above the panel's z-60). Everything else
+  // in the nav — wordmark, labs span, the tinted backdrop — stays at
+  // z-50 behind the drawer and is only visible in the left strip the
+  // drawer doesn't cover, where it paints on top of the underlying
+  // section's own background. So the nav itself tracks `onDark`
+  // directly; only the toggle gets the menu-open paper override via
+  // the `toggleTone` prop forwarded to MobileMenu.
+  const toggleTone = mobileOpen ? "paper" : onDark ? "ink" : "paper";
+  const navTextClass = onDark ? "text-[var(--paper)]" : "text-[var(--ink)]";
 
   return (
     <nav
       ref={navRef}
       aria-label="Primary"
       data-scrolled={scrolled ? "true" : undefined}
-      data-tone={navTone}
+      data-tone={onDark ? "ink" : "paper"}
       className={`chrome-nav fixed inset-x-0 top-0 z-50 py-5 ${navTextClass}`}
       style={{ paddingInline: "var(--frame-gutter)" }}
     >
@@ -194,7 +197,7 @@ export function Chrome() {
           </a>
           <MobileMenu
             activeSection={active}
-            tone={navTone}
+            tone={toggleTone}
             onOpenChange={handleMobileOpenChange}
           />
         </div>

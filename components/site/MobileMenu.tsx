@@ -61,6 +61,12 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
     overflow: string;
   } | null>(null);
   const scrollYRef = useRef(0);
+  // When the drawer closes because the user tapped an in-page anchor
+  // (`#section`), the cleanup must scroll to that target instead of
+  // restoring the user's prior scroll position — otherwise the body
+  // unlock would override the anchor navigation and the page would
+  // appear to stay put.
+  const pendingAnchorRef = useRef<string | null>(null);
 
   // Notify the parent whenever open state flips so it can adjust the
   // navbar's tone (the toggle sits inside the nav and must read
@@ -91,11 +97,22 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
     style.width = "100%";
     style.overflow = "hidden";
 
+    // Cache the focus order once for the lifetime of this open cycle:
+    //  - panel descendants (home + section rows + external links), in
+    //    DOM order;
+    //  - then the portalled toggle, so keyboard users can Tab to the
+    //    close × instead of being stuck inside the panel with only
+    //    ESC as an exit.
+    // The menu content doesn't change while the drawer is open, so
+    // there's no reason to re-query on every Tab keystroke.
+    const panel = panelRef.current;
+    const focusables: HTMLElement[] = panel
+      ? Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+      : [];
+    if (toggleRef.current) focusables.push(toggleRef.current);
+
     const focusFirst = () => {
-      const panel = panelRef.current;
-      if (!panel) return;
-      const first = panel.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
-      first?.focus({ preventScroll: true });
+      focusables[0]?.focus({ preventScroll: true });
     };
     // requestAnimationFrame so the panel's open transition is started
     // before we move focus; otherwise iOS Safari can occasionally
@@ -109,12 +126,6 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         return;
       }
       if (e.key !== "Tab") return;
-
-      const panel = panelRef.current;
-      if (!panel) return;
-      const focusables = Array.from(
-        panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-      );
       if (focusables.length === 0) return;
       const first = focusables[0]!;
       const last = focusables[focusables.length - 1]!;
@@ -133,10 +144,12 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
     return () => {
       cancelAnimationFrame(raf);
       document.removeEventListener("keydown", onKey);
-      // Restore body styles exactly + scroll back to where we pinned.
-      // Removing `position: fixed` without scrollTo would snap the
-      // page to y=0 because the negative `top` was the only thing
-      // holding the viewport in place.
+      // Restore body styles exactly. Removing `position: fixed` snaps
+      // the page back to y=0 because the negative `top` was the only
+      // thing holding the viewport in place — so we have to scroll
+      // somewhere explicitly. If the drawer was closed by tapping an
+      // in-page anchor link, scroll to that target; otherwise return
+      // to the user's pre-open scroll position.
       const prev = prevBodyStyleRef.current;
       if (prev) {
         const style = document.body.style;
@@ -147,7 +160,25 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         style.width = prev.width;
         style.overflow = prev.overflow;
         prevBodyStyleRef.current = null;
-        window.scrollTo(0, scrollYRef.current);
+
+        const anchor = pendingAnchorRef.current;
+        pendingAnchorRef.current = null;
+        if (anchor) {
+          const el = document.getElementById(anchor);
+          if (el) {
+            // Update the URL hash without re-triggering a native
+            // anchor jump (history.replaceState doesn't scroll), then
+            // smooth-scroll via scrollIntoView — html already carries
+            // `motion-safe:scroll-smooth`, so this honours the user's
+            // reduced-motion preference automatically.
+            history.replaceState(null, "", `#${anchor}`);
+            el.scrollIntoView({ block: "start" });
+          } else {
+            window.scrollTo(0, scrollYRef.current);
+          }
+        } else {
+          window.scrollTo(0, scrollYRef.current);
+        }
       }
     };
   }, [open]);
@@ -176,6 +207,21 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   }, []);
 
   const close = useCallback(() => setOpen(false), []);
+
+  // Single click handler for every link inside the drawer. For an
+  // in-page anchor (`#section`), we preventDefault so the browser
+  // doesn't start its own scroll while the body is still pinned, then
+  // stash the target id for the cleanup to scroll to after the body
+  // unlock. For external links (Docs / Litepaper) we let the browser
+  // handle navigation normally and just close the drawer.
+  const handleClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
+    const href = e.currentTarget.getAttribute("href");
+    if (href?.startsWith("#")) {
+      e.preventDefault();
+      pendingAnchorRef.current = href.slice(1);
+    }
+    setOpen(false);
+  }, []);
 
   // Portal target: the .chrome-nav sets `backdrop-filter: blur(0)` as
   // its base, which creates a containing block for `position: fixed`
@@ -220,7 +266,7 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
           <a
             href="#intro"
             className="mm-head-link meta"
-            onClick={close}
+            onClick={handleClick}
             aria-current={activeSection === "intro" ? "true" : undefined}
           >
             home
@@ -238,7 +284,7 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
                   data-active={isActive ? "true" : undefined}
                   aria-current={isActive ? "true" : undefined}
                   style={{ "--mm-i": i }}
-                  onClick={close}
+                  onClick={handleClick}
                 >
                   <span className="mm-label">{s.label}</span>
                   <span aria-hidden className="mm-mark" />
@@ -258,7 +304,7 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
                   : {})}
                 className="mm-row mm-row-external"
                 style={{ "--mm-i": SECTIONS.length + i }}
-                onClick={close}
+                onClick={handleClick}
               >
                 <span className="mm-label">{e.label}</span>
                 <span aria-hidden className="mm-arrow">
