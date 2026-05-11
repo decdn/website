@@ -5,7 +5,7 @@ A peer-to-peer delivery layer for bytes at scale. Anyone can serve bytes; client
 ![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
 ![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
 ![Tailwind CSS v4](https://img.shields.io/badge/Tailwind%20CSS-v4-06B6D4?logo=tailwindcss&logoColor=white)
-![TypeScript 5](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![TypeScript 6](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)
 ![pnpm](https://img.shields.io/badge/pnpm-F69220?logo=pnpm&logoColor=white)
 ![Cloudflare Pages](https://img.shields.io/badge/Cloudflare%20Pages-deployed-F38020?logo=cloudflarepages&logoColor=white)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-FE5196?logo=conventionalcommits&logoColor=white)](https://www.conventionalcommits.org)
@@ -29,10 +29,11 @@ pnpm format    # prettier --write .
 
 ## Project layout
 
-- `app/` — App Router entry (`layout.tsx`, `page.tsx`, `globals.css`).
+- `app/` — App Router entry (`layout.tsx`, `page.tsx`, `globals.css`) plus the blog routes (`blog/`, `blog/[slug]/`), sitemap/robots handlers, and file-convention metadata assets.
 - `components/site/` — page sections composed by `app/page.tsx` (Hero, Comparison, Method, Faq, Close).
 - `components/ui/` — low-level primitives (Frame, SectionHeader, Figure, …).
-- `lib/` — shared helpers (currently just `links.ts`).
+- `lib/` — shared helpers (`links.ts`, `blog.ts`, `faq.ts`, `jsonld.tsx`).
+- `content/blog/` — MDX posts.
 - Path alias: `@/*` maps to the project root (e.g. `@/lib/links`, not `@/src/...`).
 
 ## Gotchas
