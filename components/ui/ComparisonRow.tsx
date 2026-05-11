@@ -13,7 +13,7 @@ export function ComparisonRow({
     <div
       data-reveal
       style={{
-        ["--reveal-delay" as string]: `${delay}ms`,
+        "--reveal-delay": `${delay}ms`,
         fontSize: "var(--fs-body)",
       }}
       className="grid gap-2 border-t border-current/20 py-4 @xl:grid-cols-12 @xl:gap-8 @xl:py-5"

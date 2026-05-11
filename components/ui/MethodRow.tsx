@@ -12,7 +12,7 @@ export function MethodRow({
   return (
     <div
       data-reveal
-      style={{ ["--reveal-delay" as string]: `${delay}ms` }}
+      style={{ "--reveal-delay": `${delay}ms` }}
       className="grid grid-cols-1 gap-4 py-7 @xl:grid-cols-12 @xl:gap-10 @xl:py-10"
     >
       <div className="meta tabular-nums opacity-60 @xl:col-span-1">{n}</div>

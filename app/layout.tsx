@@ -3,6 +3,7 @@ import { Geist } from "next/font/google";
 import { links, SITE_URL, INDEXABLE } from "@/lib/links";
 import { Chrome } from "@/components/site/Chrome";
 import { FAQ_ITEMS } from "@/components/site/Faq";
+import { Footer } from "@/components/site/Footer";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
 import "./globals.css";
 
@@ -111,7 +112,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} h-full motion-safe:scroll-smooth`}
     >
-      <body className="min-h-full">
+      <head>
         {[organizationSchema, websiteSchema, serviceSchema, faqSchema].map(
           (schema) => (
             <script
@@ -121,9 +122,12 @@ export default function RootLayout({
             />
           ),
         )}
+      </head>
+      <body className="min-h-full">
         <Chrome />
         <ScrollReveal />
         {children}
+        <Footer />
       </body>
     </html>
   );

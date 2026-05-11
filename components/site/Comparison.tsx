@@ -25,7 +25,7 @@ export function Comparison() {
         <p
           data-reveal
           style={{
-            ["--reveal-delay" as string]: "120ms",
+            "--reveal-delay": "120ms",
             fontSize: "var(--fs-body)",
           }}
           className="max-w-[62ch] leading-[1.7] text-paper/75"
@@ -40,7 +40,7 @@ export function Comparison() {
       <div className="mt-auto flex flex-col pt-12">
         <div
           data-reveal
-          style={{ ["--reveal-delay" as string]: "260ms" }}
+          style={{ "--reveal-delay": "260ms" }}
           className="grid gap-2 pb-3 @xl:grid-cols-12 @xl:gap-8"
         >
           <div className="meta opacity-0 @xl:col-span-2 @xl:block">axis</div>
@@ -56,7 +56,7 @@ export function Comparison() {
         {/* big price row */}
         <div
           data-reveal
-          style={{ ["--reveal-delay" as string]: "340ms" }}
+          style={{ "--reveal-delay": "340ms" }}
           className="grid gap-3 border-t border-current/25 py-5 @xl:grid-cols-12 @xl:gap-8 @xl:py-8"
         >
           <div className="meta opacity-60 @xl:col-span-2 @xl:pt-2">price</div>

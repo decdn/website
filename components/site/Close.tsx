@@ -18,22 +18,27 @@ export function Close() {
             Contact
           </h2>
 
-          <div
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
             data-reveal
-            className="hug flex items-baseline gap-2 font-semibold tracking-[-0.05em]"
-            style={{ fontSize: "var(--fs-display)", lineHeight: "0.86" }}
-          >
-            <span>decdn</span>
-            <span aria-hidden style={{ color: "var(--whisper)" }}>
-              _
-            </span>
-          </div>
+            src="/wordmark-light.svg"
+            alt="decdn"
+            width={411}
+            height={110}
+            className="block"
+            style={{
+              "--wordmark-h": "clamp(4.75rem, 14vw, 11.5rem)",
+              height: "var(--wordmark-h)",
+              width: "auto",
+              marginLeft: "calc(var(--wordmark-h) * -0.18)",
+            }}
+          />
 
           {/* prettier-ignore */}
           <p
             data-reveal
             style={{
-              ["--reveal-delay" as string]: "120ms",
+              "--reveal-delay": "120ms",
               fontSize: "var(--fs-body)",
             }}
             className="max-w-[64ch] leading-[1.7]"
@@ -43,7 +48,7 @@ export function Close() {
 
           <div
             data-reveal
-            style={{ ["--reveal-delay" as string]: "220ms" }}
+            style={{ "--reveal-delay": "220ms" }}
             className="flex flex-col flex-wrap gap-x-10 gap-y-4 @md:flex-row @md:items-baseline"
           >
             <a
@@ -83,20 +88,6 @@ export function Close() {
 
         <FleetStatus className="block w-full" />
       </div>
-
-      <footer className="mt-auto flex flex-col gap-3 pt-16">
-        <span aria-hidden className="rule opacity-40" />
-        <div
-          className="grid grid-cols-1 gap-2 tracking-[0.2em] uppercase opacity-80 @md:grid-cols-3 @md:items-center"
-          style={{ fontSize: "var(--fs-micro)" }}
-        >
-          <span>© decdn labs · open source</span>
-          <span className="@md:text-center">
-            built in rust · probably over-engineered
-          </span>
-          <span className="tabular-nums @md:text-right">node-001 / v0</span>
-        </div>
-      </footer>
     </Frame>
   );
 }
