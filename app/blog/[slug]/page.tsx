@@ -68,6 +68,7 @@ export default async function BlogPost({
               {post.date}
             </time>
             <h1
+              id="post-h"
               className="hug font-semibold leading-[0.95] tracking-[-0.035em]"
               style={{ fontSize: "var(--fs-h2)" }}
             >

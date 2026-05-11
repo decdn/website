@@ -48,6 +48,7 @@ export default function BlogIndex() {
         <header className="flex flex-col gap-6">
           <span className="meta opacity-60">field notes</span>
           <h1
+            id="blog-h"
             className="hug font-semibold leading-[0.92] tracking-[-0.04em]"
             style={{ fontSize: "var(--fs-h2)" }}
           >
