@@ -8,6 +8,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { links } from "@/lib/links";
 
 type SectionId = "intro" | "compare" | "method" | "faq" | "contact";
@@ -48,6 +49,7 @@ const getHydratedSnapshot = () => true;
 const getServerSnapshot = () => false;
 
 export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   // Static export: document.body isn't available during prerender. Gate
   // the portal until after hydration so the first client render matches
@@ -160,10 +162,11 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
 
       if (anchor && !targetEl) {
         // Drawer opened from a different route (e.g. /blog/*); the
-        // new page handles the hash scroll. Skip the local restore —
-        // any scroll on this page would be a visible artefact on the
-        // way out.
-        window.location.assign(`/#${anchor}`);
+        // new page handles the hash scroll. Use router.push so the
+        // transition stays client-side instead of a full reload.
+        // Skip the local restore — any scroll on this page would be
+        // a visible artefact on the way out.
+        router.push(`/#${anchor}`);
         return;
       }
 
@@ -186,7 +189,7 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         targetEl.scrollIntoView({ block: "start" });
       }
     };
-  }, [open]);
+  }, [open, router]);
 
   // Skipped on the initial render (when `open` is already false) via
   // the wasOpenRef guard.
@@ -314,7 +317,11 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
 
         <footer className="mm-foot">
           <span className="meta">
-            decdn<span className="text-whisper">_</span>labs
+            decdn
+            <span aria-hidden="true" className="text-whisper">
+              _
+            </span>
+            labs
           </span>
         </footer>
       </aside>
