@@ -2,6 +2,23 @@ import type { Metadata, ResolvingMetadata } from "next";
 import Link from "next/link";
 import { Frame } from "@/components/ui/Frame";
 import { listPosts } from "@/lib/blog";
+import { JsonLd } from "@/lib/jsonld";
+import { SITE_URL } from "@/lib/links";
+
+const breadcrumbSchema = {
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "@id": `${SITE_URL}blog/#breadcrumbs`,
+  itemListElement: [
+    { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+    {
+      "@type": "ListItem",
+      position: 2,
+      name: "Blog",
+      item: `${SITE_URL}blog/`,
+    },
+  ],
+};
 
 const TITLE = "field notes";
 const DESCRIPTION = "long-form posts on the deCDN protocol.";
@@ -39,6 +56,7 @@ export default function BlogIndex() {
 
   return (
     <main>
+      <JsonLd data={breadcrumbSchema} />
       <Frame id="blog" tone="paper">
         <header className="flex flex-col gap-6">
           <span className="meta opacity-60">field notes</span>

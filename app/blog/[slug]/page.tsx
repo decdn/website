@@ -5,6 +5,8 @@ import remarkGfm from "remark-gfm";
 import { Frame } from "@/components/ui/Frame";
 import { Prose } from "@/components/ui/Prose";
 import { getPost, listPosts } from "@/lib/blog";
+import { JsonLd } from "@/lib/jsonld";
+import { ORG_ID, SITE_URL } from "@/lib/links";
 
 // Static export: enumerate every slug at build time and refuse anything
 // outside that set. `dynamicParams = false` mirrors the closed-world
@@ -59,8 +61,40 @@ export default async function BlogPost({
   const post = getPost(slug);
   if (!post) notFound();
 
+  const postUrl = `${SITE_URL}blog/${post.slug}/`;
+  const postingSchema = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${postUrl}#post`,
+    headline: post.title,
+    description: post.summary,
+    datePublished: post.date,
+    url: postUrl,
+    mainEntityOfPage: postUrl,
+    image: `${SITE_URL}opengraph-image.png`,
+    author: { "@id": ORG_ID },
+    publisher: { "@id": ORG_ID },
+  };
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "@id": `${postUrl}#breadcrumbs`,
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: `${SITE_URL}blog/`,
+      },
+      { "@type": "ListItem", position: 3, name: post.title, item: postUrl },
+    ],
+  };
+
   return (
     <main>
+      <JsonLd data={postingSchema} />
+      <JsonLd data={breadcrumbSchema} />
       <Frame id="post" tone="paper">
         <article className="flex flex-col gap-10">
           <header className="flex flex-col gap-6">
