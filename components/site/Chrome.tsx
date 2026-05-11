@@ -141,10 +141,11 @@ export function Chrome() {
             height={30}
             className={onDark ? "hidden" : "block"}
           />
+          {/* Decorative pair — accessible name comes from the light variant. */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/wordmark-dark.svg"
-            alt="decdn"
+            alt=""
             width={112}
             height={30}
             className={onDark ? "block" : "hidden"}
