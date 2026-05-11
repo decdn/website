@@ -1,7 +1,7 @@
 export function Footer() {
   return (
     <footer
-      className="bg-[var(--paper)] pt-16 pb-10 text-[var(--ink)]"
+      className="bg-paper pt-16 pb-10 text-ink"
       style={{ paddingInline: "var(--frame-gutter)" }}
     >
       <div
