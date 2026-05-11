@@ -4,11 +4,8 @@ import matter from "gray-matter";
 
 const POSTS_DIR = path.join(process.cwd(), "content", "blog");
 
-// Constrain slug shape so file-system-sourced strings can never carry
-// HTML or URL-significant characters into hrefs. This is the central
-// guard against the stored-XSS class — see CodeQL js/stored-xss.
-// Also rejects empty strings, leading/trailing hyphens, and consecutive
-// hyphens so canonical kebab-case is enforced at the boundary.
+// Central guard against stored-XSS via slug interpolation. Also enforces
+// canonical kebab-case (no empty, leading/trailing/consecutive hyphens).
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -123,13 +120,9 @@ const parseEntry = (filename: string): PostSource | null => {
   return { slug, title, date, summary, bucket, body: content };
 };
 
-// Memoise: the build is single-process and source files are immutable
-// mid-build. `readEntries` is hit from `listPosts` (BlogIndex + sitemap +
-// generateStaticParams = 3 sites) and `getPost` (generateMetadata + the
-// page render, 2× per slug), so without the cache we'd parse the
-// directory 2N+3 times. Errors are thrown before `cache` is assigned,
-// so a malformed post fails the build loud rather than poisoning the
-// cache with a partial result.
+// Single-process build with immutable source files; cache lets every
+// call site share one parse. Errors throw before assignment so a
+// malformed post can't poison the cache with a partial result.
 let cache: PostSource[] | undefined;
 
 const readEntries = (): PostSource[] => {
@@ -150,12 +143,9 @@ const readEntries = (): PostSource[] => {
     .map(parseEntry)
     .filter((e): e is PostSource => e !== null)
     .sort((a, b) => {
-      // Newest first; ISO-8601 dates compare lexically. Tie-break on
-      // slug because `fs.readdirSync` order isn't portable across
-      // filesystems (Linux returns inode order, macOS returns lex
-      // order on APFS but not on case-insensitive HFS+). Without the
-      // tie-break, ES stable sort would preserve readdir order for
-      // same-date posts and output would flip between machines.
+      // Newest first; tie-break on slug because readdir order isn't
+      // portable across filesystems and stable sort would otherwise
+      // flip same-date post order between machines.
       if (a.date !== b.date) return b.date.localeCompare(a.date);
       return a.slug.localeCompare(b.slug);
     });
