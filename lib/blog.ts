@@ -164,5 +164,7 @@ export function listPosts(): PostMeta[] {
 }
 
 export function getPost(slug: string): PostSource | null {
-  return readEntries().find((e) => e.slug === slug) ?? null;
+  const valid = parseSlug(slug);
+  if (valid === null) return null;
+  return readEntries().find((e) => e.slug === valid) ?? null;
 }
