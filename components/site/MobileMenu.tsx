@@ -32,13 +32,63 @@ type DrawerLink = {
 };
 
 const EXTERNAL: readonly DrawerLink[] = [
-  { kind: "internal", href: links.docs, label: "Docs" },
-  { kind: "internal", href: links.blog, label: "Blog" },
-  { kind: "external", href: links.litepaper, label: "Litepaper" },
+  { kind: "internal", href: links.docs, label: "docs" },
+  { kind: "internal", href: links.blog, label: "blog" },
+  { kind: "external", href: links.litepaper, label: "litepaper" },
 ] as const;
 
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+// `<html>` scroll-behavior is forced to `auto` for the lifetime of
+// the rAF: without it, each per-frame `window.scrollTo` defers to
+// `motion-safe:scroll-smooth` and queues yet another browser
+// smooth-scroll per tick, which fights the rAF and reads as a
+// lumpy "slow then sudden" scroll. The loop is single-flight — a
+// new call cancels any in-flight rAF and eagerly restores its
+// captured scroll-behavior so we never snapshot the polluted
+// "auto" value (which would otherwise survive past the helper and
+// permanently override the page's CSS scroll-smooth).
+let scrollAnchorRaf = 0;
+let scrollAnchorRestore: (() => void) | null = null;
+
+function scrollToAnchor(el: HTMLElement) {
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    el.scrollIntoView({ block: "start" });
+    return;
+  }
+  if (scrollAnchorRaf !== 0) {
+    cancelAnimationFrame(scrollAnchorRaf);
+    scrollAnchorRestore?.();
+    scrollAnchorRaf = 0;
+    scrollAnchorRestore = null;
+  }
+  const startY = window.scrollY;
+  const marginTop = parseFloat(getComputedStyle(el).scrollMarginTop);
+  const targetY = startY + el.getBoundingClientRect().top - marginTop;
+  const distance = targetY - startY;
+  if (distance === 0) return;
+  const html = document.documentElement;
+  const prevScrollBehavior = html.style.scrollBehavior;
+  html.style.scrollBehavior = "auto";
+  scrollAnchorRestore = () => {
+    html.style.scrollBehavior = prevScrollBehavior;
+  };
+  const duration = 600;
+  const startTime = performance.now();
+  const tick = (now: number) => {
+    const t = Math.min(1, (now - startTime) / duration);
+    window.scrollTo(0, startY + distance * t);
+    if (t < 1) {
+      scrollAnchorRaf = requestAnimationFrame(tick);
+    } else {
+      scrollAnchorRestore?.();
+      scrollAnchorRestore = null;
+      scrollAnchorRaf = 0;
+    }
+  };
+  scrollAnchorRaf = requestAnimationFrame(tick);
+}
 
 // Hydration gate for the createPortal target. Reads false on the
 // server and true after hydration, without a useState+useEffect
@@ -142,9 +192,8 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
     return () => {
       cancelAnimationFrame(raf);
       document.removeEventListener("keydown", onKey);
-      // Removing `position: fixed` snaps the page back to y=0 because
-      // the negative `top` was the only thing holding the viewport in
-      // place — scroll somewhere explicitly after restoring styles.
+      // Removing `position: fixed` leaves the viewport at y=0 — the
+      // negative `top` was the only thing holding it.
       const prev = prevBodyStyleRef.current!;
       const style = document.body.style;
       style.position = prev.position;
@@ -157,21 +206,35 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
 
       const anchor = pendingAnchorRef.current;
       pendingAnchorRef.current = null;
-      if (anchor) {
-        const el = document.getElementById(anchor);
-        if (el) {
-          // history.replaceState doesn't scroll; smooth-scroll via
-          // scrollIntoView. `motion-safe:scroll-smooth` on <html>
-          // honours reduced-motion automatically.
-          history.replaceState(null, "", `#${anchor}`);
-          el.scrollIntoView({ block: "start" });
-        } else {
-          // Anchor target lives on another route (drawer opened from
-          // /blog/*). Let the browser navigate to home + hash.
-          window.location.assign(`/#${anchor}`);
-        }
-      } else {
-        window.scrollTo(0, scrollYRef.current);
+      const targetEl = anchor ? document.getElementById(anchor) : null;
+
+      if (anchor && !targetEl) {
+        // Drawer opened from a different route (e.g. /blog/*); a
+        // full reload to /#anchor lets the new page handle the hash
+        // scroll deterministically (Next 16 App Router's soft-nav
+        // hash behaviour under output: "export" isn't documented).
+        // Skip the local restore — the page is about to unload.
+        window.location.assign(`/#${anchor}`);
+        return;
+      }
+
+      // Restore the prior scroll position synchronously. We bypass
+      // `<html>`'s motion-safe:scroll-smooth manually instead of
+      // passing `behavior: "instant"` — Safari only honoured the
+      // "instant" enum from 18.4; older versions silently fall back
+      // to "auto", which re-introduces the smooth scroll from y=0
+      // we're trying to suppress.
+      const html = document.documentElement;
+      const prevScrollBehavior = html.style.scrollBehavior;
+      html.style.scrollBehavior = "auto";
+      window.scrollTo(0, scrollYRef.current);
+      html.style.scrollBehavior = prevScrollBehavior;
+
+      if (anchor && targetEl) {
+        // replaceState updates the URL without scrolling;
+        // scrollToAnchor does the visible scroll.
+        history.replaceState(null, "", `#${anchor}`);
+        scrollToAnchor(targetEl);
       }
     };
   }, [open]);
@@ -214,9 +277,10 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
 
   // Portal target: toggle/overlay/panel all live in <body> so the
   // toggle can sit above the panel (z-65 > z-60) while the wordmark
-  // stays inside the nav at z-50 and is naturally covered when the
-  // drawer opens. Raising the nav's z-index would lift the wordmark
-  // above the drawer too, which it shouldn't be.
+  // stays inside the nav (z-50 resting, z-58 when the drawer opens
+  // — see Chrome.tsx + globals.css's data-mobile-open block). The
+  // nav always sits below the panel, so the wordmark is naturally
+  // covered when the drawer opens.
   const drawer = (
     <>
       <button
@@ -301,7 +365,13 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         </ul>
 
         <footer className="mm-foot">
-          <span className="meta">decdn / labs</span>
+          <span className="meta">
+            decdn
+            <span aria-hidden="true" className="text-whisper">
+              _
+            </span>
+            labs
+          </span>
         </footer>
       </aside>
     </>
