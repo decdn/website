@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { links } from "@/lib/links";
+import { MobileMenu } from "@/components/site/MobileMenu";
 
 const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
 const NAV = [
@@ -23,7 +24,13 @@ const DARK_SECTIONS: ReadonlySet<(typeof SECTION_IDS)[number]> = new Set([
 export function Chrome() {
   const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
   const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
+
+  const handleMobileOpenChange = useCallback(
+    (open: boolean) => setMobileOpen(open),
+    [],
+  );
 
   // Active section = whichever one paints the strip directly under the
   // navbar. We collapse the IO root into a 1px horizontal slice at y =
@@ -106,16 +113,21 @@ export function Chrome() {
   }, []);
 
   const onDark = DARK_SECTIONS.has(active);
+  // While the mobile drawer is open the top-right corner of the nav
+  // sits visually on top of the paper drawer, so force a paper tone
+  // (ink text) so the toggle / wordmark stay legible regardless of
+  // which section is hiding behind the overlay.
+  const navTone = mobileOpen ? "paper" : onDark ? "ink" : "paper";
+  const navTextClass =
+    !mobileOpen && onDark ? "text-[var(--paper)]" : "text-[var(--ink)]";
 
   return (
     <nav
       ref={navRef}
       aria-label="Primary"
       data-scrolled={scrolled ? "true" : undefined}
-      data-tone={onDark ? "ink" : "paper"}
-      className={`chrome-nav fixed inset-x-0 top-0 z-50 py-5 ${
-        onDark ? "text-[var(--paper)]" : "text-[var(--ink)]"
-      }`}
+      data-tone={navTone}
+      className={`chrome-nav fixed inset-x-0 top-0 z-50 py-5 ${navTextClass}`}
       style={{ paddingInline: "var(--frame-gutter)" }}
     >
       <div
@@ -169,7 +181,7 @@ export function Chrome() {
         <div className="col-start-3 flex items-center gap-5 justify-self-end">
           <a
             href={links.docs}
-            className="meta flex items-center gap-2 no-underline"
+            className="meta hidden items-center gap-2 no-underline md:flex"
             style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
           >
             <span>Docs</span>
@@ -179,12 +191,16 @@ export function Chrome() {
             href={links.litepaper}
             target="_blank"
             rel="noopener noreferrer"
-            className="meta flex items-center gap-2 no-underline"
+            className="meta hidden items-center gap-2 no-underline md:flex"
             style={{ borderBottom: "1px solid currentColor", paddingBottom: 2 }}
           >
             <span>Litepaper</span>
             <span aria-hidden>→</span>
           </a>
+          <MobileMenu
+            activeSection={active}
+            onOpenChange={handleMobileOpenChange}
+          />
         </div>
       </div>
     </nav>
