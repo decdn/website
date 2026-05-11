@@ -8,7 +8,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 ## Stack
 
-Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · TypeScript · pnpm.
+Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · TypeScript · pnpm. Node ≥24 (see `.nvmrc`).
 
 ## Commands
 
@@ -16,8 +16,11 @@ Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · TypeScript · pnpm.
 pnpm install          # required — husky hooks and lint-staged invoke `pnpm exec`
 pnpm dev              # dev server on :3000
 pnpm build            # static export → ./out
+pnpm start            # serve a prior `next build` output (not the static export)
+pnpm test             # vitest run — see `lib/blog.test.ts` for the pattern
 pnpm lint             # eslint (flat config)
 pnpm format           # prettier --write .
+pnpm format:check     # prettier --check . (CI)
 ```
 
 ## Layout
@@ -33,6 +36,7 @@ pnpm format           # prettier --write .
 ## Gotchas
 
 - **Static export only.** `next.config.ts` has `output: "export"`. No SSR, ISR, middleware, or Image Optimization API. Route handlers are allowed only when they're statically generated at build time (`dynamic = "force-static"`, GET-only) — that's how `app/sitemap.xml/route.ts`, `app/sitemap-pages.xml/route.ts`, and `app/robots.ts` emit their files into `out/`.
+- **`trailingSlash: true`.** `next.config.ts` emits every route as `<path>/index.html` and canonical/internal links should expect a trailing slash. Cloudflare Pages serves `out/` as-is.
 - **Tailwind v4.** `globals.css` uses `@import "tailwindcss"` and `@theme inline { … }`. There is no `tailwind.config.*` — theme tokens live in CSS. Don't reach for v3 directives.
 - **Conventional commits required.** `commitlint` runs in the `commit-msg` husky hook; non-conforming messages are rejected.
 - **`metadataBase` is live.** `lib/links.ts` `site` is the real origin and `INDEXABLE` is `true`. Anything anchored on this origin — OG and canonical (via `metadataBase`); JSON-LD, `app/sitemap.xml/route.ts`, `app/sitemap-pages.xml/route.ts`, `app/robots.ts` (via `SITE_URL`) — ships to production. Adding a new non-blog page = append an entry to `app/sitemap-pages.xml/route.ts`; new blog posts are auto-derived from `content/blog/`. Flip `INDEXABLE` to mark pages noindex; `robots.txt` and the sitemap remain unchanged by design (see `lib/links.ts` for why).
