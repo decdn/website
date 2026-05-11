@@ -144,7 +144,14 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
       document.removeEventListener("keydown", onKey);
       // Removing `position: fixed` snaps the page back to y=0 because
       // the negative `top` was the only thing holding the viewport in
-      // place — scroll somewhere explicitly after restoring styles.
+      // place. Restore the prior scroll synchronously and **instantly**
+      // — `behavior: "instant"` bypasses the page's
+      // `motion-safe:scroll-smooth`, which would otherwise animate
+      // from y=0 back to the saved position and read as "the page
+      // jumped to the top and scrolled down again" on close. With the
+      // instant restore in place, close-only stays put and anchor taps
+      // become a clean smooth ride from the prior position to the
+      // target instead of a jump-then-descent.
       const prev = prevBodyStyleRef.current!;
       const style = document.body.style;
       style.position = prev.position;
@@ -154,15 +161,20 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
       style.width = prev.width;
       style.overflow = prev.overflow;
       prevBodyStyleRef.current = null;
+      window.scrollTo({
+        top: scrollYRef.current,
+        left: 0,
+        behavior: "instant",
+      });
 
       const anchor = pendingAnchorRef.current;
       pendingAnchorRef.current = null;
       if (anchor) {
         const el = document.getElementById(anchor);
         if (el) {
-          // history.replaceState doesn't scroll; smooth-scroll via
-          // scrollIntoView. `motion-safe:scroll-smooth` on <html>
-          // honours reduced-motion automatically.
+          // history.replaceState doesn't scroll; scrollIntoView rides
+          // on the just-restored scroll position via the page's
+          // `motion-safe:scroll-smooth` (honours reduced-motion).
           history.replaceState(null, "", `#${anchor}`);
           el.scrollIntoView({ block: "start" });
         } else {
@@ -170,8 +182,6 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
           // /blog/*). Let the browser navigate to home + hash.
           window.location.assign(`/#${anchor}`);
         }
-      } else {
-        window.scrollTo(0, scrollYRef.current);
       }
     };
   }, [open]);
