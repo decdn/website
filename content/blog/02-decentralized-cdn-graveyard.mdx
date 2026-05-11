@@ -1,0 +1,68 @@
+---
+title: "The decentralized-CDN graveyard"
+slug: decentralized-cdn-graveyard
+date: 2026-05-11
+summary: "Six decade-spanning attempts at a decentralized CDN. What each got stuck on, and why those blockers are now resolved."
+bucket: pillar
+---
+
+The decentralized-CDN graveyard is real. Reading it carefully tells you exactly what to do differently. Six attempts span almost twenty years of work, dozens of token sales, and a combined raise well into the billions. None of them produced a network that competes with Cloudflare on price and latency for general-purpose delivery. Each one got stuck on something specific.
+
+Going through them in order:
+
+## IPFS (2014–)
+
+Beautiful primitive, no economic layer. IPFS is content-addressed P2P storage with no native payment, no SLA, no QoS. Node operators serve bytes for free or not at all — meaning in practice, "not at all" once a hash falls out of someone's enthusiasm window. There's no market signal that says "this content is in demand, somebody go cache it." Public gateways (ipfs.io, dweb.link) became de facto centralized CDNs anyway, recreating the problem IPFS was meant to solve.
+
+**The lesson:** content addressing alone is necessary but not sufficient. Without an economic gradient, popular content doesn't propagate, and the network's claim to decentralization gets re-centralized at the gateway.
+
+## Filecoin (2017, retrieval market 2020+)
+
+Filecoin solved storage and underestimated delivery. The Filecoin Plus / FIL+ retrieval market exists, but the base architecture is optimized for proof-of-spacetime cold storage — bytes you store, not bytes you move. Retrieval latency is multi-second to multi-minute (~45s in North America, longer outside it as of mid-2025); pricing has been unpredictable enough that Filecoin's own 2025 roadmap (Onchain Cloud, Filecoin Beam) explicitly frames pricing predictability as a gap they're now building to fix. And the base protocol has no concept of "the closest fast peer with this content" — successive CDN-overlay attempts have come and gone. It is, by design, an archive that keeps trying to graft delivery on top.
+
+The token-volatility problem is also live. FIL has traded in a >10× range. A storage provider who priced their service in FIL during a peak runs at a loss against fiat-denominated bandwidth bills.
+
+**The lesson:** storage-first and delivery-first architectures optimize for opposite invariants. Trying to bolt one onto the other gives you something mediocre at both.
+
+## Theta (2018–)
+
+Token-incentivized P2P video delivery layered as a sidecar to existing CDNs. The architecture decisions made it brittle: a custom L1 chain with TFUEL/THETA volatility means viewers and edge nodes both denominate in something that drifts against fiat; the protocol was video-specific from the start; settlement is on Theta's own chain, which means the network has to defend its own consensus _and_ its own delivery business. By 2024–25 Theta had pivoted to EdgeCloud — a generic GPU/AI compute marketplace — leaving the original CDN thesis behind rather than building it out.
+
+**The lesson:** running your own chain is a tax. Every decision the team makes about consensus, validator economics, or chain liveness is one they aren't making about the actual product. The tax is steepest for a small team — steep enough that the team eventually pivots away from the original product.
+
+## Livepeer (2018–)
+
+Livepeer is a transcoding marketplace, not a delivery network — but it shipped the volatility split from day one: ETH for job payments, LPT for staking. That two-currency design is the same shape we use (USDC for payments, TOKEN for staking), and the fact that the earliest decentralized compute marketplace arrived at it from launch is itself a validation. The lesson we take is that paying operators in your own volatile native token is the thing serious networks either avoid from the start or eventually migrate away from.
+
+Livepeer's other constraint: it's compute, not delivery. The transcoded output still has to land somewhere, and that somewhere is — in practice — a centralized CDN. Livepeer is a complementary network to ours, not a competitor.
+
+**The lesson:** if your network pays operators in a volatile native token, you will eventually migrate. Better to land there from day one.
+
+## Arweave / Sia / Storj (storage networks)
+
+All three solve "permanent or long-term storage at sub-cloud prices." None of them are delivery networks. Storj has decent retrieval performance for an object-storage product, but it's not a CDN — it's a storage origin that integrates with traditional CDNs (Bunny, Fastly, Varnish) for the per-region cache layer rather than running its own. Arweave's "store once, pay once" endowment model is incompatible with per-MB delivery economics; Sia is a backup product — Skynet, its delivery layer, shut down in late 2022.
+
+The pattern: storage and delivery look similar but optimize for opposite invariants. A storage network maximizes durability per dollar. A delivery network minimizes time-to-first-byte and cost-per-MB-served. We do not store; we _serve_. Origin storage stays where it already is — S3, R2, B2, local disk — opaque to the network. We compete only on the delivery layer.
+
+**The lesson:** pick one invariant and build for it. Solving storage and delivery at the same time produces a system that's mediocre at both.
+
+## MaidSafe / Safe Network (2006–)
+
+The longest-running cautionary tale: nineteen years from founding to phase-1 mainnet. MaidSafe (now Autonomi) finally went live in February 2025, with full functionality still phasing through 2026. The lesson is less about the specific design and more about scope: trying to redesign the storage primitive, the routing layer, the consensus layer, the identity layer, _and_ the economic layer simultaneously means none of them ship on any reasonable timeline. Every layer in our stack — Rust, QUIC, iroh, BLAKE3, USDC, a public L2, ERC-4337 — is something we did not invent. We invented the protocol that composes them.
+
+**The lesson:** scope discipline is a feature.
+
+## the common pattern
+
+Every prior attempt got stuck on at least one of these:
+
+1. **Volatile unit of account** for paying node operators (FIL, THETA, MAID, native LPT). Kills supply-side economics the first time the token drops.
+2. **Settlement too expensive** for per-MB granularity, or restricted to a custom chain the network has to also defend.
+3. **No demand-side payment primitive** at all (IPFS). Content propagation has no economic gradient.
+4. **Storage-first architecture retrofitted to delivery.** The proofs, the latency profile, and the data placement are wrong for the new use case.
+5. **Compliance posture undefined.** Public P2P networks without a takedown story are unshippable into enterprise.
+6. **Scope sprawl.** Reinventing the transport, the consensus, _and_ the economy at once.
+
+decdn is the protocol composed to avoid all six. We pay in USDC; we settle on a public L2; every byte is paid including node-to-node cache pulls; the architecture is delivery-first; the on-chain blacklist with regional governance is in the protocol from day one; and we did not invent any of the underlying primitives.
+
+The graveyard is informative not because each attempt was foolish, but because each one was held back by something concrete. Those things are now resolved. That's the whole pitch.
