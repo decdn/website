@@ -22,7 +22,7 @@ export function Hero() {
           <span className="rise rise-1">the delivery layer</span>
           <span className="rise rise-2 pl-[7vw]">
             anyone can serve
-            <span aria-hidden style={{ color: "var(--whisper)" }}>
+            <span aria-hidden className="text-whisper">
               .
             </span>
           </span>
@@ -40,11 +40,10 @@ export function Hero() {
               verifies every chunk with blake3, and pays per megabyte in usdc —
               whether the payload is a linux iso, a dataset, a game patch, a
               media library, or an ai model.{" "}
-              <span style={{ color: "var(--whisper)" }}>deCDN</span> is
-              demand-shaped, locality-optimised delivery for large files at
-              scale: supply forms around demand, cost collapses as regional
-              traffic concentrates. the code is open. the network is open. the
-              price is posted.
+              <span className="text-whisper">deCDN</span> is demand-shaped,
+              locality-optimised delivery for large files at scale: supply forms
+              around demand, cost collapses as regional traffic concentrates.
+              the code is open. the network is open. the price is posted.
             </p>
 
             <div className="rise rise-4 flex flex-col flex-wrap gap-x-8 gap-y-3 @md:flex-row @md:items-end">
