@@ -4,26 +4,34 @@ import matter from "gray-matter";
 
 const POSTS_DIR = path.join(process.cwd(), "content", "blog");
 
-// Constrain slug shape so file-system-sourced strings can never carry
-// HTML or URL-significant characters into hrefs. This is the central
-// guard against the stored-XSS class — see CodeQL js/stored-xss.
-// Also rejects empty strings, leading/trailing hyphens, and consecutive
-// hyphens so canonical kebab-case is enforced at the boundary.
+// Central guard against stored-XSS via slug interpolation. Also enforces
+// canonical kebab-case (no empty, leading/trailing/consecutive hyphens).
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 
 // Branded slug: once a `Slug` is produced, callers can rely on
-// SLUG_RE having held. The only constructor sites are this module's
-// own `parseEntry` (throws on failure) and `parseSlug` (returns null).
-export type Slug = string & { readonly __brand: "Slug" };
+// SLUG_RE having held. `unique symbol` makes the brand unfakeable
+// across modules — no external caller can write `"foo" as Slug`
+// because they can't reference this module-local symbol.
+declare const __slug: unique symbol;
+export type Slug = string & { readonly [__slug]: true };
 
 export const parseSlug = (s: unknown): Slug | null =>
   typeof s === "string" && SLUG_RE.test(s) ? (s as Slug) : null;
 
+// IsoDate mirrors Slug — parseEntry validates against ISO_DATE_RE, and
+// downstream consumers (RSS feed, archive page) can rely on the brand
+// rather than re-testing the regex.
+declare const __isoDate: unique symbol;
+export type IsoDate = string & { readonly [__isoDate]: true };
+
+const parseIsoDate = (s: string): IsoDate | null =>
+  ISO_DATE_RE.test(s) ? (s as IsoDate) : null;
+
 export type PostMeta = {
   slug: Slug;
   title: string;
-  date: string;
+  date: IsoDate;
   summary: string;
   bucket?: string;
 };
@@ -86,8 +94,8 @@ const parseEntry = (filename: string): PostSource | null => {
   }
   const title = data.title.trim();
 
-  const date = formatDate(data.date);
-  if (!ISO_DATE_RE.test(date)) {
+  const date = parseIsoDate(formatDate(data.date));
+  if (date === null) {
     throw new Error(
       data.date === undefined
         ? `[blog] ${filename}: frontmatter \`date\` is required`
@@ -112,20 +120,22 @@ const parseEntry = (filename: string): PostSource | null => {
   return { slug, title, date, summary, bucket, body: content };
 };
 
-// Memoise: the build is single-process and source files are immutable
-// mid-build. `readEntries` is hit from `listPosts` (BlogIndex + sitemap +
-// generateStaticParams = 3 sites) and `getPost` (generateMetadata + the
-// page render, 2× per slug), so without the cache we'd parse the
-// directory 2N+3 times. Errors are thrown before `cache` is assigned,
-// so a malformed post fails the build loud rather than poisoning the
-// cache with a partial result.
+// Single-process build with immutable source files; cache lets every
+// call site share one parse. Errors throw before assignment so a
+// malformed post can't poison the cache with a partial result.
 let cache: PostSource[] | undefined;
 
 const readEntries = (): PostSource[] => {
   if (cache) return cache;
+  // The directory's presence is part of the project's contract — every
+  // statically wired blog route depends on it. Falling back to `[]`
+  // would silently regress to "nothing yet." in prod. If you really
+  // want zero posts, leave a `.gitkeep` in `content/blog/`.
   if (!fs.existsSync(POSTS_DIR)) {
-    cache = [];
-    return cache;
+    throw new Error(
+      `[blog] posts directory not found at ${POSTS_DIR}. ` +
+        `If you intentionally have zero posts, create the directory with a .gitkeep.`,
+    );
   }
   cache = fs
     .readdirSync(POSTS_DIR)
@@ -133,12 +143,9 @@ const readEntries = (): PostSource[] => {
     .map(parseEntry)
     .filter((e): e is PostSource => e !== null)
     .sort((a, b) => {
-      // Newest first; ISO-8601 dates compare lexically. Tie-break on
-      // slug because `fs.readdirSync` order isn't portable across
-      // filesystems (Linux returns inode order, macOS returns lex
-      // order on APFS but not on case-insensitive HFS+). Without the
-      // tie-break, ES stable sort would preserve readdir order for
-      // same-date posts and output would flip between machines.
+      // Newest first; tie-break on slug because readdir order isn't
+      // portable across filesystems and stable sort would otherwise
+      // flip same-date post order between machines.
       if (a.date !== b.date) return b.date.localeCompare(a.date);
       return a.slug.localeCompare(b.slug);
     });
@@ -158,5 +165,7 @@ export function listPosts(): PostMeta[] {
 }
 
 export function getPost(slug: string): PostSource | null {
-  return readEntries().find((e) => e.slug === slug) ?? null;
+  const valid = parseSlug(slug);
+  if (valid === null) return null;
+  return readEntries().find((e) => e.slug === valid) ?? null;
 }

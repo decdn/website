@@ -6,14 +6,9 @@ import { listPosts } from "@/lib/blog";
 const TITLE = "field notes";
 const DESCRIPTION = "long-form posts on the deCDN protocol.";
 
-// Inherit the root file-convention og image (app/opengraph-image.png).
-// Next merges flat fields but shallow-replaces nested objects like
-// `openGraph`, so declaring an `openGraph` here without re-including
-// `images` strips the root image — which previously left every blog
-// route sharing a blank card. We reuse `ogImages` for twitter too:
-// the parent `twitter.images` field is empty here (no app/twitter-image
-// convention exists) and Next's "fall back to og for twitter" only
-// fires at the final resolution step, not via `parent`.
+// openGraph shallow-replaces in Next 16, so re-pass `images` from parent
+// or the root og image is dropped. Twitter `images` set explicitly because
+// the og→twitter fallback fires at final resolution, not via ResolvingMetadata.
 export async function generateMetadata(
   _: unknown,
   parent: ResolvingMetadata,
@@ -48,6 +43,7 @@ export default function BlogIndex() {
         <header className="flex flex-col gap-6">
           <span className="meta opacity-60">field notes</span>
           <h1
+            id="blog-h"
             className="hug font-semibold leading-[0.92] tracking-[-0.04em]"
             style={{ fontSize: "var(--fs-h2)" }}
           >
@@ -94,14 +90,12 @@ export default function BlogIndex() {
                     >
                       {post.title}
                     </h2>
-                    {post.summary ? (
-                      <p
-                        className="max-w-[60ch] leading-[1.6] opacity-75"
-                        style={{ fontSize: "var(--fs-body)" }}
-                      >
-                        {post.summary}
-                      </p>
-                    ) : null}
+                    <p
+                      className="max-w-[60ch] leading-[1.6] opacity-75"
+                      style={{ fontSize: "var(--fs-body)" }}
+                    >
+                      {post.summary}
+                    </p>
                   </div>
                 </Link>
               </li>

@@ -1,6 +1,16 @@
 import { SITE_URL } from "@/lib/links";
 import { listPosts } from "@/lib/blog";
 
+// SITE_URL is interpolated raw into <loc> bodies below. SLUG_RE guards
+// the per-post slug; this guards the origin against a future accident
+// (preview-URL with query string, embedded entity) that would emit
+// invalid XML and have search engines silently reject the sitemap.
+if (/[<>&"']/.test(SITE_URL)) {
+  throw new Error(
+    `[sitemap] SITE_URL contains XML-significant characters: ${SITE_URL}`,
+  );
+}
+
 // Required by Next 16 under `output: "export"` for route handlers that emit
 // static files at build time. GET-only is the only verb supported in export.
 export const dynamic = "force-static";
