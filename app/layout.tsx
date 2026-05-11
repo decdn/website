@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { links, SITE_URL, INDEXABLE } from "@/lib/links";
 import { Chrome } from "@/components/site/Chrome";
-import { FAQ_ITEMS } from "@/components/site/Faq";
 import { Footer } from "@/components/site/Footer";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
+import { FAQ_ITEMS } from "@/lib/faq";
 import "./globals.css";
 
 const geistSans = Geist({
