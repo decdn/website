@@ -3,10 +3,27 @@ import { Comparison } from "@/components/site/Comparison";
 import { Faq } from "@/components/site/Faq";
 import { Hero } from "@/components/site/Hero";
 import { Method } from "@/components/site/Method";
+import { FAQ_ITEMS } from "@/lib/faq";
+import { JsonLd } from "@/lib/jsonld";
+import { SITE_URL } from "@/lib/links";
+
+// FAQPage schema only ships on the route that actually renders the FAQ.
+// Google flags structured data that doesn't match visible page content.
+const faqSchema = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "@id": `${SITE_URL}#faq`,
+  mainEntity: FAQ_ITEMS.map(({ q, a }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: a },
+  })),
+};
 
 export default function Home() {
   return (
     <main>
+      <JsonLd data={faqSchema} />
       <Hero />
       <Comparison />
       <Method />

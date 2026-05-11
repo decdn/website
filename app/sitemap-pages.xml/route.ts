@@ -21,15 +21,24 @@ export const dynamic = "force-static";
 // lib/blog.ts forbids `&`, `<`, `>`; if that regex ever loosens this
 // must move to an XML-encoder, or search engines silently reject the
 // sitemap.
-const postUrls = listPosts()
-  .map((p) => `  <url><loc>${SITE_URL}blog/${p.slug}/</loc></url>`)
+const posts = listPosts();
+// Newest-first sort is enforced in lib/blog.ts; the first entry is the
+// latest post date, which we reuse as `lastmod` for the static pages
+// since they surface the latest post (home links to blog; blog index
+// lists them). Fallback only fires when there are zero posts.
+const siteLastMod = posts[0]?.date ?? new Date().toISOString().slice(0, 10);
+const postUrls = posts
+  .map(
+    (p) =>
+      `  <url><loc>${SITE_URL}blog/${p.slug}/</loc><lastmod>${p.date}</lastmod></url>`,
+  )
   .join("\n");
 
 const BODY = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>${SITE_URL}</loc></url>
-  <url><loc>${SITE_URL}decdn_litepaper.pdf</loc></url>
-  <url><loc>${SITE_URL}blog/</loc></url>
+  <url><loc>${SITE_URL}</loc><lastmod>${siteLastMod}</lastmod></url>
+  <url><loc>${SITE_URL}decdn_litepaper.pdf</loc><lastmod>${siteLastMod}</lastmod></url>
+  <url><loc>${SITE_URL}blog/</loc><lastmod>${siteLastMod}</lastmod></url>
 ${postUrls}
 </urlset>
 `;
