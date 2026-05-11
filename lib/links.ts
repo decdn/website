@@ -16,9 +16,11 @@ export const links = {
 // hand-built URLs (sitemap entries, JSON-LD @ids) won't match rendered routes.
 export const SITE_URL = new URL("/", links.site).toString();
 
-// Drives `<meta name="robots">` in `app/layout.tsx` only. `robots.txt` stays
-// `Allow: /` and the sitemap keeps listing every URL regardless: Disallow +
-// noindex is an anti-pattern that strands URLs in search results — blocked
-// crawlers never fetch the page and so never see the noindex directive. Flip
-// this to mark pages noindex; robots and sitemap remain unchanged by design.
+// Drives both `index` and `follow` on the `<meta name="robots">` tag in
+// `app/layout.tsx` only. `robots.txt` stays `Allow: /` and the sitemap keeps
+// listing every URL regardless: Disallow + noindex is an anti-pattern that
+// strands URLs in search results — blocked crawlers never fetch the page and
+// so never see the noindex directive. Flip this to mark pages
+// `noindex, nofollow` via the meta tag; robots.txt and the sitemap remain
+// unchanged by design.
 export const INDEXABLE = true;
