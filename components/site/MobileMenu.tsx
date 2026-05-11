@@ -1,6 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
+import { createPortal } from "react-dom";
 import { links } from "@/lib/links";
 
 type SectionId = "intro" | "compare" | "method" | "faq" | "contact";
@@ -26,8 +33,24 @@ const EXTERNAL: readonly { href: string; label: string; external: boolean }[] =
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+// Hydration gate for the createPortal target — useSyncExternalStore is
+// the React-18+ idiomatic way to read a different value on the server
+// vs the client without tripping the `set-state-in-effect` lint rule.
+const noopSubscribe = () => () => {};
+const getHydratedSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export function MobileMenu({ activeSection, onOpenChange }: Props) {
   const [open, setOpen] = useState(false);
+  // Gate the portal until after hydration so the static export's
+  // server-rendered HTML matches what React first renders on the
+  // client (no portal target available at SSR time).
+  const isHydrated = useSyncExternalStore(
+    noopSubscribe,
+    getHydratedSnapshot,
+    getServerSnapshot,
+  );
+
   const toggleRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   // Stash whatever inline overflow value was set before the drawer
@@ -113,19 +136,13 @@ export function MobileMenu({ activeSection, onOpenChange }: Props) {
 
   const close = useCallback(() => setOpen(false), []);
 
-  return (
+  // Portal target: the .chrome-nav sets `backdrop-filter: blur(0)`
+  // as its base, which creates a containing block for `position: fixed`
+  // descendants. Rendering the overlay + panel as children of <nav>
+  // therefore clips them to the nav's box. Portal to <body> so their
+  // fixed positioning is resolved against the viewport instead.
+  const drawer = (
     <>
-      <button
-        ref={toggleRef}
-        type="button"
-        className="mm-toggle"
-        data-open={open ? "true" : undefined}
-        aria-expanded={open}
-        aria-controls="mm-panel"
-        aria-label={open ? "Close menu" : "Open menu"}
-        onClick={() => setOpen((v) => !v)}
-      />
-
       <div
         className="mm-overlay"
         data-open={open ? "true" : undefined}
@@ -199,6 +216,22 @@ export function MobileMenu({ activeSection, onOpenChange }: Props) {
           <span className="meta">decdn / labs</span>
         </footer>
       </aside>
+    </>
+  );
+
+  return (
+    <>
+      <button
+        ref={toggleRef}
+        type="button"
+        className="mm-toggle"
+        data-open={open ? "true" : undefined}
+        aria-expanded={open}
+        aria-controls="mm-panel"
+        aria-label={open ? "Close menu" : "Open menu"}
+        onClick={() => setOpen((v) => !v)}
+      />
+      {isHydrated ? createPortal(drawer, document.body) : null}
     </>
   );
 }
