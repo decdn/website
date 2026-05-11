@@ -3,26 +3,21 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { links } from "@/lib/links";
 import { MobileMenu } from "@/components/site/MobileMenu";
+import {
+  DARK_SECTIONS,
+  NAV_SECTIONS as NAV,
+  SECTION_IDS,
+  type SectionId,
+} from "@/lib/sections";
 
-const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
-const NAV = [
-  { id: "compare", label: "compare" },
-  { id: "method", label: "method" },
-  { id: "faq", label: "faq" },
-  { id: "contact", label: "contact" },
-] as const;
-
-// Ids of sections that paint on a dark background — used to flip the
-// navbar text color per-section instead of relying on
-// `mix-blend-mode: difference`, which silently fails on Safari / iOS
-// when applied to `position: fixed` elements (the nav would vanish).
-const DARK_SECTIONS: ReadonlySet<(typeof SECTION_IDS)[number]> = new Set([
-  "compare",
-  "faq",
-]);
+// Sections that paint on a dark background drive the navbar's
+// per-section tone flip — `DARK_SECTIONS` from lib/sections. We
+// avoid `mix-blend-mode: difference` because it silently fails on
+// Safari / iOS when applied to `position: fixed` elements (the nav
+// would vanish).
 
 export function Chrome() {
-  const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
+  const [active, setActive] = useState<SectionId>("intro");
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
@@ -62,7 +57,7 @@ export function Chrome() {
       const margin = `-${navH}px 0px -${bottomInset}px 0px`;
       io = new IntersectionObserver(
         (entries) => {
-          let bestId: (typeof SECTION_IDS)[number] | null = null;
+          let bestId: SectionId | null = null;
           let bestTop = -Infinity;
           for (const entry of entries) {
             if (!entry.isIntersecting) continue;
@@ -71,7 +66,7 @@ export function Chrome() {
             const top = entry.boundingClientRect.top;
             if (top > bestTop) {
               bestTop = top;
-              bestId = id as (typeof SECTION_IDS)[number];
+              bestId = id as SectionId;
             }
           }
           if (bestId !== null) setActive(bestId);

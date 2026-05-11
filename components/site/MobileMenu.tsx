@@ -9,21 +9,13 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { links } from "@/lib/links";
-
-type SectionId = "intro" | "compare" | "method" | "faq" | "contact";
+import { NAV_SECTIONS as SECTIONS, type SectionId } from "@/lib/sections";
 
 type Props = {
   activeSection: SectionId;
   tone: "ink" | "paper";
   onOpenChange?: (open: boolean) => void;
 };
-
-const SECTIONS: readonly { id: SectionId; label: string }[] = [
-  { id: "compare", label: "compare" },
-  { id: "method", label: "method" },
-  { id: "faq", label: "faq" },
-  { id: "contact", label: "contact" },
-] as const;
 
 const EXTERNAL: readonly { href: string; label: string; external: boolean }[] =
   [
@@ -54,10 +46,21 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
 
   const toggleRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  // Stash whatever inline overflow value was set before the drawer
-  // opened so we restore the page exactly as it was, rather than
-  // forcing it back to "" and stomping a value some other code owned.
-  const prevBodyOverflowRef = useRef<string | null>(null);
+  // iOS Safari leaks scroll through `overflow: hidden` on the body —
+  // a swipe on a fixed overlay can still drag the documentElement.
+  // The robust fix is to pin the body via `position: fixed; top: -y`,
+  // which moves the layout viewport with us so there is nothing to
+  // scroll. We save every inline body style we override so the page
+  // is restored exactly to its prior state on close (or unmount).
+  const prevBodyStyleRef = useRef<{
+    position: string;
+    top: string;
+    left: string;
+    right: string;
+    width: string;
+    overflow: string;
+  } | null>(null);
+  const scrollYRef = useRef(0);
 
   // Notify the parent whenever open state flips so it can adjust the
   // navbar's tone (the toggle sits inside the nav and must read
@@ -70,8 +73,23 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   useEffect(() => {
     if (!open) return;
 
-    prevBodyOverflowRef.current = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
+    const scrollY = window.scrollY;
+    scrollYRef.current = scrollY;
+    const style = document.body.style;
+    prevBodyStyleRef.current = {
+      position: style.position,
+      top: style.top,
+      left: style.left,
+      right: style.right,
+      width: style.width,
+      overflow: style.overflow,
+    };
+    style.position = "fixed";
+    style.top = `-${scrollY}px`;
+    style.left = "0";
+    style.right = "0";
+    style.width = "100%";
+    style.overflow = "hidden";
 
     const focusFirst = () => {
       const panel = panelRef.current;
@@ -115,8 +133,22 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
     return () => {
       cancelAnimationFrame(raf);
       document.removeEventListener("keydown", onKey);
-      document.body.style.overflow = prevBodyOverflowRef.current ?? "";
-      prevBodyOverflowRef.current = null;
+      // Restore body styles exactly + scroll back to where we pinned.
+      // Removing `position: fixed` without scrollTo would snap the
+      // page to y=0 because the negative `top` was the only thing
+      // holding the viewport in place.
+      const prev = prevBodyStyleRef.current;
+      if (prev) {
+        const style = document.body.style;
+        style.position = prev.position;
+        style.top = prev.top;
+        style.left = prev.left;
+        style.right = prev.right;
+        style.width = prev.width;
+        style.overflow = prev.overflow;
+        prevBodyStyleRef.current = null;
+        window.scrollTo(0, scrollYRef.current);
+      }
     };
   }, [open]);
 
