@@ -32,9 +32,9 @@ type DrawerLink = {
 };
 
 const EXTERNAL: readonly DrawerLink[] = [
-  { kind: "internal", href: links.docs, label: "Docs" },
-  { kind: "internal", href: links.blog, label: "Blog" },
-  { kind: "external", href: links.litepaper, label: "Litepaper" },
+  { kind: "internal", href: links.docs, label: "docs" },
+  { kind: "internal", href: links.blog, label: "blog" },
+  { kind: "external", href: links.litepaper, label: "litepaper" },
 ] as const;
 
 const FOCUSABLE_SELECTOR =
@@ -313,7 +313,9 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         </ul>
 
         <footer className="mm-foot">
-          <span className="meta">decdn / labs</span>
+          <span className="meta">
+            decdn<span className="text-whisper">_</span>labs
+          </span>
         </footer>
       </aside>
     </>
