@@ -66,9 +66,9 @@ export function Close() {
             <a
               className="underline-brutal font-semibold tracking-[0.02em]"
               style={{ fontSize: "var(--fs-lead)" }}
-              href={links.runNode}
+              href={links.docs}
             >
-              run a node
+              read the docs
               <span className="arrow" aria-hidden>
                 →
               </span>
