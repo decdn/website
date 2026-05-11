@@ -43,11 +43,6 @@ export function Faq() {
             q="Can publishers pay on behalf of users?"
             a="Yes. Account abstraction lets a publisher fund a payment channel for their audience, so users pull content with no wallet and no subscription — same free-to-download experience as a public mirror, except the publisher pays peers per megabyte instead of one cloud's egress bill. Default flow is client-pays; publisher-pays is the flag you flip when you want to ship widely without per-user payment friction."
           />
-          <FaqItem
-            delay={400}
-            q="Does this work well for AI models?"
-            a="Yes — AI is where deCDN's primitives compound. Clients pull large weights from several peers in parallel and saturate their own uplink instead of a single origin's. BLAKE3 chunk addressing lets teams grab one quantisation variant or a single layer without downloading the full checkpoint. And when a model drops and every region pulls it at once, the mesh warms around the demand instead of choking at a central bucket."
-          />
         </dl>
       </div>
     </Frame>
