@@ -31,7 +31,7 @@ Earlier networks (BitTorrent, IPFS, Filecoin retrieval) used SHA-256 or SHA-1 pi
 
 Result: every byte we deliver is verified by the receiving client at line rate. We do not need a separate proof-of-delivery oracle. The retrieval problem Filecoin had to design a whole sub-protocol around — proving you delivered the right bytes — is just not a problem we have to solve.
 
-## Settlement: stablecoins are now load-bearing financial infrastructure
+## Settlement: Stablecoins are now load-bearing financial infrastructure
 
 USDC and USDT cleared north of $10T of on-chain volume in 2024 and are settled by Circle / Tether against actual reserves with monthly attestations. They are no longer "crypto experiments" — they are how dollars move on public chains. For a network of node operators with real infrastructure costs (VPS, bandwidth, storage), this is the difference between a viable business and a casino.
 
@@ -39,7 +39,7 @@ A node operator who books $300/month in earnings keeps $300/month of buying powe
 
 Five years ago the only way to pay node operators on-chain was a volatile native token. Every prior decentralized delivery network priced bandwidth in something whose value could halve overnight. We don't.
 
-## L2s: payment channels are finally cheap enough to bother with
+## L2s: Payment channels are finally cheap enough to bother with
 
 Per-MB delivery payments are on the order of $0.00001 — six orders of magnitude below any L1 transaction fee. Without an off-chain channel mechanism the economics never close. But payment channels need to _open_ and _settle_ on-chain, which on Ethereum mainnet costs $5–50 per transaction. That kills the channel before it starts.
 

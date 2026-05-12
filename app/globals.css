@@ -875,6 +875,13 @@ a.underline-brutal:hover .arrow {
   font-weight: 600;
   letter-spacing: -0.03em;
   line-height: 1.05;
+}
+
+/* Larger gap before an h2 than the base 1.4em — scoped to non-first
+   children so a post that opens on a heading doesn't get a stray top
+   margin (mirrors `.prose > * + *`; wins it on specificity). h3 needs no
+   such rule: its pre-heading gap is just the base 1.4em. */
+.prose > * + h2 {
   margin-block-start: 1.7em;
 }
 
@@ -883,7 +890,6 @@ a.underline-brutal:hover .arrow {
   font-weight: 600;
   letter-spacing: -0.01em;
   line-height: 1.2;
-  margin-block-start: 1.4em;
 }
 
 .prose p,
