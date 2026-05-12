@@ -1,1 +1,2 @@
+# Keep compiled lock files as generated artifacts; merge=ours keeps the current branch lock file during conflicts. After merges where the source `.md` workflow changed, run `gh aw compile` to regenerate lock files.
 .github/workflows/*.lock.yml linguist-generated=true merge=ours

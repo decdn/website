@@ -14,6 +14,8 @@ tools:
 safe-outputs:
   add-labels:
     max: 6
+  remove-labels:
+    max: 6
   add-comment:
     max: 2
   assign-to-user:
@@ -58,6 +60,7 @@ For each triggered issue, do all applicable triage actions:
 - `type:chore`
 
 If none clearly fit, apply `type:needs-triage`.
+When you later determine a definitive type, in the same workflow execution use `remove-labels` to remove `type:needs-triage`, then use `add-labels` to add the correct final type label, so only one type label remains.
 
 ### Priority labels (apply exactly one)
 
@@ -106,7 +109,7 @@ Assign to one best owner using this order:
 2. ownership files such as `CODEOWNERS` (if available)
 3. repository history (recent contributors to relevant files/areas)
 
-Only assign when confidence is reasonable and the user appears assignable. If assignment is uncertain or fails, do not force it.
+Only assign when confidence is reasonable and the candidate is assignable (repository collaborator/member with assignment permissions and no clear opt-out context). If assignment is uncertain or fails, do not force it.
 
 ## Output rules
 
