@@ -141,7 +141,8 @@ const parseEntry = (filename: string): PostSource | null => {
         `[blog] ${filename}: frontmatter \`tags\` must be an array of non-empty strings when present`,
       );
     }
-    tags = raw.map((t) => t.trim());
+    // An empty `tags: []` is treated as "no tags" — same as omitting the key.
+    tags = raw.length > 0 ? raw.map((t) => t.trim()) : undefined;
   }
 
   const words = countWords(content);

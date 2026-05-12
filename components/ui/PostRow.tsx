@@ -12,12 +12,18 @@ export const BLOG_GRID_COLS =
 
 // `2026-05-11` → `2026·05·11` — the field-log date style. The machine
 // value stays in <time dateTime>; only the display string gets the dots.
-const dotted = (iso: string) => iso.replaceAll("-", "·");
+// Shared with the post page (app/blog/[slug]/page.tsx).
+export const dottedDate = (iso: string) => iso.replaceAll("-", "·");
+
+// `08 min` — zero-padded read estimate. Shared with the post page.
+export const readLabel = (min: number) => `${String(min).padStart(2, "0")} min`;
 
 // Lowercase meta (11px, tracked, tabular figures) — like `.meta` but
-// without its forced uppercase, since `02 · 08 min · 1,920 wds` read
-// lowercase. `.meta` is an unlayered rule we can't override per-call.
-const META = "text-[0.6875rem] leading-[1.2] font-medium tracking-[0.16em]";
+// without its forced uppercase, since `02 · 08 min` reads lowercase.
+// `.meta` is an unlayered rule we can't override per-call. Shared with
+// the post page.
+export const META =
+  "text-[0.6875rem] leading-[1.3] font-medium tracking-[0.16em]";
 
 export function PostRow({
   post,
@@ -28,7 +34,8 @@ export function PostRow({
   num: string;
   delay: number;
 }) {
-  const minutes = `${String(post.readMin).padStart(2, "0")} min`;
+  const minutes = readLabel(post.readMin);
+  const date = dottedDate(post.date);
   const tags = post.tags ?? [];
 
   return (
@@ -43,7 +50,7 @@ export function PostRow({
         >
           <span>
             {num} <span aria-hidden>·</span>{" "}
-            <time dateTime={post.date}>{dotted(post.date)}</time>
+            <time dateTime={post.date}>{date}</time>
           </span>
           <span>{minutes}</span>
         </div>
@@ -60,7 +67,7 @@ export function PostRow({
           dateTime={post.date}
           className={`${META} hidden self-start tabular-nums opacity-55 @xl:mt-1.5 @xl:block`}
         >
-          {dotted(post.date)}
+          {date}
         </time>
 
         {/* title · summary · tags */}

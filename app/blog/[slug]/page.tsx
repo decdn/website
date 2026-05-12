@@ -5,18 +5,11 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import { Frame } from "@/components/ui/Frame";
 import { Pill } from "@/components/ui/Pill";
+import { META, dottedDate, readLabel } from "@/components/ui/PostRow";
 import { Prose } from "@/components/ui/Prose";
 import { getPost, listPosts } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
 import { ORG_ID, SITE_URL } from "@/lib/links";
-
-// `2026-05-11` → `2026·05·11` for display; <time dateTime> keeps the
-// machine value.
-const dotted = (iso: string) => iso.replaceAll("-", "·");
-
-// Lowercase meta strip (mirrors components/ui/PostRow) — `.meta` is an
-// unlayered rule that forces uppercase, which we don't want on `08 min`.
-const META = "text-[0.6875rem] leading-[1.3] font-medium tracking-[0.16em]";
 
 // Static export: enumerate every slug at build time and refuse anything
 // outside that set. `dynamicParams = false` mirrors the closed-world
@@ -81,7 +74,7 @@ export default async function BlogPost({
   const older = i < all.length - 1 ? all[i + 1] : undefined;
 
   const tags = post.tags ?? [];
-  const minutes = `${String(post.readMin).padStart(2, "0")} min`;
+  const minutes = readLabel(post.readMin);
 
   const postUrl = `${SITE_URL}blog/${post.slug}/`;
   const postingSchema = {
@@ -123,6 +116,7 @@ export default async function BlogPost({
         <article className="flex flex-col gap-10">
           <Link
             href="/blog/"
+            aria-label="Back to field notes"
             className="meta inline-flex items-center gap-2 self-start opacity-50 no-underline transition-opacity hover:opacity-100"
           >
             <span aria-hidden>←</span> field notes
@@ -134,7 +128,7 @@ export default async function BlogPost({
             >
               <span>§ {num}</span>
               <span aria-hidden>·</span>
-              <time dateTime={post.date}>{dotted(post.date)}</time>
+              <time dateTime={post.date}>{dottedDate(post.date)}</time>
               <span aria-hidden>·</span>
               <span>{minutes}</span>
             </div>
