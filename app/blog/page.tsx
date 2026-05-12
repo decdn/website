@@ -1,6 +1,6 @@
 import type { Metadata, ResolvingMetadata } from "next";
-import Link from "next/link";
 import { Frame } from "@/components/ui/Frame";
+import { BLOG_GRID_COLS, PostRow } from "@/components/ui/PostRow";
 import { listPosts } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
 import { SITE_URL } from "@/lib/links";
@@ -59,66 +59,64 @@ export default function BlogIndex() {
       <JsonLd data={breadcrumbSchema} />
       <Frame id="blog" tone="paper">
         <header className="flex flex-col gap-6">
-          <span className="meta opacity-60">field notes</span>
           <h1
             id="blog-h"
-            className="hug font-semibold leading-[0.92] tracking-[-0.04em]"
+            className="hug rise rise-0 leading-[0.92] font-bold"
             style={{ fontSize: "var(--fs-h2)" }}
           >
-            field notes.
+            field notes
+            <span aria-hidden className="text-whisper">
+              _
+            </span>
           </h1>
-          <p
-            className="max-w-[60ch] leading-[1.7] opacity-75"
-            style={{ fontSize: "var(--fs-lead)" }}
-          >
-            long-form posts on the deCDN protocol — what it is, why now, and how
-            the pieces fit together. published when something&apos;s worth
-            saying.
-          </p>
+          {/* .rise forces opacity:1 at rest (fill: forwards), so the
+              dimmed lead sits inside a .rise wrapper rather than carrying
+              the class itself. */}
+          <div className="rise rise-1">
+            <p
+              className="max-w-[60ch] leading-[1.7] opacity-75"
+              style={{ fontSize: "var(--fs-lead)" }}
+            >
+              long-form posts on the deCDN protocol — what it is, why now, and
+              how the pieces fit together. published when something&apos;s worth
+              saying.
+            </p>
+          </div>
         </header>
 
-        <span aria-hidden className="rule mt-16 opacity-20" />
-
         {posts.length === 0 ? (
-          <p
-            className="mt-16 opacity-60"
-            style={{ fontSize: "var(--fs-body)" }}
-          >
-            nothing yet.
-          </p>
+          <>
+            <span aria-hidden className="rule mt-16 opacity-20" />
+            <p
+              className="mt-16 opacity-60"
+              style={{ fontSize: "var(--fs-body)" }}
+            >
+              nothing yet.
+            </p>
+          </>
         ) : (
-          <ul className="mt-16 flex flex-col divide-y divide-current/15">
-            {posts.map((post) => (
-              <li key={post.slug}>
-                <Link
-                  href={`/blog/${post.slug}/`}
-                  className="group grid gap-2 py-8 no-underline @xl:grid-cols-[10rem_1fr] @xl:gap-10"
-                >
-                  <time
-                    className="meta opacity-60"
-                    dateTime={post.date}
-                    style={{ alignSelf: "start" }}
-                  >
-                    {post.date}
-                  </time>
-                  <div className="flex flex-col gap-3">
-                    <h2
-                      className="hug font-semibold leading-[1.05] tracking-[-0.025em] group-hover:opacity-80"
-                      style={{ fontSize: "var(--fs-h3)" }}
-                    >
-                      {post.title}
-                    </h2>
-                    <p
-                      className="max-w-[60ch] leading-[1.6] opacity-75"
-                      style={{ fontSize: "var(--fs-body)" }}
-                    >
-                      {post.summary}
-                    </p>
-                  </div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <div className="mt-16 flex flex-col">
+            <div
+              aria-hidden
+              className={`meta hidden pb-3 opacity-50 @xl:grid ${BLOG_GRID_COLS}`}
+            >
+              <span>#</span>
+              <span>date</span>
+              <span>title · summary</span>
+              <span className="text-right">read</span>
+              <span />
+            </div>
+            <span aria-hidden className="rule rule-2" />
+            <ul className="flex flex-col divide-y divide-current/12">
+              {posts.map((post, i) => (
+                <PostRow
+                  key={post.slug}
+                  post={post}
+                  delay={Math.min(i, 4) * 80}
+                />
+              ))}
+            </ul>
+          </div>
         )}
       </Frame>
     </main>

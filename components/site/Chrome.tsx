@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { links } from "@/lib/links";
 import { MobileMenu } from "@/components/site/MobileMenu";
 
@@ -30,6 +31,12 @@ export function Chrome() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
+  // This component lives in the root layout, so a `next/link` client-side
+  // nav swaps the page DOM without remounting it. Keying the observers on
+  // `pathname` lets them re-bind to the new route's sections — otherwise,
+  // after navigating to /blog/* and back, `active` (and the nav tone that
+  // tracks it) would stay frozen at its last home-page value.
+  const pathname = usePathname();
 
   const handleMobileOpenChange = useCallback(
     (open: boolean) => setMobileOpen(open),
@@ -43,8 +50,9 @@ export function Chrome() {
   // nav, so the tone flip happens exactly when its top crosses under.
   //
   // The slice depends on window.innerHeight AND navbar.offsetHeight, so
-  // the IO is rebuilt on (a) window resize and (b) nav-size changes
-  // (e.g. webfont swap). Rebuilds are rAF-coalesced so a resize burst
+  // the IO is rebuilt on (a) route change (the section nodes themselves
+  // change), (b) window resize and (c) nav-size changes (e.g. webfont
+  // swap). Rebuilds are rAF-coalesced so a resize burst
   // collapses to one rebuild per frame. When two adjacent sections
   // share the slice (subpixel rounding at boundaries), we pick the
   // entry with the largest boundingClientRect.top — the section whose
@@ -107,14 +115,17 @@ export function Chrome() {
       ro?.disconnect();
       io?.disconnect();
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
+    // Re-sync after a client-side nav too: the route change resets scroll
+    // to the top, but a `[]`-deps effect wouldn't re-read it, leaving
+    // `data-scrolled` stale on the new page until the next scroll event.
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [pathname]);
 
   const onDark = DARK_SECTIONS.has(active);
   // The toggle is portalled to <body> (see MobileMenu.tsx) and lives
