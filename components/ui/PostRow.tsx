@@ -70,6 +70,15 @@ export function PostRow({
             style={{ fontSize: "var(--fs-h3)" }}
           >
             {post.title}
+            {/* terminal-prompt cursor — echoes the "field notes_" page
+                title; sits invisible (reserving its width so hover never
+                reflows the line) and fades in whisper-green on row hover. */}
+            <span
+              aria-hidden
+              className="text-whisper opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100"
+            >
+              _
+            </span>
           </h2>
           <p
             className="max-w-[62ch] leading-[1.6] opacity-75"
