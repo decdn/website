@@ -34,9 +34,22 @@ export type PostMeta = {
   date: IsoDate;
   summary: string;
   bucket?: string;
+  tags?: string[];
+  /** Whitespace-delimited token count of the raw MDX source. */
+  words: number;
+  /** Estimated reading time in whole minutes (>= 1), at ~200 wpm. */
+  readMin: number;
 };
 
 export type PostSource = PostMeta & { body: string };
+
+// Reading estimate from the raw MDX: markdown punctuation (`##`, `**`,
+// link syntax) counts toward the total, so this runs a touch high — the
+// same trade-off every "N min read" widget makes. Exported for tests.
+const WORDS_PER_MINUTE = 200;
+export const countWords = (s: string): number => (s.match(/\S+/g) ?? []).length;
+const readingMinutes = (words: number): number =>
+  Math.max(1, Math.round(words / WORDS_PER_MINUTE));
 
 // YAML auto-coerces `YYYY-MM-DD` into a Date — coerce back so consumers
 // always get a stable `2026-05-11` string. Returns empty string on
@@ -117,7 +130,33 @@ const parseEntry = (filename: string): PostSource | null => {
   }
   const bucket = typeof data.bucket === "string" ? data.bucket : undefined;
 
-  return { slug, title, date, summary, bucket, body: content };
+  let tags: string[] | undefined;
+  if ("tags" in data) {
+    const raw: unknown = data.tags;
+    if (
+      !Array.isArray(raw) ||
+      !raw.every((t): t is string => typeof t === "string" && t.trim() !== "")
+    ) {
+      throw new Error(
+        `[blog] ${filename}: frontmatter \`tags\` must be an array of non-empty strings when present`,
+      );
+    }
+    tags = raw.map((t) => t.trim());
+  }
+
+  const words = countWords(content);
+
+  return {
+    slug,
+    title,
+    date,
+    summary,
+    bucket,
+    tags,
+    words,
+    readMin: readingMinutes(words),
+    body: content,
+  };
 };
 
 // Single-process build with immutable source files; cache lets every
@@ -158,6 +197,9 @@ const toMeta = (e: PostSource): PostMeta => ({
   date: e.date,
   summary: e.summary,
   bucket: e.bucket,
+  tags: e.tags,
+  words: e.words,
+  readMin: e.readMin,
 });
 
 export function listPosts(): PostMeta[] {
