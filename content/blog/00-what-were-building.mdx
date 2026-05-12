@@ -9,13 +9,13 @@ tags: [primer, protocol, architecture, overview]
 
 **decdn** is a content delivery network where there's no central operator. Bytes flow from anyone willing to serve them to anyone willing to pay for them, denominated in dollars, with cryptographic verification at the edge and no contract longer than a single megabyte. This post is the plain-English introduction.
 
-## the elevator version
+## The elevator version
 
 A traditional CDN is a company that runs servers near your users and charges your business a monthly bill. CloudFront, Fastly, Akamai, Cloudflare. They cache your content, route around the slow paths of the public internet, and absorb traffic spikes for you. They charge $0.04–$0.20 per gigabyte. Their operations are opaque to you, and you're locked in to whoever you signed with.
 
 decdn is the same job — caching content near users, routing around the slow paths, absorbing spikes — but the operators are anyone with a server and a stake. They compete on price and latency. There's no monthly bill. You pay per megabyte, in USDC, only for what you actually pulled. The target market rate is **$0.01/GB**, four to twenty times cheaper than incumbent list pricing.
 
-## the two roles
+## The two roles
 
 There are two kinds of participant in the network.
 
@@ -25,7 +25,7 @@ There are two kinds of participant in the network.
 
 There's no third role. No platform. No middleman. The protocol is the platform.
 
-## what's underneath
+## What's underneath
 
 Every part of the stack is a primitive that already exists. decdn is the protocol that composes them.
 
@@ -38,7 +38,7 @@ Every part of the stack is a primitive that already exists. decdn is the protoco
 
 The protocol surface is thin: a wire format for probe and delivery, a payment channel contract, a staking registry, a slashing judge, a content blacklist, and a governance system. We did not invent any of the underlying primitives. We invented the protocol that composes them.
 
-## the economic shape
+## The economic shape
 
 Two currencies, doing two jobs.
 
@@ -48,7 +48,7 @@ Two currencies, doing two jobs.
 
 The split is deliberate. Volatility goes in one currency, used for alignment over long horizons. Stability goes in the other, used for payments matched to fiat-denominated server bills.
 
-## what we're not
+## What we're not
 
 To set expectations, here's what decdn does _not_ do.
 
@@ -57,7 +57,7 @@ To set expectations, here's what decdn does _not_ do.
 - **We don't pay operators in our own token.** Delivery is in USDC. Operator P&L tracks fiat costs in fiat-pegged revenue.
 - **We don't bolt onto an existing CDN.** This is its own protocol from the bottom up — not a sidecar, not a plugin layer, not an "edge computing" wrapper around someone else's bandwidth.
 
-## who this is for
+## Who this is for
 
 If you're a **node operator** — a sysadmin, a homelabber, a datacenter shop with spare bandwidth — decdn is supply-side opportunity. Stake, register, serve, earn USDC.
 

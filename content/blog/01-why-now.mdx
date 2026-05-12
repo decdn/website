@@ -11,7 +11,7 @@ Decentralized CDNs have been attempted for a decade. Most got stuck before they 
 
 **decdn** is the first attempt that gets to design _only_ the protocol, because the rails it runs on are finally ready. This is what changed.
 
-## transport: QUIC stopped being a research project
+## Transport: QUIC stopped being a research project
 
 QUIC was an IETF draft until 2021. By 2024 it carried roughly a third of public web traffic and shipped natively in every major OS. The properties that matter for a delivery network are now load-bearing parts of the public internet, not a thing we have to build.
 
@@ -21,7 +21,7 @@ QUIC was an IETF draft until 2021. By 2024 it carried roughly a third of public 
 
 QUIC plus iroh isn't incremental. It's the difference between "CDN-grade transport requires CDN-grade infrastructure" and "CDN-grade transport runs on a $5 VPS."
 
-## addressing: BLAKE3 made verification free
+## Addressing: BLAKE3 made verification free
 
 Earlier networks (BitTorrent, IPFS, Filecoin retrieval) used SHA-256 or SHA-1 piece hashes. Verification was either expensive enough to skip on commodity hardware (SHA-256 at multi-gigabit) or insecure enough to need a separate proof oracle. BLAKE3 changed that.
 
@@ -31,7 +31,7 @@ Earlier networks (BitTorrent, IPFS, Filecoin retrieval) used SHA-256 or SHA-1 pi
 
 Result: every byte we deliver is verified by the receiving client at line rate. We do not need a separate proof-of-delivery oracle. The retrieval problem Filecoin had to design a whole sub-protocol around — proving you delivered the right bytes — is just not a problem we have to solve.
 
-## settlement: stablecoins are now load-bearing financial infrastructure
+## Settlement: stablecoins are now load-bearing financial infrastructure
 
 USDC and USDT cleared north of $10T of on-chain volume in 2024 and are settled by Circle / Tether against actual reserves with monthly attestations. They are no longer "crypto experiments" — they are how dollars move on public chains. For a network of node operators with real infrastructure costs (VPS, bandwidth, storage), this is the difference between a viable business and a casino.
 
@@ -51,7 +51,7 @@ The same maturity wave gave us:
 - **OpenZeppelin SignatureChecker** supporting both EOA and ERC-1271 smart-account signatures uniformly across all our contracts.
 - **Circle's CCTP** for native USDC bridging across L2s, removing the trust assumption of wrapped-token bridges.
 
-## demand caught up at the same time
+## Demand caught up at the same time
 
 The supply-side primitives matured in parallel with a demand shock that didn't exist in 2020. Payload sizes grew an order of magnitude — modern open-source ML weights run 10–700GB; high-bitrate media, container images, and dataset distributions all push hundreds of GB; package archives are a hundred-fold larger than they were a decade ago. Legacy CDN list pricing didn't move: Cloudflare R2, AWS CloudFront, and Akamai are still in the $0.04–$0.20/GB band, the same as ten years ago. The teams shipping these payloads cannot run that math.
 
@@ -59,7 +59,7 @@ Centralized risk got worse, not better. A handful of hosts carry the load for in
 
 The demand-side market existed at this scale for the first time around 2023. The supply-side primitives became viable around the same time. The intersection is the wedge.
 
-## the window
+## The window
 
 The supply-side primitives are ready. The demand-side pain is acute. The category has no incumbent. Three things have to be true at once for a decentralized delivery network to work, and for the first time, all three are.
 
