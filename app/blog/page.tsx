@@ -59,15 +59,9 @@ export default function BlogIndex() {
       <JsonLd data={breadcrumbSchema} />
       <Frame id="blog" tone="paper">
         <header className="flex flex-col gap-6">
-          {/* .rise forces opacity:1 at rest (fill: forwards), so the
-              dimmed label/lead sit inside .rise wrappers rather than
-              carrying the class themselves. */}
-          <div className="rise rise-0">
-            <span className="meta opacity-60">field notes</span>
-          </div>
           <h1
             id="blog-h"
-            className="hug rise rise-1 leading-[0.92] font-extrabold"
+            className="hug rise rise-0 leading-[0.92] font-bold"
             style={{ fontSize: "var(--fs-h2)" }}
           >
             field notes
@@ -75,7 +69,10 @@ export default function BlogIndex() {
               _
             </span>
           </h1>
-          <div className="rise rise-2">
+          {/* .rise forces opacity:1 at rest (fill: forwards), so the
+              dimmed lead sits inside a .rise wrapper rather than carrying
+              the class itself. */}
+          <div className="rise rise-1">
             <p
               className="max-w-[60ch] leading-[1.7] opacity-75"
               style={{ fontSize: "var(--fs-lead)" }}

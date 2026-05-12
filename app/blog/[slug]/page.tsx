@@ -140,7 +140,7 @@ export default async function BlogPost({
             </div>
             <h1
               id="post-h"
-              className="hug leading-[0.95] font-extrabold"
+              className="hug leading-[0.95] font-bold"
               style={{ fontSize: "var(--fs-h2)" }}
             >
               {post.title}

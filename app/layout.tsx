@@ -10,9 +10,7 @@ import "./globals.css";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
-  // 800 powers the blog "field-log" display titles (font-extrabold);
-  // everything else uses 400–700.
-  weight: ["400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
 });
 
 const TITLE = "deCDN — A peer-to-peer delivery layer for bytes at scale";

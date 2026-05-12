@@ -66,7 +66,7 @@ export function PostRow({
         {/* title · summary · tags */}
         <div className="flex flex-col gap-3">
           <h2
-            className="hug leading-[1.05] font-extrabold transition-opacity group-hover:opacity-80"
+            className="hug leading-[1.05] font-bold transition-opacity group-hover:opacity-80"
             style={{ fontSize: "var(--fs-h3)" }}
           >
             {post.title}
