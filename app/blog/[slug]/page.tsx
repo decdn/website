@@ -127,9 +127,12 @@ export default async function BlogPost({
             <span aria-hidden>←</span> field notes
           </Link>
 
-          <header className="flex flex-col gap-6">
+          {/* Centered masthead — meta line, title, and tags align on the
+              page's vertical axis above the (centered) body. The "← field
+              notes" back-link above stays flush-left as nav chrome. */}
+          <header className="flex flex-col items-center gap-6 text-center">
             <div
-              className={`${META} flex flex-wrap items-center gap-x-3 gap-y-1 tabular-nums opacity-50`}
+              className={`${META} flex flex-wrap items-center justify-center gap-x-3 gap-y-1 tabular-nums opacity-50`}
             >
               <span>§ {num}</span>
               <span aria-hidden>·</span>
@@ -139,13 +142,13 @@ export default async function BlogPost({
             </div>
             <h1
               id="post-h"
-              className="hug leading-[0.95] font-bold"
+              className="hug text-balance leading-[0.95] font-bold"
               style={{ fontSize: "var(--fs-h2)" }}
             >
               {post.title}
             </h1>
             {tags.length > 0 && (
-              <ul className="flex flex-wrap gap-2">
+              <ul className="flex flex-wrap justify-center gap-2">
                 {tags.map((tag) => (
                   <li key={tag}>
                     <Pill>#{tag}</Pill>
