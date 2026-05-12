@@ -35,6 +35,10 @@ export type PostMeta = {
   summary: string;
   bucket?: string;
   tags?: string[];
+  /** 1-based place in the series, oldest = 1. Assigned after the
+   *  newest-first sort (see `readEntries`) so the index `#` column and
+   *  the post page `§ NN` always agree. */
+  seriesNumber: number;
   /** Whitespace-delimited token count of the raw MDX source. */
   words: number;
   /** Estimated reading time in whole minutes (>= 1), at ~200 wpm. */
@@ -48,8 +52,22 @@ export type PostSource = PostMeta & { body: string };
 // same trade-off every "N min read" widget makes. Exported for tests.
 const WORDS_PER_MINUTE = 200;
 export const countWords = (s: string): number => (s.match(/\S+/g) ?? []).length;
-const readingMinutes = (words: number): number =>
+export const readingMinutes = (words: number): number =>
   Math.max(1, Math.round(words / WORDS_PER_MINUTE));
+
+// --- display formatters (shared by the index list and the post page) ---
+
+// `2026-05-11` → `2026·05·11`. The machine-readable value stays in
+// `<time dateTime>`; only the rendered string gets the middle dots.
+export const dottedDate = (iso: string): string => iso.replaceAll("-", "·");
+
+const pad2 = (n: number): string => String(n).padStart(2, "0");
+
+/** `8` → `08 min`. Receives `PostMeta.readMin` (integer ≥ 1). */
+export const readLabel = (min: number): string => `${pad2(min)} min`;
+
+/** `2` → `02`. Receives `PostMeta.seriesNumber`. */
+export const seriesLabel = (n: number): string => pad2(n);
 
 // YAML auto-coerces `YYYY-MM-DD` into a Date — coerce back so consumers
 // always get a stable `2026-05-11` string. Returns empty string on
@@ -65,7 +83,32 @@ const formatDate = (value: unknown): string => {
 const fileToSlug = (filename: string): string =>
   filename.replace(/^\d+-/, "").replace(/\.mdx?$/, "");
 
-const parseEntry = (filename: string): PostSource | null => {
+// Frontmatter `tags`: optional array of non-empty strings. Returned
+// trimmed and de-duplicated in source order; an empty `[]` is treated as
+// "no tags" — same as omitting the key. Throws (with file context) on
+// any other shape. Exported for tests.
+export const parseTags = (
+  value: unknown,
+  filename: string,
+): string[] | undefined => {
+  if (value === undefined) return undefined;
+  if (
+    !Array.isArray(value) ||
+    !value.every((t): t is string => typeof t === "string" && t.trim() !== "")
+  ) {
+    throw new Error(
+      `[blog] ${filename}: frontmatter \`tags\` must be an array of non-empty strings when present`,
+    );
+  }
+  const tags = [...new Set(value.map((t) => t.trim()))];
+  return tags.length > 0 ? tags : undefined;
+};
+
+// Everything `parseEntry` can produce on its own — `seriesNumber` depends
+// on the post's position in the sorted list and is filled in by `readEntries`.
+type RawPost = Omit<PostSource, "seriesNumber">;
+
+const parseEntry = (filename: string): RawPost | null => {
   const raw = fs.readFileSync(path.join(POSTS_DIR, filename), "utf8");
   let parsed;
   try {
@@ -129,22 +172,7 @@ const parseEntry = (filename: string): PostSource | null => {
     );
   }
   const bucket = typeof data.bucket === "string" ? data.bucket : undefined;
-
-  let tags: string[] | undefined;
-  if ("tags" in data) {
-    const raw: unknown = data.tags;
-    if (
-      !Array.isArray(raw) ||
-      !raw.every((t): t is string => typeof t === "string" && t.trim() !== "")
-    ) {
-      throw new Error(
-        `[blog] ${filename}: frontmatter \`tags\` must be an array of non-empty strings when present`,
-      );
-    }
-    // An empty `tags: []` is treated as "no tags" — same as omitting the key.
-    tags = raw.length > 0 ? raw.map((t) => t.trim()) : undefined;
-  }
-
+  const tags = parseTags(data.tags, filename);
   const words = countWords(content);
 
   return {
@@ -181,14 +209,18 @@ const readEntries = (): PostSource[] => {
     .readdirSync(POSTS_DIR)
     .filter((f) => /\.mdx?$/.test(f))
     .map(parseEntry)
-    .filter((e): e is PostSource => e !== null)
+    .filter((e): e is RawPost => e !== null)
     .sort((a, b) => {
       // Newest first; tie-break on slug because readdir order isn't
       // portable across filesystems and stable sort would otherwise
       // flip same-date post order between machines.
       if (a.date !== b.date) return b.date.localeCompare(a.date);
       return a.slug.localeCompare(b.slug);
-    });
+    })
+    // Number the series after the sort: newest gets the highest number,
+    // oldest gets 1. Both the index `#` column and the post page `§ NN`
+    // read this, so they can't disagree.
+    .map((e, i, arr): PostSource => ({ ...e, seriesNumber: arr.length - i }));
   return cache;
 };
 
@@ -199,6 +231,7 @@ const toMeta = (e: PostSource): PostMeta => ({
   summary: e.summary,
   bucket: e.bucket,
   tags: e.tags,
+  seriesNumber: e.seriesNumber,
   words: e.words,
   readMin: e.readMin,
 });

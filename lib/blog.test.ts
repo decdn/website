@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { countWords, getPost, listPosts, parseSlug } from "./blog";
+import {
+  countWords,
+  dottedDate,
+  getPost,
+  listPosts,
+  parseSlug,
+  parseTags,
+  readingMinutes,
+  readLabel,
+  seriesLabel,
+} from "./blog";
 
 describe("parseSlug", () => {
   it.each(["a", "a-b", "a-b-c", "abc123", "a1-b2"])("accepts %j", (input) => {
@@ -43,6 +53,65 @@ describe("countWords", () => {
     expect(countWords("")).toBe(0);
     expect(countWords("   \n\t ")).toBe(0);
   });
+
+  it("counts markdown punctuation as tokens (the documented over-estimate)", () => {
+    // `##` (ATX heading) and `[link](url)` are each one token.
+    expect(countWords("## Heading and a [link](url)")).toBe(5);
+  });
+});
+
+describe("readingMinutes", () => {
+  // 200 wpm with Math.round → the half-up boundary lands at 300 words.
+  it.each([
+    [0, 1],
+    [1, 1],
+    [100, 1],
+    [299, 1],
+    [300, 2],
+    [400, 2],
+    [500, 3],
+    [1000, 5],
+  ])("%d words → %d min", (words, min) => {
+    expect(readingMinutes(words)).toBe(min);
+  });
+});
+
+describe("display formatters", () => {
+  it("dottedDate swaps hyphens for middle dots", () => {
+    expect(dottedDate("2026-05-11")).toBe("2026·05·11");
+  });
+
+  it("readLabel zero-pads to two digits", () => {
+    expect(readLabel(8)).toBe("08 min");
+    expect(readLabel(12)).toBe("12 min");
+  });
+
+  it("seriesLabel zero-pads to two digits", () => {
+    expect(seriesLabel(2)).toBe("02");
+    expect(seriesLabel(11)).toBe("11");
+  });
+});
+
+describe("parseTags", () => {
+  it("returns undefined when absent or an empty array", () => {
+    expect(parseTags(undefined, "x.mdx")).toBeUndefined();
+    expect(parseTags([], "x.mdx")).toBeUndefined();
+  });
+
+  it("trims and de-duplicates, preserving source order", () => {
+    expect(
+      parseTags(["  transport ", "transport", "settlement"], "x.mdx"),
+    ).toEqual(["transport", "settlement"]);
+  });
+
+  it.each<[string, unknown]>([
+    ["a bare string", "primer"],
+    ["a non-string element", ["primer", 1]],
+    ["an empty-string element", ["primer", ""]],
+    ["a whitespace-only element", ["primer", "   "]],
+  ])("throws (with file context) on %s", (_label, input) => {
+    expect(() => parseTags(input, "bad.mdx")).toThrow(/bad\.mdx.*tags/s);
+  });
 });
 
 describe("listPosts metadata", () => {
@@ -67,5 +136,13 @@ describe("listPosts metadata", () => {
         expect(t).not.toBe("");
       }
     }
+  });
+
+  it("numbers the series 1..N (oldest = 1), newest first in the list", () => {
+    const numbers = posts.map((p) => p.seriesNumber).sort((a, b) => a - b);
+    expect(numbers).toEqual(
+      Array.from({ length: posts.length }, (_, i) => i + 1),
+    );
+    expect(posts[0]?.seriesNumber).toBe(posts.length);
   });
 });

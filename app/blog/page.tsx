@@ -112,7 +112,6 @@ export default function BlogIndex() {
                 <PostRow
                   key={post.slug}
                   post={post}
-                  num={String(posts.length - i).padStart(2, "0")}
                   delay={Math.min(i, 4) * 80}
                 />
               ))}

@@ -5,9 +5,15 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import { Frame } from "@/components/ui/Frame";
 import { Pill } from "@/components/ui/Pill";
-import { META, dottedDate, readLabel } from "@/components/ui/PostRow";
+import { META } from "@/components/ui/PostRow";
 import { Prose } from "@/components/ui/Prose";
-import { getPost, listPosts } from "@/lib/blog";
+import {
+  dottedDate,
+  getPost,
+  listPosts,
+  readLabel,
+  seriesLabel,
+} from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
 import { ORG_ID, SITE_URL } from "@/lib/links";
 
@@ -65,13 +71,12 @@ export default async function BlogPost({
   const post = getPost(slug);
   if (!post) notFound();
 
-  // Position in the series: list is newest-first, so a smaller index is
-  // a *later* post. num counts oldest = 01, matching the index page.
+  // Prev/next: the posts one number above (more recent) and below this
+  // one in the series. `find` returns undefined at the ends.
   const all = listPosts();
-  const i = all.findIndex((p) => p.slug === post.slug);
-  const num = String(all.length - i).padStart(2, "0");
-  const newer = i > 0 ? all[i - 1] : undefined;
-  const older = i < all.length - 1 ? all[i + 1] : undefined;
+  const num = seriesLabel(post.seriesNumber);
+  const newer = all.find((p) => p.seriesNumber === post.seriesNumber + 1);
+  const older = all.find((p) => p.seriesNumber === post.seriesNumber - 1);
 
   const tags = post.tags ?? [];
   const minutes = readLabel(post.readMin);
@@ -169,7 +174,9 @@ export default async function BlogPost({
                   href={`/blog/${older.slug}/`}
                   className="group flex flex-col gap-2 no-underline"
                 >
-                  <span className="meta opacity-50">← earlier</span>
+                  <span className="meta opacity-50">
+                    <span aria-hidden>←</span> earlier
+                  </span>
                   <span
                     className="hug leading-[1.2] font-bold transition-opacity group-hover:opacity-70"
                     style={{ fontSize: "var(--fs-lead)" }}
@@ -185,7 +192,9 @@ export default async function BlogPost({
                   href={`/blog/${newer.slug}/`}
                   className="group flex flex-col gap-2 no-underline @xl:items-end @xl:text-right"
                 >
-                  <span className="meta opacity-50">later →</span>
+                  <span className="meta opacity-50">
+                    later <span aria-hidden>→</span>
+                  </span>
                   <span
                     className="hug leading-[1.2] font-bold transition-opacity group-hover:opacity-70"
                     style={{ fontSize: "var(--fs-lead)" }}

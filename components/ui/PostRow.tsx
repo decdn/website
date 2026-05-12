@@ -1,39 +1,26 @@
 import Link from "next/link";
 import type { PostMeta } from "@/lib/blog";
+import { dottedDate, readLabel, seriesLabel } from "@/lib/blog";
 import { Pill } from "./Pill";
 
 // Shared 5-track grid for the index "field-log" table — `#` · date ·
 // title/summary · read · arrow. The column-header row in app/blog/page.tsx
-// uses the same tracks so labels line up over their columns. `minmax(0,1fr)`
-// lets the title column shrink (titles carry hard hyphens) instead of
-// pushing the grid wider than its container.
+// uses the same tracks so the labels line up over their columns.
+// `minmax(0,1fr)` (rather than plain `1fr`) lets the title column shrink
+// below its content's intrinsic width instead of pushing the grid past
+// its container — a long unbroken title can't blow out the layout.
 export const BLOG_GRID_COLS =
   "@xl:grid-cols-[2.5rem_7.5rem_minmax(0,1fr)_6.5rem_1.5rem] @xl:gap-x-8";
 
-// `2026-05-11` → `2026·05·11` — the field-log date style. The machine
-// value stays in <time dateTime>; only the display string gets the dots.
-// Shared with the post page (app/blog/[slug]/page.tsx).
-export const dottedDate = (iso: string) => iso.replaceAll("-", "·");
-
-// `08 min` — zero-padded read estimate. Shared with the post page.
-export const readLabel = (min: number) => `${String(min).padStart(2, "0")} min`;
-
-// Lowercase meta (11px, tracked, tabular figures) — like `.meta` but
-// without its forced uppercase, since `02 · 08 min` reads lowercase.
-// `.meta` is an unlayered rule we can't override per-call. Shared with
-// the post page.
+// Lowercase meta text — like `.meta` but without its forced uppercase
+// (`02 · 08 min` reads lowercase) and at a tighter tracking. `.meta` is
+// an unlayered rule we can't override per-call. Bakes in `tabular-nums`
+// so figures align down the column. Shared with the post page.
 export const META =
-  "text-[0.6875rem] leading-[1.3] font-medium tracking-[0.16em]";
+  "text-[0.6875rem] leading-[1.3] font-medium tracking-[0.16em] tabular-nums";
 
-export function PostRow({
-  post,
-  num,
-  delay,
-}: {
-  post: PostMeta;
-  num: string;
-  delay: number;
-}) {
+export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
+  const num = seriesLabel(post.seriesNumber);
   const minutes = readLabel(post.readMin);
   const date = dottedDate(post.date);
   const tags = post.tags ?? [];
@@ -46,7 +33,7 @@ export function PostRow({
       >
         {/* mobile-only meta line */}
         <div
-          className={`${META} flex items-baseline justify-between gap-4 tabular-nums opacity-50 @xl:hidden`}
+          className={`${META} flex items-baseline justify-between gap-4 opacity-50 @xl:hidden`}
         >
           <span>
             {num} <span aria-hidden>·</span>{" "}
@@ -57,7 +44,7 @@ export function PostRow({
 
         {/* # */}
         <span
-          className={`${META} hidden self-start tabular-nums opacity-35 @xl:mt-1.5 @xl:block`}
+          className={`${META} hidden self-start opacity-35 @xl:mt-1.5 @xl:block`}
         >
           {num}
         </span>
@@ -65,7 +52,7 @@ export function PostRow({
         {/* date */}
         <time
           dateTime={post.date}
-          className={`${META} hidden self-start tabular-nums opacity-55 @xl:mt-1.5 @xl:block`}
+          className={`${META} hidden self-start opacity-55 @xl:mt-1.5 @xl:block`}
         >
           {date}
         </time>
@@ -106,7 +93,7 @@ export function PostRow({
 
         {/* read */}
         <div
-          className={`${META} hidden self-start tabular-nums @xl:mt-1.5 @xl:block @xl:text-right`}
+          className={`${META} hidden self-start @xl:mt-1.5 @xl:block @xl:text-right`}
         >
           {minutes}
         </div>
