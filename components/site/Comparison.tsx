@@ -1,3 +1,4 @@
+import { LegacyPriceTicker } from "@/components/site/LegacyPriceTicker";
 import { ComparisonRow } from "@/components/ui/ComparisonRow";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -69,15 +70,13 @@ export function Comparison() {
                   lineHeight: "0.96",
                 }}
               >
-                <span className="opacity-55">
-                  $0.085–$0.17
-                  <span className="meta ml-1 align-baseline opacity-70">
-                    /GB
-                  </span>
-                </span>
+                <LegacyPriceTicker />
+                {/* opaque mid-gray = paper@55% over the ink section bg, so it
+                    reads as the same color as the dimmed digits without the
+                    lighter banding a semi-transparent bar leaves over glyphs. */}
                 <span
                   aria-hidden
-                  className="absolute inset-x-0 top-1/2 h-[2px] -translate-y-1/2 bg-paper @xl:h-[4px]"
+                  className="absolute inset-x-0 top-1/2 h-[2px] -translate-y-1/2 bg-[color-mix(in_srgb,var(--paper)_55%,var(--ink))] @xl:h-[4px]"
                 />
               </div>
             </div>
