@@ -29,7 +29,6 @@ export function PostRow({
   delay: number;
 }) {
   const minutes = `${String(post.readMin).padStart(2, "0")} min`;
-  const words = `${post.words.toLocaleString("en-US")} wds`;
   const tags = post.tags ?? [];
 
   return (
@@ -71,9 +70,6 @@ export function PostRow({
             style={{ fontSize: "var(--fs-h3)" }}
           >
             {post.title}
-            <span aria-hidden className="text-whisper">
-              .
-            </span>
           </h2>
           <p
             className="max-w-[62ch] leading-[1.6] opacity-75"
@@ -94,10 +90,9 @@ export function PostRow({
 
         {/* read */}
         <div
-          className={`${META} hidden flex-col items-end gap-1 self-start tabular-nums @xl:mt-1.5 @xl:flex`}
+          className={`${META} hidden self-start tabular-nums @xl:mt-1.5 @xl:block @xl:text-right`}
         >
-          <span>{minutes}</span>
-          <span className="opacity-50">{words}</span>
+          {minutes}
         </div>
 
         {/* arrow */}

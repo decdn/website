@@ -82,7 +82,6 @@ export default async function BlogPost({
 
   const tags = post.tags ?? [];
   const minutes = `${String(post.readMin).padStart(2, "0")} min`;
-  const words = `${post.words.toLocaleString("en-US")} wds`;
 
   const postUrl = `${SITE_URL}blog/${post.slug}/`;
   const postingSchema = {
@@ -137,9 +136,7 @@ export default async function BlogPost({
               <span aria-hidden>·</span>
               <time dateTime={post.date}>{dotted(post.date)}</time>
               <span aria-hidden>·</span>
-              <span>
-                {minutes} <span aria-hidden>·</span> {words}
-              </span>
+              <span>{minutes}</span>
             </div>
             <h1
               id="post-h"
@@ -147,9 +144,6 @@ export default async function BlogPost({
               style={{ fontSize: "var(--fs-h2)" }}
             >
               {post.title}
-              <span aria-hidden className="text-whisper">
-                .
-              </span>
             </h1>
             {tags.length > 0 && (
               <ul className="flex flex-wrap gap-2">

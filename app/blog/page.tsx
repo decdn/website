@@ -72,7 +72,7 @@ export default function BlogIndex() {
           >
             field notes
             <span aria-hidden className="text-whisper">
-              .
+              _
             </span>
           </h1>
           <div className="rise rise-2">
