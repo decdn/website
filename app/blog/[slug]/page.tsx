@@ -174,11 +174,20 @@ export default async function BlogPost({
                   href={`/blog/${older.slug}/`}
                   className="group flex flex-col gap-2 no-underline"
                 >
-                  <span className="meta opacity-50">
-                    <span aria-hidden>←</span> earlier
+                  {/* The title holds steady on hover — the glyph slides +
+                      greens and the label lifts, mirroring the index row's
+                      `→`. */}
+                  <span className="meta opacity-50 transition-opacity duration-300 ease-out group-hover:opacity-90">
+                    <span
+                      aria-hidden
+                      className="inline-block transition-all duration-300 ease-out group-hover:-translate-x-1 group-hover:text-whisper"
+                    >
+                      ←
+                    </span>{" "}
+                    earlier
                   </span>
                   <span
-                    className="hug leading-[1.2] font-bold transition-opacity group-hover:opacity-70"
+                    className="hug leading-[1.2] font-bold"
                     style={{ fontSize: "var(--fs-lead)" }}
                   >
                     {older.title}
@@ -192,11 +201,17 @@ export default async function BlogPost({
                   href={`/blog/${newer.slug}/`}
                   className="group flex flex-col gap-2 no-underline @xl:items-end @xl:text-right"
                 >
-                  <span className="meta opacity-50">
-                    later <span aria-hidden>→</span>
+                  <span className="meta opacity-50 transition-opacity duration-300 ease-out group-hover:opacity-90">
+                    later{" "}
+                    <span
+                      aria-hidden
+                      className="inline-block transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:text-whisper"
+                    >
+                      →
+                    </span>
                   </span>
                   <span
-                    className="hug leading-[1.2] font-bold transition-opacity group-hover:opacity-70"
+                    className="hug leading-[1.2] font-bold"
                     style={{ fontSize: "var(--fs-lead)" }}
                   >
                     {newer.title}

@@ -60,13 +60,15 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
         {/* title · summary · tags */}
         <div className="flex flex-col gap-3">
           <h2
-            className="hug leading-[1.05] font-bold transition-opacity group-hover:opacity-80"
+            className="hug leading-[1.05] font-bold"
             style={{ fontSize: "var(--fs-h3)" }}
           >
             {post.title}
             {/* terminal-prompt cursor — echoes the "field notes_" page
                 title; sits invisible (reserving its width so hover never
-                reflows the line) and fades in whisper-green on row hover. */}
+                reflows the line) and fades in whisper-green on row hover.
+                The title itself doesn't change on hover — the cursor and
+                the sliding `→` carry the affordance. */}
             <span
               aria-hidden
               className="text-whisper opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100"
