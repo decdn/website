@@ -71,12 +71,20 @@ export default async function Image({ params }: { params: Promise<Params> }) {
       </div>
 
       {/* Title — echoes the site `.hug` treatment (tight negative
-            tracking on large display sizes). */}
+            tracking on large display sizes). The `maxHeight` /
+            `overflow` combo is a defensive cap so a pathologically long
+            title can't push the bottom row off the 630px canvas:
+            630 − 160 (top/bottom padding) − ~52 (eyebrow + bottom row at
+            22px) ≈ 418px available, rounded down to a safe 400. The
+            44-char auto-shrink heuristic above keeps current titles
+            well inside this bound. */}
       <div
         style={{
           fontSize: titleSize,
           letterSpacing: "-0.03em",
           lineHeight: 1.05,
+          maxHeight: 400,
+          overflow: "hidden",
         }}
       >
         {post.title}

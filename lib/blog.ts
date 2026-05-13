@@ -134,7 +134,18 @@ export const parseImage = (
       return `${SITE_URL}${trimmed.slice(1)}`;
     }
     if (ABSOLUTE_HTTP_URL_RE.test(trimmed)) {
-      return trimmed;
+      // The regex gates "looks like an http(s) URL"; `new URL` then
+      // confirms the string actually parses AND the authority is
+      // non-empty. Catches host-less inputs (`http://`, `https://`)
+      // that the regex alone would let through and ship as broken
+      // og:image / JSON-LD values.
+      try {
+        if (new URL(trimmed).hostname.length > 0) {
+          return trimmed;
+        }
+      } catch {
+        // Falls through to the shared throw below.
+      }
     }
   }
   throw new Error(

@@ -158,6 +158,8 @@ describe("parseImage", () => {
     ["a dot-prefixed relative path", "./foo.png"],
     ["a protocol-relative URL", "//example.test/foo.png"],
     ["a single slash", "/"],
+    ["a host-less http URL", "http://"],
+    ["a host-less https URL", "https://"],
     ["a data URL", "data:image/png;base64,AAA"],
     ["an ftp URL", "ftp://example.test/foo.png"],
     ["a mailto URL", "mailto:x@y.z"],
