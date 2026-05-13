@@ -21,6 +21,12 @@ export const SITE_URL = new URL("/", links.site).toString();
 // `author` field so the structured-data graph joins correctly.
 export const ORG_ID = `${SITE_URL}#organization`;
 
+// Trailing-slash blog base, paired with SITE_URL so callers can concat
+// `${BLOG_URL}${slug}/` (post URL) and `${BLOG_URL}#blog` (stable @id)
+// without re-deriving the path. Must agree with `next.config.ts`'s
+// `trailingSlash: true` and `links.blog`.
+export const BLOG_URL = `${SITE_URL}blog/`;
+
 // Twitter expects an `@handle`; derive from the X profile URL so the X
 // account is the single source of truth.
 export const X_HANDLE = `@${new URL(links.x).pathname.replace(/^\//, "")}`;
