@@ -10,9 +10,14 @@ export const dynamic = "force-static";
 
 // The metadata route does NOT inherit generateStaticParams from the
 // sibling page.tsx — each file convention enumerates its own params.
-// Driving both off listPosts() keeps them single-sourced.
+// Driving both off listPosts() keeps them single-sourced. Posts with a
+// frontmatter `image:` override are filtered out: their <meta> tags
+// point at the override URL, so the generated card would ship as an
+// unreferenced PNG in the static export.
 export function generateStaticParams() {
-  return listPosts().map((p) => ({ slug: p.slug }));
+  return listPosts()
+    .filter((p) => !p.image)
+    .map((p) => ({ slug: p.slug }));
 }
 
 export const size = { width: 1200, height: 630 };

@@ -4,12 +4,14 @@ import {
   dottedDate,
   getPost,
   listPosts,
+  parseImage,
   parseSlug,
   parseTags,
   readingMinutes,
   readLabel,
   seriesLabel,
 } from "./blog";
+import { SITE_URL } from "./links";
 
 describe("parseSlug", () => {
   it.each(["a", "a-b", "a-b-c", "abc123", "a1-b2"])("accepts %j", (input) => {
@@ -111,6 +113,56 @@ describe("parseTags", () => {
     ["a whitespace-only element", ["primer", "   "]],
   ])("throws (with file context) on %s", (_label, input) => {
     expect(() => parseTags(input, "bad.mdx")).toThrow(/bad\.mdx.*tags/s);
+  });
+});
+
+describe("parseImage", () => {
+  it("returns undefined when absent", () => {
+    expect(parseImage(undefined, "x.mdx")).toBeUndefined();
+  });
+
+  it.each<[string, string, string]>([
+    [
+      "site-relative path",
+      "/blog-cards/foo.png",
+      `${SITE_URL}blog-cards/foo.png`,
+    ],
+    ["nested site-relative path", "/a/b/c.png", `${SITE_URL}a/b/c.png`],
+    [
+      "absolute https URL",
+      "https://example.test/foo.png",
+      "https://example.test/foo.png",
+    ],
+    [
+      "absolute http URL",
+      "http://example.test/foo.png",
+      "http://example.test/foo.png",
+    ],
+    [
+      "surrounding whitespace",
+      "  https://example.test/foo.png  ",
+      "https://example.test/foo.png",
+    ],
+  ])("accepts %s", (_label, input, expected) => {
+    expect(parseImage(input, "x.mdx")).toBe(expected);
+  });
+
+  it.each<[string, unknown]>([
+    ["a number", 42],
+    ["null", null],
+    ["an array", ["/foo.png"]],
+    ["an object", {}],
+    ["an empty string", ""],
+    ["a whitespace-only string", "   "],
+    ["a bare relative path", "foo.png"],
+    ["a dot-prefixed relative path", "./foo.png"],
+    ["a protocol-relative URL", "//example.test/foo.png"],
+    ["a single slash", "/"],
+    ["a data URL", "data:image/png;base64,AAA"],
+    ["an ftp URL", "ftp://example.test/foo.png"],
+    ["a mailto URL", "mailto:x@y.z"],
+  ])("throws (with file context) on %s", (_label, input) => {
+    expect(() => parseImage(input, "bad.mdx")).toThrow(/bad\.mdx.*image/s);
   });
 });
 

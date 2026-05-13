@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { SITE_URL } from "./links";
 
 const POSTS_DIR = path.join(process.cwd(), "content", "blog");
 
@@ -35,6 +36,13 @@ export type PostMeta = {
   summary: string;
   bucket?: string;
   tags?: string[];
+  /** Optional per-post override for the OG/JSON-LD image. When set,
+   *  consumed as-is for `og:image`, `twitter:image`, and
+   *  `BlogPosting.image` — bypasses the generated
+   *  `app/blog/[slug]/opengraph-image.tsx` card. Site-relative paths
+   *  (leading `/`, e.g. `/blog-cards/foo.png`) are resolved against
+   *  `SITE_URL` at parse time. Validated by `parseImage`. */
+  image?: string;
   /** 1-based place in the series, oldest = 1. Assigned after the
    *  newest-first sort (see `readEntries`) so the index `#` column and
    *  the post page `§ NN` always agree. */
@@ -102,6 +110,36 @@ export const parseTags = (
   }
   const tags = [...new Set(value.map((t) => t.trim()))];
   return tags.length > 0 ? tags : undefined;
+};
+
+// Frontmatter `image`: optional override for the generated OG card.
+// Accepts a site-relative path (leading `/` plus at least one char, e.g.
+// `/blog-cards/foo.png`) — resolved against `SITE_URL` — or an absolute
+// http/https URL. Anything else (relative without `/`, protocol-relative
+// `//`, `data:`/`mailto:`/`ftp:` schemes, non-string) throws with file
+// context. Exported for tests.
+const ABSOLUTE_HTTP_URL_RE = /^https?:\/\//i;
+const SITE_RELATIVE_PATH_RE = /^\/[^/]/;
+
+export const parseImage = (
+  value: unknown,
+  filename: string,
+): string | undefined => {
+  if (value === undefined) return undefined;
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (SITE_RELATIVE_PATH_RE.test(trimmed)) {
+      // SITE_URL already ends in `/`, so strip the leading slash from
+      // the path before concatenating to avoid `//`.
+      return `${SITE_URL}${trimmed.slice(1)}`;
+    }
+    if (ABSOLUTE_HTTP_URL_RE.test(trimmed)) {
+      return trimmed;
+    }
+  }
+  throw new Error(
+    `[blog] ${filename}: frontmatter \`image\` must be a site-relative path (leading \`/\`) or an absolute http(s) URL when present`,
+  );
 };
 
 // Everything `parseEntry` can produce on its own — `seriesNumber` depends
@@ -173,6 +211,7 @@ const parseEntry = (filename: string): RawPost | null => {
   }
   const bucket = typeof data.bucket === "string" ? data.bucket : undefined;
   const tags = parseTags(data.tags, filename);
+  const image = parseImage(data.image, filename);
   const words = countWords(content);
 
   return {
@@ -182,6 +221,7 @@ const parseEntry = (filename: string): RawPost | null => {
     summary,
     bucket,
     tags,
+    image,
     words,
     readMin: readingMinutes(words),
     body: content,
@@ -231,6 +271,7 @@ const toMeta = (e: PostSource): PostMeta => ({
   summary: e.summary,
   bucket: e.bucket,
   tags: e.tags,
+  image: e.image,
   seriesNumber: e.seriesNumber,
   words: e.words,
   readMin: e.readMin,
