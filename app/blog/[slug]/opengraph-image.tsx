@@ -67,7 +67,7 @@ export default async function Image({ params }: { params: Promise<Params> }) {
           color: "rgba(255, 255, 255, 0.6)",
         }}
       >
-        DECDN · FIELD LOG
+        DECDN · FIELD NOTES
       </div>
 
       {/* Title — echoes the site `.hug` treatment (tight negative
