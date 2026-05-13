@@ -46,7 +46,6 @@
   --text-h2: clamp(1.875rem, 5.8vw, 5.25rem);
   --text-method-row: clamp(2rem, 6.5vw, 6rem);
   --text-h1: clamp(2.25rem, 7vw, 6.5rem);
-  --text-display: clamp(3.5rem, 14vw, 12.5rem);
   --text-price: clamp(1.125rem, 5vw, 4rem);
 }
 
