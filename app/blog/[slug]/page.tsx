@@ -1,4 +1,4 @@
-import type { Metadata, ResolvingMetadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
@@ -29,17 +29,17 @@ export function generateStaticParams() {
 
 type Params = { slug: string };
 
-export async function generateMetadata(
-  { params }: { params: Promise<Params> },
-  parent: ResolvingMetadata,
-): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
   const { slug } = await params;
   const post = getPost(slug);
   if (!post) notFound();
-  // Inherit the root file-convention og image so post shares get the
-  // site card instead of a blank one; see app/blog/page.tsx for the
-  // pattern and the reason we reuse ogImages for twitter.
-  const ogImages = (await parent).openGraph?.images ?? [];
+  // OG/Twitter images come from the sibling `opengraph-image.tsx` file
+  // convention — one per-post card, with the og→twitter fallback
+  // populating `twitter:image` automatically.
   return {
     title: post.title,
     description: post.summary,
@@ -51,13 +51,11 @@ export async function generateMetadata(
       type: "article",
       publishedTime: post.date,
       tags: post.tags,
-      images: ogImages,
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.summary,
-      images: ogImages,
     },
   };
 }
@@ -91,7 +89,9 @@ export default async function BlogPost({
     datePublished: post.date,
     url: postUrl,
     mainEntityOfPage: postUrl,
-    image: `${SITE_URL}opengraph-image.png`,
+    // Extensionless to match the URL Next emits for the file-convention
+    // OG image (`out/blog/<slug>/opengraph-image`, no `.png`).
+    image: `${postUrl}opengraph-image`,
     keywords: post.tags?.join(", "),
     wordCount: post.words,
     author: { "@id": ORG_ID },
