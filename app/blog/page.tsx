@@ -3,9 +3,7 @@ import { Frame } from "@/components/ui/Frame";
 import { BLOG_GRID_COLS, PostRow } from "@/components/ui/PostRow";
 import { listPosts } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
-import { ORG_ID, SITE_URL } from "@/lib/links";
-
-const BLOG_URL = `${SITE_URL}blog/`;
+import { BLOG_URL, ORG_ID, SITE_URL } from "@/lib/links";
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",
@@ -75,6 +73,10 @@ export default function BlogIndex() {
         headline: p.title,
         description: p.summary,
         url: postUrl,
+        mainEntityOfPage: postUrl,
+        image: `${SITE_URL}opengraph-image.png`,
+        keywords: p.tags?.join(", "),
+        wordCount: p.words,
         datePublished: p.date,
         dateModified: p.date,
         author: { "@id": ORG_ID },

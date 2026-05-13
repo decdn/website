@@ -15,7 +15,7 @@ import {
   seriesLabel,
 } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
-import { ORG_ID, SITE_URL } from "@/lib/links";
+import { BLOG_URL, ORG_ID, SITE_URL } from "@/lib/links";
 
 // Static export: enumerate every slug at build time and refuse anything
 // outside that set. `dynamicParams = false` mirrors the closed-world
@@ -81,7 +81,7 @@ export default async function BlogPost({
   const tags = post.tags ?? [];
   const minutes = readLabel(post.readMin);
 
-  const postUrl = `${SITE_URL}blog/${post.slug}/`;
+  const postUrl = `${BLOG_URL}${post.slug}/`;
   const postingSchema = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -108,7 +108,7 @@ export default async function BlogPost({
         "@type": "ListItem",
         position: 2,
         name: "Blog",
-        item: `${SITE_URL}blog/`,
+        item: BLOG_URL,
       },
       { "@type": "ListItem", position: 3, name: post.title, item: postUrl },
     ],
