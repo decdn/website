@@ -39,10 +39,7 @@ export function Method() {
 
       <div data-reveal className="mt-auto pt-12">
         <span className="meta mb-3 block opacity-60">stack</span>
-        <div
-          className="hug flex flex-wrap items-baseline gap-x-5 gap-y-2 font-semibold tracking-[-0.03em]"
-          style={{ fontSize: "var(--fs-h3)" }}
-        >
+        <div className="hug flex flex-wrap items-baseline gap-x-5 gap-y-2 text-h3 font-semibold tracking-[-0.03em]">
           <span>blake3</span>
           <span aria-hidden className="opacity-30">
             ·

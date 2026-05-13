@@ -12,12 +12,13 @@ import { Pill } from "./Pill";
 export const BLOG_GRID_COLS =
   "@xl:grid-cols-[2.5rem_7.5rem_minmax(0,1fr)_6.5rem_1.5rem] @xl:gap-x-8";
 
-// Lowercase meta text — like `.meta` but without its forced uppercase
-// (`02 · 08 min` reads lowercase) and at a tighter tracking. `.meta` is
-// an unlayered rule we can't override per-call. Bakes in `tabular-nums`
-// so figures align down the column. Shared with the post page.
+// Lowercase meta text — same size as `.meta` (the shared `text-micro`
+// token) but without its forced uppercase (`02 · 08 min` reads lowercase)
+// and at a tighter tracking. `.meta` is an unlayered rule we can't
+// override per-call. Bakes in `tabular-nums` so figures align down the
+// column. Shared with the post page.
 export const META =
-  "text-[0.6875rem] leading-[1.3] font-medium tracking-[0.16em] tabular-nums";
+  "text-micro leading-[1.3] font-medium tracking-[0.16em] tabular-nums";
 
 export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
   const num = seriesLabel(post.seriesNumber);
@@ -59,10 +60,7 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
 
         {/* title · summary · tags */}
         <div className="flex flex-col gap-3">
-          <h2
-            className="hug leading-[1.05] font-bold"
-            style={{ fontSize: "var(--fs-h3)" }}
-          >
+          <h2 className="hug text-h3 leading-[1.05] font-bold">
             {post.title}
             {/* terminal-prompt cursor — echoes the "field notes_" page
                 title; sits invisible (reserving its width so hover never
@@ -76,10 +74,7 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
               _
             </span>
           </h2>
-          <p
-            className="max-w-[62ch] leading-[1.6] opacity-75"
-            style={{ fontSize: "var(--fs-body)" }}
-          >
+          <p className="max-w-[62ch] text-body leading-[1.6] opacity-75">
             {post.summary}
           </p>
           {tags.length > 0 && (

@@ -38,11 +38,8 @@ export function Close() {
           {/* prettier-ignore */}
           <p
             data-reveal
-            style={{
-              "--reveal-delay": "120ms",
-              fontSize: "var(--fs-body)",
-            }}
-            className="max-w-[64ch] leading-[1.7]"
+            style={{ "--reveal-delay": "120ms" }}
+            className="max-w-[64ch] text-body leading-[1.7]"
           >
             <span className="text-whisper">deCDN</span>{" "}is a peer-to-peer delivery layer for large files — software releases, datasets, media libraries, ai models, anything meant to be pulled a million times and that shouldn&apos;t depend on one bucket. the code is open. the network is open. the price is posted.
           </p>
@@ -53,8 +50,7 @@ export function Close() {
             className="flex flex-col flex-wrap gap-x-10 gap-y-4 @md:flex-row @md:items-baseline"
           >
             <a
-              className="underline-brutal font-semibold tracking-[0.02em]"
-              style={{ fontSize: "var(--fs-lead)" }}
+              className="underline-brutal text-lead font-semibold tracking-[0.02em]"
               href={links.litepaper}
               target="_blank"
               rel="noopener noreferrer"
@@ -65,8 +61,7 @@ export function Close() {
               </span>
             </a>
             <a
-              className="underline-brutal font-semibold tracking-[0.02em]"
-              style={{ fontSize: "var(--fs-lead)" }}
+              className="underline-brutal text-lead font-semibold tracking-[0.02em]"
               href={links.docs}
             >
               read the docs
@@ -75,8 +70,7 @@ export function Close() {
               </span>
             </a>
             <a
-              className="underline-brutal font-semibold tracking-[0.02em]"
-              style={{ fontSize: "var(--fs-lead)" }}
+              className="underline-brutal text-lead font-semibold tracking-[0.02em]"
               href={links.github}
             >
               source on github

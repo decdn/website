@@ -20,17 +20,9 @@ export function Frame({ id, tone, className = "", children }: FrameProps) {
     <section
       id={id}
       aria-labelledby={`${id}-h`}
-      className={`relative flex scroll-mt-[var(--nav-h)] flex-col ${TONE_CLASS[tone]} ${className}`}
-      style={{
-        minHeight: "min(100svh, var(--frame-min-h-cap))",
-        paddingInline: "var(--frame-gutter)",
-        paddingBlock: "var(--frame-pad-y)",
-      }}
+      className={`relative flex min-h-[min(100svh,var(--frame-min-h-cap))] scroll-mt-[var(--nav-h)] flex-col px-[var(--frame-gutter)] py-[var(--frame-pad-y)] ${TONE_CLASS[tone]} ${className}`}
     >
-      <div
-        className="@container relative z-10 mx-auto flex w-full flex-1 flex-col"
-        style={{ maxWidth: "var(--frame-max)" }}
-      >
+      <div className="@container relative z-10 mx-auto flex w-full max-w-[var(--frame-max)] flex-1 flex-col">
         {children}
       </div>
     </section>

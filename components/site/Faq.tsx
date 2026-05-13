@@ -12,8 +12,7 @@ export function Faq() {
         <h2
           data-reveal
           id="faq-h"
-          className="hug font-semibold leading-[0.92] tracking-[-0.04em]"
-          style={{ fontSize: "var(--fs-h2)" }}
+          className="hug text-h2 leading-[0.92] font-semibold tracking-[-0.04em]"
         >
           frequently asked.
         </h2>

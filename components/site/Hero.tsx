@@ -16,8 +16,7 @@ export function Hero() {
       <div className="mt-10 flex flex-col gap-8 @4xl:gap-12">
         <h1
           id="intro-h"
-          className="hug flex flex-col font-semibold leading-[0.9] tracking-[-0.04em]"
-          style={{ fontSize: "var(--fs-h1)" }}
+          className="hug flex flex-col text-h1 leading-[0.9] font-semibold tracking-[-0.04em]"
         >
           <span className="rise rise-1">the delivery layer</span>
           <span className="rise rise-2 pl-[7vw]">
@@ -31,10 +30,7 @@ export function Hero() {
 
         <div className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-end @4xl:gap-12">
           <div className="flex flex-col gap-8 @4xl:gap-12">
-            <p
-              className="rise rise-3 max-w-[64ch] leading-[1.65]"
-              style={{ fontSize: "var(--fs-body)" }}
-            >
+            <p className="rise rise-3 max-w-[64ch] text-body leading-[1.65]">
               a 14-gigabyte file posted in berlin reaches a client in tokyo in
               under a second. the client streams from three peers at once,
               verifies every chunk with blake3, and pays per megabyte in usdc —
@@ -48,8 +44,7 @@ export function Hero() {
 
             <div className="rise rise-4 flex flex-col flex-wrap gap-x-8 gap-y-3 @md:flex-row @md:items-end">
               <a
-                className="underline-brutal font-semibold tracking-[0.14em] uppercase"
-                style={{ fontSize: "var(--fs-cta)" }}
+                className="underline-brutal text-cta font-semibold tracking-[0.14em] uppercase"
                 href={links.litepaper}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -60,8 +55,7 @@ export function Hero() {
                 </span>
               </a>
               <a
-                className="underline-brutal font-semibold tracking-[0.14em] uppercase"
-                style={{ fontSize: "var(--fs-cta)" }}
+                className="underline-brutal text-cta font-semibold tracking-[0.14em] uppercase"
                 href={links.docs}
               >
                 read the docs
@@ -70,8 +64,7 @@ export function Hero() {
                 </span>
               </a>
               <a
-                className="underline-brutal font-semibold tracking-[0.14em] uppercase"
-                style={{ fontSize: "var(--fs-cta)" }}
+                className="underline-brutal text-cta font-semibold tracking-[0.14em] uppercase"
                 href={links.github}
               >
                 source
