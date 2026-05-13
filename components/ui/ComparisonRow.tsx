@@ -12,11 +12,8 @@ export function ComparisonRow({
   return (
     <div
       data-reveal
-      style={{
-        "--reveal-delay": `${delay}ms`,
-        fontSize: "var(--fs-body)",
-      }}
-      className="grid gap-2 border-t border-current/20 py-4 @xl:grid-cols-12 @xl:gap-8 @xl:py-5"
+      style={{ "--reveal-delay": `${delay}ms` }}
+      className="grid gap-2 border-t border-current/20 py-4 text-body @xl:grid-cols-12 @xl:gap-8 @xl:py-5"
     >
       <div className="meta opacity-60 @xl:col-span-2">{label}</div>
       <div className="grid grid-cols-2 gap-4 @xl:contents">

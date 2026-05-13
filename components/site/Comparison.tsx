@@ -15,8 +15,7 @@ export function Comparison() {
         <h2
           data-reveal
           id="compare-h"
-          className="hug flex flex-col font-semibold leading-[0.92] tracking-[-0.04em]"
-          style={{ fontSize: "var(--fs-h2)" }}
+          className="hug flex flex-col text-h2 leading-[0.92] font-semibold tracking-[-0.04em]"
         >
           <span>information scaled.</span>
           <span className="pl-[3vw] opacity-60">supply didn&apos;t.</span>
@@ -24,11 +23,8 @@ export function Comparison() {
 
         <p
           data-reveal
-          style={{
-            "--reveal-delay": "120ms",
-            fontSize: "var(--fs-body)",
-          }}
-          className="max-w-[62ch] leading-[1.7] text-paper/75"
+          style={{ "--reveal-delay": "120ms" }}
+          className="max-w-[62ch] text-body leading-[1.7] text-paper/75"
         >
           the pattern repeats whenever something big ships: mirrors fork, cdns
           rate-limit, small teams burn tens of thousands hosting bytes they
@@ -62,13 +58,7 @@ export function Comparison() {
           <div className="meta opacity-60 @xl:col-span-2 @xl:pt-2">price</div>
           <div className="grid grid-cols-2 gap-4 @xl:contents">
             <div className="@xl:col-span-5">
-              <div
-                className="hug relative inline-flex font-semibold tracking-[-0.04em]"
-                style={{
-                  fontSize: "var(--fs-price)",
-                  lineHeight: "0.96",
-                }}
-              >
+              <div className="hug relative inline-flex text-price leading-[0.96] font-semibold tracking-[-0.04em]">
                 <span className="opacity-55">
                   $0.085–$0.17
                   <span className="meta ml-1 align-baseline opacity-70">
@@ -82,13 +72,7 @@ export function Comparison() {
               </div>
             </div>
             <div className="@xl:col-span-5">
-              <div
-                className="hug font-semibold tracking-[-0.04em]"
-                style={{
-                  fontSize: "var(--fs-price)",
-                  lineHeight: "0.96",
-                }}
-              >
+              <div className="hug text-price leading-[0.96] font-semibold tracking-[-0.04em]">
                 $0.01
                 <span className="meta ml-1 align-baseline opacity-70">/GB</span>
               </div>

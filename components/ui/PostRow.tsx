@@ -59,10 +59,7 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
 
         {/* title · summary · tags */}
         <div className="flex flex-col gap-3">
-          <h2
-            className="hug leading-[1.05] font-bold"
-            style={{ fontSize: "var(--fs-h3)" }}
-          >
+          <h2 className="hug text-h3 leading-[1.05] font-bold">
             {post.title}
             {/* terminal-prompt cursor — echoes the "field notes_" page
                 title; sits invisible (reserving its width so hover never
@@ -76,10 +73,7 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
               _
             </span>
           </h2>
-          <p
-            className="max-w-[62ch] leading-[1.6] opacity-75"
-            style={{ fontSize: "var(--fs-body)" }}
-          >
+          <p className="max-w-[62ch] text-body leading-[1.6] opacity-75">
             {post.summary}
           </p>
           {tags.length > 0 && (

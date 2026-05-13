@@ -142,8 +142,7 @@ export default async function BlogPost({
             </div>
             <h1
               id="post-h"
-              className="hug text-balance leading-[0.95] font-bold"
-              style={{ fontSize: "var(--fs-h2)" }}
+              className="hug text-h2 text-balance leading-[0.95] font-bold"
             >
               {post.title}
             </h1>
@@ -189,10 +188,7 @@ export default async function BlogPost({
                     </span>{" "}
                     earlier
                   </span>
-                  <span
-                    className="hug leading-[1.2] font-bold"
-                    style={{ fontSize: "var(--fs-lead)" }}
-                  >
+                  <span className="hug text-lead leading-[1.2] font-bold">
                     {older.title}
                   </span>
                 </Link>
@@ -213,10 +209,7 @@ export default async function BlogPost({
                       →
                     </span>
                   </span>
-                  <span
-                    className="hug leading-[1.2] font-bold"
-                    style={{ fontSize: "var(--fs-lead)" }}
-                  >
+                  <span className="hug text-lead leading-[1.2] font-bold">
                     {newer.title}
                   </span>
                 </Link>

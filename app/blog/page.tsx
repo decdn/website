@@ -61,8 +61,7 @@ export default function BlogIndex() {
         <header className="flex flex-col gap-6">
           <h1
             id="blog-h"
-            className="hug rise rise-0 leading-[0.92] font-bold"
-            style={{ fontSize: "var(--fs-h2)" }}
+            className="hug rise rise-0 text-h2 leading-[0.92] font-bold"
           >
             field notes
             <span aria-hidden className="text-whisper">
@@ -73,10 +72,7 @@ export default function BlogIndex() {
               dimmed lead sits inside a .rise wrapper rather than carrying
               the class itself. */}
           <div className="rise rise-1">
-            <p
-              className="max-w-[60ch] leading-[1.7] opacity-75"
-              style={{ fontSize: "var(--fs-lead)" }}
-            >
+            <p className="max-w-[60ch] text-lead leading-[1.7] opacity-75">
               long-form posts on the deCDN protocol — what it is, why now, and
               how the pieces fit together. published when something&apos;s worth
               saying.
@@ -87,12 +83,7 @@ export default function BlogIndex() {
         {posts.length === 0 ? (
           <>
             <span aria-hidden className="rule mt-16 opacity-20" />
-            <p
-              className="mt-16 opacity-60"
-              style={{ fontSize: "var(--fs-body)" }}
-            >
-              nothing yet.
-            </p>
+            <p className="mt-16 text-body opacity-60">nothing yet.</p>
           </>
         ) : (
           <div className="mt-16 flex flex-col">
