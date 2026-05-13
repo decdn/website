@@ -36,7 +36,8 @@
 
   /* Type scale: micro and CTA are fixed; body and headlines scale with viewport.
      Named under Tailwind v4's --text-* namespace so `text-body`, `text-h1`, …
-     utilities auto-generate (font-size only — no --line-height companion). */
+     utilities auto-generate. Each key is bare (no --text-*--line-height sibling),
+     so the utilities set font-size only — every call site brings its own leading-*. */
   --text-micro: 0.6875rem;
   --text-cta: 0.8125rem;
   --text-body: clamp(0.9375rem, 0.55vw + 0.78rem, 1.0625rem);

@@ -12,12 +12,13 @@ import { Pill } from "./Pill";
 export const BLOG_GRID_COLS =
   "@xl:grid-cols-[2.5rem_7.5rem_minmax(0,1fr)_6.5rem_1.5rem] @xl:gap-x-8";
 
-// Lowercase meta text — like `.meta` but without its forced uppercase
-// (`02 · 08 min` reads lowercase) and at a tighter tracking. `.meta` is
-// an unlayered rule we can't override per-call. Bakes in `tabular-nums`
-// so figures align down the column. Shared with the post page.
+// Lowercase meta text — same size as `.meta` (the shared `text-micro`
+// token) but without its forced uppercase (`02 · 08 min` reads lowercase)
+// and at a tighter tracking. `.meta` is an unlayered rule we can't
+// override per-call. Bakes in `tabular-nums` so figures align down the
+// column. Shared with the post page.
 export const META =
-  "text-[0.6875rem] leading-[1.3] font-medium tracking-[0.16em] tabular-nums";
+  "text-micro leading-[1.3] font-medium tracking-[0.16em] tabular-nums";
 
 export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
   const num = seriesLabel(post.seriesNumber);

@@ -9,7 +9,7 @@ import type { ReactNode } from "react";
  */
 export function Pill({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex items-center rounded border border-current/25 px-2 py-1 text-[0.6875rem] leading-none font-medium tracking-[0.06em] opacity-55">
+    <span className="inline-flex items-center rounded border border-current/25 px-2 py-1 text-micro leading-none font-medium tracking-[0.06em] opacity-55">
       {children}
     </span>
   );
