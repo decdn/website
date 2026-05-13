@@ -89,6 +89,7 @@ export default async function BlogPost({
     headline: post.title,
     description: post.summary,
     datePublished: post.date,
+    dateModified: post.date,
     url: postUrl,
     mainEntityOfPage: postUrl,
     image: `${SITE_URL}opengraph-image.png`,

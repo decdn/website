@@ -3,19 +3,21 @@ import { Frame } from "@/components/ui/Frame";
 import { BLOG_GRID_COLS, PostRow } from "@/components/ui/PostRow";
 import { listPosts } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
-import { SITE_URL } from "@/lib/links";
+import { ORG_ID, SITE_URL } from "@/lib/links";
+
+const BLOG_URL = `${SITE_URL}blog/`;
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
-  "@id": `${SITE_URL}blog/#breadcrumbs`,
+  "@id": `${BLOG_URL}#breadcrumbs`,
   itemListElement: [
     { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
     {
       "@type": "ListItem",
       position: 2,
       name: "Blog",
-      item: `${SITE_URL}blog/`,
+      item: BLOG_URL,
     },
   ],
 };
@@ -54,9 +56,37 @@ export async function generateMetadata(
 export default function BlogIndex() {
   const posts = listPosts();
 
+  // Blog graph node — `blogPost` entries use the same stable @id
+  // (`${postUrl}#post`) emitted by app/blog/[slug]/page.tsx so the
+  // graph resolves to one canonical BlogPosting per post.
+  const blogSchema = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "@id": `${BLOG_URL}#blog`,
+    url: BLOG_URL,
+    name: TITLE,
+    description: DESCRIPTION,
+    publisher: { "@id": ORG_ID },
+    blogPost: posts.map((p) => {
+      const postUrl = `${BLOG_URL}${p.slug}/`;
+      return {
+        "@type": "BlogPosting",
+        "@id": `${postUrl}#post`,
+        headline: p.title,
+        description: p.summary,
+        url: postUrl,
+        datePublished: p.date,
+        dateModified: p.date,
+        author: { "@id": ORG_ID },
+        publisher: { "@id": ORG_ID },
+      };
+    }),
+  };
+
   return (
     <main>
       <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={blogSchema} />
       <Frame id="blog" tone="paper">
         <header className="flex flex-col gap-6">
           <h1
