@@ -96,9 +96,6 @@ export default function BlogIndex() {
             className="hug rise rise-0 text-h2 leading-[0.92] font-bold"
           >
             field notes
-            <span aria-hidden className="text-whisper">
-              _
-            </span>
           </h1>
           {/* .rise forces opacity:1 at rest (fill: forwards), so the
               dimmed lead sits inside a .rise wrapper rather than carrying

@@ -62,11 +62,11 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
         <div className="flex flex-col gap-3">
           <h2 className="hug text-h3 leading-[1.05] font-bold">
             {post.title}
-            {/* terminal-prompt cursor — echoes the "field notes_" page
-                title; sits invisible (reserving its width so hover never
-                reflows the line) and fades in whisper-green on row hover.
-                The title itself doesn't change on hover — the cursor and
-                the sliding `→` carry the affordance. */}
+            {/* terminal-prompt cursor — sits invisible (reserving its
+                width so hover never reflows the line) and fades in
+                whisper-green on row hover. The title itself doesn't
+                change on hover — the cursor and the sliding `→` carry
+                the affordance. */}
             <span
               aria-hidden
               className="text-whisper opacity-0 transition-opacity duration-300 ease-out group-hover:opacity-100"
