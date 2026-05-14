@@ -127,7 +127,13 @@ export function Chrome() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [pathname]);
 
-  const onDark = DARK_SECTIONS.has(active);
+  // Off-home routes (e.g. /blog/, /blog/[slug]/) render none of the
+  // observed sections, so the IO effect's bail leaves `active` carrying
+  // its last home-page value. Treat it as "intro" off-home so a stale
+  // `DARK_SECTIONS` value can't paint `text-paper` over a paper-toned
+  // page (and so the mobile drawer doesn't show a stale active section).
+  const effectiveActive = pathname === "/" ? active : "intro";
+  const onDark = DARK_SECTIONS.has(effectiveActive);
   // The toggle is portalled to <body> (see MobileMenu.tsx) and lives
   // on top of the paper panel while the drawer is open — force it to
   // paper then so its × reads against the white panel.
@@ -175,7 +181,7 @@ export function Chrome() {
 
         <ul className="hidden items-center gap-7 xl:flex">
           {NAV.map((item) => {
-            const isActive = active === item.id;
+            const isActive = effectiveActive === item.id;
             return (
               <li key={item.id}>
                 <Link
@@ -216,7 +222,7 @@ export function Chrome() {
             <span aria-hidden>→</span>
           </a>
           <MobileMenu
-            activeSection={active}
+            activeSection={effectiveActive}
             tone={toggleTone}
             onOpenChange={handleMobileOpenChange}
           />
