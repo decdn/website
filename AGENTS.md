@@ -35,7 +35,7 @@ pnpm format:check     # prettier --check . (CI)
 
 ## Gotchas
 
-- **Static export only.** `next.config.ts` has `output: "export"`. No SSR, ISR, middleware, or Image Optimization API. Route handlers (`app/sitemap.xml/route.ts`, `app/sitemap-pages.xml/route.ts`) are allowed only when statically generated at build time (`dynamic = "force-static"`, GET-only); the `app/robots.ts` metadata file emits `robots.txt` under the same constraint.
+- **Static export only.** `next.config.ts` has `output: "export"`. No SSR, ISR, middleware, or Image Optimization API. Route handlers (`app/sitemap.xml/route.ts`, `app/sitemap-pages.xml/route.ts`) are allowed only when statically generated at build time (`dynamic = "force-static"`, GET-only); the `app/robots.ts` metadata file emits `robots.txt` and also requires `dynamic = "force-static"`.
 - **`trailingSlash: true`.** `next.config.ts` emits every route as `<path>/index.html` and canonical/internal links should expect a trailing slash. Cloudflare Pages serves `out/` as-is.
 - **Tailwind v4.** `globals.css` uses `@import "tailwindcss"` and `@theme inline { … }`. There is no `tailwind.config.*` — theme tokens live in CSS. Don't reach for v3 directives.
 - **Conventional commits required.** `commitlint` runs in the `commit-msg` husky hook; non-conforming messages are rejected.
