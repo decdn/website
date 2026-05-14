@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
+import { SITE_URL } from "./links";
 
 const POSTS_DIR = path.join(process.cwd(), "content", "blog");
 
@@ -35,6 +36,13 @@ export type PostMeta = {
   summary: string;
   bucket?: string;
   tags?: string[];
+  /** Optional per-post override for the OG/JSON-LD image. When set,
+   *  consumed as-is for `og:image`, `twitter:image`, and
+   *  `BlogPosting.image` — bypasses the generated
+   *  `app/blog/[slug]/opengraph-image.tsx` card. Site-relative paths
+   *  (leading `/`, e.g. `/blog-cards/foo.png`) are resolved against
+   *  `SITE_URL` at parse time. Validated by `parseImage`. */
+  image?: string;
   /** 1-based place in the series, oldest = 1. Assigned after the
    *  newest-first sort (see `readEntries`) so the index `#` column and
    *  the post page `§ NN` always agree. */
@@ -102,6 +110,65 @@ export const parseTags = (
   }
   const tags = [...new Set(value.map((t) => t.trim()))];
   return tags.length > 0 ? tags : undefined;
+};
+
+// Frontmatter `image`: optional override for the generated OG card.
+// Accepts a site-relative path (leading `/` followed by a non-`/` char,
+// e.g. `/blog-cards/foo.png`) — resolved against `SITE_URL` — or an
+// absolute http/https URL. Anything else (relative without `/`,
+// protocol-relative `//`, `data:`/`mailto:`/`ftp:` schemes, non-string)
+// throws with file context. Exported for tests.
+//
+// The non-`/` next-char constraint on the site-relative regex is what
+// rejects protocol-relative `//host/path` here rather than via a
+// separate guard.
+const ABSOLUTE_HTTP_URL_RE = /^https?:\/\//i;
+const SITE_RELATIVE_PATH_RE = /^\/[^/]/;
+
+export const parseImage = (
+  value: unknown,
+  filename: string,
+): string | undefined => {
+  if (value === undefined) return undefined;
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (SITE_RELATIVE_PATH_RE.test(trimmed)) {
+      // `new URL(rel, base)` handles the trailing-slash join correctly
+      // whether or not SITE_URL ends in `/`, so we don't depend on that
+      // invariant. The result is a fully resolved absolute URL.
+      return new URL(trimmed, SITE_URL).toString();
+    }
+    if (ABSOLUTE_HTTP_URL_RE.test(trimmed)) {
+      // The regex only screens for an http(s) scheme — `new URL` is the
+      // real validator. It throws on syntactically invalid inputs (e.g.
+      // `https://exa mple.com/foo`, `http://[::1`) and surfaces a parsed
+      // hostname we can check separately to catch host-less inputs like
+      // `http://` / `https://` that would otherwise parse-but-mean-
+      // nothing. Distinguish the two failure modes in the message so
+      // authors see the actual reason their URL was rejected.
+      let parsed: URL;
+      try {
+        parsed = new URL(trimmed);
+      } catch (err) {
+        throw new Error(
+          `[blog] ${filename}: frontmatter \`image\` "${trimmed}" is not a valid URL — ${(err as Error).message}`,
+          { cause: err },
+        );
+      }
+      if (parsed.hostname.length === 0) {
+        throw new Error(
+          `[blog] ${filename}: frontmatter \`image\` "${trimmed}" is missing a hostname`,
+        );
+      }
+      // Returned verbatim (not `parsed.toString()`) so authors keep
+      // control over the exact bytes that hit og:image / JSON-LD —
+      // case-sensitive paths, query-string order, etc.
+      return trimmed;
+    }
+  }
+  throw new Error(
+    `[blog] ${filename}: frontmatter \`image\` must be a site-relative path (leading \`/\`) or an absolute http(s) URL when present`,
+  );
 };
 
 // Everything `parseEntry` can produce on its own — `seriesNumber` depends
@@ -173,6 +240,7 @@ const parseEntry = (filename: string): RawPost | null => {
   }
   const bucket = typeof data.bucket === "string" ? data.bucket : undefined;
   const tags = parseTags(data.tags, filename);
+  const image = parseImage(data.image, filename);
   const words = countWords(content);
 
   return {
@@ -182,6 +250,7 @@ const parseEntry = (filename: string): RawPost | null => {
     summary,
     bucket,
     tags,
+    image,
     words,
     readMin: readingMinutes(words),
     body: content,
@@ -231,6 +300,7 @@ const toMeta = (e: PostSource): PostMeta => ({
   summary: e.summary,
   bucket: e.bucket,
   tags: e.tags,
+  image: e.image,
   seriesNumber: e.seriesNumber,
   words: e.words,
   readMin: e.readMin,
@@ -245,3 +315,32 @@ export function getPost(slug: string): PostSource | null {
   if (valid === null) return null;
   return readEntries().find((e) => e.slug === valid) ?? null;
 }
+
+// --- pure metadata builders (single-sourced so app/blog/[slug]/page.tsx
+// and app/blog/[slug]/opengraph-image.tsx share the same shape). Each
+// is a tiny function on plain data, deliberately decoupled from `next`,
+// React, and the route handlers so the contract is unit-testable here.
+
+/** OG / Twitter `images` array when the post has a frontmatter `image:`
+ *  override; `undefined` when absent so the file-convention card wins.
+ *  The override alt mirrors the post title because the override image
+ *  doesn't carry the title visually the way the generated card does. */
+export const buildOgImages = (
+  post: PostMeta,
+): { url: string; alt: string }[] | undefined =>
+  post.image ? [{ url: post.image, alt: post.title }] : undefined;
+
+/** BlogPosting JSON-LD `image` URL. Frontmatter override wins, otherwise
+ *  the extensionless file-convention card URL — extensionless because
+ *  that's how Next writes the route to `out/blog/<slug>/opengraph-image`
+ *  (no `.png`). The og:image meta gets a cache-busting `?<hash>` from
+ *  Next that JSON-LD doesn't have; Cloudflare ignores the query on
+ *  static assets so both resolve to the same file. */
+export const postImageUrl = (post: PostMeta, postUrl: string): string =>
+  post.image ?? `${postUrl}opengraph-image`;
+
+/** Slugs that should get a generated OG card — i.e., posts WITHOUT a
+ *  frontmatter `image:` override. Filtering here means the static export
+ *  doesn't emit a card PNG that no <meta> tag references. */
+export const ogCardSlugs = (posts: PostMeta[]): { slug: Slug }[] =>
+  posts.filter((p) => !p.image).map((p) => ({ slug: p.slug }));

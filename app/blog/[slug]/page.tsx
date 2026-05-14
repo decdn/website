@@ -1,4 +1,4 @@
-import type { Metadata, ResolvingMetadata } from "next";
+import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
@@ -8,9 +8,11 @@ import { Pill } from "@/components/ui/Pill";
 import { META } from "@/components/ui/PostRow";
 import { Prose } from "@/components/ui/Prose";
 import {
+  buildOgImages,
   dottedDate,
   getPost,
   listPosts,
+  postImageUrl,
   readLabel,
   seriesLabel,
 } from "@/lib/blog";
@@ -29,17 +31,21 @@ export function generateStaticParams() {
 
 type Params = { slug: string };
 
-export async function generateMetadata(
-  { params }: { params: Promise<Params> },
-  parent: ResolvingMetadata,
-): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
   const { slug } = await params;
   const post = getPost(slug);
   if (!post) notFound();
-  // Inherit the root file-convention og image so post shares get the
-  // site card instead of a blank one; see app/blog/page.tsx for the
-  // pattern and the reason we reuse ogImages for twitter.
-  const ogImages = (await parent).openGraph?.images ?? [];
+  // OG/Twitter images come from the sibling `opengraph-image.tsx` file
+  // convention by default — Next's static-metadata merge step (see
+  // resolve-metadata.js in next/dist) populates both `og:image` and
+  // `twitter:image` with the same cache-busted URL automatically.
+  // Frontmatter `image:` overrides both when present; the override shape
+  // and the alt-as-title decision live in `buildOgImages` (lib/blog.ts).
+  const ogImages = buildOgImages(post);
   return {
     title: post.title,
     description: post.summary,
@@ -51,13 +57,13 @@ export async function generateMetadata(
       type: "article",
       publishedTime: post.date,
       tags: post.tags,
-      images: ogImages,
+      ...(ogImages && { images: ogImages }),
     },
     twitter: {
       card: "summary_large_image",
       title: post.title,
       description: post.summary,
-      images: ogImages,
+      ...(ogImages && { images: ogImages }),
     },
   };
 }
@@ -92,7 +98,11 @@ export default async function BlogPost({
     dateModified: post.date,
     url: postUrl,
     mainEntityOfPage: postUrl,
-    image: `${SITE_URL}opengraph-image.png`,
+    // Override-vs-fallback selection lives in `postImageUrl`; see the
+    // JSDoc there for the cache-buster mismatch between this URL and
+    // the og:image meta (same file underneath; Cloudflare ignores the
+    // query string on static assets).
+    image: postImageUrl(post, postUrl),
     keywords: post.tags?.join(", "),
     wordCount: post.words,
     author: { "@id": ORG_ID },

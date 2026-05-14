@@ -5,3 +5,17 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
   X-Frame-Options: DENY
+
+# Next emits the per-post OG image as an extensionless file
+# (out/blog/<slug>/opengraph-image, no .png). Cloudflare assigns
+# Content-Type by extension, and the global `X-Content-Type-Options:
+# nosniff` above would otherwise have social scrapers reject it as
+# application/octet-stream. Pin the type explicitly here.
+#
+# Forward-compat: this rule is tied to Next's *extensionless* emission.
+# If a future Next release writes `opengraph-image.png` instead, this
+# stanza becomes dead config (the extension would carry the type) — the
+# only visible signal would be the rule going unmatched in the Cloudflare
+# Pages headers preview. Revisit on a Next major bump.
+/blog/*/opengraph-image
+  Content-Type: image/png

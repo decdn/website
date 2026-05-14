@@ -1,0 +1,132 @@
+import { ImageResponse } from "next/og";
+import {
+  dottedDate,
+  getPost,
+  listPosts,
+  ogCardSlugs,
+  seriesLabel,
+} from "@/lib/blog";
+
+// Static export: under `output: "export"` Next refuses to collect a
+// metadata Route Handler without this flag — same rule as
+// app/sitemap.xml/route.ts, app/sitemap-pages.xml/route.ts, app/robots.ts
+// (see AGENTS.md "Static export only").
+export const dynamic = "force-static";
+
+// The metadata route does NOT inherit generateStaticParams from the
+// sibling page.tsx — each file convention enumerates its own params.
+// Driving both off listPosts() keeps them single-sourced. The
+// `ogCardSlugs` filter (see lib/blog.ts) drops posts that override the
+// OG image via frontmatter — without it the static export would ship a
+// card PNG that no <meta> tag references, wasting build cycles and
+// leaving an unreachable artifact in `out/`.
+export function generateStaticParams() {
+  return ogCardSlugs(listPosts());
+}
+
+export const size = { width: 1200, height: 630 };
+export const contentType = "image/png";
+// Static alt by design. A per-post alt would force `generateImageMetadata`,
+// which inserts an `id` segment into the emitted URL — the card itself
+// carries the title visually, so a brand-level alt is acceptable.
+export const alt = "deCDN — field notes";
+
+// Inlined palette — Satori can't see app/globals.css CSS-var tokens.
+// Keep in sync with --ink / --paper / --whisper in app/globals.css.
+const INK = "#000000";
+const PAPER = "#ffffff";
+const WHISPER = "#0f9d6a";
+
+type Params = { slug: string };
+
+export default async function Image({ params }: { params: Promise<Params> }) {
+  const { slug } = await params;
+  const post = getPost(slug);
+  if (!post) {
+    // Closed-world under `output: "export"`: the only way we get here is
+    // if generateStaticParams() and getPost() disagree (e.g. listPosts
+    // returned a slug parseSlug now rejects). Surface it as a loud build
+    // error rather than `notFound()`, which has no runtime under static
+    // export and would silently emit a missing/empty PNG.
+    throw new Error(
+      `[blog/opengraph-image] no post for slug "${slug}" — generateStaticParams() and getPost() are out of sync`,
+    );
+  }
+
+  // Auto-shrink long titles so two-line layouts stay inside the safe
+  // area. The cutoff (~44 chars) is the longest title that still fits
+  // on one line at 76px in Geist Regular at this canvas width.
+  const titleSize = post.title.length > 44 ? 60 : 76;
+
+  return new ImageResponse(
+    <div
+      style={{
+        width: "100%",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        padding: 80,
+        backgroundColor: INK,
+        color: PAPER,
+      }}
+    >
+      {/* Eyebrow — echoes the site `.meta` treatment (uppercase, wide
+            tracking, dimmed). */}
+      <div
+        style={{
+          fontSize: 22,
+          letterSpacing: "0.22em",
+          color: "rgba(255, 255, 255, 0.6)",
+        }}
+      >
+        DECDN · FIELD NOTES
+      </div>
+
+      {/* Title — echoes the site `.hug` treatment (tight negative
+            tracking on large display sizes). The `maxHeight` /
+            `overflow` combo is a defensive cap so a pathologically long
+            title can't push the bottom row off the 630px canvas:
+            630 − 160 (top/bottom padding) − ~52 (eyebrow + bottom row at
+            22px) ≈ 418px available, rounded down to a safe 400. The
+            44-char auto-shrink heuristic above keeps current titles
+            well inside this bound. */}
+      <div
+        style={{
+          fontSize: titleSize,
+          letterSpacing: "-0.03em",
+          lineHeight: 1.05,
+          maxHeight: 400,
+          overflow: "hidden",
+        }}
+      >
+        {post.title}
+      </div>
+
+      {/* Bottom row — date · series · whisper dot. `space-between`
+            pins the dot to the right edge without absolute positioning. */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          fontSize: 22,
+          letterSpacing: "0.22em",
+          color: "rgba(255, 255, 255, 0.6)",
+        }}
+      >
+        <span>{dottedDate(post.date)}</span>
+        <span>§ {seriesLabel(post.seriesNumber)}</span>
+        <span
+          style={{
+            width: 12,
+            height: 12,
+            borderRadius: 6,
+            backgroundColor: WHISPER,
+          }}
+        />
+      </div>
+    </div>,
+    { ...size },
+  );
+}
