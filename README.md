@@ -40,11 +40,11 @@ pnpm format    # prettier --write .
 
 ## Gotchas
 
-- **Static export only.** `next.config.ts` sets `output: "export"`; the build emits `./out`. No SSR, ISR, middleware, or Image Optimization API. Route handlers must be `dynamic = "force-static"` and GET-only — that's how `app/sitemap.xml/route.ts`, `app/sitemap-pages.xml/route.ts`, and `app/robots.ts` emit files into `out/`.
+- **Static export only.** `next.config.ts` sets `output: "export"`; the build emits `./out`. No SSR, ISR, middleware, or Image Optimization API. Route handlers (`app/sitemap.xml/route.ts`, `app/sitemap-pages.xml/route.ts`) must be `dynamic = "force-static"` and GET-only; the `app/robots.ts` metadata file emits `robots.txt` under the same constraint.
 - **`trailingSlash: true`.** Every route emits `<path>/index.html`. Internal links and hand-built URLs (sitemap entries, JSON-LD `@id`s) should expect a trailing slash — see `SITE_URL` and `BLOG_URL` in `lib/links.ts`.
 - **Tailwind v4.** Theme tokens live in `app/globals.css` under `@theme inline { … }` — there is no `tailwind.config.*`.
 - **Conventional commits enforced.** `commitlint` runs in the `commit-msg` husky hook; non-conforming messages are rejected.
-- **`metadataBase` is live.** `lib/links.ts` `site` is the real origin and `INDEXABLE` is `true`. Anything that absolutizes through `metadataBase` (OG, JSON-LD, canonical) ships to production — keep payloads accurate. Flipping `INDEXABLE` flips `<meta name="robots">` only; `robots.txt` and the sitemap stay unconditional by design (rationale in `lib/links.ts`).
+- **`metadataBase` is live.** `lib/links.ts` `site` is the real origin and `INDEXABLE` is `true`. Anything anchored on this origin — OG and canonical (via `metadataBase`); JSON-LD and the sitemap/robots emitters (via `SITE_URL`) — ships to production. Flipping `INDEXABLE` flips `<meta name="robots">` only; `robots.txt` and the sitemap stay unconditional by design (rationale in `lib/links.ts`).
 
 ## Deploy
 
