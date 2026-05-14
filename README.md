@@ -11,7 +11,7 @@ A peer-to-peer delivery layer for bytes at scale. Anyone can serve bytes; client
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-FE5196?logo=conventionalcommits&logoColor=white)](https://www.conventionalcommits.org)
 ![Code style: Prettier](https://img.shields.io/badge/code%20style-Prettier-F7B93E?logo=prettier&logoColor=black)
 
-This is the source for the static one-page deCDN marketing site.
+This is the source for the deCDN marketing site and blog.
 
 ## Stack
 
@@ -23,6 +23,7 @@ Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · TypeScript · pnpm. St
 pnpm install   # required (not npm/yarn) — husky hooks shell out to `pnpm exec`
 pnpm dev       # dev server on :3000
 pnpm build     # static export → ./out
+pnpm test      # vitest run
 pnpm lint      # eslint (flat config)
 pnpm format    # prettier --write .
 ```
@@ -33,15 +34,17 @@ pnpm format    # prettier --write .
 - `components/site/` — page sections composed by `app/page.tsx` (Hero, Comparison, Method, Faq, Close).
 - `components/ui/` — low-level primitives (Frame, SectionHeader, Figure, …).
 - `lib/` — shared helpers (`links.ts`, `blog.ts`, `faq.ts`, `jsonld.tsx`).
-- `content/blog/` — MDX posts.
+- `content/blog/` — MDX posts loaded by `lib/blog.ts` and rendered by `app/blog/[slug]/page.tsx`.
+- `docs/` — Mintlify source for `docs.decdn.org`. Built and deployed independently of `pnpm build`; not part of the static export and not imported from the website code.
 - Path alias: `@/*` maps to the project root (e.g. `@/lib/links`, not `@/src/...`).
 
 ## Gotchas
 
-- **Static export only.** `next.config.ts` sets `output: "export"`; the build emits `./out`. No SSR, ISR, middleware, or Image Optimization API. Route handlers must be `dynamic = "force-static"` and GET-only (used for `sitemap.xml`, `sitemap-pages.xml`, `robots`).
+- **Static export only.** `next.config.ts` sets `output: "export"`; the build emits `./out`. No SSR, ISR, middleware, or Image Optimization API. Route handlers must be `dynamic = "force-static"` and GET-only — that's how `app/sitemap.xml/route.ts`, `app/sitemap-pages.xml/route.ts`, and `app/robots.ts` emit files into `out/`.
+- **`trailingSlash: true`.** Every route emits `<path>/index.html`. Internal links and hand-built URLs (sitemap entries, JSON-LD `@id`s) should expect a trailing slash — see `SITE_URL` and `BLOG_URL` in `lib/links.ts`.
 - **Tailwind v4.** Theme tokens live in `app/globals.css` under `@theme inline { … }` — there is no `tailwind.config.*`.
 - **Conventional commits enforced.** `commitlint` runs in the `commit-msg` husky hook; non-conforming messages are rejected.
-- **`metadataBase` is live.** `lib/links.ts` `site` is the real origin and `robots: { index: true }`. Anything that absolutizes through `metadataBase` (OG, JSON-LD, canonical) ships to production — keep payloads accurate.
+- **`metadataBase` is live.** `lib/links.ts` `site` is the real origin and `INDEXABLE` is `true`. Anything that absolutizes through `metadataBase` (OG, JSON-LD, canonical) ships to production — keep payloads accurate. Flipping `INDEXABLE` flips `<meta name="robots">` only; `robots.txt` and the sitemap stay unconditional by design (rationale in `lib/links.ts`).
 
 ## Deploy
 
