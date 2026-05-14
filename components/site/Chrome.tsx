@@ -127,14 +127,11 @@ export function Chrome() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [pathname]);
 
-  // `active` is only meaningful when (a) we're on the home page, where
-  // the IO actually observes sections, and (b) the page has scrolled
-  // past the threshold, so the IO has had a chance to fire on the new
-  // route. Off-home or at-top, fall back to "intro" — otherwise a stale
-  // `DARK_SECTIONS` value can paint `text-paper` over a paper-toned
-  // page (e.g. on /blog/, or for one frame after navigating back to /
-  // before the IO fires). The mobile drawer's active highlight reads
-  // from the same value, so it stays in sync.
+  // Guard against a stale `active` landing in `DARK_SECTIONS` and painting
+  // `text-paper` over a paper-toned page: off-home the IO observes nothing,
+  // and on the first render after a client nav `active` still holds the
+  // previous route's last value until the [pathname] effects re-sync.
+  // `scrolled` doubles as a proxy for "past the intro hero".
   const effectiveActive = pathname === "/" && scrolled ? active : "intro";
   const onDark = DARK_SECTIONS.has(effectiveActive);
   // The toggle is portalled to <body> (see MobileMenu.tsx) and lives
