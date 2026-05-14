@@ -1,6 +1,11 @@
 import { ImageResponse } from "next/og";
-import { notFound } from "next/navigation";
-import { dottedDate, getPost, listPosts, seriesLabel } from "@/lib/blog";
+import {
+  dottedDate,
+  getPost,
+  listPosts,
+  ogCardSlugs,
+  seriesLabel,
+} from "@/lib/blog";
 
 // Static export: under `output: "export"` Next refuses to collect a
 // metadata Route Handler without this flag — same rule as
@@ -10,14 +15,13 @@ export const dynamic = "force-static";
 
 // The metadata route does NOT inherit generateStaticParams from the
 // sibling page.tsx — each file convention enumerates its own params.
-// Driving both off listPosts() keeps them single-sourced. Posts with a
-// frontmatter `image:` override are filtered out: their <meta> tags
-// point at the override URL, so the generated card would ship as an
-// unreferenced PNG in the static export.
+// Driving both off listPosts() keeps them single-sourced. The
+// `ogCardSlugs` filter (see lib/blog.ts) drops posts that override the
+// OG image via frontmatter — without it the static export would ship a
+// card PNG that no <meta> tag references, wasting build cycles and
+// leaving an unreachable artifact in `out/`.
 export function generateStaticParams() {
-  return listPosts()
-    .filter((p) => !p.image)
-    .map((p) => ({ slug: p.slug }));
+  return ogCardSlugs(listPosts());
 }
 
 export const size = { width: 1200, height: 630 };
@@ -28,7 +32,7 @@ export const contentType = "image/png";
 export const alt = "deCDN — field notes";
 
 // Inlined palette — Satori can't see app/globals.css CSS-var tokens.
-// Keep in sync with --ink / --paper / --whisper there (lines 3–6).
+// Keep in sync with --ink / --paper / --whisper in app/globals.css.
 const INK = "#000000";
 const PAPER = "#ffffff";
 const WHISPER = "#0f9d6a";
@@ -38,7 +42,16 @@ type Params = { slug: string };
 export default async function Image({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   const post = getPost(slug);
-  if (!post) notFound();
+  if (!post) {
+    // Closed-world under `output: "export"`: the only way we get here is
+    // if generateStaticParams() and getPost() disagree (e.g. listPosts
+    // returned a slug parseSlug now rejects). Surface it as a loud build
+    // error rather than `notFound()`, which has no runtime under static
+    // export and would silently emit a missing/empty PNG.
+    throw new Error(
+      `[blog/opengraph-image] no post for slug "${slug}" — generateStaticParams() and getPost() are out of sync`,
+    );
+  }
 
   // Auto-shrink long titles so two-line layouts stay inside the safe
   // area. The cutoff (~44 chars) is the longest title that still fits

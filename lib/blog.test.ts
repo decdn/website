@@ -1,15 +1,20 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildOgImages,
   countWords,
   dottedDate,
   getPost,
   listPosts,
+  ogCardSlugs,
   parseImage,
   parseSlug,
   parseTags,
+  postImageUrl,
   readingMinutes,
   readLabel,
   seriesLabel,
+  type PostMeta,
+  type Slug,
 } from "./blog";
 import { SITE_URL } from "./links";
 
@@ -143,8 +148,44 @@ describe("parseImage", () => {
       "  https://example.test/foo.png  ",
       "https://example.test/foo.png",
     ],
+    // Pins the "verbatim, not canonicalized" contract: the validator
+    // accepts but does NOT lowercase the host / re-encode the path.
+    // A future refactor switching to `parsed.toString()` would fail
+    // this case, making the behaviour change explicit rather than silent.
+    [
+      "mixed-case scheme and host preserved",
+      "HTTPS://Example.Test/Foo.png",
+      "HTTPS://Example.Test/Foo.png",
+    ],
+    [
+      "query string + fragment + port preserved",
+      "https://example.test:8443/foo.png?v=2#frag",
+      "https://example.test:8443/foo.png?v=2#frag",
+    ],
   ])("accepts %s", (_label, input, expected) => {
     expect(parseImage(input, "x.mdx")).toBe(expected);
+  });
+
+  // Pins the invariant that every accepted output is itself a parseable
+  // absolute URL — catches a regression in the site-relative branch where
+  // `SITE_URL`'s trailing slash + the input's leading slash double up
+  // into `https://decdn.org//foo.png`, or worse, `https://decdn.orgfoo`.
+  it("returns a parseable absolute URL for every accepted shape", () => {
+    const inputs = [
+      "/blog-cards/foo.png",
+      "/a/b/c.png",
+      "https://example.test/foo.png",
+      "http://example.test/foo.png",
+    ];
+    for (const input of inputs) {
+      const out = parseImage(input, "x.mdx");
+      expect(out).toBeDefined();
+      const parsed = new URL(out!);
+      expect(parsed.hostname.length).toBeGreaterThan(0);
+      // No accidental `//` in the pathname (the double-slash regression
+      // the trailing-slash invariant used to risk).
+      expect(parsed.pathname.startsWith("//")).toBe(false);
+    }
   });
 
   it.each<[string, unknown]>([
@@ -160,11 +201,129 @@ describe("parseImage", () => {
     ["a single slash", "/"],
     ["a host-less http URL", "http://"],
     ["a host-less https URL", "https://"],
+    [
+      "a malformed absolute URL (space in authority)",
+      "https://exa mple.test/x",
+    ],
     ["a data URL", "data:image/png;base64,AAA"],
     ["an ftp URL", "ftp://example.test/foo.png"],
     ["a mailto URL", "mailto:x@y.z"],
   ])("throws (with file context) on %s", (_label, input) => {
     expect(() => parseImage(input, "bad.mdx")).toThrow(/bad\.mdx.*image/s);
+  });
+
+  // Per Important #1 from the PR-review pass: the URL parser's reason
+  // for rejection has to surface, not get swallowed into the generic
+  // "must be a site-relative path…" message. Lock the specific phrasing
+  // so a future refactor can't quietly regress to a generic error.
+  it.each([
+    ["host-less http", "http://"],
+    ["host-less https", "https://"],
+    ["space in authority", "https://exa mple.test/x"],
+  ])(
+    "surfaces the URL parser's reason for malformed absolute URLs (%s)",
+    (_label, input) => {
+      expect(() => parseImage(input, "bad.mdx")).toThrow(/is not a valid URL/);
+    },
+  );
+});
+
+describe("buildOgImages", () => {
+  // Minimal PostMeta shape — `as Slug` / `as IsoDate` casts are safe
+  // because we're not exercising the brand here, just the metadata
+  // builder's read of `image` and `title`.
+  const base: PostMeta = {
+    slug: "p" as Slug,
+    title: "Why Now",
+    date: "2026-05-04" as PostMeta["date"],
+    summary: "x",
+    seriesNumber: 1,
+    words: 100,
+    readMin: 1,
+  };
+
+  it("returns undefined when the post has no image override", () => {
+    expect(buildOgImages(base)).toBeUndefined();
+  });
+
+  it("returns a single image with title-as-alt when image is set", () => {
+    const out = buildOgImages({
+      ...base,
+      image: "https://decdn.org/blog-cards/why-now.png",
+    });
+    expect(out).toEqual([
+      {
+        url: "https://decdn.org/blog-cards/why-now.png",
+        alt: "Why Now",
+      },
+    ]);
+  });
+});
+
+describe("postImageUrl", () => {
+  const base: PostMeta = {
+    slug: "p" as Slug,
+    title: "Why Now",
+    date: "2026-05-04" as PostMeta["date"],
+    summary: "x",
+    seriesNumber: 1,
+    words: 100,
+    readMin: 1,
+  };
+
+  it("falls back to the extensionless file-convention URL when no override", () => {
+    expect(postImageUrl(base, "https://decdn.org/blog/why-now/")).toBe(
+      "https://decdn.org/blog/why-now/opengraph-image",
+    );
+  });
+
+  it("returns the override URL verbatim when image is set", () => {
+    expect(
+      postImageUrl(
+        { ...base, image: "https://cdn.example/x.png" },
+        "https://decdn.org/blog/why-now/",
+      ),
+    ).toBe("https://cdn.example/x.png");
+  });
+});
+
+describe("ogCardSlugs", () => {
+  const post = (slug: string, image?: string): PostMeta => ({
+    slug: slug as Slug,
+    title: slug,
+    date: "2026-05-04" as PostMeta["date"],
+    summary: "x",
+    seriesNumber: 1,
+    words: 100,
+    readMin: 1,
+    image,
+  });
+
+  it("returns all slugs when no post overrides", () => {
+    expect(ogCardSlugs([post("a"), post("b"), post("c")])).toEqual([
+      { slug: "a" },
+      { slug: "b" },
+      { slug: "c" },
+    ]);
+  });
+
+  it("filters out posts whose frontmatter sets image:", () => {
+    expect(
+      ogCardSlugs([
+        post("a"),
+        post("b", "https://cdn.example/b.png"),
+        post("c"),
+      ]),
+    ).toEqual([{ slug: "a" }, { slug: "c" }]);
+  });
+
+  it("returns an empty array when every post overrides", () => {
+    expect(
+      ogCardSlugs([
+        post("a", "https://cdn.example/a.png"),
+        post("b", "https://cdn.example/b.png"),
+      ]),
+    ).toEqual([]);
   });
 });
 
@@ -189,6 +348,21 @@ describe("listPosts metadata", () => {
         expect(t).toBe(t.trim());
         expect(t).not.toBe("");
       }
+    }
+  });
+
+  // Mirror the tags loop for `image`. No fixture currently uses the
+  // override, so today this is a no-op — but the first time an author
+  // adds `image:` to a real post, this guards the invariant that the
+  // emitted value is always an absolute, parseable URL with a hostname.
+  it("exposes image as an absolute parseable URL with a hostname when present", () => {
+    for (const p of posts) {
+      if (p.image === undefined) continue;
+      expect(typeof p.image).toBe("string");
+      expect(p.image).toBe(p.image.trim());
+      expect(p.image.length).toBeGreaterThan(0);
+      const parsed = new URL(p.image);
+      expect(parsed.hostname.length).toBeGreaterThan(0);
     }
   });
 

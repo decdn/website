@@ -8,9 +8,11 @@ import { Pill } from "@/components/ui/Pill";
 import { META } from "@/components/ui/PostRow";
 import { Prose } from "@/components/ui/Prose";
 import {
+  buildOgImages,
   dottedDate,
   getPost,
   listPosts,
+  postImageUrl,
   readLabel,
   seriesLabel,
 } from "@/lib/blog";
@@ -38,14 +40,12 @@ export async function generateMetadata({
   const post = getPost(slug);
   if (!post) notFound();
   // OG/Twitter images come from the sibling `opengraph-image.tsx` file
-  // convention by default — one per-post generated card, with the
-  // og→twitter fallback populating `twitter:image` automatically.
-  // Frontmatter `image:` (validated in lib/blog.ts) overrides both when
-  // present; the alt mirrors the post title because the override image
-  // doesn't carry the title visually the way the generated card does.
-  const ogImages = post.image
-    ? [{ url: post.image, alt: post.title }]
-    : undefined;
+  // convention by default — Next's static-metadata merge step (see
+  // resolve-metadata.js in next/dist) populates both `og:image` and
+  // `twitter:image` with the same cache-busted URL automatically.
+  // Frontmatter `image:` overrides both when present; the override shape
+  // and the alt-as-title decision live in `buildOgImages` (lib/blog.ts).
+  const ogImages = buildOgImages(post);
   return {
     title: post.title,
     description: post.summary,
@@ -97,10 +97,11 @@ export default async function BlogPost({
     datePublished: post.date,
     url: postUrl,
     mainEntityOfPage: postUrl,
-    // Frontmatter `image:` wins when set; otherwise point at the
-    // file-convention OG card. Extensionless to match the URL Next emits
-    // (`out/blog/<slug>/opengraph-image`, no `.png`).
-    image: post.image ?? `${postUrl}opengraph-image`,
+    // Override-vs-fallback selection lives in `postImageUrl`; see the
+    // JSDoc there for the cache-buster mismatch between this URL and
+    // the og:image meta (same file underneath; Cloudflare ignores the
+    // query string on static assets).
+    image: postImageUrl(post, postUrl),
     keywords: post.tags?.join(", "),
     wordCount: post.words,
     author: { "@id": ORG_ID },

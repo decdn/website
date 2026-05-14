@@ -113,11 +113,15 @@ export const parseTags = (
 };
 
 // Frontmatter `image`: optional override for the generated OG card.
-// Accepts a site-relative path (leading `/` plus at least one char, e.g.
-// `/blog-cards/foo.png`) — resolved against `SITE_URL` — or an absolute
-// http/https URL. Anything else (relative without `/`, protocol-relative
-// `//`, `data:`/`mailto:`/`ftp:` schemes, non-string) throws with file
-// context. Exported for tests.
+// Accepts a site-relative path (leading `/` followed by a non-`/` char,
+// e.g. `/blog-cards/foo.png`) — resolved against `SITE_URL` — or an
+// absolute http/https URL. Anything else (relative without `/`,
+// protocol-relative `//`, `data:`/`mailto:`/`ftp:` schemes, non-string)
+// throws with file context. Exported for tests.
+//
+// The non-`/` next-char constraint on the site-relative regex is what
+// rejects protocol-relative `//host/path` here rather than via a
+// separate guard.
 const ABSOLUTE_HTTP_URL_RE = /^https?:\/\//i;
 const SITE_RELATIVE_PATH_RE = /^\/[^/]/;
 
@@ -129,23 +133,37 @@ export const parseImage = (
   if (typeof value === "string") {
     const trimmed = value.trim();
     if (SITE_RELATIVE_PATH_RE.test(trimmed)) {
-      // SITE_URL already ends in `/`, so strip the leading slash from
-      // the path before concatenating to avoid `//`.
-      return `${SITE_URL}${trimmed.slice(1)}`;
+      // `new URL(rel, base)` handles the trailing-slash join correctly
+      // whether or not SITE_URL ends in `/`, so we don't depend on that
+      // invariant. The result is a fully resolved absolute URL.
+      return new URL(trimmed, SITE_URL).toString();
     }
     if (ABSOLUTE_HTTP_URL_RE.test(trimmed)) {
-      // The regex gates "looks like an http(s) URL"; `new URL` then
-      // confirms the string actually parses AND the authority is
-      // non-empty. Catches host-less inputs (`http://`, `https://`)
-      // that the regex alone would let through and ship as broken
-      // og:image / JSON-LD values.
+      // The regex only screens for an http(s) scheme — `new URL` is the
+      // real validator. It throws on syntactically invalid inputs (e.g.
+      // `https://exa mple.com/foo`, `http://[::1`) and surfaces a parsed
+      // hostname we can check separately to catch host-less inputs like
+      // `http://` / `https://` that would otherwise parse-but-mean-
+      // nothing. Distinguish the two failure modes in the message so
+      // authors see the actual reason their URL was rejected.
+      let parsed: URL;
       try {
-        if (new URL(trimmed).hostname.length > 0) {
-          return trimmed;
-        }
-      } catch {
-        // Falls through to the shared throw below.
+        parsed = new URL(trimmed);
+      } catch (err) {
+        throw new Error(
+          `[blog] ${filename}: frontmatter \`image\` "${trimmed}" is not a valid URL — ${(err as Error).message}`,
+          { cause: err },
+        );
       }
+      if (parsed.hostname.length === 0) {
+        throw new Error(
+          `[blog] ${filename}: frontmatter \`image\` "${trimmed}" is missing a hostname`,
+        );
+      }
+      // Returned verbatim (not `parsed.toString()`) so authors keep
+      // control over the exact bytes that hit og:image / JSON-LD —
+      // case-sensitive paths, query-string order, etc.
+      return trimmed;
     }
   }
   throw new Error(
@@ -297,3 +315,32 @@ export function getPost(slug: string): PostSource | null {
   if (valid === null) return null;
   return readEntries().find((e) => e.slug === valid) ?? null;
 }
+
+// --- pure metadata builders (single-sourced so app/blog/[slug]/page.tsx
+// and app/blog/[slug]/opengraph-image.tsx share the same shape). Each
+// is a tiny function on plain data, deliberately decoupled from `next`,
+// React, and the route handlers so the contract is unit-testable here.
+
+/** OG / Twitter `images` array when the post has a frontmatter `image:`
+ *  override; `undefined` when absent so the file-convention card wins.
+ *  The override alt mirrors the post title because the override image
+ *  doesn't carry the title visually the way the generated card does. */
+export const buildOgImages = (
+  post: PostMeta,
+): { url: string; alt: string }[] | undefined =>
+  post.image ? [{ url: post.image, alt: post.title }] : undefined;
+
+/** BlogPosting JSON-LD `image` URL. Frontmatter override wins, otherwise
+ *  the extensionless file-convention card URL — extensionless because
+ *  that's how Next writes the route to `out/blog/<slug>/opengraph-image`
+ *  (no `.png`). The og:image meta gets a cache-busting `?<hash>` from
+ *  Next that JSON-LD doesn't have; Cloudflare ignores the query on
+ *  static assets so both resolve to the same file. */
+export const postImageUrl = (post: PostMeta, postUrl: string): string =>
+  post.image ?? `${postUrl}opengraph-image`;
+
+/** Slugs that should get a generated OG card — i.e., posts WITHOUT a
+ *  frontmatter `image:` override. Filtering here means the static export
+ *  doesn't emit a card PNG that no <meta> tag references. */
+export const ogCardSlugs = (posts: PostMeta[]): { slug: Slug }[] =>
+  posts.filter((p) => !p.image).map((p) => ({ slug: p.slug }));
