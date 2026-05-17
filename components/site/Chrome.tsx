@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { links } from "@/lib/links";
+import { homeHashSectionId } from "@/lib/scroll";
 import { MobileMenu } from "@/components/site/MobileMenu";
 
 const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
@@ -40,6 +41,46 @@ export function Chrome() {
 
   const handleMobileOpenChange = useCallback(
     (open: boolean) => setMobileOpen(open),
+    [],
+  );
+
+  // Plain `<Link href="/#section">` appends rather than replaces the hash
+  // when the URL already carries it (Next 16 App Router, output: "export"
+  // + trailingSlash), growing `/#method#method…` across click → reload →
+  // click cycles. Intercept same-page anchors and resolve locally. Off
+  // this route the section isn't in the DOM (e.g. /blog/*); force a full
+  // reload so the destination resolves the hash deterministically — the
+  // soft-nav hash codepath is the unreliable one. Modified clicks (new
+  // tab, middle-click) fall through to the native <Link>.
+  const handleNavClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (
+        e.defaultPrevented ||
+        e.button !== 0 ||
+        e.metaKey ||
+        e.ctrlKey ||
+        e.shiftKey ||
+        e.altKey
+      ) {
+        return;
+      }
+      const id = homeHashSectionId(e.currentTarget.getAttribute("href") ?? "");
+      if (id === null) return;
+      e.preventDefault();
+      const el = document.getElementById(id);
+      if (el === null) {
+        window.location.assign(`/#${id}`);
+        return;
+      }
+      // Write the exact single hash so it can never accumulate;
+      // replaceState keeps a same-hash click a URL no-op.
+      history.replaceState(null, "", `#${id}`);
+      // Native smooth scroll: with <html>'s motion-safe:scroll-smooth
+      // this is the browser's eased curve, respects each section's
+      // scroll-mt, and auto-honours reduced-motion. No body pin on
+      // desktop, so the drawer's custom rAF isn't needed.
+      el.scrollIntoView({ block: "start" });
+    },
     [],
   );
 
@@ -153,6 +194,7 @@ export function Chrome() {
       <div className="mx-auto grid w-full max-w-[var(--frame-max)] grid-cols-[1fr_auto_1fr] items-center gap-4">
         <Link
           href="/#intro"
+          onClick={handleNavClick}
           className="col-start-1 flex items-center gap-3 no-underline"
         >
           {/* Both variants stay mounted and toggled via `display` so the
@@ -186,6 +228,7 @@ export function Chrome() {
               <li key={item.id}>
                 <Link
                   href={`/#${item.id}`}
+                  onClick={handleNavClick}
                   aria-current={isActive ? "true" : undefined}
                   className="nav-item"
                 >
