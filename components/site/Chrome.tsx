@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { links } from "@/lib/links";
+import { homeHashSectionId, scrollToAnchor } from "@/lib/scroll";
 import { MobileMenu } from "@/components/site/MobileMenu";
 
 const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
@@ -40,6 +41,39 @@ export function Chrome() {
 
   const handleMobileOpenChange = useCallback(
     (open: boolean) => setMobileOpen(open),
+    [],
+  );
+
+  // Plain `<Link href="/#section">` clicks append the hash rather than
+  // replace it when the URL already carries it (Next 16 App Router under
+  // output: "export" + trailingSlash), growing `/#method#method#method…`
+  // across click → reload → click cycles (#116). Intercept same-page
+  // anchor clicks and resolve them locally, mirroring MobileMenu's
+  // handleClick. Modified clicks (new tab, middle-click) and cross-route
+  // clicks (the section isn't on this page, e.g. /blog/*) fall through to
+  // the native <Link>, preserving the rationale behind the `/#` hrefs.
+  const handleNavClick = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (
+        e.defaultPrevented ||
+        e.button !== 0 ||
+        e.metaKey ||
+        e.ctrlKey ||
+        e.shiftKey ||
+        e.altKey
+      ) {
+        return;
+      }
+      const id = homeHashSectionId(e.currentTarget.getAttribute("href") ?? "");
+      if (id === null) return;
+      const el = document.getElementById(id);
+      if (el === null) return;
+      e.preventDefault();
+      // Write the exact single hash so it can never accumulate;
+      // replaceState keeps a same-hash click a URL no-op.
+      history.replaceState(null, "", `#${id}`);
+      scrollToAnchor(el);
+    },
     [],
   );
 
@@ -153,6 +187,7 @@ export function Chrome() {
       <div className="mx-auto grid w-full max-w-[var(--frame-max)] grid-cols-[1fr_auto_1fr] items-center gap-4">
         <Link
           href="/#intro"
+          onClick={handleNavClick}
           className="col-start-1 flex items-center gap-3 no-underline"
         >
           {/* Both variants stay mounted and toggled via `display` so the
@@ -186,6 +221,7 @@ export function Chrome() {
               <li key={item.id}>
                 <Link
                   href={`/#${item.id}`}
+                  onClick={handleNavClick}
                   aria-current={isActive ? "true" : undefined}
                   className="nav-item"
                 >
