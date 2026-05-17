@@ -1,12 +1,14 @@
 // Returns the section id for a home-page hash href, or null when the href
 // is not an in-page anchor we should resolve locally.
 //
-//   "/#method"      -> "method"
-//   "/#"  | "/"     -> null   (no target section)
-//   "#method"       -> null   (bare hash — resolves against the current
-//                              URL, not the home page; not our concern)
-//   "/blog/foo"     -> null   (cross-route navigation)
+//   "/#method"          -> "method"
+//   "/#"  | "/"         -> null   (no target section)
+//   "#method"           -> null   (bare hash — resolves against the
+//                                  current URL, not home; not our concern)
+//   "/blog/foo/#method" -> null   (cross-route navigation)
 //
+// Callers pass a clean `/#${id}`; this does not sanitize multi-hash or
+// trailing-slash input (`/#a#b` -> "a#b", `/#intro/` -> "intro/").
 // Pure and DOM-free so the desktop nav click decision is unit-testable.
 export function homeHashSectionId(href: string): string | null {
   if (!href.startsWith("/#")) return null;
@@ -24,10 +26,9 @@ export function homeHashSectionId(href: string): string | null {
 // "auto" value (which would otherwise survive past the helper and
 // permanently override the page's CSS scroll-smooth).
 //
-// The state is module-level and shared by every caller (the desktop
-// nav in Chrome.tsx and the mobile drawer in MobileMenu.tsx): a nav
-// click mid drawer-close scroll cancels and restores cleanly instead
-// of the two fighting each other.
+// State is module-level so a re-entrant call — a second anchor jump
+// before the first settles — cancels the in-flight rAF and restores
+// scroll-behavior before snapshotting, rather than two loops fighting.
 let scrollAnchorRaf = 0;
 let scrollAnchorRestore: (() => void) | null = null;
 

@@ -21,4 +21,10 @@ describe("homeHashSectionId", () => {
     expect(homeHashSectionId("/blog/foo")).toBeNull();
     expect(homeHashSectionId("/blog/foo/#method")).toBeNull();
   });
+
+  it("does not sanitize multi-hash or trailing-slash input (callers pass clean ids)", () => {
+    expect(homeHashSectionId("/#method#method")).toBe("method#method");
+    expect(homeHashSectionId("/#intro/")).toBe("intro/");
+    expect(homeHashSectionId("/?x=1#method")).toBeNull();
+  });
 });

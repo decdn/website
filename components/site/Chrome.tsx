@@ -44,14 +44,14 @@ export function Chrome() {
     [],
   );
 
-  // Plain `<Link href="/#section">` clicks append the hash rather than
-  // replace it when the URL already carries it (Next 16 App Router under
-  // output: "export" + trailingSlash), growing `/#method#method#method…`
-  // across click → reload → click cycles (#116). Intercept same-page
-  // anchor clicks and resolve them locally, mirroring MobileMenu's
-  // handleClick. Modified clicks (new tab, middle-click) and cross-route
-  // clicks (the section isn't on this page, e.g. /blog/*) fall through to
-  // the native <Link>, preserving the rationale behind the `/#` hrefs.
+  // Plain `<Link href="/#section">` appends rather than replaces the hash
+  // when the URL already carries it (Next 16 App Router, output: "export"
+  // + trailingSlash), growing `/#method#method…` across click → reload →
+  // click cycles. Intercept same-page anchors and resolve locally. Off
+  // this route the section isn't in the DOM (e.g. /blog/*); force a full
+  // reload so the destination resolves the hash deterministically — the
+  // soft-nav hash codepath is the unreliable one. Modified clicks (new
+  // tab, middle-click) fall through to the native <Link>.
   const handleNavClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (
@@ -66,16 +66,19 @@ export function Chrome() {
       }
       const id = homeHashSectionId(e.currentTarget.getAttribute("href") ?? "");
       if (id === null) return;
-      const el = document.getElementById(id);
-      if (el === null) return;
       e.preventDefault();
+      const el = document.getElementById(id);
+      if (el === null) {
+        window.location.assign(`/#${id}`);
+        return;
+      }
       // Write the exact single hash so it can never accumulate;
       // replaceState keeps a same-hash click a URL no-op.
       history.replaceState(null, "", `#${id}`);
       // Native smooth scroll: with <html>'s motion-safe:scroll-smooth
-      // this is the browser's eased curve (the pre-fix feel), respects
-      // each section's scroll-mt, and auto-honours reduced-motion. No
-      // body pin on desktop, so the drawer's custom rAF isn't needed.
+      // this is the browser's eased curve, respects each section's
+      // scroll-mt, and auto-honours reduced-motion. No body pin on
+      // desktop, so the drawer's custom rAF isn't needed.
       el.scrollIntoView({ block: "start" });
     },
     [],
