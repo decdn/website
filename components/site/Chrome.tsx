@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { links } from "@/lib/links";
-import { homeHashSectionId, scrollToAnchor } from "@/lib/scroll";
+import { homeHashSectionId } from "@/lib/scroll";
 import { MobileMenu } from "@/components/site/MobileMenu";
 
 const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
@@ -72,7 +72,11 @@ export function Chrome() {
       // Write the exact single hash so it can never accumulate;
       // replaceState keeps a same-hash click a URL no-op.
       history.replaceState(null, "", `#${id}`);
-      scrollToAnchor(el);
+      // Native smooth scroll: with <html>'s motion-safe:scroll-smooth
+      // this is the browser's eased curve (the pre-fix feel), respects
+      // each section's scroll-mt, and auto-honours reduced-motion. No
+      // body pin on desktop, so the drawer's custom rAF isn't needed.
+      el.scrollIntoView({ block: "start" });
     },
     [],
   );
