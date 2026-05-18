@@ -186,6 +186,11 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         // scrollToAnchor does the visible scroll.
         history.replaceState(null, "", `#${anchor}`);
         scrollToAnchor(targetEl);
+        // Move keyboard / SR focus into the section — scrollToAnchor
+        // only moves the viewport. preventScroll so .focus() doesn't
+        // jump past the in-flight rAF scroll.
+        targetEl.setAttribute("tabindex", "-1");
+        targetEl.focus({ preventScroll: true });
       }
     };
   }, [open]);

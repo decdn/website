@@ -71,6 +71,12 @@ export function Chrome() {
       // scroll-mt, and auto-honours reduced-motion. No body pin on
       // desktop, so the drawer's custom rAF isn't needed.
       el.scrollIntoView({ block: "start" });
+      // Unlike a real anchor nav, the intercepted scroll doesn't move
+      // keyboard / SR focus — without this, tab order and the reading
+      // cursor stay stuck on the nav. preventScroll so .focus() doesn't
+      // jump past the in-flight smooth scroll.
+      el.setAttribute("tabindex", "-1");
+      el.focus({ preventScroll: true });
     },
     [],
   );
