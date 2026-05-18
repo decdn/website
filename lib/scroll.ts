@@ -16,6 +16,28 @@ export function homeHashSectionId(href: string): string | null {
   return id.length > 0 ? id : null;
 }
 
+// Whether a nav click should be intercepted for local hash resolution,
+// vs. falling through to the native <Link> (modified clicks: new tab,
+// middle-click, etc. — generic browser-nav etiquette). Pure so the
+// desktop handler's guard is unit-testable; the DOM glue stays untested.
+export function shouldInterceptNavClick(e: {
+  defaultPrevented: boolean;
+  button: number;
+  metaKey: boolean;
+  ctrlKey: boolean;
+  shiftKey: boolean;
+  altKey: boolean;
+}): boolean {
+  return !(
+    e.defaultPrevented ||
+    e.button !== 0 ||
+    e.metaKey ||
+    e.ctrlKey ||
+    e.shiftKey ||
+    e.altKey
+  );
+}
+
 // `<html>` scroll-behavior is forced to `auto` for the lifetime of
 // the rAF: without it, each per-frame `window.scrollTo` defers to
 // `motion-safe:scroll-smooth` and queues yet another browser

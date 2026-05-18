@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { links } from "@/lib/links";
-import { homeHashSectionId } from "@/lib/scroll";
+import { homeHashSectionId, shouldInterceptNavClick } from "@/lib/scroll";
 import { MobileMenu } from "@/components/site/MobileMenu";
 
 const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
@@ -54,16 +54,7 @@ export function Chrome() {
   // tab, middle-click) fall through to the native <Link>.
   const handleNavClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
-      if (
-        e.defaultPrevented ||
-        e.button !== 0 ||
-        e.metaKey ||
-        e.ctrlKey ||
-        e.shiftKey ||
-        e.altKey
-      ) {
-        return;
-      }
+      if (!shouldInterceptNavClick(e)) return;
       const id = homeHashSectionId(e.currentTarget.getAttribute("href") ?? "");
       if (id === null) return;
       e.preventDefault();
