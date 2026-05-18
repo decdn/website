@@ -66,6 +66,9 @@ export function scrollToAnchor(el: HTMLElement) {
     scrollAnchorRestore = null;
   }
   const startY = window.scrollY;
+  // Captured once (symmetric with startY) so a horizontal scroll mid-
+  // animation can't yank the page sideways; this loop only moves Y.
+  const startX = window.scrollX;
   const marginTop = parseFloat(getComputedStyle(el).scrollMarginTop);
   const targetY = startY + el.getBoundingClientRect().top - marginTop;
   const distance = targetY - startY;
@@ -80,7 +83,10 @@ export function scrollToAnchor(el: HTMLElement) {
   const startTime = performance.now();
   const tick = (now: number) => {
     const t = Math.min(1, (now - startTime) / duration);
-    window.scrollTo(0, startY + distance * t);
+    // Quadratic ease-in-out — linear reads mechanical next to the
+    // browser's native eased curve.
+    const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    window.scrollTo(startX, startY + distance * ease);
     if (t < 1) {
       scrollAnchorRaf = requestAnimationFrame(tick);
     } else {
