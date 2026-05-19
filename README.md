@@ -31,7 +31,7 @@ pnpm format    # prettier --write .
 ## Project layout
 
 - `app/` — App Router entry (`layout.tsx`, `page.tsx`, `globals.css`) plus the blog routes (`blog/`, `blog/[slug]/`), sitemap/robots handlers, and file-convention metadata assets.
-- `components/site/` — page sections composed by `app/page.tsx` (Hero, Comparison, Method, Faq, Close).
+- `components/site/` — page sections composed by `app/page.tsx` (Hero, Compare, Method, Faq, Contact).
 - `components/ui/` — low-level primitives (Frame, SectionHeader, Figure, …).
 - `lib/` — shared helpers (`links.ts`, `blog.ts`, `faq.ts`, `jsonld.tsx`).
 - `content/blog/` — MDX posts loaded by `lib/blog.ts` and rendered by `app/blog/[slug]/page.tsx`.
