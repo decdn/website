@@ -7,7 +7,7 @@ const wordmarkH = "clamp(4.75rem, 14vw, 11.5rem)";
 
 export function Close() {
   return (
-    <Frame id="contact" tone="paper" className="overflow-hidden">
+    <Frame id="contact" tone="paper" className="overflow-hidden" fill={false}>
       <SectionHeader
         index="05"
         label="Contact"
