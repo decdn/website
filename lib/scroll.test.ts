@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { homeHashSectionId, shouldInterceptNavClick } from "./scroll";
+import {
+  homeHashSectionId,
+  parseScrollMarginTop,
+  shouldInterceptNavClick,
+} from "./scroll";
 
 describe("homeHashSectionId", () => {
   it("returns the section id for a home-page hash href", () => {
@@ -26,6 +30,26 @@ describe("homeHashSectionId", () => {
     expect(homeHashSectionId("/#method#method")).toBe("method#method");
     expect(homeHashSectionId("/#intro/")).toBe("intro/");
     expect(homeHashSectionId("/?x=1#method")).toBeNull();
+  });
+});
+
+describe("parseScrollMarginTop", () => {
+  it("parses a normal resolved px value", () => {
+    expect(parseScrollMarginTop("80px")).toBe(80);
+    expect(parseScrollMarginTop("0px")).toBe(0);
+    expect(parseScrollMarginTop("24.5px")).toBe(24.5);
+  });
+
+  it("falls back to 0 for an empty computed value (the #124 bug case)", () => {
+    expect(parseScrollMarginTop("")).toBe(0);
+  });
+
+  it("falls back to 0 for a non-numeric computed value", () => {
+    expect(parseScrollMarginTop("auto")).toBe(0);
+  });
+
+  it("tolerates leading whitespace (parseFloat semantics)", () => {
+    expect(parseScrollMarginTop("  16px ")).toBe(16);
   });
 });
 
