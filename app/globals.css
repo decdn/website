@@ -82,6 +82,15 @@ body {
   color: var(--ink);
 }
 
+/* The <Footer/> (body > footer) owns the gap above itself via
+   pt-[var(--frame-pad-y)]. Drop the redundant bottom padding of the section
+   it directly follows so the single rhythm unit isn't doubled — the empty
+   band #123/#125 removed. Unlayered, so it beats Tailwind's
+   py-[var(--frame-pad-y)] utility regardless of specificity. */
+main:has(+ footer) > section:last-child {
+  padding-bottom: 0;
+}
+
 /* --- utilities --------------------------------------------------------- */
 
 .rule {
