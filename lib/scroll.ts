@@ -16,6 +16,29 @@ export function homeHashSectionId(href: string): string | null {
   return id.length > 0 ? id : null;
 }
 
+// Whether a nav click should be intercepted for local hash resolution,
+// vs. falling through to the native <Link> (modified clicks: new tab,
+// middle-click, etc. — generic browser-nav etiquette). `button` is the
+// DOM MouseEvent.button enum; only 0 (primary) is intercepted. Pure so
+// the desktop handler's guard is unit-testable; DOM glue stays untested.
+export function shouldInterceptNavClick(e: {
+  defaultPrevented: boolean;
+  button: number;
+  metaKey: boolean;
+  ctrlKey: boolean;
+  shiftKey: boolean;
+  altKey: boolean;
+}): boolean {
+  return !(
+    e.defaultPrevented ||
+    e.button !== 0 ||
+    e.metaKey ||
+    e.ctrlKey ||
+    e.shiftKey ||
+    e.altKey
+  );
+}
+
 // `<html>` scroll-behavior is forced to `auto` for the lifetime of
 // the rAF: without it, each per-frame `window.scrollTo` defers to
 // `motion-safe:scroll-smooth` and queues yet another browser
@@ -58,7 +81,13 @@ export function scrollToAnchor(el: HTMLElement) {
   const startTime = performance.now();
   const tick = (now: number) => {
     const t = Math.min(1, (now - startTime) / duration);
-    window.scrollTo(0, startY + distance * t);
+    // Quadratic ease-in-out so the programmatic scroll doesn't read
+    // mechanically (linear feels robotic). scrollX is re-read each
+    // frame rather than hard-coded to 0, so this Y-only loop preserves
+    // the current horizontal position instead of snapping to the left
+    // edge.
+    const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    window.scrollTo(window.scrollX, startY + distance * ease);
     if (t < 1) {
       scrollAnchorRaf = requestAnimationFrame(tick);
     } else {

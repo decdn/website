@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { links } from "@/lib/links";
-import { homeHashSectionId } from "@/lib/scroll";
+import { homeHashSectionId, shouldInterceptNavClick } from "@/lib/scroll";
 import { MobileMenu } from "@/components/site/MobileMenu";
 
 const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
@@ -54,16 +54,7 @@ export function Chrome() {
   // tab, middle-click) fall through to the native <Link>.
   const handleNavClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
-      if (
-        e.defaultPrevented ||
-        e.button !== 0 ||
-        e.metaKey ||
-        e.ctrlKey ||
-        e.shiftKey ||
-        e.altKey
-      ) {
-        return;
-      }
+      if (!shouldInterceptNavClick(e)) return;
       const id = homeHashSectionId(e.currentTarget.getAttribute("href") ?? "");
       if (id === null) return;
       e.preventDefault();
@@ -80,6 +71,16 @@ export function Chrome() {
       // scroll-mt, and auto-honours reduced-motion. No body pin on
       // desktop, so the drawer's custom rAF isn't needed.
       el.scrollIntoView({ block: "start" });
+      // Unlike a real anchor nav, the intercepted scroll doesn't move
+      // keyboard / SR focus — without this, tab order and the reading
+      // cursor stay stuck on the nav. Add tabindex only when the target
+      // isn't already focusable (don't pull a focusable el out of tab
+      // order); leaving the injected tabindex="-1" in place is the
+      // established programmatic-focus pattern (focusable via script,
+      // not via Tab). preventScroll so .focus() doesn't run its own
+      // scroll and race the scrollIntoView above.
+      if (el.tabIndex < 0) el.setAttribute("tabindex", "-1");
+      el.focus({ preventScroll: true });
     },
     [],
   );
