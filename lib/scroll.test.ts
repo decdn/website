@@ -51,6 +51,12 @@ describe("parseScrollMarginTop", () => {
   it("tolerates leading whitespace (parseFloat semantics)", () => {
     expect(parseScrollMarginTop("  16px ")).toBe(16);
   });
+
+  it("guards finiteness only, not sign (a negative value passes through)", () => {
+    // scroll-margin-top is subtracted into live scroll math, so the
+    // helper deliberately clamps NaN — not the sign — to 0.
+    expect(parseScrollMarginTop("-8px")).toBe(-8);
+  });
 });
 
 describe("shouldInterceptNavClick", () => {

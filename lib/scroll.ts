@@ -56,8 +56,8 @@ let scrollAnchorRaf = 0;
 let scrollAnchorRestore: (() => void) | null = null;
 
 // `getComputedStyle(el).scrollMarginTop` is normally a `px` string, but a
-// detached/unrendered element (or unsupported serialization) yields "" →
-// parseFloat is NaN. Unguarded, that NaN flows into `distance`; since
+// detached/unrendered element yields "" → parseFloat is NaN. Unguarded,
+// that NaN flows into `distance`; since
 // `NaN === 0` is false the no-op early return is skipped and the rAF runs
 // `scrollTo(x, NaN)`, which CSSOM-View coerces to y=0 — the page silently
 // scrolls to the top. Clamping to 0 degrades to "ignore scroll-margin" (a

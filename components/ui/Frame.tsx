@@ -28,13 +28,16 @@ export function Frame({
   fill = true,
   children,
 }: FrameProps) {
-  const minH = fill ? "min-h-[min(100svh,var(--frame-min-h-cap))]" : "";
+  const sectionClass = [
+    "relative flex flex-col scroll-mt-[var(--nav-h)] px-[var(--frame-gutter)] py-[var(--frame-pad-y)]",
+    fill && "min-h-[min(100svh,var(--frame-min-h-cap))]",
+    TONE_CLASS[tone],
+    className,
+  ]
+    .filter(Boolean)
+    .join(" ");
   return (
-    <section
-      id={id}
-      aria-labelledby={`${id}-h`}
-      className={`relative flex ${minH} scroll-mt-[var(--nav-h)] flex-col px-[var(--frame-gutter)] py-[var(--frame-pad-y)] ${TONE_CLASS[tone]} ${className}`}
-    >
+    <section id={id} aria-labelledby={`${id}-h`} className={sectionClass}>
       <div className="@container relative z-10 mx-auto flex w-full max-w-[var(--frame-max)] flex-1 flex-col">
         {children}
       </div>
