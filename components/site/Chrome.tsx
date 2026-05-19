@@ -73,10 +73,12 @@ export function Chrome() {
       el.scrollIntoView({ block: "start" });
       // Unlike a real anchor nav, the intercepted scroll doesn't move
       // keyboard / SR focus — without this, tab order and the reading
-      // cursor stay stuck on the nav. Only add tabindex when the target
-      // isn't already focusable, so a focusable el isn't pulled out of
-      // tab order; leaving -1 on a section is the standard pattern.
-      // preventScroll so .focus() doesn't jump past the smooth scroll.
+      // cursor stay stuck on the nav. Add tabindex only when the target
+      // isn't already focusable (don't pull a focusable el out of tab
+      // order); leaving the injected tabindex="-1" in place is the
+      // established programmatic-focus pattern (focusable via script,
+      // not via Tab). preventScroll so .focus() doesn't run its own
+      // scroll and race the scrollIntoView above.
       if (el.tabIndex < 0) el.setAttribute("tabindex", "-1");
       el.focus({ preventScroll: true });
     },

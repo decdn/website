@@ -18,8 +18,9 @@ export function homeHashSectionId(href: string): string | null {
 
 // Whether a nav click should be intercepted for local hash resolution,
 // vs. falling through to the native <Link> (modified clicks: new tab,
-// middle-click, etc. — generic browser-nav etiquette). Pure so the
-// desktop handler's guard is unit-testable; the DOM glue stays untested.
+// middle-click, etc. — generic browser-nav etiquette). `button` is the
+// DOM MouseEvent.button enum; only 0 (primary) is intercepted. Pure so
+// the desktop handler's guard is unit-testable; DOM glue stays untested.
 export function shouldInterceptNavClick(e: {
   defaultPrevented: boolean;
   button: number;
@@ -80,10 +81,11 @@ export function scrollToAnchor(el: HTMLElement) {
   const startTime = performance.now();
   const tick = (now: number) => {
     const t = Math.min(1, (now - startTime) / duration);
-    // Quadratic ease-in-out — linear reads mechanical next to the
-    // browser's native eased curve. scrollX is read live each frame
-    // (not pinned to a captured value) so a horizontal scroll mid-
-    // animation isn't fought; this loop only drives Y.
+    // Quadratic ease-in-out so the programmatic scroll doesn't read
+    // mechanically (linear feels robotic). scrollX is re-read each
+    // frame rather than hard-coded to 0, so this Y-only loop preserves
+    // the current horizontal position instead of snapping to the left
+    // edge.
     const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
     window.scrollTo(window.scrollX, startY + distance * ease);
     if (t < 1) {
