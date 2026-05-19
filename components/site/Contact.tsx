@@ -5,7 +5,7 @@ import { FleetStatus } from "@/components/site/FleetStatus";
 
 const wordmarkH = "clamp(4.75rem, 14vw, 11.5rem)";
 
-export function Close() {
+export function Contact() {
   return (
     <Frame id="contact" tone="paper" className="overflow-hidden" fill={false}>
       <SectionHeader
