@@ -77,6 +77,11 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   // scroll to that target instead of restoring the prior scroll
   // position — otherwise the body unlock would override the anchor jump.
   const pendingAnchorRef = useRef<string | null>(null);
+  // An anchor-select close moves focus into the target section from the
+  // Effect-A cleanup, which runs *before* the toggle-refocus effect's
+  // setup in the same commit. This flag — set there, consumed there —
+  // stops that effect from yanking focus back to the hamburger.
+  const focusMovedToSectionRef = useRef(false);
 
   useEffect(() => {
     onOpenChange(open);
@@ -187,12 +192,14 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         history.replaceState(null, "", `#${anchor}`);
         scrollToAnchor(targetEl);
         // Move keyboard / SR focus into the section — scrollToAnchor
-        // only moves the viewport. Guard the tabindex so an already-
-        // focusable target isn't pulled out of tab order; leaving -1
-        // on a section is the standard pattern. preventScroll so
-        // .focus() doesn't jump past the in-flight rAF scroll.
+        // only moves the viewport. Add tabindex only when the target
+        // isn't already focusable (don't pull a focusable el out of
+        // tab order); leaving the injected tabindex="-1" in place is
+        // the established programmatic-focus pattern. preventScroll so
+        // .focus() doesn't race the in-flight rAF scroll.
         if (targetEl.tabIndex < 0) targetEl.setAttribute("tabindex", "-1");
         targetEl.focus({ preventScroll: true });
+        focusMovedToSectionRef.current = true;
       }
     };
   }, [open]);
@@ -202,7 +209,14 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   const wasOpenRef = useRef(false);
   useEffect(() => {
     if (wasOpenRef.current && !open) {
-      toggleRef.current?.focus({ preventScroll: true });
+      // An anchor-select close already moved focus into the section;
+      // leave it there. Normal closes (Escape, scrim, toggle, resize)
+      // leave the flag false and still return focus to the toggle.
+      if (focusMovedToSectionRef.current) {
+        focusMovedToSectionRef.current = false;
+      } else {
+        toggleRef.current?.focus({ preventScroll: true });
+      }
     }
     wasOpenRef.current = open;
   }, [open]);
