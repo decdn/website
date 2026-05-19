@@ -2,7 +2,7 @@ import { links } from "@/lib/links";
 
 export function Footer() {
   return (
-    <footer className="bg-paper px-[var(--frame-gutter)] pt-16 pb-10 text-ink">
+    <footer className="bg-paper px-[var(--frame-gutter)] pb-10 text-ink">
       <div className="@container mx-auto flex max-w-[var(--frame-max)] flex-col gap-3">
         <span aria-hidden className="rule opacity-40" />
         <div className="grid grid-cols-1 gap-2 text-micro tracking-[0.2em] uppercase opacity-80 @md:grid-cols-3 @md:items-center">
