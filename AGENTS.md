@@ -26,7 +26,7 @@ pnpm format:check     # prettier --check . (CI)
 ## Layout
 
 - `app/` — App Router entry (`layout.tsx`, `page.tsx`, `globals.css`), the `blog/` and `blog/[slug]/` routes, the `robots.ts` / `sitemap.xml/route.ts` / `sitemap-pages.xml/route.ts` handlers, and the file-convention assets (`favicon.ico`, `icon.svg`, `apple-icon.png`, `opengraph-image.{png,alt.txt}`).
-- `components/site/` — page sections composed by `app/page.tsx` (Hero, Compare, Method, Faq, Contact, …) plus chrome (`Chrome`, `Footer`, `ScrollReveal`). Section components are named after their section `id` (e.g. `Contact.tsx` → `#contact`); `Hero` is the idiomatic exception for the top `#intro` section.
+- `components/site/` — page sections composed by `app/page.tsx` (Hero, Compare, Method, Faq, Contact, …) plus chrome (`Chrome`, `Footer`, `ScrollReveal`). Section components are named after their section `id` (e.g. `Contact.tsx` for `id="contact"`); `Hero` is the idiomatic exception for the top `id="intro"` section.
 - `components/ui/` — low-level primitives (Frame, SectionHeader, Prose, Figure, …).
 - `lib/` — shared helpers (`links.ts`, `blog.ts`, `faq.ts`, `jsonld.tsx`).
 - `content/blog/` — MDX posts loaded by `lib/blog.ts` and rendered via `app/blog/[slug]/page.tsx`.
