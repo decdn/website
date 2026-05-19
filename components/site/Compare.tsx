@@ -2,7 +2,7 @@ import { ComparisonRow } from "@/components/ui/ComparisonRow";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
-export function Comparison() {
+export function Compare() {
   return (
     <Frame id="compare" tone="ink">
       <SectionHeader

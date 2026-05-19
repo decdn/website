@@ -1,5 +1,5 @@
-import { Close } from "@/components/site/Close";
-import { Comparison } from "@/components/site/Comparison";
+import { Compare } from "@/components/site/Compare";
+import { Contact } from "@/components/site/Contact";
 import { Faq } from "@/components/site/Faq";
 import { Hero } from "@/components/site/Hero";
 import { Method } from "@/components/site/Method";
@@ -25,10 +25,10 @@ export default function Home() {
     <main>
       <JsonLd data={faqSchema} />
       <Hero />
-      <Comparison />
+      <Compare />
       <Method />
       <Faq />
-      <Close />
+      <Contact />
     </main>
   );
 }
