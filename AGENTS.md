@@ -25,7 +25,7 @@ pnpm format:check     # prettier --check . (CI)
 
 ## Layout
 
-- `app/` — App Router entry (`layout.tsx`, `page.tsx`, `globals.css`), the `blog/` and `blog/[slug]/` routes, the `robots.ts` / `sitemap.xml/route.ts` / `sitemap-pages.xml/route.ts` handlers, and the file-convention assets (`favicon.ico`, `icon.svg`, `apple-icon.png`, `opengraph-image.{png,alt.txt}`).
+- `app/` — App Router entry (`layout.tsx`, `page.tsx`, `globals.css`), the `blog/` and `blog/[slug]/` routes, the `robots.txt/route.ts` / `sitemap.xml/route.ts` / `sitemap-pages.xml/route.ts` handlers, and the file-convention assets (`favicon.ico`, `icon.svg`, `apple-icon.png`, `opengraph-image.{png,alt.txt}`).
 - `components/site/` — page sections composed by `app/page.tsx` (Hero, Compare, Method, Faq, Contact, …) plus chrome (`Chrome`, `Footer`, `ScrollReveal`). Section components are named after their section `id` (e.g. `Contact.tsx` for `id="contact"`); `Hero` is the idiomatic exception for the top `id="intro"` section.
 - `components/ui/` — low-level primitives (Frame, SectionHeader, Prose, Figure, …).
 - `lib/` — shared helpers (`links.ts`, `blog.ts`, `faq.ts`, `jsonld.tsx`).
@@ -35,7 +35,7 @@ pnpm format:check     # prettier --check . (CI)
 
 ## Gotchas
 
-- **Static export only.** `next.config.ts` has `output: "export"`. No SSR, ISR, middleware, or Image Optimization API. Route handlers (`app/sitemap.xml/route.ts`, `app/sitemap-pages.xml/route.ts`) are allowed only when statically generated at build time (`dynamic = "force-static"`, GET-only); the `app/robots.ts` metadata file emits `robots.txt` and also requires `dynamic = "force-static"`.
+- **Static export only.** `next.config.ts` has `output: "export"`. No SSR, ISR, middleware, or Image Optimization API. Route handlers (`app/robots.txt/route.ts`, `app/sitemap.xml/route.ts`, `app/sitemap-pages.xml/route.ts`) are allowed only when statically generated at build time (`dynamic = "force-static"`, GET-only). `robots.txt` is a hand-written route handler rather than the Next `app/robots.ts` metadata file so it can emit non-standard directives (`Content-Signal:` per contentsignals.org).
 - **`trailingSlash: true`.** `next.config.ts` emits every route as `<path>/index.html` and canonical/internal links should expect a trailing slash. Cloudflare Pages serves `out/` as-is.
 - **Tailwind v4.** `globals.css` uses `@import "tailwindcss"` and `@theme inline { … }`. There is no `tailwind.config.*` — theme tokens live in CSS. Don't reach for v3 directives.
 - **Conventional commits required.** `commitlint` runs in the `commit-msg` husky hook; non-conforming messages are rejected.
