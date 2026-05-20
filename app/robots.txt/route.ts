@@ -9,9 +9,9 @@ export const dynamic = "force-static";
 //
 // `Content-Signal` declares AI/search usage preferences per
 // https://contentsignals.org/ and draft-romm-aipref-contentsignals: allow
-// search indexing and real-time AI grounding/RAG, disallow training-data use.
+// search indexing, training, and real-time AI grounding/RAG.
 const BODY = `User-Agent: *
-Content-Signal: ai-train=no, search=yes, ai-input=yes
+Content-Signal: ai-train=yes, search=yes, ai-input=yes
 Allow: /
 
 Sitemap: ${SITE_URL}sitemap.xml
