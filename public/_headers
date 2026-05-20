@@ -5,6 +5,9 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
   X-Frame-Options: DENY
+  Link: <https://docs.decdn.org/>; rel="service-doc"
+  Link: </sitemap.xml>; rel="sitemap"
+  Link: </decdn_litepaper.pdf>; rel="describedby"
 
 # Next emits the per-post OG image as an extensionless file
 # (out/blog/<slug>/opengraph-image, no .png). Cloudflare assigns
