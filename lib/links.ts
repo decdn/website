@@ -1,3 +1,5 @@
+export const EMAIL = "info@decdn.org";
+
 export const links = {
   site: "https://decdn.org",
   github: "https://github.com/decdn",
@@ -7,7 +9,7 @@ export const links = {
   presskit: "/presskit/decdn-presskit.zip",
   docs: "https://docs.decdn.org/overview/introduction",
   blog: "/blog/",
-  contact: "mailto:info@decdn.org",
+  contact: `mailto:${EMAIL}`,
 } as const;
 
 // Trailing-slash base: lets callers concat `${SITE_URL}icon.svg` and

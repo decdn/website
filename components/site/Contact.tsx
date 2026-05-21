@@ -1,4 +1,4 @@
-import { links } from "@/lib/links";
+import { EMAIL, links } from "@/lib/links";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { FleetStatus } from "@/components/site/FleetStatus";
@@ -54,7 +54,7 @@ export function Contact() {
               className="underline-brutal text-lead font-semibold tracking-[0.02em]"
               href={links.contact}
             >
-              info@decdn.org
+              {EMAIL}
               <span className="arrow" aria-hidden>
                 →
               </span>
@@ -76,7 +76,7 @@ export function Contact() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              x
+              X (Twitter)
               <span className="arrow" aria-hidden>
                 →
               </span>
