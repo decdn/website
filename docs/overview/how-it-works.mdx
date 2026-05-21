@@ -57,8 +57,8 @@ If pull-through is disabled in the node's config, the node returns a redirect po
 ## What keeps the network honest
 
 - **Hash verification.** Clients verify every chunk against the known blob hash. A bad byte voids payment.
-- **On-chain evidence.** Protocol messages are signed in a form that can be verified on-chain as evidence of corrupted delivery, phantom announcements, rate manipulation, or blacklist violations ([slashing](/protocol/slashing)).
-- **Challenge-response.** Submit evidence; the counterparty has a window to submit counter-evidence. The on-chain judge adjudicates after the window.
+- **On-chain evidence.** Protocol messages are signed in a form that can be verified on-chain as evidence of phantom announcements, rate manipulation, or blacklist violations ([slashing](/protocol/slashing)).
+- **Synchronous adjudication.** The on-chain judge verifies submitted evidence and slashes on the spot, with no counter-evidence window.
 - **Reputation.** A 0.0–1.0 score combining direct experience and signed gossip from staked nodes ([reputation](/protocol/reputation)).
 - **Content blacklist.** Governance-managed on-chain hash blacklist. Serving a blacklisted hash after the compliance window is slashable ([takedown](/protocol/takedown)).
 
