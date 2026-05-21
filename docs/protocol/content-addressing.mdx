@@ -16,8 +16,6 @@ Every blob is identified by its **BLAKE3 hash**. Clients and nodes verify receiv
 
 Blobs are transmitted in chunks, each accompanied by the sibling hashes needed to prove inclusion in the root hash the client expects. The client accepts bytes only after verification, so a malicious node cannot insert a single corrupt byte and still earn — the client rejects the stream before paying for that chunk.
 
-The on-chain corruption evidence path uses the same chunking ([slashing](/protocol/slashing)).
-
 ## Hash-to-object-key mapping
 
 Origin backends speak their own namespace: S3 objects are addressed by key, NFS by path, local disk by filename. Blobs are addressed by BLAKE3 hash. The mapping lives in a **content catalog** — a small database (PostgreSQL or SQLite) maintained by the operator:
