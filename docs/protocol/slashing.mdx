@@ -1,6 +1,6 @@
 ---
 title: Slashing & on-chain verification
-description: Three slashable offenses with on-chain evidence paths and challenge-based adjudication.
+description: Three slashable offenses with on-chain evidence paths and synchronous on-chain adjudication.
 ---
 
 ## Decision
@@ -11,7 +11,7 @@ Three slashable offenses with concrete on-chain evidence paths:
 2. **Rate manipulation** — charged a rate different from the advertised rate.
 3. **Blacklist violation** — served a blacklisted hash after the compliance window.
 
-A unified on-chain judge adjudicates all three and triggers stake slashing on resolution.
+A unified on-chain judge adjudicates all three synchronously and triggers stake slashing immediately upon verification.
 
 ## Evidence staleness
 
