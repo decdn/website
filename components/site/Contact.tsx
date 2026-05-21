@@ -76,7 +76,7 @@ export function Contact() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              X (Twitter)
+              x (twitter)
               <span className="arrow" aria-hidden>
                 →
               </span>
