@@ -8,7 +8,7 @@ export function Compare() {
       <SectionHeader
         index="02"
         label="Side by side"
-        timestamp="legacy vs decdn · seven axes"
+        timestamp="traditional vs decdn · seven axes"
       />
 
       <div className="mt-14 flex flex-col gap-10">
@@ -41,7 +41,9 @@ export function Compare() {
         >
           <div className="meta opacity-0 @xl:col-span-2 @xl:block">axis</div>
           <div className="grid grid-cols-2 gap-4 @xl:contents">
-            <div className="meta opacity-55 @xl:col-span-5">legacy cdn</div>
+            <div className="meta opacity-55 @xl:col-span-5">
+              traditional cdn
+            </div>
             <div className="meta @xl:col-span-5">
               decdn
               <span className="ml-2 opacity-60">/ peer-to-peer</span>
@@ -82,37 +84,37 @@ export function Compare() {
 
         <ComparisonRow
           label="delivery"
-          legacy="fixed provisioning"
+          traditional="fixed provisioning"
           decdn="demand-shaped mesh"
           delay={420}
         />
         <ComparisonRow
           label="billing"
-          legacy="monthly minimums, annual contracts"
+          traditional="monthly minimums, annual contracts"
           decdn="per megabyte, in usdc"
           delay={480}
         />
         <ComparisonRow
           label="operators"
-          legacy="three hyperscalers"
+          traditional="three hyperscalers"
           decdn="home labs to datacenters"
           delay={540}
         />
         <ComparisonRow
           label="integrity"
-          legacy="trust the origin"
+          traditional="trust the origin"
           decdn="blake3, verify every chunk"
           delay={600}
         />
         <ComparisonRow
           label="failure"
-          legacy="pop dies, region 503s"
+          traditional="pop dies, region 503s"
           decdn="peer drops, stream continues"
           delay={660}
         />
         <ComparisonRow
           label="scaling"
-          legacy="gets more expensive"
+          traditional="gets more expensive"
           decdn="gets cheaper"
           delay={720}
         />

@@ -15,7 +15,7 @@ const geistSans = Geist({
 
 const TITLE = "deCDN — A peer-to-peer delivery layer for bytes at scale";
 const DESCRIPTION =
-  "A peer-to-peer CDN. Anyone can serve bytes; clients pay per megabyte in USDC. ~$0.01/GB — up to 90% cheaper than legacy networks.";
+  "A peer-to-peer CDN. Anyone can serve bytes; clients pay per megabyte in USDC. ~$0.01/GB — up to 90% cheaper than traditional networks.";
 
 export const metadata: Metadata = {
   metadataBase: new URL(links.site),

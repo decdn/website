@@ -1,11 +1,11 @@
 export function ComparisonRow({
   label,
-  legacy,
+  traditional,
   decdn,
   delay = 0,
 }: {
   label: string;
-  legacy: string;
+  traditional: string;
   decdn: string;
   delay?: number;
 }) {
@@ -17,7 +17,7 @@ export function ComparisonRow({
     >
       <div className="meta opacity-60 @xl:col-span-2">{label}</div>
       <div className="grid grid-cols-2 gap-4 @xl:contents">
-        <div className="opacity-55 @xl:col-span-5">{legacy}</div>
+        <div className="opacity-55 @xl:col-span-5">{traditional}</div>
         <div className="font-semibold tracking-[-0.01em] @xl:col-span-5">
           {decdn}
         </div>
