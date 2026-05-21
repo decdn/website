@@ -28,6 +28,7 @@
               "overview/architecture",
               "overview/participants",
               "overview/how-it-works",
+              "overview/design-decisions",
               "overview/glossary"
             ]
           }
