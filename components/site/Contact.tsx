@@ -35,13 +35,14 @@ export function Contact() {
             }}
           />
 
-          {/* prettier-ignore */}
           <p
             data-reveal
             style={{ "--reveal-delay": "120ms" }}
             className="max-w-[64ch] text-body leading-[1.7]"
           >
-            <span className="text-whisper">deCDN</span>{" "}is a peer-to-peer delivery layer for large files — software releases, datasets, media libraries, ai models, anything meant to be pulled a million times and that shouldn&apos;t depend on one bucket. the code is open. the network is open. the price is posted.
+            the network is open. so is our inbox. write us with questions,
+            partnerships, or anything you&apos;d run on a fleet of idle
+            machines. we read everything.
           </p>
 
           <div
@@ -51,29 +52,31 @@ export function Contact() {
           >
             <a
               className="underline-brutal text-lead font-semibold tracking-[0.02em]"
-              href={links.litepaper}
+              href={links.contact}
+            >
+              info@decdn.org
+              <span className="arrow" aria-hidden>
+                →
+              </span>
+            </a>
+            <a
+              className="underline-brutal text-lead font-semibold tracking-[0.02em]"
+              href={links.linkedin}
               target="_blank"
               rel="noopener noreferrer"
             >
-              read the litepaper
+              linkedin
               <span className="arrow" aria-hidden>
                 →
               </span>
             </a>
             <a
               className="underline-brutal text-lead font-semibold tracking-[0.02em]"
-              href={links.docs}
+              href={links.x}
+              target="_blank"
+              rel="noopener noreferrer"
             >
-              read the docs
-              <span className="arrow" aria-hidden>
-                →
-              </span>
-            </a>
-            <a
-              className="underline-brutal text-lead font-semibold tracking-[0.02em]"
-              href={links.github}
-            >
-              source on github
+              x
               <span className="arrow" aria-hidden>
                 →
               </span>
