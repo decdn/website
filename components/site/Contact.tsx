@@ -6,12 +6,13 @@ import { FleetStatus } from "@/components/site/FleetStatus";
 const wordmarkH = "clamp(4.75rem, 14vw, 11.5rem)";
 
 // Solid monochrome glyphs leading each contact link. Decorative — every link
-// carries its own visible text label — so each <svg> is aria-hidden. Sized to
-// the text-lead cap height; shrink-0 keeps them from squishing in the
-// inline-flex link. The envelope is an original geometric glyph; the X and
-// LinkedIn glyphs are derived from Simple Icons (CC0 / public domain) — the
-// marks are trademarks of their owners, shown nominatively as links to our
-// own profiles. LinkedIn is the bare "in" mark, no badge.
+// carries its own visible text label — so each <svg> is aria-hidden. iconClass
+// sizes them in em (1.05×), so each glyph scales with its link's font-size;
+// shrink-0 keeps the box from compressing in the inline-flex link. The
+// envelope is an original geometric glyph; the X and LinkedIn glyphs are from
+// Simple Icons (CC0 / public domain) — the marks are trademarks of their
+// owners, shown nominatively as links to our own profiles. LinkedIn is the
+// bare "in" mark, no badge.
 const iconClass = "size-[1.05em] shrink-0";
 
 function MailIcon() {
