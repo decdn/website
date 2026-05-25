@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { links } from "@/lib/links";
 import { homeHashSectionId, shouldInterceptNavClick } from "@/lib/scroll";
 import { MobileMenu } from "@/components/site/MobileMenu";
+import { resolveActiveSection } from "@/components/site/chrome-active";
 
 const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
 // Hash anchors are written `/#section`. Required because this nav also
@@ -174,7 +175,12 @@ export function Chrome() {
   // and on the first render after a client nav `active` still holds the
   // previous route's last value until the [pathname] effects re-sync.
   // `scrolled` doubles as a proxy for "past the intro hero".
-  const effectiveActive = pathname === "/" && scrolled ? active : "intro";
+  const effectiveActive = resolveActiveSection(
+    pathname,
+    scrolled,
+    active,
+    "intro",
+  );
   const onDark = DARK_SECTIONS.has(effectiveActive);
   // The toggle is portalled to <body> (see MobileMenu.tsx) and lives
   // on top of the paper panel while the drawer is open — force it to
