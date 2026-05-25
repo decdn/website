@@ -1,10 +1,11 @@
-// Why both `pathname === "/"` and `scrolled` must hold for `observed` to win:
-// - Off-home, the caller's section observer holds stale values from the
-//   previous home-route render — off-home reads must dominate.
-// - On home, `scrolled` doubles as a "past the intro hero" proxy that
-//   suppresses the brief window after a client-side back-nav resets scroll
-//   to top while the observer's last value is still in flight.
-export function resolveActiveSection<T extends string>(
+// Both `pathname === "/"` and `scrolled` must hold for `observed` to win.
+// Off-home, the caller's observer never gets built but `active` still
+// holds its last home-route value — the home check stops that stale value
+// painting. On home, `active` is briefly stale between the route-change
+// render and the new observer's first callback; `scrolled` (scrollY > 8)
+// stands in for "observer has had a moment to fire". Caveat: back-nav
+// with restored scroll skips this — a brief stale-tone flash is possible.
+export function resolveActiveSection<T>(
   pathname: string,
   scrolled: boolean,
   observed: T,
