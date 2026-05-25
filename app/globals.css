@@ -22,7 +22,6 @@
   --color-ink: var(--ink);
   --color-paper: var(--paper);
   --color-whisper: var(--whisper);
-  --font-sans: var(--font-geist-sans);
 
   /* Shared content rail: every Frame centers within --frame-max. */
   --frame-max: 1280px;
