@@ -38,6 +38,13 @@ describe("resolveActiveSection", () => {
       observed: "faq",
       expected: "intro",
     },
+    {
+      name: "home with query string falls back (exact match)",
+      pathname: "/?utm=x",
+      scrolled: true,
+      observed: "compare",
+      expected: "intro",
+    },
   ] as const)("$name", ({ pathname, scrolled, observed, expected }) => {
     expect(resolveActiveSection(pathname, scrolled, observed, "intro")).toBe(
       expected,

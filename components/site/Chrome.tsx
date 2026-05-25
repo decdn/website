@@ -170,11 +170,6 @@ export function Chrome() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [pathname]);
 
-  // Guard against a stale `active` landing in `DARK_SECTIONS` and painting
-  // `text-paper` over a paper-toned page: off-home the IO observes nothing,
-  // and on the first render after a client nav `active` still holds the
-  // previous route's last value until the [pathname] effects re-sync.
-  // `scrolled` doubles as a proxy for "past the intro hero".
   const effectiveActive = resolveActiveSection(
     pathname,
     scrolled,
