@@ -4,7 +4,7 @@ import { resolveActiveSection } from "./chrome-active";
 describe("resolveActiveSection", () => {
   it.each([
     {
-      name: "off-home + scrolled falls back (the #112 bug)",
+      name: "off-home + scrolled falls back",
       pathname: "/blog/foo/",
       scrolled: true,
       observed: "compare",
