@@ -29,8 +29,8 @@ export function Frame({
   children,
 }: FrameProps) {
   const sectionClass = [
-    "relative flex flex-col scroll-mt-[var(--nav-h)] px-[var(--frame-gutter)] py-[var(--frame-pad-y)]",
-    fill && "min-h-[min(100svh,var(--frame-min-h-cap))]",
+    "relative flex flex-col scroll-mt-[var(--nav-h)] px-frame-gutter py-frame-pad-y",
+    fill && "min-h-frame-min-h",
     TONE_CLASS[tone],
     className,
   ]
@@ -38,7 +38,7 @@ export function Frame({
     .join(" ");
   return (
     <section id={id} aria-labelledby={`${id}-h`} className={sectionClass}>
-      <div className="@container relative z-10 mx-auto flex w-full max-w-[var(--frame-max)] flex-1 flex-col">
+      <div className="@container relative z-10 mx-auto flex w-full max-w-frame flex-1 flex-col">
         {children}
       </div>
     </section>

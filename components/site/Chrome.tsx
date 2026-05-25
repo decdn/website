@@ -188,11 +188,11 @@ export function Chrome() {
       data-scrolled={scrolled ? "true" : undefined}
       data-tone={onDark ? "ink" : "paper"}
       data-mobile-open={mobileOpen ? "true" : undefined}
-      className={`chrome-nav fixed inset-x-0 top-0 z-50 px-[var(--frame-gutter)] py-5 ${
+      className={`chrome-nav fixed inset-x-0 top-0 z-50 px-frame-gutter py-5 ${
         onDark ? "text-paper" : "text-ink"
       }`}
     >
-      <div className="mx-auto grid w-full max-w-[var(--frame-max)] grid-cols-[1fr_auto_1fr] items-center gap-4">
+      <div className="mx-auto grid w-full max-w-frame grid-cols-[1fr_auto_1fr] items-center gap-4">
         <Link
           href="/#intro"
           onClick={handleNavClick}

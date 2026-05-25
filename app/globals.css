@@ -6,15 +6,15 @@
   --whisper: #0f9d6a;
   /* Intentionally 0: anchor jumps land flush at viewport top (under
      the fixed nav). Section headers don't get clipped because every
-     Frame's --frame-pad-y floor (5rem = 80px) sits comfortably above
-     the current fixed-nav height (py-5 + 30px wordmark ≈ 70px),
+     Frame's --spacing-frame-pad-y floor (5rem = 80px) sits comfortably
+     above the current fixed-nav height (py-5 + 30px wordmark ≈ 70px),
      leaving ~10px of breathing room below the nav. If the nav grows
      past 5rem, set --nav-h to the measured nav height — Frame already
      applies scroll-mt-[var(--nav-h)] on every section, so anchor
      offsets pick it up automatically. (Bumping the 5rem floor on
-     --frame-pad-y only helps below ~889px — above that the clamp's
-     9vw term already exceeds 5rem, so a bigger floor does nothing on
-     desktop.) */
+     --spacing-frame-pad-y only helps below ~889px — above that the
+     clamp's 9vw term already exceeds 5rem, so a bigger floor does
+     nothing on desktop.) */
   --nav-h: 0;
 }
 
@@ -23,15 +23,15 @@
   --color-paper: var(--paper);
   --color-whisper: var(--whisper);
 
-  /* Shared content rail: every Frame centers within --frame-max. */
-  --frame-max: 1280px;
-  --frame-gutter: clamp(1.5rem, 4vw, 4rem);
-  --frame-pad-y: clamp(
+  /* Shared content rail: every Frame centers within --container-frame. */
+  --container-frame: 1280px;
+  --spacing-frame-gutter: clamp(1.5rem, 4vw, 4rem);
+  --spacing-frame-pad-y: clamp(
     5rem,
     9vw,
     7rem
   ); /* floor coupled to nav height — see --nav-h note above */
-  --frame-min-h-cap: 54rem;
+  --spacing-frame-min-h: min(100svh, 54rem);
 
   /* Type scale: micro and CTA are fixed; body and headlines scale with viewport.
      Named under Tailwind v4's --text-* namespace so `text-body`, `text-h1`, …
@@ -1008,7 +1008,7 @@ a.underline-brutal:hover .arrow {
 .mm-toggle {
   position: fixed;
   top: 24px;
-  right: var(--frame-gutter);
+  right: var(--spacing-frame-gutter);
   z-index: 65;
   width: 22px;
   height: 22px;
