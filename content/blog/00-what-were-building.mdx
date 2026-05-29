@@ -19,7 +19,7 @@ decdn is the same job — caching content near users, routing around the slow pa
 
 There are two kinds of participant in the network.
 
-**Nodes** serve content. A node is a process running on a server (cloud VPS, dedicated hardware, or a spare machine in someone's closet) that stakes the network's native token, joins the peer mesh, advertises itself via gossip, and accepts paid delivery requests. Nodes set their own per-megabyte rate, manage their own cache, and earn USDC for every byte they ship. Some nodes are configured with an origin backend (S3, R2, B2, NFS, local disk) — those are the ones that can answer the first request for a hash that's never been served before. Most nodes are pure caches that pull from peers on miss and re-serve.
+**Nodes** serve content. A node is a process running on a server (cloud VPS, dedicated hardware, or a spare machine in someone's closet) that bonds the network's native token, joins the peer mesh, advertises itself via gossip, and accepts paid delivery requests. Nodes set their own per-megabyte rate, manage their own cache, and earn USDC for every byte they ship. Some nodes are configured with an origin backend (S3, R2, B2, NFS, local disk) — those are the ones that can answer the first request for a hash that's never been served before. Most nodes are pure caches that pull from peers on miss and re-serve.
 
 **Clients** consume content. A client opens a payment channel against a node's network identity, deposits some USDC, and signs vouchers as bytes flow. Each voucher is a structured signature saying "I now owe this node N USDC, cumulative." When the session ends, the channel closes on-chain and the node gets paid. The client only ever pays for bytes it received, verified, and accepted.
 
@@ -36,7 +36,7 @@ Every part of the stack is a primitive that already exists. decdn is the protoco
 - A low-cost EVM L2 for settlement — payment channels open, close, and dispute on-chain, with per-transaction costs in the cents range.
 - **ERC-4337 account abstraction** and **Safe smart wallets**, so operators and clients can use modern wallet UX, batch approvals, and pay gas in stablecoins instead of native chain tokens.
 
-The protocol surface is thin: a wire format for probe and delivery, a payment channel contract, a staking registry, a slashing judge, a content blacklist, and a governance system. We did not invent any of the underlying primitives. We invented the protocol that composes them.
+The protocol surface is thin: a wire format for probe and delivery, a payment channel contract, a bonding registry, a slashing judge, a content blacklist, and a governance system. We did not invent any of the underlying primitives. We invented the protocol that composes them.
 
 ## The economic shape
 
@@ -59,7 +59,7 @@ To set expectations, here's what decdn does _not_ do.
 
 ## Who this is for
 
-If you're a **node operator** — a sysadmin, a homelabber, a datacenter shop with spare bandwidth — decdn is supply-side opportunity. Stake, register, serve, earn USDC.
+If you're a **node operator** — a sysadmin, a homelabber, a datacenter shop with spare bandwidth — decdn is supply-side opportunity. Bond, register, serve, earn USDC.
 
 If you're a **content publisher** — a team shipping large payloads — decdn is the fraction-of-the-cost alternative to incumbent CDN pricing, with origin protection and optional end-to-end encryption built in.
 
