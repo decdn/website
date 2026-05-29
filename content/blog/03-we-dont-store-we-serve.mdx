@@ -1,0 +1,54 @@
+---
+title: "We Don't Store. We Serve."
+slug: we-dont-store-we-serve
+date: 2026-05-29
+summary: "A storage network and a delivery network optimize for opposite invariants. deCDN doesn't store — it serves, and leaves origin storage where it already works."
+bucket: pillar
+tags: [delivery, storage, caching, origins]
+---
+
+A storage network and a delivery network look similar from a thousand feet up. They both have nodes. They both run on commodity hardware. They both move bytes around. The trouble starts when you ask which invariant the system optimizes for.
+
+A storage network maximizes durability per dollar — the chance that a given byte is still readable five years from now. A delivery network minimizes time-to-first-byte and cost-per-MB-served — how fast you get something _right now_, and what it costs to get it. These objectives don't share a frontier. Optimizing one is, in practice, deoptimizing the other. The history of decentralized infrastructure is dotted with projects that tried to do both and ended up mediocre at each. **decdn** does not store. It serves. Storage stays where it already is.
+
+## The proofs argument
+
+Storage networks have to keep proving, continuously, that the bytes they committed to keeping are still there. Filecoin's proof-of-spacetime is the canonical example. Sia challenges hosts. Arweave bakes proofs into block production. These proofs cost something — CPU, storage I/O, or both — and that cost is paid by every byte under management for as long as the network keeps it.
+
+A delivery network proves something different and proves it once: the byte you just sent matches the BLAKE3 hash the client asked for. The verification is at the edge, at receipt time, at line rate. There's no continuous proof obligation. There's no challenge game. If a node lies about having a blob, it gets caught the next time it tries to serve it (and pays a slashing penalty). If a node serves bytes that don't hash to the requested ID, the client throws them away and pays nothing.
+
+This isn't just a pricing difference. It's a different shape of system. Every line of code we don't have to write to maintain a continuous proof economy is a line of code we can write to compete on latency.
+
+## The placement argument
+
+Storage networks place data deliberately and replicate it. The user (or the protocol) declares a replication factor; the network selects N hosts; data is striped or copied across them; the protocol monitors and re-replicates when a host disappears. Placement is a control-plane decision. The hosts are usually static for the lifetime of the deal.
+
+Delivery networks place data _emergently_. A blob propagates because someone requested it from somewhere it wasn't, the closest node didn't have it, and the closest node paid a peer who did and cached the bytes for the next request. The replication count is whatever the demand gradient produces. There's no replication factor to set; there's a price-per-MB and a probe latency and a unified selection score, and the rest is market.
+
+This is why we make every node-to-node cache-miss pull a paid transaction. The economic gradient _is_ the replication strategy. Make popular content cheap to serve nearby (because someone else paid to drag it there once), and the next operator over has every reason to cache it. Storage networks have to design replication; we design the price curve and let placement happen.
+
+## The pricing argument
+
+Storage networks tend toward endowment pricing — pay once at upload, the network commits to retention for a fixed term or "forever" against an interest-style draw. The economics make sense for cold archives where retrieval is rare. They break for delivery, where retrieval is the entire workload and per-MB cost has to track the marginal cost of moving bytes.
+
+Delivery networks have to bill per-MB, in real time, with sub-cent granularity. That's not optional — it's how you let the spot market discover what content is worth moving and what isn't. A pre-paid endowment can't give you that signal because there's no marginal cost to retrieval; everyone who already paid the upload fee should hammer the network forever, and they will.
+
+We bill in USDC, off-chain, in payment channels that settle on a low-cost L2 once. A voucher for the next megabyte is a signed message, not a transaction. That's the only billing model we found where the unit economics close at $0.01/GB without compromising the granularity.
+
+## Origin stays where it is
+
+Decentralized storage already exists. So does centralized storage, and it's better than the decentralized stuff for most workloads — cheaper per byte, lower latency to first byte, better tooling, stricter SLAs. We do not need to relitigate this.
+
+decdn's nodes have _opaque_ origin backends. A node can be configured with S3, Cloudflare R2, Backblaze B2, MinIO, NFS, or local disk. The decdn protocol does not see, name, or address the origin. It only sees the BLAKE3 hash of the blob the origin produced. From the rest of the network's perspective, an origin-backed node is just a node that happens to never have a cache miss for certain hashes.
+
+This is what hidden origins buys us:
+
+- Content publishers reuse infrastructure they already pay for. R2 doesn't charge for egress to a decdn node any more than it charges for egress to anything else. The publisher doesn't pay twice.
+- The network surface is small. We don't carry an S3 protocol, a B2 protocol, a NFS shim. There's one small origin adapter — fetch the bytes for a given hash, and report what kind of backend it is — and operators implement it for whichever backend they have.
+- The decentralization story is honest. We don't claim to decentralize storage. We claim to decentralize delivery, and we leave the storage where it works best.
+
+## The implication for protocol design
+
+The thing that falls out of the "we don't store" decision is that nearly every architectural choice cascades. We don't need a continuous proof system. We don't need replication factor management. We don't need a deal market. We don't need cold-storage-grade durability guarantees. We don't need a separate retrieval protocol bolted on top of a storage protocol.
+
+What we need is a fast probe, a paid stream, an off-chain channel, and a cache eviction policy. Every layer is in service of one objective: get the byte to the client faster and cheaper than the centralized alternative. Storage stays where it is.
