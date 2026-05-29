@@ -44,7 +44,7 @@ Two currencies, doing two jobs.
 
 **USDC** is for delivery payments. Every byte transferred is paid in USDC, including the bytes one node pulls from another on a cache miss. The economic gradient _is_ the replication strategy: popular content propagates because each cache becomes a paying source for the next hop. Operator revenue tracks operator costs in the same currency as the operator's server bill.
 
-**The native token** is for staking, governance, and fee-share alignment. Operators stake to register; the stake is slashable for misbehavior. Vote-locked tokens steer protocol parameters. A portion of protocol fees flows back to long-term holders. The native token is never used to pay for bandwidth — the network that tries to do that is the network that loses its supply side the first time the token drops.
+**The native token** is for bonding, governance, and value accrual. Operators bond to register, sized to the capacity they declare; the bond is slashable for misbehavior. Voting weight comes from proven delivered bytes, not from locked tokens — the operators actually moving traffic steer protocol parameters. Thirty percent of every settlement is routed to buyback-and-burn, so network usage accrues to holders through deflation rather than a fee-share payout. The native token is never used to pay for bandwidth — the network that tries to do that is the network that loses its supply side the first time the token drops.
 
 The split is deliberate. Volatility goes in one currency, used for alignment over long horizons. Stability goes in the other, used for payments matched to fiat-denominated server bills.
 
