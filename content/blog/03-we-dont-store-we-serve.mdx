@@ -2,7 +2,7 @@
 title: "We Don't Store. We Serve."
 slug: we-dont-store-we-serve
 date: 2026-05-29
-summary: "A storage network and a delivery network optimize for opposite invariants. deCDN doesn't store — it serves, and leaves origin storage where it already works."
+summary: "A storage network and a delivery network optimize for opposite invariants. decdn doesn't store — it serves, and leaves origin storage where it already works."
 bucket: pillar
 tags: [delivery, storage, caching, origins]
 ---
@@ -44,7 +44,7 @@ decdn's nodes have _opaque_ origin backends. A node can be configured with S3, C
 This is what hidden origins buys us:
 
 - Content publishers reuse infrastructure they already pay for. R2 doesn't charge for egress to a decdn node any more than it charges for egress to anything else. The publisher doesn't pay twice.
-- The network surface is small. We don't carry an S3 protocol, a B2 protocol, a NFS shim. There's one small origin adapter — fetch the bytes for a given hash, and report what kind of backend it is — and operators implement it for whichever backend they have.
+- The network surface is small. We don't carry an S3 protocol, a B2 protocol, an NFS shim. There's one small origin adapter — fetch the bytes for a given hash, and report what kind of backend it is — and operators implement it for whichever backend they have.
 - The decentralization story is honest. We don't claim to decentralize storage. We claim to decentralize delivery, and we leave the storage where it works best.
 
 ## The implication for protocol design
