@@ -3,7 +3,7 @@ export const EMAIL = "info@decdn.org";
 export const links = {
   site: "https://decdn.org",
   github: "https://github.com/decdn",
-  x: "https://x.com/deCDNorg",
+  x: "https://x.com/decdn_",
   linkedin: "https://www.linkedin.com/company/decdn",
   litepaper: "/decdn_litepaper.pdf",
   presskit: "/presskit/decdn-presskit.zip",
