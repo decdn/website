@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { links } from "@/lib/links";
 import { homeHashSectionId, shouldInterceptNavClick } from "@/lib/scroll";
 import { MobileMenu } from "@/components/site/MobileMenu";
+import { resolveActiveSection } from "@/components/site/chrome-active";
 
 const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
 // Hash anchors are written `/#section`. Required because this nav also
@@ -169,12 +170,12 @@ export function Chrome() {
     return () => window.removeEventListener("scroll", onScroll);
   }, [pathname]);
 
-  // Guard against a stale `active` landing in `DARK_SECTIONS` and painting
-  // `text-paper` over a paper-toned page: off-home the IO observes nothing,
-  // and on the first render after a client nav `active` still holds the
-  // previous route's last value until the [pathname] effects re-sync.
-  // `scrolled` doubles as a proxy for "past the intro hero".
-  const effectiveActive = pathname === "/" && scrolled ? active : "intro";
+  const effectiveActive = resolveActiveSection(
+    pathname,
+    scrolled,
+    active,
+    "intro",
+  );
   const onDark = DARK_SECTIONS.has(effectiveActive);
   // The toggle is portalled to <body> (see MobileMenu.tsx) and lives
   // on top of the paper panel while the drawer is open — force it to
@@ -188,11 +189,11 @@ export function Chrome() {
       data-scrolled={scrolled ? "true" : undefined}
       data-tone={onDark ? "ink" : "paper"}
       data-mobile-open={mobileOpen ? "true" : undefined}
-      className={`chrome-nav fixed inset-x-0 top-0 z-50 px-[var(--frame-gutter)] py-5 ${
+      className={`chrome-nav fixed inset-x-0 top-0 z-50 px-frame-gutter py-5 ${
         onDark ? "text-paper" : "text-ink"
       }`}
     >
-      <div className="mx-auto grid w-full max-w-[var(--frame-max)] grid-cols-[1fr_auto_1fr] items-center gap-4">
+      <div className="mx-auto grid w-full max-w-frame grid-cols-[1fr_auto_1fr] items-center gap-4">
         <Link
           href="/#intro"
           onClick={handleNavClick}
