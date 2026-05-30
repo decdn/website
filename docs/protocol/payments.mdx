@@ -1,11 +1,11 @@
 ---
 title: Payments
-description: Off-chain ERC-20 payment channels. Market-driven rates within governance-set bounds.
+description: Off-chain USDC payment channels. Market-driven rates within governance-set bounds.
 ---
 
 ## Decision
 
-Clients pay nodes **per MB** over off-chain **payment channels** settled on-chain. On a cache miss, nodes pay peers per MB for initial content pulls, then amortize that cost across many client deliveries. Origin-backed nodes set the effective price ceiling (their backend egress costs). Rates are fully market-driven within governance-set bounds.
+Clients pay nodes **per MB** over off-chain **payment channels** settled on-chain. All channels are denominated in **USDC**, fixed at contract deployment. On a cache miss, nodes pay peers per MB for initial content pulls, then amortize that cost across many client deliveries. Origin-backed nodes set the effective price ceiling (their backend egress costs). Rates are fully market-driven within governance-set bounds.
 
 ## Channel lifecycle
 
@@ -15,7 +15,7 @@ sequenceDiagram
     participant N as Node
     participant CH as PaymentChannel (on-chain)
 
-    C->>CH: openChannel(nodeAddr, deposit, token)
+    C->>CH: openChannel(nodeAddr, deposit)
     loop Per stream
         C->>N: Voucher (off-chain, signed)
     end
@@ -31,7 +31,7 @@ Off-chain signed messages bound to a specific channel. Each voucher supersedes p
 
 ## Rate discovery
 
-Each node advertises its own per-MB rate. Governance sets per-token bounds; a node advertising outside the bounds is ignored by selection. Rates can change between streams.
+Each node advertises its own per-MB rate. Governance sets rate bounds (in USDC); a node advertising outside the bounds is ignored by selection. Rates can change between streams.
 
 ## Dispute window
 
