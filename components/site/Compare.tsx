@@ -46,7 +46,7 @@ export function Compare() {
             </div>
             <div className="meta @xl:col-span-5">
               decdn
-              <span className="ml-2 opacity-60">/ peer-to-peer</span>
+              <span className="ml-2 opacity-60">/ decentralized</span>
             </div>
           </div>
         </div>
