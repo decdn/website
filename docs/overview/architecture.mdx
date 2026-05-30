@@ -52,7 +52,7 @@ See [Participants](/overview/participants) for a deeper breakdown per role.
 1. **Client bootstrap** — client generates a keypair, queries the on-chain registry, seeds a peer table, and subscribes to regional + global gossip topics.
 2. **Discovery** — client probes its known peers for a blob hash. On miss, any peer performs a DHT lookup to locate holders.
 3. **Selection** — returned candidates are scored by price, latency, and reputation; lowest cost wins.
-4. **Payment channel open** — client opens a payment channel in an allowlisted ERC-20 with the selected node on-chain ([payments](/protocol/payments)).
+4. **Payment channel open** — client opens a USDC payment channel with the selected node on-chain ([payments](/protocol/payments)).
 5. **Streaming + vouchers** — node streams to the client; client signs off-chain vouchers as bytes flow.
 6. **Cache-miss fan-out** — if the node doesn't have the blob, it pulls from another peer (paid). Every byte delivered in the network is paid.
 7. **Channel close** — either party initiates settlement on-chain, with a dispute window for stale closes.

@@ -1,11 +1,21 @@
 ---
 title: Governance
-description: Token-weighted governance with safety bounds and a sunsetted emergency multisig.
+description: Operator governance weighted by delivered bytes, with safety bounds and a sunsetted emergency multisig.
 ---
 
 ## Decision
 
-OpenZeppelin Governor with TOKEN voting, **4% quorum**, and a **2-day timelock**. All governable parameters have hardcoded safety bounds that governance cannot override. A **3-of-5 emergency multisig** can only pause contracts and add emergency blacklist entries, and has a **12-month sunset** enforced via an immutable constructor deadline. Governance can vote to extend the sunset by capped increments.
+OpenZeppelin Governor whose voting weight is an operator's **delivered bytes over a trailing window** — not TOKEN balance — with a **4% quorum** and a **2-day timelock**. All governable parameters have hardcoded safety bounds that governance cannot override. A **3-of-5 emergency multisig** can pause contracts, add emergency blacklist entries, and triage disputed slashes and blacklist entries, and has a **12-month sunset** enforced via an immutable constructor deadline. Governance can vote to extend the sunset by capped increments.
+
+## Voting weight
+
+Voting weight is each operator's **served bytes over a trailing window** (default ~1 quarter, governable), scaled by a tenure ramp and capped per operator (default 5% of the window's bytes).
+
+- **Passive TOKEN holders have no vote.** Governance power tracks real delivery, not holdings — you must operate a node and serve bytes to vote.
+- **Fresh operators ramp in.** A new operator that serves heavily on day one still votes at a fraction of its byte share until the tenure ramp completes over several months.
+- **Slashing zeroes out the vote.** A slashed operator's weight drops to zero for the rest of the window, then recovers as the window slides past the slash.
+
+Bytes are read from the on-chain `FeeRouter` settlement counter, so weight is auditable and cannot be claimed without paid delivery.
 
 ## Hardcoded safety bounds
 
@@ -23,10 +33,11 @@ Bounds are enforced in `require()` checks in the setter functions. A malicious g
 
 ## Emergency multisig
 
-3-of-5 signers. Can only:
+3-of-5 signers. Limited to:
 
 - **Pause** any contract (`Pausable`)
 - **Add emergency blacklist entries** (with 14-day auto-expiry or 90-day for CSAM/terrorist categories — see [takedown](/protocol/takedown))
+- **Triage disputed slashes and blacklist entries** — fast-track or reject an appeal within a fixed window, never decide it unilaterally
 
 Can **not**:
 
@@ -38,16 +49,16 @@ Can **not**:
 
 ## Proposal flow
 
-1. Proposer holds ≥ proposal threshold TOKEN.
+1. Proposer's served-bytes weight ≥ the proposal threshold.
 2. `propose()` with target, calldata, description.
 3. Voting period (default 3 days).
-4. Quorum check (4% of circulating TOKEN).
+4. Quorum check — 4% of total delivered bytes in the trailing window.
 5. Queue in timelock (2 days).
 6. Execute.
 
 ## Why 4% quorum
 
-Low enough that realistic participation can reach quorum; high enough that a single whale cannot unilaterally pass a proposal. 4% maps to established DAO practice (Compound, Uniswap) and works in conjunction with the hardcoded safety bounds — the bounds mean a bad quorum can still only move parameters within the safe range.
+Low enough that realistic participation can reach quorum; high enough that no single operator can unilaterally pass a proposal — and the per-operator weight cap bounds concentration directly. 4% maps to established DAO practice (Compound, Uniswap) and works in conjunction with the hardcoded safety bounds — the bounds mean a bad quorum can still only move parameters within the safe range.
 
 ## Regional governance bodies
 

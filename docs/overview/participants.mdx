@@ -13,7 +13,7 @@ A **node** is a staked QUIC endpoint that caches and serves content-addressed bl
 - **Stake.** Required to join the mesh.
 - **Gossip.** Publishes node metadata on a global topic and a regional topic. Also emits rate-change updates.
 - **Delivery.** Serves the paid-delivery protocol — the sole rail for both client→node and node→node traffic.
-- **Earnings.** Per-MB voucher revenue in the channel's token — any governance-allowlisted ERC-20.
+- **Earnings.** Per-MB voucher revenue in USDC.
 
 Two deployment shapes:
 
@@ -30,7 +30,7 @@ A **client** is a lightweight QUIC endpoint that consumes content and pays for i
 
 - **Identity.** Ephemeral network keypair — no stake, no on-chain registration.
 - **Gossip.** Subscribes to topics but does not publish.
-- **Payment.** Opens an on-chain ERC-20 payment channel with each node it buys from, then signs off-chain vouchers as bytes flow ([payments](/protocol/payments)).
+- **Payment.** Opens an on-chain USDC payment channel with each node it buys from, then signs off-chain vouchers as bytes flow ([payments](/protocol/payments)).
 - **Trust model.** Verifies hashes on all bytes received. Trusts nodes for availability (slashable if claimed and not delivered), not for content.
 
 Clients can run a multi-node parallel download for large files and resume crashed transfers from the last verified byte.

@@ -20,7 +20,7 @@ sequenceDiagram
     C->>N: Channel close / settle
 ```
 
-The client picks the candidate with the best combination of price, latency, and reputation. After settling on a node, it opens a channel in an allowlisted ERC-20 and streams. Vouchers cover every byte delivered; the node can settle any voucher on-chain later.
+The client picks the candidate with the best combination of price, latency, and reputation. After settling on a node, it opens a USDC channel and streams. Vouchers cover every byte delivered; the node can settle any voucher on-chain later.
 
 ## Cache miss with pull-through
 

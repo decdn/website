@@ -48,4 +48,4 @@ Each node maintains a **local denylist** for direct legal notices (e.g., a DMCA 
 
 ## Slash schedule
 
-Blacklist violations use an escalating schedule: **10% / 25% / 50%** for first / second / third offense within 90 days.
+Blacklist violations use an escalating schedule: **5% / 15% / 50%** for first / second / third offense (capped at 50% per offense). Offenses accumulate over the operator's lifetime; a node whose bond falls below 50% of the minimum is auto-ejected.
