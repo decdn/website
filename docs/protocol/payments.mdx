@@ -15,19 +15,22 @@ sequenceDiagram
     participant N as Node
     participant CH as PaymentChannel (on-chain)
 
-    C->>CH: openChannel(nodeAddr, deposit)
+    C->>CH: openChannel(provider, deposit)
     loop Per stream
-        C->>N: Voucher (off-chain, signed)
+        C->>N: Cumulative voucher (off-chain, signed, nonce++)
     end
     N->>CH: closeChannel(latest voucher)
-    CH->>CH: Dispute window
-    CH-->>N: Settle → NodeAddr
+    Note over CH: Dispute window — either party<br/>can submit a higher-nonce voucher<br/>via disputeChannel
+    CH->>CH: settleChannel
+    CH-->>N: Settle → provider
     CH-->>C: Refund remaining deposit
 ```
 
+The channel token is fixed (USDC) at deployment, so `openChannel` takes only the provider and deposit. Close is a three-step lifecycle — `closeChannel` (callable by either party) starts the dispute window, `disputeChannel` accepts a higher-nonce voucher during the window, and `settleChannel` distributes funds after it expires. A node may also `withdraw` accrued earnings against the latest voucher while the channel stays open — redeeming a monotonic client-signed claim needs no dispute window.
+
 ## Vouchers
 
-Off-chain signed messages bound to a specific channel. Each voucher supersedes prior ones in the same channel — at settlement only the highest-value voucher matters, so nodes can safely discard older ones. Cadence is negotiated per stream.
+Off-chain signed messages bound to a specific channel, carrying a strictly increasing **nonce** (starting at 1) and a **cumulative** amount and byte count. Each new voucher restates the running total owed — both amount and bytes are monotonically non-decreasing — and the highest-nonce voucher is the one that settles. Nodes persist the latest nonce rather than discarding older state, since `disputeChannel` only accepts a strictly higher nonce. Cadence is negotiated per stream.
 
 ## Rate discovery
 
@@ -35,4 +38,4 @@ Each node advertises its own per-MB rate. Governance sets rate bounds (in USDC);
 
 ## Dispute window
 
-A close window during which the counterparty can submit a later voucher if a stale-nonce close was filed. Bounded by governance.
+A window after `closeChannel` during which either party can submit a later (higher-nonce) voucher via `disputeChannel` if a stale close was filed. Default 48 hours, governable within 12h–72h.
