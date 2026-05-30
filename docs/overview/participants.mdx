@@ -1,16 +1,16 @@
 ---
 title: Participants
-description: Who does what, who stakes, who pays, and who is on- or off-protocol.
+description: Who does what, who bonds, who pays, and who is on- or off-protocol.
 ---
 
 deCDN has two protocol roles (nodes and clients) plus one external component (origin backends). Only nodes and clients speak CDN protocols.
 
 ## Nodes
 
-A **node** is a staked QUIC endpoint that caches and serves content-addressed blobs.
+A **node** is a bonded QUIC endpoint that caches and serves content-addressed blobs.
 
 - **Identity.** A network keypair bound on-chain to an Ethereum address at registration ([network](/protocol/network)).
-- **Stake.** Required to join the mesh.
+- **Bond.** A capacity bond in TOKEN, scaled to declared bandwidth (`bond = k × Mbps^α`) — the only TOKEN-side requirement to join the mesh; the bond scales with declared capacity rather than a flat minimum.
 - **Gossip.** Publishes node metadata on a global topic and a regional topic. Also emits rate-change updates.
 - **Delivery.** Serves the paid-delivery protocol — the sole rail for both client→node and node→node traffic.
 - **Earnings.** Per-MB voucher revenue in USDC.
@@ -37,15 +37,15 @@ Clients can run a multi-node parallel download for large files and resume crashe
 
 ## External components
 
-These are **not CDN protocol participants**. They ride the same QUIC transport but do not gossip, probe, or stake.
+These are **not CDN protocol participants**. They ride the same QUIC transport but do not gossip, probe, or bond.
 
 ### Origin backend
 
 An S3 bucket, R2 bucket, MinIO instance, NFS mount, or local disk. Holds the canonical bytes. Origin-backed nodes query it on cache miss. Never exposed to the network — the hash→object-key mapping is a private catalog held by the operator.
 
-## Who stakes, who pays
+## Who bonds, who pays
 
-| Participant        | Stakes?  | Pays?                          | Earns?                    |
+| Participant        | Bonds?   | Pays?                          | Earns?                    |
 | ------------------ | -------- | ------------------------------ | ------------------------- |
 | Pure cache node    | ✅ TOKEN | ✅ Pays upstream on cache miss | ✅ Per-MB voucher revenue |
 | Origin-backed node | ✅ TOKEN | ❌                             | ✅ Per-MB voucher revenue |

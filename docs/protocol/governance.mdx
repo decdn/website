@@ -5,7 +5,7 @@ description: Operator governance weighted by delivered bytes, with safety bounds
 
 ## Decision
 
-OpenZeppelin Governor whose voting weight is an operator's **delivered bytes over a trailing window** — not TOKEN balance — with a **4% quorum** and a **2-day timelock**. All governable parameters have hardcoded safety bounds that governance cannot override. A **3-of-5 emergency multisig** can pause contracts, add emergency blacklist entries, and triage disputed slashes and blacklist entries, and has a **12-month sunset** enforced via an immutable constructor deadline. Governance can vote to extend the sunset by capped increments.
+OpenZeppelin Governor whose voting weight is an operator's **delivered bytes over a trailing window** — not TOKEN balance — with a **4% quorum** and a **2-day timelock**. All governable parameters have hardcoded safety bounds that governance cannot override. A **3-of-5 emergency multisig** can pause contracts, add emergency blacklist entries, and triage disputed slashes and blacklist entries, and has a **12-month sunset** enforced via an immutable constructor deadline — governance cannot extend it; prolonging emergency capability requires deploying a new contract version and migrating through the standard upgrade path.
 
 ## Voting weight
 
@@ -17,19 +17,23 @@ Voting weight is each operator's **served bytes over a trailing window** (defaul
 
 Bytes are read from the on-chain `FeeRouter` settlement counter, so weight is auditable and cannot be claimed without paid delivery.
 
+### Launch phase
+
+Served-bytes DAO voting only activates once the operator set is large enough to make it safe. Until then — the first 6–12 months post-launch — a **5-of-9 bootstrap multisig** (distinct from the emergency multisig) operates the protocol within the same safety bounds. The bootstrap phase ends, irreversibly, when the active operator count reaches **≥ 30** _and_ total declared capacity reaches **≥ 100 Gbps**; at the transition, governance role authority transfers to the timelock-controlled Governor and the bootstrap multisig cannot be reinstated.
+
 ## Hardcoded safety bounds
 
 Even governance cannot set parameters outside these bounds:
 
-| Parameter           | Bounds      |
-| ------------------- | ----------- |
-| Slash percentage    | 5% – 50%    |
-| Dispute window      | 12 h – 72 h |
-| Min stake           | > 0         |
-| Protocol fee        | < 100%      |
-| Channel close delay | > 0         |
+| Parameter                                 | Bounds      |
+| ----------------------------------------- | ----------- |
+| Operator revenue share (`FeeRouter` base) | 40% – 90%   |
+| Burn share (`FeeRouter`)                  | ≥ 5%        |
+| Dispute window                            | 12 h – 72 h |
+| Per-operator voting cap                   | 1% – 25%    |
+| Unbonding window                          | 7 – 60 days |
 
-Bounds are enforced in `require()` checks in the setter functions. A malicious governance proposal that attempts to set stake to zero simply reverts.
+Bounds are enforced in `require()` checks in the setter functions. A malicious governance proposal that attempts to push the operator revenue share below its floor simply reverts. (Slashing tiers — 5% / 15% / 50% by lifetime offense count — are fixed constants, not governable parameters; see [slashing](/protocol/slashing).)
 
 ## Emergency multisig
 
@@ -45,16 +49,18 @@ Can **not**:
 - Change parameters
 - Grant roles
 
-**12-month sunset** is enforced in the multisig's constructor — after the deadline, the emergency functions are unreachable on-chain. Governance can vote to extend the deadline by capped increments, preserving the anti-centralization default while retaining emergency capability.
+**12-month sunset** is enforced in the multisig's constructor as an immutable deadline — after it, `pause()` and emergency blacklisting revert on-chain. Governance **cannot** modify the deadline; to retain emergency capability past the sunset, a new contract version with a new deadline must be deployed and migrated to via the standard upgrade path (timelock + governance vote). This guarantees the sunset cannot be silently extended.
 
 ## Proposal flow
 
 1. Proposer's served-bytes weight ≥ the proposal threshold.
 2. `propose()` with target, calldata, description.
-3. Voting period (default 3 days).
+3. Voting period (default 7 days, after a 1-day voting delay).
 4. Quorum check — 4% of total delivered bytes in the trailing window.
 5. Queue in timelock (2 days).
 6. Execute.
+
+The combined ~10-day minimum delay (voting delay + 7-day period + 48-hour timelock) is deliberately longer than the OpenZeppelin Governor defaults, reflecting operator-class participation cadence.
 
 ## Why 4% quorum
 

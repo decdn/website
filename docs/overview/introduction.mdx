@@ -10,7 +10,7 @@ deCDN is a **decentralized content delivery network**. Instead of a single provi
 - **Content-addressed.** Every blob is identified by its BLAKE3 hash. Clients verify the bytes they receive — they do not trust any node to return the right content.
 - **Paid per megabyte.** Every byte delivered is paid, including node-to-node cache-miss pulls. Payments run on off-chain channels denominated in USDC (fixed at deployment), with on-chain settlement only at channel open and close.
 - **Origin-hidden.** Origin backends (S3, R2, B2, NFS, local disk) are opaque per-node configuration. No external origin URL is ever exposed to the network.
-- **Staked and slashable.** Nodes stake TOKEN to join the peer mesh. Slashable offenses have on-chain evidence paths that anyone can challenge.
+- **Bonded and slashable.** Nodes post a TOKEN capacity bond (scaled to declared bandwidth) to join the peer mesh. Slashable offenses have on-chain evidence paths that anyone can challenge.
 - **No single operator.** Gossip for discovery. A DHT for content location. Optimistic challenge-response for disputes. Operator governance weighted by delivered bytes, with a timelock for parameter updates.
 
 ## What it isn't
