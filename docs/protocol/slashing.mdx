@@ -11,7 +11,7 @@ Three slashable offenses with concrete on-chain evidence paths:
 2. **Rate manipulation** — charged a rate different from the advertised rate.
 3. **Blacklist violation** — served a blacklisted hash after the compliance window.
 
-A unified on-chain judge adjudicates all three synchronously and triggers the stake reduction immediately upon verification — there is no in-protocol counter-evidence window, because each offense rests on cryptographically dispositive signed evidence. The reduced stake is then held in escrow pending a post-slash appeal (below), not distributed on the spot.
+A unified on-chain judge adjudicates all three synchronously and triggers the bond reduction immediately upon verification — there is no in-protocol counter-evidence window, because each offense rests on cryptographically dispositive signed evidence. The reduced bond is then held in escrow pending a post-slash appeal (below), not distributed on the spot.
 
 ## Evidence staleness
 
@@ -19,8 +19,8 @@ Evidence has a maximum age, set strictly below the unbonding period — so an ac
 
 ## Escrow and appeals
 
-The stake reduction is immediate, but the slashed TOKEN sits in `CapacityBond` escrow rather than being paid out at slash time. The slashed **operator** — and only the operator — may file an **operational-failure appeal** within **30 days** (e.g. a genuine network outage, NTP drift, or hosting incident prevented compliance), posting a TOKEN appeal bond. The emergency multisig fast-tracks or rejects within a fixed window; the Governor then grants or upholds. A **granted** appeal refunds the full escrowed stake to the operator; a **failed** appeal distributes the escrow like an unappealed slash. The lifetime offense counter is unchanged either way — an appeal restitutes capital, not standing.
+The bond reduction is immediate, but the slashed TOKEN sits in `CapacityBond` escrow rather than being paid out at slash time. The slashed **operator** — and only the operator — may file an **operational-failure appeal** within **30 days** (e.g. a genuine network outage, NTP drift, or hosting incident prevented compliance), posting a TOKEN appeal bond. The emergency multisig fast-tracks or rejects within a fixed window; the Governor then grants or upholds. A **granted** appeal refunds the full escrowed bond to the operator; a **failed** appeal distributes the escrow like an unappealed slash. The lifetime offense counter is unchanged either way — an appeal restitutes capital, not standing.
 
 ## Challenger incentives
 
-Submitting evidence requires a **100 TOKEN** bond. A challenge that fails on-chain verification simply reverts — the challenger only loses gas, and the bond is not transferred. A challenge that passes always slashes the node and the bond is returned. At finality (≤ 30 days with no appeal, later if one is filed) the escrowed stake is split **50% to the challenger / 50% burned**, unless the operator's appeal is granted, in which case the operator is refunded and no challenger reward is paid.
+Submitting evidence requires a **100 TOKEN** bond. A challenge that fails on-chain verification simply reverts — the challenger only loses gas, and the bond is not transferred. A challenge that passes always slashes the node and the bond is returned. At finality (≤ 30 days with no appeal, later if one is filed) the escrowed bond is split **50% to the challenger / 50% burned**, unless the operator's appeal is granted, in which case the operator is refunded and no challenger reward is paid.

@@ -61,7 +61,7 @@ See [Participants](/overview/participants) for a deeper breakdown per role.
 
 - No external origin URL exists — content enters the network through origin-backed nodes whose backends are hidden.
 - A node cannot earn without delivering verifiable bytes — hash mismatch voids payment.
-- A node cannot join the mesh without bonding — registration enforces a capacity bond (`bond = k × Mbps^α`) scaled to declared bandwidth, not a flat minimum stake.
+- A node cannot join the mesh without bonding — registration enforces a capacity bond (`bond = k × Mbps^α`) scaled to declared bandwidth, rather than a flat minimum.
 - A node cannot register an identity it does not control — both keys must sign at registration.
 - Safety bounds on all governable parameters are hardcoded — governance cannot set fees to 100% or push the operator revenue share below its floor.
 - Being recognized as an origin is DAO-governed — configuring an origin backend locally without authorization means the node's bytes are served only as cache.

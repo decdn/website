@@ -10,7 +10,7 @@ deCDN has two protocol roles (nodes and clients) plus one external component (or
 A **node** is a bonded QUIC endpoint that caches and serves content-addressed blobs.
 
 - **Identity.** A network keypair bound on-chain to an Ethereum address at registration ([network](/protocol/network)).
-- **Bond.** A capacity bond in TOKEN, scaled to declared bandwidth (`bond = k × Mbps^α`) — the only TOKEN-side requirement to join the mesh; there is no flat minimum stake.
+- **Bond.** A capacity bond in TOKEN, scaled to declared bandwidth (`bond = k × Mbps^α`) — the only TOKEN-side requirement to join the mesh; the bond scales with declared capacity rather than a flat minimum.
 - **Gossip.** Publishes node metadata on a global topic and a regional topic. Also emits rate-change updates.
 - **Delivery.** Serves the paid-delivery protocol — the sole rail for both client→node and node→node traffic.
 - **Earnings.** Per-MB voucher revenue in USDC.
