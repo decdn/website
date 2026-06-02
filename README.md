@@ -1,6 +1,6 @@
 # deCDN — marketing site
 
-A peer-to-peer delivery layer for bytes at scale. Anyone can serve bytes; clients pay per megabyte in USDC.
+A decentralized delivery layer for bytes at scale. Anyone can serve bytes; clients pay per megabyte in USDC.
 
 ![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
 ![React 19](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white)
