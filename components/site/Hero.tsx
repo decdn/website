@@ -31,11 +31,11 @@ export function Hero() {
         <div className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-end @4xl:gap-12">
           <div className="flex flex-col gap-8 @4xl:gap-12">
             <p className="rise rise-3 max-w-[64ch] text-body leading-[1.65]">
-              a 14-gigabyte file posted in berlin reaches a client in tokyo in
-              under a second. the client streams from three peers at once,
-              verifies every chunk with blake3, and pays per megabyte in usdc —
-              whether the payload is a linux iso, a dataset, a game patch, a
-              media library, or an ai model.{" "}
+              the first bytes of a 14-gigabyte file posted in berlin reach a
+              client in tokyo in under a second. the client streams from three
+              peers at once, verifies every chunk with blake3, and pays per
+              megabyte in usdc — whether the payload is a linux iso, a dataset,
+              a game patch, a media library, or an ai model.{" "}
               <span className="text-whisper">deCDN</span> is demand-shaped,
               locality-optimised delivery for large files at scale: supply forms
               around demand, cost collapses as regional traffic concentrates.
@@ -78,7 +78,7 @@ export function Hero() {
               <Figure label="target price" value="$0.01/GB" />
               <Figure label="p50 latency" value="50–100 ms" />
               <Figure label="settlement" value="per-MB · usdc" />
-              <Figure label="gas overhead" value="<1%" />
+              <Figure label="gas overhead" value="~2.3%" />
             </div>
           </div>
 

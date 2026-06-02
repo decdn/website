@@ -62,7 +62,7 @@ export function Compare() {
             <div className="@xl:col-span-5">
               <div className="hug relative inline-flex text-price leading-[0.96] font-semibold tracking-[-0.04em]">
                 <span className="opacity-55">
-                  $0.085–$0.17
+                  $0.04–$0.20
                   <span className="meta ml-1 align-baseline opacity-70">
                     /GB
                   </span>

@@ -1,1 +1,1 @@
-deCDN — peer-to-peer delivery layer.
+deCDN — decentralized delivery layer.
