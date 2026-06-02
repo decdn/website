@@ -78,7 +78,7 @@ export function Hero() {
               <Figure label="target price" value="$0.01/GB" />
               <Figure label="p50 latency" value="50–100 ms" />
               <Figure label="settlement" value="per-MB · usdc" />
-              <Figure label="gas overhead" value="~2.3%" />
+              <Figure label="gas overhead" value="<1%" />
             </div>
           </div>
 
