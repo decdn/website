@@ -13,7 +13,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "Why does the network need a token?",
-    a: "TOKEN secures the network — operators stake it to participate, and they lose it if they misbehave. Payments, though, happen in USDC, because operators want stable currency they can pay power bills with. Twenty percent of protocol fees flow into a Balancer V3 80/20 TOKEN/USDC buyback, tying token demand to network throughput.",
+    a: "TOKEN secures the network — operators stake it to participate, and they lose it if they misbehave. Payments, though, happen in USDC, because operators want stable currency they can pay power bills with. Thirty percent of protocol fees flow into a Balancer V3 80/20 TOKEN/USDC buyback, tying token demand to network throughput.",
   },
   {
     q: "Can publishers pay on behalf of users?",
