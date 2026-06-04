@@ -53,7 +53,7 @@ The same maturity wave gave us:
 
 ## Demand caught up at the same time
 
-The supply-side primitives matured in parallel with a demand shock that didn't exist in 2020. Payload sizes grew an order of magnitude — modern open-source ML weights run 10–700GB; high-bitrate media, container images, and dataset distributions all push hundreds of GB; package archives are a hundred-fold larger than they were a decade ago. Traditional CDN list pricing didn't move: Cloudflare R2, AWS CloudFront, and Akamai are still in the $0.04–$0.20/GB band, the same as ten years ago. The teams shipping these payloads cannot run that math.
+The supply-side primitives matured in parallel with a demand shock that didn't exist in 2020. Payload sizes grew an order of magnitude — modern open-source ML weights run 10–700GB; high-bitrate media, container images, and dataset distributions all push hundreds of GB; package archives are a hundred-fold larger than they were a decade ago. Traditional CDN list pricing didn't move: AWS CloudFront and Akamai are still in the $0.04–$0.20/GB band, the same as ten years ago. Free-egress object storage (Cloudflare R2, Backblaze B2) undercuts that, but it is a revocable single-vendor arrangement, not an open market, and ties you to one provider's terms and outage surface. The teams shipping these payloads cannot run the legacy math, and the free alternative is a dependency, not a guarantee.
 
 Centralized risk got worse, not better. A handful of hosts carry the load for industries whose entire pitch is openness. Every major release throttles incumbent CDNs within hours.
 
