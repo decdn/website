@@ -1,7 +1,7 @@
 export const FAQ_ITEMS = [
   {
-    q: "How is it 90% cheaper?",
-    a: "Traditional CDNs provision for peak traffic and amortise that cost across long contracts, so a popular release gets expensive fast. deCDN is demand-shaped: supply forms around traffic, nodes cache what's hot, and bandwidth gets reused across many pulls. Cost per gigabyte collapses as regional demand concentrates — the opposite of how fixed-provisioning CDNs behave. Target price today: ~$0.01/GB, one cent, per actual gigabyte delivered.",
+    q: "What about free-egress storage like Cloudflare R2 or Backblaze B2?",
+    a: "It's real, and for a small project it's the right call. But that free egress is a revocable vendor arrangement, not a guarantee: R2 is Cloudflare's own loss-leader, repriceable at its discretion, and B2's free egress rides the Bandwidth Alliance, a pact among rivals that any member can exit. Either way you depend on one provider's roadmap, terms, and outage surface. deCDN is the opposite: an open market where operators set their own rates and compete for every request, so the price falls as the network grows, on capacity that's already paid for at the edge rather than in hyperscale datacenters. We don't claim to beat free on the egress line, and no token subsidy props up demand. Against the buyers paying a bill today, AWS CloudFront plus S3 at $0.04 to $0.20 per gigabyte list, we're materially cheaper: around $0.01/GB and trending down.",
   },
   {
     q: "How is byte-level integrity enforced?",
