@@ -5,11 +5,11 @@ export const FAQ_ITEMS = [
   },
   {
     q: "How is byte-level integrity enforced?",
-    a: "Every blob is BLAKE3-addressed, so the hash the client is asking for is the same hash they'll be checking on the way in. Verification happens chunk-by-chunk, in flight — mismatched bytes are dropped and the next peer on the list is asked instead. Peers that send garbage don't get paid for it: the mismatch is caught in flight and the bytes dropped. On-chain misbehaviour (phantom availability, rate manipulation, blacklist violations) is slashed against the peer's bonded TOKEN at submit time, from an EIP-712 signed message rather than a central arbiter. The math is the arbiter.",
+    a: "Every blob is BLAKE3-addressed, so the hash the client is asking for is the same hash they'll be checking on the way in. Verification happens chunk-by-chunk, in flight — mismatched bytes are dropped and the next peer on the list is asked instead. Peers that send garbage don't get paid for it: the mismatch is caught in flight and the bytes dropped. On-chain misbehavior (phantom availability, rate manipulation, blacklist violations) is slashed against the peer's capacity bond at submit time, from an EIP-712 signed message rather than a central arbiter. The math is the arbiter.",
   },
   {
     q: "Can content be gated or taken down?",
-    a: "Both. For gating: upload ciphertext instead of plaintext — nodes cache the encrypted blob without ever seeing inside, and your app holds the keys, handing them to clients over a separate authenticated channel. Subscription, paywall, whatever logic fits. For takedown: governance can flag specific BLAKE3 hashes as non-servable, and nodes that keep serving them past a short compliance window lose bonded TOKEN — slashing is on-chain, not a human call. Both the key gate and the flag list are auditable; compliance runs end-to-end, from origin onboarding to peer-level slashing, governance-owned and auditable throughout.",
+    a: "Both. For gating: upload ciphertext instead of plaintext — nodes cache the encrypted blob without ever seeing inside, and your app holds the keys, handing them to clients over a separate authenticated channel. Subscription, paywall, whatever logic fits. For takedown: governance can flag specific BLAKE3 hashes as non-servable, and nodes that keep serving them past a short compliance window lose part of their capacity bond — slashing is on-chain, not a human call. Both the key gate and the flag list are auditable; compliance runs end-to-end, from origin onboarding to peer-level slashing, governance-owned and auditable throughout.",
   },
   {
     q: "Why does the network need a token?",
