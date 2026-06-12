@@ -4,7 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { links } from "@/lib/links";
-import { homeHashSectionId, shouldInterceptNavClick } from "@/lib/scroll";
+import {
+  HOME_SECTION_ID,
+  homeNavTarget,
+  shouldInterceptNavClick,
+} from "@/lib/scroll";
 import { MobileMenu } from "@/components/site/MobileMenu";
 import { resolveActiveSection } from "@/components/site/chrome-active";
 
@@ -56,8 +60,32 @@ export function Chrome() {
   const handleNavClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (!shouldInterceptNavClick(e)) return;
-      const id = homeHashSectionId(e.currentTarget.getAttribute("href") ?? "");
-      if (id === null) return;
+      const target = homeNavTarget(e.currentTarget.getAttribute("href") ?? "");
+      if (target === null) return;
+
+      if (target.type === "top") {
+        // Home: land at the very top with no #intro fragment. Off this
+        // route the hero isn't in the DOM (e.g. /blog/*) — return without
+        // preventDefault so the native <Link href="/"> soft-navs home.
+        if (document.getElementById(HOME_SECTION_ID) === null) return;
+        e.preventDefault();
+        // Drop only the #fragment (keep any query); pathname+search is the
+        // canonical home. replaceState keeps a repeat click a URL no-op so
+        // nothing can accumulate.
+        history.replaceState(
+          null,
+          "",
+          window.location.pathname + window.location.search,
+        );
+        // scrollTo's default behaviour defers to <html>'s
+        // motion-safe:scroll-smooth, so it auto-honours reduced motion
+        // (the variant drops out → instant), mirroring the section path's
+        // scrollIntoView below.
+        window.scrollTo({ top: 0 });
+        return;
+      }
+
+      const { id } = target;
       e.preventDefault();
       const el = document.getElementById(id);
       if (el === null) {
@@ -195,7 +223,7 @@ export function Chrome() {
     >
       <div className="mx-auto grid w-full max-w-frame grid-cols-[1fr_auto_1fr] items-center gap-4">
         <Link
-          href="/#intro"
+          href="/"
           onClick={handleNavClick}
           className="col-start-1 flex items-center gap-3 no-underline"
         >

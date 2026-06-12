@@ -1,19 +1,35 @@
-// Returns the section id for a home-page hash href, or null when the href
-// is not an in-page anchor we should resolve locally.
+// `intro` is the id of the top (Hero) section. Its anchor is treated as
+// "go to the top, no fragment" rather than a section deep-link, so the URL
+// never carries a sticky `#intro`.
+export const HOME_SECTION_ID = "intro";
+
+export type HomeNavTarget =
+  | { type: "top" } // home — scroll to the top and clear the hash
+  | { type: "section"; id: string }; // a section anchor — scroll + set the hash
+
+// Classifies a home-nav href into the local action to take, or null when the
+// href is not an in-page target we should resolve locally.
 //
-//   "/#method"          -> "method"
-//   "/#"  | "/"         -> null   (no target section)
+//   "/"                 -> { type: "top" }                 (canonical home)
+//   "/#intro"           -> { type: "top" }                 (intro IS the top)
+//   "/#method"          -> { type: "section", id: "method" }
+//   "/#"                -> null   (no target section)
 //   "#method"           -> null   (bare hash — resolves against the
 //                                  current URL, not home; not our concern)
 //   "/blog/foo/#method" -> null   (cross-route navigation)
+//   "/?x=1#method"      -> null   (query before the hash — not "/#…")
 //
 // Callers pass a clean `/#${id}`; this does not sanitize multi-hash or
-// trailing-slash input (`/#a#b` -> "a#b", `/#intro/` -> "intro/").
-// Pure and DOM-free so the desktop nav click decision is unit-testable.
-export function homeHashSectionId(href: string): string | null {
+// trailing-slash input (`/#a#b` -> section "a#b", `/#intro/` -> section
+// "intro/"). Pure and DOM-free so the desktop nav click decision is
+// unit-testable.
+export function homeNavTarget(href: string): HomeNavTarget | null {
+  if (href === "/") return { type: "top" };
   if (!href.startsWith("/#")) return null;
   const id = href.slice(2);
-  return id.length > 0 ? id : null;
+  if (id.length === 0) return null;
+  if (id === HOME_SECTION_ID) return { type: "top" };
+  return { type: "section", id };
 }
 
 // Whether a nav click should be intercepted for local hash resolution,

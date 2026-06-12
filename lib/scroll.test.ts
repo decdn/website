@@ -1,35 +1,69 @@
 import { describe, expect, it } from "vitest";
 import {
-  homeHashSectionId,
+  HOME_SECTION_ID,
+  homeNavTarget,
   parseScrollMarginTop,
   shouldInterceptNavClick,
 } from "./scroll";
 
-describe("homeHashSectionId", () => {
-  it("returns the section id for a home-page hash href", () => {
-    expect(homeHashSectionId("/#method")).toBe("method");
-    expect(homeHashSectionId("/#intro")).toBe("intro");
-    expect(homeHashSectionId("/#contact")).toBe("contact");
+describe("homeNavTarget", () => {
+  it("maps the home root and the intro anchor to the top (no fragment)", () => {
+    expect(homeNavTarget("/")).toEqual({ type: "top" });
+    expect(homeNavTarget("/#intro")).toEqual({ type: "top" });
+  });
+
+  it("locks the home section id to intro", () => {
+    expect(HOME_SECTION_ID).toBe("intro");
+    expect(homeNavTarget(`/#${HOME_SECTION_ID}`)).toEqual({ type: "top" });
+  });
+
+  it("matches the intro id exactly (case-sensitive, no normalization)", () => {
+    // The id compare is exact; only the lowercase ids callers emit fold to
+    // the top. "/#INTRO" stays a section (then misses getElementById).
+    expect(homeNavTarget("/#INTRO")).toEqual({ type: "section", id: "INTRO" });
+  });
+
+  it("returns null for a query before the intro hash (not a clean /#…)", () => {
+    // Symmetric with the "/?x=1#method" case: the query breaks the "/#"
+    // prefix, so a query-bearing home href is not recognized as the top.
+    expect(homeNavTarget("/?x=1#intro")).toBeNull();
+  });
+
+  it("maps a section hash href to a section target", () => {
+    expect(homeNavTarget("/#method")).toEqual({
+      type: "section",
+      id: "method",
+    });
+    expect(homeNavTarget("/#contact")).toEqual({
+      type: "section",
+      id: "contact",
+    });
   });
 
   it("returns null when there is no target section", () => {
-    expect(homeHashSectionId("/#")).toBeNull();
-    expect(homeHashSectionId("/")).toBeNull();
+    expect(homeNavTarget("/#")).toBeNull();
   });
 
   it("returns null for a bare hash (resolves against current URL, not home)", () => {
-    expect(homeHashSectionId("#method")).toBeNull();
+    expect(homeNavTarget("#method")).toBeNull();
+    expect(homeNavTarget("#intro")).toBeNull();
   });
 
   it("returns null for cross-route navigation", () => {
-    expect(homeHashSectionId("/blog/foo")).toBeNull();
-    expect(homeHashSectionId("/blog/foo/#method")).toBeNull();
+    expect(homeNavTarget("/blog/foo")).toBeNull();
+    expect(homeNavTarget("/blog/foo/#method")).toBeNull();
   });
 
   it("does not sanitize multi-hash or trailing-slash input (callers pass clean ids)", () => {
-    expect(homeHashSectionId("/#method#method")).toBe("method#method");
-    expect(homeHashSectionId("/#intro/")).toBe("intro/");
-    expect(homeHashSectionId("/?x=1#method")).toBeNull();
+    expect(homeNavTarget("/#method#method")).toEqual({
+      type: "section",
+      id: "method#method",
+    });
+    expect(homeNavTarget("/#intro/")).toEqual({
+      type: "section",
+      id: "intro/",
+    });
+    expect(homeNavTarget("/?x=1#method")).toBeNull();
   });
 });
 
