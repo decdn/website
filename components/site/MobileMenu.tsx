@@ -163,7 +163,7 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
       const anchor = pendingAnchorRef.current;
       pendingAnchorRef.current = null;
       // intro is the top of the page, not a section deep-link: go to the
-      // very top and clear the hash rather than writing #intro (issue #157).
+      // very top and clear the hash rather than writing #intro.
       const isHome = anchor === HOME_SECTION_ID;
       const targetEl = anchor ? document.getElementById(anchor) : null;
 

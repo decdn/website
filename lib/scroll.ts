@@ -1,6 +1,6 @@
 // `intro` is the id of the top (Hero) section. Its anchor is treated as
 // "go to the top, no fragment" rather than a section deep-link, so the URL
-// never carries a sticky `#intro` (issue #157).
+// never carries a sticky `#intro`.
 export const HOME_SECTION_ID = "intro";
 
 export type HomeNavTarget =
