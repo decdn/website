@@ -78,8 +78,9 @@ export function Chrome() {
           window.location.pathname + window.location.search,
         );
         // scrollTo's default behaviour defers to <html>'s
-        // motion-safe:scroll-smooth (and reduced-motion), mirroring the
-        // section path's scrollIntoView below.
+        // motion-safe:scroll-smooth, so it auto-honours reduced motion
+        // (the variant drops out → instant), mirroring the section path's
+        // scrollIntoView below.
         window.scrollTo({ top: 0 });
         return;
       }

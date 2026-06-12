@@ -17,6 +17,18 @@ describe("homeNavTarget", () => {
     expect(homeNavTarget(`/#${HOME_SECTION_ID}`)).toEqual({ type: "top" });
   });
 
+  it("matches the intro id exactly (case-sensitive, no normalization)", () => {
+    // The id compare is exact; only the lowercase ids callers emit fold to
+    // the top. "/#INTRO" stays a section (then misses getElementById).
+    expect(homeNavTarget("/#INTRO")).toEqual({ type: "section", id: "INTRO" });
+  });
+
+  it("returns null for a query before the intro hash (not a clean /#…)", () => {
+    // Symmetric with the "/?x=1#method" case: the query breaks the "/#"
+    // prefix, so a query-bearing home href is not recognized as the top.
+    expect(homeNavTarget("/?x=1#intro")).toBeNull();
+  });
+
   it("maps a section hash href to a section target", () => {
     expect(homeNavTarget("/#method")).toEqual({
       type: "section",

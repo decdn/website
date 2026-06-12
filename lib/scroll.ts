@@ -17,6 +17,7 @@ export type HomeNavTarget =
 //   "#method"           -> null   (bare hash — resolves against the
 //                                  current URL, not home; not our concern)
 //   "/blog/foo/#method" -> null   (cross-route navigation)
+//   "/?x=1#method"      -> null   (query before the hash — not "/#…")
 //
 // Callers pass a clean `/#${id}`; this does not sanitize multi-hash or
 // trailing-slash input (`/#a#b` -> section "a#b", `/#intro/` -> section
