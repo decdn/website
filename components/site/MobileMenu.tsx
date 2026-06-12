@@ -9,7 +9,7 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { links } from "@/lib/links";
-import { scrollToAnchor } from "@/lib/scroll";
+import { HOME_SECTION_ID, scrollToAnchor } from "@/lib/scroll";
 
 type SectionId = "intro" | "compare" | "method" | "faq" | "contact";
 
@@ -162,15 +162,18 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
 
       const anchor = pendingAnchorRef.current;
       pendingAnchorRef.current = null;
+      // intro is the top of the page, not a section deep-link: go to the
+      // very top and clear the hash rather than writing #intro (issue #157).
+      const isHome = anchor === HOME_SECTION_ID;
       const targetEl = anchor ? document.getElementById(anchor) : null;
 
       if (anchor && !targetEl) {
-        // Drawer opened from a different route (e.g. /blog/*); a
-        // full reload to /#anchor lets the new page handle the hash
-        // scroll deterministically (Next 16 App Router's soft-nav
-        // hash behaviour under output: "export" isn't documented).
+        // Drawer opened from a different route (e.g. /blog/*); a full
+        // reload lets the new page resolve the destination deterministically
+        // (Next 16 App Router's soft-nav hash behaviour under output:
+        // "export" isn't documented). Home -> "/", section -> "/#anchor".
         // Skip the local restore — the page is about to unload.
-        window.location.assign(`/#${anchor}`);
+        window.location.assign(isHome ? "/" : `/#${anchor}`);
         return;
       }
 
@@ -183,10 +186,21 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
       const html = document.documentElement;
       const prevScrollBehavior = html.style.scrollBehavior;
       html.style.scrollBehavior = "auto";
-      window.scrollTo(0, scrollYRef.current);
+      // Home lands at the top; a section restores the prior position so
+      // scrollToAnchor can animate from there.
+      window.scrollTo(0, isHome ? 0 : scrollYRef.current);
       html.style.scrollBehavior = prevScrollBehavior;
 
-      if (anchor && targetEl) {
+      if (isHome) {
+        // Clear any #section fragment — the top is canonical home, no
+        // #intro. Leave focusMovedToSectionRef false so the close effect
+        // returns focus to the toggle (top-right), correct for "to the top".
+        history.replaceState(
+          null,
+          "",
+          window.location.pathname + window.location.search,
+        );
+      } else if (anchor && targetEl) {
         // replaceState updates the URL without scrolling;
         // scrollToAnchor does the visible scroll.
         history.replaceState(null, "", `#${anchor}`);
