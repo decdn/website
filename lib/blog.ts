@@ -36,6 +36,10 @@ export type PostMeta = {
   summary: string;
   bucket?: string;
   tags?: string[];
+  /** Sticks the post to the top of the index, above the date sort, with a
+   *  pin marker on its row. Multiple pinned posts keep newest-first order
+   *  among themselves. Defaults to false. */
+  pinned: boolean;
   /** Optional per-post override for the OG/JSON-LD image. When set,
    *  consumed as-is for `og:image`, `twitter:image`, and
    *  `BlogPosting.image` — bypasses the generated
@@ -198,6 +202,13 @@ const parseEntry = (filename: string): RawPost | null => {
   }
   if (data.draft === true) return null;
 
+  if ("pinned" in data && typeof data.pinned !== "boolean") {
+    throw new Error(
+      `[blog] ${filename}: frontmatter \`pinned\` must be a boolean (got ${typeof data.pinned})`,
+    );
+  }
+  const pinned = data.pinned === true;
+
   if ("slug" in data && typeof data.slug !== "string") {
     throw new Error(
       `[blog] ${filename}: frontmatter \`slug\` must be a string when present`,
@@ -251,6 +262,7 @@ const parseEntry = (filename: string): RawPost | null => {
     bucket,
     tags,
     image,
+    pinned,
     words,
     readMin: readingMinutes(words),
     body: content,
@@ -301,6 +313,7 @@ const toMeta = (e: PostSource): PostMeta => ({
   bucket: e.bucket,
   tags: e.tags,
   image: e.image,
+  pinned: e.pinned,
   seriesNumber: e.seriesNumber,
   words: e.words,
   readMin: e.readMin,
@@ -308,6 +321,16 @@ const toMeta = (e: PostSource): PostMeta => ({
 
 export function listPosts(): PostMeta[] {
   return readEntries().map(toMeta);
+}
+
+// Blog-index display order: pinned posts first, then `listPosts()`'s
+// newest-first date order (stable sort holds that within each group).
+// Deliberately separate from `listPosts()` so its date-sorted contract —
+// relied on by the sitemap `lastmod`, OG cards, and generateStaticParams —
+// is never perturbed by pinning. `seriesNumber` is assigned before pinning
+// (see `readEntries`), so a pinned older post keeps its real series number.
+export function listIndexPosts(): PostMeta[] {
+  return [...listPosts()].sort((a, b) => Number(b.pinned) - Number(a.pinned));
 }
 
 export function getPost(slug: string): PostSource | null {
