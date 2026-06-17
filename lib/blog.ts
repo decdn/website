@@ -36,6 +36,10 @@ export type PostMeta = {
   summary: string;
   bucket?: string;
   tags?: string[];
+  /** Sticks the post to the top of the index, above the date sort, with a
+   *  pin marker on its row. Multiple pinned posts keep newest-first order
+   *  among themselves. Defaults to false. */
+  pinned: boolean;
   /** Optional per-post override for the OG/JSON-LD image. When set,
    *  consumed as-is for `og:image`, `twitter:image`, and
    *  `BlogPosting.image` — bypasses the generated
@@ -198,6 +202,13 @@ const parseEntry = (filename: string): RawPost | null => {
   }
   if (data.draft === true) return null;
 
+  if ("pinned" in data && typeof data.pinned !== "boolean") {
+    throw new Error(
+      `[blog] ${filename}: frontmatter \`pinned\` must be a boolean (got ${typeof data.pinned})`,
+    );
+  }
+  const pinned = data.pinned === true;
+
   if ("slug" in data && typeof data.slug !== "string") {
     throw new Error(
       `[blog] ${filename}: frontmatter \`slug\` must be a string when present`,
@@ -251,6 +262,7 @@ const parseEntry = (filename: string): RawPost | null => {
     bucket,
     tags,
     image,
+    pinned,
     words,
     readMin: readingMinutes(words),
     body: content,
@@ -289,7 +301,12 @@ const readEntries = (): PostSource[] => {
     // Number the series after the sort: newest gets the highest number,
     // oldest gets 1. Both the index `#` column and the post page `§ NN`
     // read this, so they can't disagree.
-    .map((e, i, arr): PostSource => ({ ...e, seriesNumber: arr.length - i }));
+    .map((e, i, arr): PostSource => ({ ...e, seriesNumber: arr.length - i }))
+    // Pinned posts float to the top of the display list. Done *after*
+    // numbering so `seriesNumber` stays tied to publish date, not slot —
+    // a pinned older post keeps its real series number. Array.sort is
+    // stable (Node ≥11), so date order holds within each group.
+    .sort((a, b) => Number(b.pinned) - Number(a.pinned));
   return cache;
 };
 
@@ -301,6 +318,7 @@ const toMeta = (e: PostSource): PostMeta => ({
   bucket: e.bucket,
   tags: e.tags,
   image: e.image,
+  pinned: e.pinned,
   seriesNumber: e.seriesNumber,
   words: e.words,
   readMin: e.readMin,

@@ -1,0 +1,50 @@
+---
+title: "The Road to Testnet: decdn in 2026"
+slug: road-to-testnet
+date: 2026-06-17
+summary: "What decdn has already shipped end-to-end, and the path through a Q3 2026 public testnet and open source to a Q1 2027 mainnet target."
+bucket: pillar
+tags: [roadmap, testnet, open-source, pre-seed]
+pinned: true
+---
+
+We started **decdn** with a stubborn belief: the economics of moving bytes shouldn't be captured by three companies. CDNs won the last decade on physics and bandwidth pricing, and the bill for that has only gone up. Egress is still the line item nobody can negotiate down.
+
+So we built a different kind of CDN — one where anyone with capacity can bond, serve content, and get paid per byte delivered, with no gatekeeper deciding who gets to participate or what it costs.
+
+This is where we are, and where we're going.
+
+## What's already built
+
+decdn is not a whitepaper. The protocol runs end-to-end in our test environment today:
+
+- **Content-addressed delivery.** Every blob is addressed by its hash, served over QUIC. You can't be handed the wrong bytes without it being provable.
+- **Per-byte payments.** Clients pay nodes through off-chain payment channels settled in USDC, priced per byte served. No subscriptions, no minimums, no egress surprise.
+- **Bonded, slashable nodes.** Operators bond capital against the capacity they declare. Serve honestly and you earn; cheat, and it's provable on-chain and your bond is at risk.
+- **A real appeals path.** Slashing isn't a black box. There's an on-chain dispute and appeal process, so honest operators have recourse and bad actors still pay.
+- **Content discovery at scale.** A distributed hash table plus an on-chain origin directory lets any node find and pull content, then cache and serve it, paying the peer it pulled from.
+- **Value that accrues to the network.** Fees from real usage flow back through buyback-and-burn. No inflationary emissions paying for traffic that isn't there.
+
+The full smart-contract suite is written and tested. The node software serves live traffic in our harness. This is the part most projects are still designing; for us it's the part that already works.
+
+## Q3 2026: public testnet, and open source
+
+This quarter we do two things at once.
+
+We **open-source the protocol** — the contracts, the node, the wire protocol, all of it. A decentralized network you can't read isn't decentralized, and we'd rather be judged on the code than the pitch.
+
+And we launch a **public testnet** on Arbitrum Sepolia: real nodes, real content, real payment channels, real slashing, running in the open. This is where the protocol stops being something we tested and becomes something anyone can run.
+
+A dedicated post for operators who want to run a node is coming when the testnet opens.
+
+## The road to mainnet
+
+Mainnet is the goal, and we're confident it's close: **we're targeting Q1 2027.** We're not putting a hard date on it before testnet earns it, because a payments network that touches real money should prove itself in the open first. That's the whole point of doing testnet and open source together.
+
+Decentralization is staged on purpose. The network starts under a tightly-scoped multisig and hands control to an operator-governed DAO as real capacity and real operators come online, with voting weight tied to bytes actually served. Governance you earn by doing the work, not by holding the most tokens.
+
+## For investors
+
+We're raising a pre-seed round to take decdn from a working protocol to a live network.
+
+If you invest at the intersection of DePIN, decentralized infrastructure, and real-revenue token economics — and you want to see a team that shipped the hard part before asking for a check — we'd like to talk. Reply or reach out and we'll share the full materials.

@@ -237,6 +237,7 @@ describe("buildOgImages", () => {
     title: "Why Now",
     date: "2026-05-04" as PostMeta["date"],
     summary: "x",
+    pinned: false,
     seriesNumber: 1,
     words: 100,
     readMin: 1,
@@ -266,6 +267,7 @@ describe("postImageUrl", () => {
     title: "Why Now",
     date: "2026-05-04" as PostMeta["date"],
     summary: "x",
+    pinned: false,
     seriesNumber: 1,
     words: 100,
     readMin: 1,
@@ -293,6 +295,7 @@ describe("ogCardSlugs", () => {
     title: slug,
     date: "2026-05-04" as PostMeta["date"],
     summary: "x",
+    pinned: false,
     seriesNumber: 1,
     words: 100,
     readMin: 1,
@@ -366,11 +369,30 @@ describe("listPosts metadata", () => {
     }
   });
 
-  it("numbers the series 1..N (oldest = 1), newest first in the list", () => {
+  it("numbers the series 1..N (oldest = 1), newest carries the highest", () => {
     const numbers = posts.map((p) => p.seriesNumber).sort((a, b) => a - b);
     expect(numbers).toEqual(
       Array.from({ length: posts.length }, (_, i) => i + 1),
     );
-    expect(posts[0]?.seriesNumber).toBe(posts.length);
+    // The newest post by date gets number N, wherever pinning places it in
+    // the display list — so seriesNumber stays tied to date, not slot.
+    const newest = [...posts].sort((a, b) => b.date.localeCompare(a.date))[0];
+    expect(newest?.seriesNumber).toBe(posts.length);
+  });
+
+  it("floats pinned posts above unpinned, newest-first within each group", () => {
+    const firstUnpinned = posts.findIndex((p) => !p.pinned);
+    if (firstUnpinned !== -1) {
+      // once the first unpinned post appears, nothing pinned follows
+      expect(posts.slice(firstUnpinned).some((p) => p.pinned)).toBe(false);
+    }
+    for (const group of [
+      posts.filter((p) => p.pinned),
+      posts.filter((p) => !p.pinned),
+    ]) {
+      for (let i = 1; i < group.length; i++) {
+        expect(group[i - 1].date >= group[i].date).toBe(true);
+      }
+    }
   });
 });
