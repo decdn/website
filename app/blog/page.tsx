@@ -1,7 +1,7 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { Frame } from "@/components/ui/Frame";
 import { BLOG_GRID_COLS, PostRow } from "@/components/ui/PostRow";
-import { listPosts } from "@/lib/blog";
+import { listIndexPosts } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
 import { BLOG_URL, ORG_ID, SITE_URL } from "@/lib/links";
 
@@ -52,7 +52,7 @@ export async function generateMetadata(
 }
 
 export default function BlogIndex() {
-  const posts = listPosts();
+  const posts = listIndexPosts();
 
   // Blog graph node — `blogPost` entries use the same stable @id
   // (`${postUrl}#post`) emitted by app/blog/[slug]/page.tsx so the

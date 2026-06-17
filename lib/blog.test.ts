@@ -4,6 +4,7 @@ import {
   countWords,
   dottedDate,
   getPost,
+  listIndexPosts,
   listPosts,
   ogCardSlugs,
   parseImage,
@@ -369,15 +370,34 @@ describe("listPosts metadata", () => {
     }
   });
 
-  it("numbers the series 1..N (oldest = 1), newest carries the highest", () => {
+  // listPosts() is the date-ordered contract: strictly newest-first,
+  // unperturbed by pinning. The sitemap `lastmod`, OG cards, and
+  // generateStaticParams all lean on this. Pinning lives in
+  // listIndexPosts() (tested below), not here.
+  it("orders strictly newest-first by date (pinning does not apply)", () => {
+    for (let i = 1; i < posts.length; i++) {
+      expect(posts[i - 1].date >= posts[i].date).toBe(true);
+    }
+    expect(posts[0]?.seriesNumber).toBe(posts.length);
+  });
+
+  it("numbers the series 1..N (oldest = 1)", () => {
     const numbers = posts.map((p) => p.seriesNumber).sort((a, b) => a - b);
     expect(numbers).toEqual(
       Array.from({ length: posts.length }, (_, i) => i + 1),
     );
-    // The newest post by date gets number N, wherever pinning places it in
-    // the display list — so seriesNumber stays tied to date, not slot.
-    const newest = [...posts].sort((a, b) => b.date.localeCompare(a.date))[0];
-    expect(newest?.seriesNumber).toBe(posts.length);
+  });
+});
+
+describe("listIndexPosts ordering", () => {
+  const posts = listIndexPosts();
+
+  it("holds the same posts as listPosts()", () => {
+    expect([...posts].map((p) => p.slug).sort()).toEqual(
+      listPosts()
+        .map((p) => p.slug)
+        .sort(),
+    );
   });
 
   it("floats pinned posts above unpinned, newest-first within each group", () => {

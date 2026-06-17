@@ -301,12 +301,7 @@ const readEntries = (): PostSource[] => {
     // Number the series after the sort: newest gets the highest number,
     // oldest gets 1. Both the index `#` column and the post page `§ NN`
     // read this, so they can't disagree.
-    .map((e, i, arr): PostSource => ({ ...e, seriesNumber: arr.length - i }))
-    // Pinned posts float to the top of the display list. Done *after*
-    // numbering so `seriesNumber` stays tied to publish date, not slot —
-    // a pinned older post keeps its real series number. Array.sort is
-    // stable (Node ≥11), so date order holds within each group.
-    .sort((a, b) => Number(b.pinned) - Number(a.pinned));
+    .map((e, i, arr): PostSource => ({ ...e, seriesNumber: arr.length - i }));
   return cache;
 };
 
@@ -326,6 +321,16 @@ const toMeta = (e: PostSource): PostMeta => ({
 
 export function listPosts(): PostMeta[] {
   return readEntries().map(toMeta);
+}
+
+// Blog-index display order: pinned posts first, then `listPosts()`'s
+// newest-first date order (stable sort holds that within each group).
+// Deliberately separate from `listPosts()` so its date-sorted contract —
+// relied on by the sitemap `lastmod`, OG cards, and generateStaticParams —
+// is never perturbed by pinning. `seriesNumber` is assigned before pinning
+// (see `readEntries`), so a pinned older post keeps its real series number.
+export function listIndexPosts(): PostMeta[] {
+  return [...listPosts()].sort((a, b) => Number(b.pinned) - Number(a.pinned));
 }
 
 export function getPost(slug: string): PostSource | null {
