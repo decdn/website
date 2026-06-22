@@ -31,7 +31,7 @@ This is what makes caching skill matter. A node that holds the right blobs becom
 
 (That round number isn't branding: the model treats 100 TB as 100,000 GB and bills per megabyte at the protocol's $0.00001/MB rate, counting 1 GB as 1,024 MB. So 100,000 × 1,024 × $0.00001 = $1,024 exactly.)
 
-This is gross billing, before the FeeRouter split. decdn has no flat "protocol fee" and no discount tier to stake for. Instead, every client→node settlement is split on-chain in the transaction that closes the channel: **60% goes straight to the operator in USDC, 30% to buyback-and-burn, 10% to the protocol treasury**. Node-to-node cache-miss pulls bypass the split entirely — when this node serves a peer, the peer pays it directly, with no skim.
+This is gross billing, before the FeeRouter split. decdn has no flat "protocol fee" and no discount tier to bond for. Instead, every client→node settlement is split on-chain in the transaction that closes the channel: **60% goes straight to the operator in USDC, 30% to buyback-and-burn, 10% to the protocol treasury**. Node-to-node cache-miss pulls bypass the split entirely — when this node serves a peer, the peer pays it directly, with no skim.
 
 So the $1,024 splits by where the bytes went:
 
