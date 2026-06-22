@@ -21,7 +21,7 @@ Market rate of **$0.01/GB** is the public expected price — roughly 8–20× ch
 
 Of the 100 TB this node serves, roughly 70 TB goes directly to clients and 30 TB goes to other nodes pulling cache misses. Both are paid. Both are revenue.
 
-Why the split? Because every byte transferred — client to node *and* node to node — is paid in decdn. When a peer node has a cache miss for a blob this node is holding, the peer probes, finds this node has it, and pulls the bytes by opening or extending a payment channel against this node's NodeId. From this node's perspective, that's identical to a client request: signed vouchers come in, USDC settles when the channel closes.
+Why the split? Because every byte transferred — client to node _and_ node to node — is paid in decdn. When a peer node has a cache miss for a blob this node is holding, the peer probes, finds this node has it, and pulls the bytes by opening or extending a payment channel against this node's NodeId. From this node's perspective, that's identical to a client request: signed vouchers come in, USDC settles when the channel closes.
 
 This is what makes caching skill matter. A node that holds the right blobs becomes a paying source for the next hop. Margin amplifies through caching, not through raw throughput.
 
@@ -58,29 +58,29 @@ Total costs: ~$259 (cache-miss pulls $154 + infrastructure $95 + gas $10).
 
 ## The bottom line
 
-| Line | Amount |
-|---|---|
-| Client billing (≈70 TB), operator's 60% base share | +$430 |
-| Peer-serving (≈30 TB), no skim | +$307 |
-| Cache-miss pulls (15 TB × wholesale) | −$154 |
-| Infrastructure | −$95 |
-| L2 gas | −$10 |
-| **Net liquid USDC** | **+$478** |
+| Line                                               | Amount    |
+| -------------------------------------------------- | --------- |
+| Client billing (≈70 TB), operator's 60% base share | +$430     |
+| Peer-serving (≈30 TB), no skim                     | +$307     |
+| Cache-miss pulls (15 TB × wholesale)               | −$154     |
+| Infrastructure                                     | −$95      |
+| L2 gas                                             | −$10      |
+| **Net liquid USDC**                                | **+$478** |
 
 That's **$478/month of liquid USDC** at the launch-fleet target — about 47% of billed revenue, on mid-cost hosting. Cheaper infrastructure or a higher cache-hit rate pushes it up; the EU low-cost setup (Hetzner CPX22, ~$95 infra) is already baked into the figure.
 
-Two things make the operator's *aligned* return larger than the liquid-USDC line. The 30% of client billing routed to buyback-and-burn ($215 here) is USDC swapped for TOKEN and burned — deflation that accrues to the operator as a bond-holder, not to a passive third party; counting the 60% direct plus the 30% burn, the protocol's **operator-aligned share is 90%**. And through the first 12 months, pre-seed USDC subsidies cover early-operator infrastructure, so launch-period unit economics are positive before the network reaches steady state.
+Two things make the operator's _aligned_ return larger than the liquid-USDC line. The 30% of client billing routed to buyback-and-burn ($215 here) is USDC swapped for TOKEN and burned — deflation that accrues to the operator as a bond-holder, not to a passive third party; counting the 60% direct plus the 30% burn, the protocol's **operator-aligned share is 90%**. And through the first 12 months, pre-seed USDC subsidies cover early-operator infrastructure, so launch-period unit economics are positive before the network reaches steady state.
 
 ## The smaller scenario, for comparison
 
 A 10 TB/month node — early-traction, well within the Hetzner CPX22 included bandwidth allowance, no overage:
 
-| Line | Amount |
-|---|---|
-| Client billing (≈7 TB), 60% base share | +$43 |
-| Peer-serving (≈3 TB), no skim | +$31 |
-| Cache-miss pulls + infrastructure + gas | −$34 |
-| **Net liquid USDC** | **+$40** |
+| Line                                    | Amount   |
+| --------------------------------------- | -------- |
+| Client billing (≈7 TB), 60% base share  | +$43     |
+| Peer-serving (≈3 TB), no skim           | +$31     |
+| Cache-miss pulls + infrastructure + gas | −$34     |
+| **Net liquid USDC**                     | **+$40** |
 
 That's the operator past the launch ramp but not yet at scale — $40/month of liquid USDC, positive once you count the burn-driven alignment and the year-one infrastructure subsidy. Enough to cover their own self-paid AWS bill and a coffee.
 
