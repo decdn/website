@@ -41,7 +41,7 @@ const postUrls = posts
 // can introduce XML-significant characters into the <loc>/<lastmod> bodies.
 const legalUrls = LEGAL_SLUGS.map((slug) => {
   const doc = getLegalDoc(slug);
-  return `  <url><loc>${SITE_URL}${slug}/</loc><lastmod>${doc.effective}</lastmod></url>`;
+  return `  <url><loc>${SITE_URL}legal/${slug}/</loc><lastmod>${doc.effective}</lastmod></url>`;
 }).join("\n");
 
 const BODY = `<?xml version="1.0" encoding="UTF-8"?>

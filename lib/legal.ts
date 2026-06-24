@@ -5,9 +5,10 @@ import matter from "gray-matter";
 
 const LEGAL_DIR = path.join(process.cwd(), "content", "legal");
 
-// The closed set of legal documents. Adding one means adding its MDX file,
-// a route under app/<slug>/, a footer link, and a sitemap-pages entry — see
-// the PR that introduced these for the full checklist.
+// The closed set of legal documents, served from app/legal/[doc]/. Adding
+// one means adding its MDX file under content/legal/ and a slug here; the
+// route, sitemap entry, and metadata all derive from this list. A footer
+// link is the only other manual step.
 export const LEGAL_SLUGS = ["privacy", "terms", "disclaimer"] as const;
 export type LegalSlug = (typeof LEGAL_SLUGS)[number];
 
@@ -74,7 +75,7 @@ export function getLegalDoc(slug: LegalSlug): LegalDoc {
 
 export function legalMetadata(slug: LegalSlug): Metadata {
   const doc = getLegalDoc(slug);
-  const canonical = `/${slug}/`;
+  const canonical = `/legal/${slug}/`;
   return {
     title: doc.title,
     description: doc.description,
