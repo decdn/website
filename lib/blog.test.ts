@@ -49,6 +49,12 @@ describe("getPost", () => {
       expect(getPost(input)).toBeNull();
     },
   );
+
+  it('does not repeat "please" in post 06 body text', () => {
+    const post = getPost("show-me-the-money");
+    expect(post).not.toBeNull();
+    expect(post!.body).not.toContain("please please cache it");
+  });
 });
 
 describe("countWords", () => {
