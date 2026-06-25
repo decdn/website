@@ -10,6 +10,9 @@ export const links = {
   docs: "https://docs.decdn.org/overview/introduction",
   blog: "/blog/",
   contact: `mailto:${EMAIL}`,
+  privacy: "/legal/privacy/",
+  terms: "/legal/terms/",
+  disclaimer: "/legal/disclaimer/",
 } as const;
 
 // Trailing-slash base: lets callers concat `${SITE_URL}icon.svg` and

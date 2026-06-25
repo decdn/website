@@ -1,5 +1,6 @@
 import { SITE_URL } from "@/lib/links";
 import { listPosts } from "@/lib/blog";
+import { LEGAL_SLUGS, getLegalDoc } from "@/lib/legal";
 
 // SITE_URL is interpolated raw into <loc> bodies below. SLUG_RE guards
 // the per-post slug; this guards the origin against a future accident
@@ -35,11 +36,20 @@ const postUrls = posts
   )
   .join("\n");
 
+// Legal pages (privacy, terms, disclaimer): the slug is a fixed literal and
+// the effective date is validated as an ISO date in lib/legal, so neither
+// can introduce XML-significant characters into the <loc>/<lastmod> bodies.
+const legalUrls = LEGAL_SLUGS.map((slug) => {
+  const doc = getLegalDoc(slug);
+  return `  <url><loc>${SITE_URL}legal/${slug}/</loc><lastmod>${doc.effective}</lastmod></url>`;
+}).join("\n");
+
 const BODY = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${SITE_URL}</loc><lastmod>${siteLastMod}</lastmod></url>
   <url><loc>${SITE_URL}decdn_litepaper.pdf</loc></url>
   <url><loc>${SITE_URL}blog/</loc><lastmod>${siteLastMod}</lastmod></url>
+${legalUrls}
 ${postUrls}
 </urlset>
 `;
