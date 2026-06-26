@@ -7,11 +7,7 @@ import { HeroTerminal } from "@/components/site/HeroTerminal";
 export function Hero() {
   return (
     <Frame id="intro" tone="paper" className="overflow-hidden">
-      <SectionHeader
-        index="01"
-        label="Hero"
-        timestamp="2026-04 · testnet · v0"
-      />
+      <SectionHeader index="01" label="Hero" timestamp="testnet · v0" />
 
       <div className="mt-10 flex flex-col gap-8 @4xl:gap-12">
         <h1
