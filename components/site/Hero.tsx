@@ -12,7 +12,7 @@ export function Hero() {
       <div className="mt-10 flex flex-col gap-8 @4xl:gap-12">
         <h1
           id="intro-h"
-          className="hug flex flex-col text-h1 leading-[0.9] font-semibold tracking-[-0.04em]"
+          className="hug flex flex-col pl-[8vw] text-h1 leading-[0.9] font-semibold tracking-[-0.04em]"
         >
           <span className="rise rise-1">the delivery layer</span>
           <span className="rise rise-2 pl-[7vw]">
