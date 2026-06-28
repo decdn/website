@@ -2,12 +2,12 @@
 title: "Show Me the Money: A 100-TB/Month Node, Line by Line"
 slug: show-me-the-money
 date: 2026-06-22
-summary: "A single decdn node at the 100-TB/month launch-fleet target, walked line by line: $1,024 billed, $478 left in liquid USDC after the FeeRouter split, cache-miss pulls, infrastructure, and gas."
+summary: "A single decdn node at the 100-TB/month launch-fleet target, walked line by line: $1,024 billed, $355 left in liquid USDC after the FeeRouter split, cache-miss pulls, infrastructure, and gas."
 bucket: operator
 tags: [operators, economics, payments, usdc]
 ---
 
-$1,024 billed. $478 left, in liquid USDC.
+$1,024 billed. $355 left, in liquid USDC.
 
 That's the headline P&L for a single decdn node hitting the launch-fleet target — 100 TB of traffic in a month, at a market rate of $0.01/GB. This post walks the line items.
 
@@ -31,13 +31,13 @@ This is what makes caching skill matter. A node that holds the right blobs becom
 
 (That round number isn't branding: the model treats 100 TB as 100,000 GB and bills per megabyte at the protocol's $0.00001/MB rate, counting 1 GB as 1,024 MB. So 100,000 × 1,024 × $0.00001 = $1,024 exactly.)
 
-This is gross billing, before the FeeRouter split. decdn has no flat "protocol fee" and no discount tier to bond for. Instead, every client→node settlement is split on-chain in the transaction that closes the channel: **60% goes straight to the operator in USDC, 30% to buyback-and-burn, 10% to the protocol treasury**. Node-to-node cache-miss pulls bypass the split entirely — when this node serves a peer, the peer pays it directly, with no skim.
+This is gross billing, before the FeeRouter split. decdn has no flat "protocol fee" and no discount tier to bond for. Instead, every settlement is split on-chain in the transaction that closes the channel: **60% goes straight to the operator in USDC, 30% to buyback-and-burn, 10% to the protocol treasury**. Node-to-node cache-miss pulls pass through the same contract — when this node serves a peer, that settlement routes through the FeeRouter and takes the same 60/30/10 split.
 
-So the $1,024 splits by where the bytes went:
+So the $1,024 splits the same way wherever the bytes went:
 
 - Client traffic (≈70 TB → $717 billed): operator keeps the 60% base share = **$430** in liquid USDC; $215 funds buyback-and-burn, $72 the treasury.
-- Peer-serving (≈30 TB → $307): paid peer-to-peer, no skim, so the operator keeps **all $307**.
-- Operator USDC inflow: **$737**.
+- Peer-serving (≈30 TB → $307 billed): same 60/30/10 split — operator keeps the 60% base share = **$184**; $92 funds buyback-and-burn, $31 the treasury.
+- Operator USDC inflow: **$614**.
 
 ## The cost lines
 
@@ -61,15 +61,15 @@ Total costs: ~$259 (cache-miss pulls $154 + infrastructure $95 + gas $10).
 | Line                                               | Amount    |
 | -------------------------------------------------- | --------- |
 | Client billing (≈70 TB), operator's 60% base share | +$430     |
-| Peer-serving (≈30 TB), no skim                     | +$307     |
+| Peer-serving (≈30 TB), operator's 60% base share   | +$184     |
 | Cache-miss pulls (15 TB × wholesale)               | −$154     |
 | Infrastructure                                     | −$95      |
 | L2 gas                                             | −$10      |
-| **Net liquid USDC**                                | **+$478** |
+| **Net liquid USDC**                                | **+$355** |
 
-That's **$478/month of liquid USDC** at the launch-fleet target — about 47% of billed revenue, on mid-cost hosting. Cheaper infrastructure or a higher cache-hit rate pushes it up; the EU low-cost setup (Hetzner CPX22, ~$95 infra) is already baked into the figure.
+That's **$355/month of liquid USDC** at the launch-fleet target — about 35% of billed revenue, on mid-cost hosting. Cheaper infrastructure or a higher cache-hit rate pushes it up; the EU low-cost setup (Hetzner CPX22, ~$95 infra) is already baked into the figure.
 
-Two things make the operator's _aligned_ return larger than the liquid-USDC line. The 30% of client billing routed to buyback-and-burn ($215 here) is USDC swapped for TOKEN and burned — deflation that accrues to the operator as a bond-holder, not to a passive third party; counting the 60% direct plus the 30% burn, the protocol's **operator-aligned share is 90%**. And through the first 12 months, pre-seed USDC subsidies cover early-operator infrastructure, so launch-period unit economics are positive before the network reaches steady state.
+Two things make the operator's _aligned_ return larger than the liquid-USDC line. The 30% of all billing routed to buyback-and-burn ($307 here) is USDC swapped for TOKEN and burned — deflation that accrues to the operator as a bond-holder, not to a passive third party; counting the 60% direct plus the 30% burn, the protocol's **operator-aligned share is 90%**. And through the first 12 months, pre-seed USDC subsidies cover early-operator infrastructure, so launch-period unit economics are positive before the network reaches steady state.
 
 ## The smaller scenario, for comparison
 
@@ -78,11 +78,11 @@ A 10 TB/month node — early-traction, well within the Hetzner CPX22 included ba
 | Line                                    | Amount   |
 | --------------------------------------- | -------- |
 | Client billing (≈7 TB), 60% base share  | +$43     |
-| Peer-serving (≈3 TB), no skim           | +$31     |
+| Peer-serving (≈3 TB), 60% base share    | +$18     |
 | Cache-miss pulls + infrastructure + gas | −$34     |
-| **Net liquid USDC**                     | **+$40** |
+| **Net liquid USDC**                     | **+$27** |
 
-That's the operator past the launch ramp but not yet at scale — $40/month of liquid USDC, positive once you count the burn-driven alignment and the year-one infrastructure subsidy. Enough to cover their own self-paid AWS bill and a coffee.
+That's the operator past the launch ramp but not yet at scale — $27/month of liquid USDC, positive once you count the burn-driven alignment and the year-one infrastructure subsidy. Enough to cover their own self-paid AWS bill and a coffee.
 
 ## Why the math works
 
