@@ -9,83 +9,130 @@ tags: [operators, economics, payments, usdc]
 
 $1,024 billed. $355 left, in liquid USDC.
 
-That's the headline P&L for a single decdn node hitting the launch-fleet target — 100 TB of traffic in a month, at a market rate of $0.01/GB. This post walks the line items.
+That's the reference month for a healthy decdn node at the launch-fleet target: 100 TB served at a market rate of $0.01/GB. The point isn't to claim every node always earns that number. The point is to show the cash path, line by line, without mixing operator revenue, token alignment, and protocol treasury flow into one blurry headline.
 
-## The scenario
+## The setup
 
-Production launch fleet target. One node. Hetzner CPX22 with bandwidth overage, or equivalently a 1 Gbps unmetered dedicated tier (the cost structures converge above 100 TB/month — overage on a metered VPS approaches and eventually exceeds the flat-rate cost of an unmetered dedicated server). The node is healthy: it accepts client traffic, it pulls cache misses from peers, it serves 100 TB of bytes that month total.
+The reference node serves 100 TB in a month. It runs on a low-cost, 1 Gbps-class setup: a Hetzner CPX22 with bandwidth overage, or an equivalent unmetered dedicated tier once traffic makes metered bandwidth a bad trade. Around 100 TB/month, those cost curves converge. Below that, a cheap VPS can work. Above that, a flat bandwidth port starts to matter.
 
-Market rate of **$0.01/GB** is the public expected price — roughly 8–20× cheaper than incumbent CDN list pricing (CloudFront $0.085/GB, Akamai $0.12–$0.20/GB) and at parity with budget CDN tiers. Operators set their own rate per-node; the market filters who wins which traffic.
+The rate is **$0.01/GB**. That's the public target rate, not a protocol-enforced price: nodes advertise their own rates, and clients choose among price, latency, and reputation. The model uses $0.01/GB because it's the launch reference price — cheap enough to be a real CDN alternative (roughly 8–20× cheaper than incumbent list pricing: CloudFront $0.085/GB, Akamai $0.12–$0.20/GB, at parity with budget CDN tiers), high enough for efficient operators to clear costs.
 
-## The traffic split
+The traffic mix is:
 
-Of the 100 TB this node serves, roughly 70 TB goes directly to clients and 30 TB goes to other nodes pulling cache misses. Both are paid. Both are revenue.
+| Stream           | Monthly volume | What it means                                     |
+| ---------------- | -------------: | ------------------------------------------------- |
+| Client delivery  |          70 TB | End users pulling content from this node          |
+| Peer delivery    |          30 TB | Other nodes paying this node for cache-miss pulls |
+| **Total served** |     **100 TB** | Every served byte is paid delivery                |
 
-Why the split? Because every byte transferred — client to node _and_ node to node — is paid in decdn. When a peer node has a cache miss for a blob this node is holding, the peer probes, finds this node has it, and pulls the bytes by opening or extending a payment channel against this node's NodeId. From this node's perspective, that's identical to a client request: signed vouchers come in, USDC settles when the channel closes.
+Both streams are revenue. When another node needs a blob this node already has, it opens or extends a payment channel and pays for the pull; signed vouchers come in, and USDC settles when the channel closes. From this node's point of view, that peer request is just another paid delivery.
 
-This is what makes caching skill matter. A node that holds the right blobs becomes a paying source for the next hop. Margin amplifies through caching, not through raw throughput.
+This is why cache quality matters. A useful cache isn't a favor to the network. It's inventory.
 
-## The revenue line
+## Gross billing
 
-100 TB × $0.01/GB ≈ $1,024.
+100 TB at $0.01/GB is **$1,024 billed**:
 
-(That round number isn't branding: the model treats 100 TB as 100,000 GB and bills per megabyte at the protocol's $0.00001/MB rate, counting 1 GB as 1,024 MB. So 100,000 × 1,024 × $0.00001 = $1,024 exactly.)
+```text
+100,000 GB x 1,024 MB/GB x $0.00001/MB = $1,024
+```
 
-This is gross billing, before the FeeRouter split. decdn has no flat "protocol fee" and no discount tier to bond for. Instead, every settlement is split on-chain in the transaction that closes the channel: **60% goes straight to the operator in USDC, 30% to buyback-and-burn, 10% to the protocol treasury**. Node-to-node cache-miss pulls pass through the same contract — when this node serves a peer, that settlement routes through the FeeRouter and takes the same 60/30/10 split.
+That $1,024 is gross settlement volume, not operator take-home. There's no flat "protocol fee" and no discount tier to bond for — instead, every settlement routes through the FeeRouter and splits on-chain in the transaction that closes the channel:
 
-So the $1,024 splits the same way wherever the bytes went:
+| Bucket           | Share | Cash path                    |
+| ---------------- | ----: | ---------------------------- |
+| Operator base    |   60% | USDC to the serving operator |
+| Buyback-and-burn |   30% | USDC buys TOKEN and burns it |
+| Treasury         |   10% | USDC to protocol treasury    |
 
-- Client traffic (≈70 TB → $717 billed): operator keeps the 60% base share = **$430** in liquid USDC; $215 funds buyback-and-burn, $72 the treasury.
-- Peer-serving (≈30 TB → $307 billed): same 60/30/10 split — operator keeps the 60% base share = **$184**; $92 funds buyback-and-burn, $31 the treasury.
-- Operator USDC inflow: **$614**.
+Node-to-node cache-miss pulls don't bypass this split. A peer settlement routes the same way a client settlement does. That keeps the accounting simple — and it makes fake self-volume uneconomic.
 
-## The cost lines
+So the reference month splits the same way wherever the bytes went:
 
-**Cache miss pulls.** When a client requests a blob this node doesn't have, the node has two options: serve a redirect (return an origin NodeId, let the client connect there directly), or pay a peer to pull the bytes through (cache the result locally and stream to the client simultaneously). The pull-through path is the default and the better business — it keeps the client on this node's channel, captures the per-MB revenue, and warms the cache for the next request.
+| Stream                       | Gross billing | Operator cash share |
+| ---------------------------- | ------------: | ------------------: |
+| Client delivery, about 70 TB |          $717 |                $430 |
+| Peer delivery, about 30 TB   |          $307 |                $184 |
+| **Total operator inflow**    |    **$1,024** |            **$614** |
 
-At a healthy 85% cache hit rate, 15% of the traffic is a paid pull from a peer. The wholesale rate a node pays to pull from a peer is the same market — somewhere around the same $0.01/GB price band. So:
+The other $410 is real value flow, but it's not cash the operator can use to pay the server bill: about $307 funds buyback-and-burn, and about $102 funds the treasury.
 
-- 15% × 100 TB = 15 TB pulled from peers
-- 15 TB × $0.01/GB ≈ $154 in node-to-node payments out
+## Cash costs
 
-That's the most operator-significant cost line, and it's the one most operators don't budget for on day one. Cache miss pulls are real money. The thing that makes them sustainable is the same thing that makes them necessary: the bytes they bring in get re-served, repeatedly, at a margin.
+The largest variable cost is paid cache misses.
 
-**Infrastructure.** A Hetzner CPX22 base plus bandwidth overage at 100 TB/month comes to about **$95/month**. A 1 Gbps unmetered dedicated tier is a touch cheaper all-in — roughly $85 flat port plus the gas line below — so the $95 here is the conservative anchor.
+The 70/30 split above describes _outgoing_ served bytes: 70 TB to clients, 30 TB to peer nodes. Separately, an 85% cache-hit assumption means this node has to _buy_ about 15 TB from peers to cover its own misses. Peer delivery is revenue; cache-miss pulling is cost. They're different flows.
 
-**L2 gas.** A full channel lifecycle (open, close, settle) costs about **$0.23** in gas on the L2, a settle-only update about $0.08. Across a month of opening and settling channels the model budgets **$10** at mid Arbitrum fee markets — and flags a revisit if sustained settlement gas ever crosses $1.00.
+When this node doesn't have a requested blob, it can redirect the client to another node, or it can pull the blob through — cache it locally and stream it to the client at the same time. Pull-through is the better default: it keeps the client on this node's channel, keeps the request fast, and warms the cache for the next request.
 
-Total costs: ~$259 (cache-miss pulls $154 + infrastructure $95 + gas $10).
+At an 85% cache-hit rate, 15% of served traffic has to be pulled from peers at the same ~$0.01/GB market band:
 
-## The bottom line
+```text
+15% x 100 TB = 15 TB paid wholesale
+15 TB x $0.01/GB = about $154 out
+```
 
-| Line                                               | Amount    |
-| -------------------------------------------------- | --------- |
-| Client billing (≈70 TB), operator's 60% base share | +$430     |
-| Peer-serving (≈30 TB), operator's 60% base share   | +$184     |
-| Cache-miss pulls (15 TB × wholesale)               | −$154     |
-| Infrastructure                                     | −$95      |
-| L2 gas                                             | −$10      |
-| **Net liquid USDC**                                | **+$355** |
+That's the most operator-significant cost line, and the one most operators don't budget for on day one. The thing that makes it sustainable is the same thing that makes it necessary: the bytes it brings in get re-served, repeatedly, at a margin.
 
-That's **$355/month of liquid USDC** at the launch-fleet target — about 35% of billed revenue, on mid-cost hosting. Cheaper infrastructure or a higher cache-hit rate pushes it up; the EU low-cost setup (Hetzner CPX22, ~$95 infra) is already baked into the figure.
+**Infrastructure.** At this volume, the model uses **$95/month** as the conservative hosting anchor — the point where a metered VPS with overage and a 1 Gbps unmetered tier are effectively competing choices.
 
-Two things make the operator's _aligned_ return larger than the liquid-USDC line. The 30% of all billing routed to buyback-and-burn ($307 here) is USDC swapped for TOKEN and burned — deflation that accrues to the operator as a bond-holder, not to a passive third party; counting the 60% direct plus the 30% burn, the protocol's **operator-aligned share is 90%**. And through the first 12 months, pre-seed USDC subsidies cover early-operator infrastructure, so launch-period unit economics are positive before the network reaches steady state.
+**L2 gas.** Small, but not zero. A full channel lifecycle (open, close, settle) costs about **$0.23** in gas on the L2, a settle-only update about **$0.08**. Across a month of opening and settling channels the model budgets **$10** at mid Arbitrum fee markets — and flags a revisit if sustained settlement gas ever crosses $1.00.
+
+Total cash costs:
+
+| Cost             |   Amount |
+| ---------------- | -------: |
+| Cache-miss pulls |     $154 |
+| Infrastructure   |      $95 |
+| L2 gas           |      $10 |
+| **Total**        | **$259** |
+
+## Operator P&L
+
+Put the revenue and costs together:
+
+| Line                                 |    Amount |
+| ------------------------------------ | --------: |
+| Client delivery, operator cash share |     +$430 |
+| Peer delivery, operator cash share   |     +$184 |
+| Cache-miss pulls                     |     −$154 |
+| Infrastructure                       |      −$95 |
+| L2 gas                               |      −$10 |
+| **Net liquid USDC**                  | **+$355** |
+
+That's **$355/month of liquid USDC** — about 35% of gross billed delivery, before any TOKEN-side upside.
+
+This number moves with operating quality. A warmer cache improves it. Better bandwidth improves it. The reference case is deliberately ordinary: a 1 Gbps-class node, 100 TB/month, an 85% cache-hit rate, $0.01/GB market pricing.
+
+## What not to count as cash
+
+The operator-_aligned_ return is larger than the cash line — but it shouldn't be mixed into the OpEx math.
+
+The FeeRouter sends 30% of every settlement to buyback-and-burn ($307 in the reference month). For bonded operators, that burn is aligned with the operator side of the network: capacity providers hold TOKEN bonds, and network usage mechanically removes TOKEN supply — deflation that accrues to operators as bond-holders, not to a passive third party. Counting direct USDC plus burn, **90% of every settled byte is operator-aligned**.
+
+But invoices are paid in liquid currency. The operator's cash P&L is the operator base share minus cache-miss pulls, infrastructure, and gas. The burn belongs in the upside story, not on the server bill.
 
 ## The smaller scenario, for comparison
 
 A 10 TB/month node — early-traction, well within the Hetzner CPX22 included bandwidth allowance, no overage:
 
-| Line                                    | Amount   |
-| --------------------------------------- | -------- |
-| Client billing (≈7 TB), 60% base share  | +$43     |
-| Peer-serving (≈3 TB), 60% base share    | +$18     |
-| Cache-miss pulls + infrastructure + gas | −$34     |
+| Line                                    |   Amount |
+| --------------------------------------- | -------: |
+| Client billing (≈7 TB), 60% base share  |     +$43 |
+| Peer-serving (≈3 TB), 60% base share    |     +$18 |
+| Cache-miss pulls + infrastructure + gas |     −$34 |
 | **Net liquid USDC**                     | **+$27** |
 
 That's the operator past the launch ramp but not yet at scale — $27/month of liquid USDC, positive once you count the burn-driven alignment and the year-one infrastructure subsidy. Enough to cover their own self-paid AWS bill and a coffee.
 
-## Why the math works
+## Why the economics work
 
-The thing that makes decdn's unit economics close where prior decentralized delivery networks didn't is the combination of three things. The currency is a stablecoin, so revenue and costs are in the same denomination. The settlement is on an L2, so per-MB billing has sub-cent granularity without on-chain transaction fees swamping the price. And every byte — including the ones flowing between nodes on a cache miss — is paid, so popular content propagates with an economic gradient instead of a polite request that someone please cache it.
+The economics work because three pieces line up.
 
-Run the numbers on your own region, your own provider, your own expected utilization. The launch-ramp subsidy covers operators through cold-start; break-even hits around 5 TB/month per node; everything above that is real money in a stable currency.
+First, operators earn in USDC. They're not asked to cover dollar-denominated bandwidth bills with volatile emissions.
+
+Second, payment channels make per-MB billing cheap enough to matter. Most byte-level payments happen off-chain; the L2 only sees channel-lifecycle transactions and settlement.
+
+Third, cache misses are paid. Popular content spreads because the next node can earn from holding it, not because someone asked nicely.
+
+That's the operator thesis in one sentence: serve useful bytes, keep the right cache warm, and settle in a stable currency. The launch-ramp subsidy covers the cold-start period while traffic fills in. After that, break-even sits around 5 TB/month per node in the reference setup. At 100 TB/month, the reference node clears **$355/month** in liquid USDC.
