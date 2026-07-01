@@ -858,9 +858,16 @@ a.underline-brutal:hover .arrow {
    in the color-mix() calls below. */
 
 .prose {
+  width: 100%; /* fill the flex column, then cap with max-width. Without an
+                  explicit width, `margin-inline: auto` opts this flex item out
+                  of `align-items: stretch`, so it takes its 68ch max-content
+                  and overflows narrow viewports. */
   max-width: 68ch;
-  margin-inline: auto; /* center the reading column within the wide Frame */
+  min-width: 0;
+  margin-inline: auto; /* center the capped reading column on wide screens */
   color: var(--ink);
+  overflow-wrap: break-word; /* wrap long unbreakable tokens (URLs, rates like
+                                $0.00001/MB) rather than overflow */
 }
 
 .prose > * + * {
@@ -982,6 +989,7 @@ a.underline-brutal:hover .arrow {
   border-bottom: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
   text-align: left;
   vertical-align: top;
+  overflow-wrap: break-word; /* let cells collapse to fit a narrow column */
 }
 
 .prose th {
