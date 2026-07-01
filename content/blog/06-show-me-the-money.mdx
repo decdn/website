@@ -11,7 +11,7 @@ $1,024 billed. $355 left, in liquid USDC.
 
 That is the reference month for a healthy decdn node at the launch-fleet target: 100 TB served at a market rate of $0.01/GB. The point is not to claim every node always earns that number. The point is to show the cash path, line by line, without mixing operator revenue, token alignment, and protocol treasury flow into one blurry headline.
 
-## the setup
+## The setup
 
 The reference node serves 100 TB in a month. It runs on a low-cost 1 Gbps-class setup: a Hetzner CPX22 with bandwidth overage, or an equivalent unmetered dedicated tier once traffic makes metered bandwidth a bad trade. Around 100 TB/month, those curves converge. Below that, a cheap VPS can work. Above that, a flat bandwidth port starts to matter.
 
@@ -29,7 +29,7 @@ Both streams are revenue. When another node needs a blob this node already has, 
 
 This is why cache quality matters. A useful cache is not a favor to the network. It is inventory.
 
-## gross billing
+## Gross billing
 
 100 TB at $0.01/GB is **$1,024 billed**.
 
@@ -59,7 +59,7 @@ So the reference month becomes:
 
 The other $410 is real value flow, but it is not cash the operator can use to pay the server bill. About $307 funds buyback-and-burn, and about $102 funds treasury.
 
-## cash costs
+## Cash costs
 
 The largest variable cost is paid cache misses.
 
@@ -87,7 +87,7 @@ Total cash costs:
 | L2 gas           |      $10 |
 | **Total**        | **$259** |
 
-## operator p&l
+## Operator P&L
 
 Put the revenue and costs together:
 
@@ -104,7 +104,7 @@ That is **$355/month of liquid USDC**, about 35% of gross billed delivery, befor
 
 This number moves with operating quality. A warmer cache improves it. Better bandwidth improves it. The reference case is deliberately ordinary: a 1 Gbps-class node, 100 TB/month, 85% cache hit rate, $0.01/GB market pricing.
 
-## what not to count as cash
+## What not to count as cash
 
 The operator-aligned return is larger than the cash line, but it should not be mixed into OpEx math.
 
@@ -112,7 +112,7 @@ FeeRouter sends 30% of every settlement to buyback-and-burn. For bonded operator
 
 But invoices are paid in liquid currency. The operator's cash P&L is the operator base share minus cache-miss pulls, infrastructure, and gas. The burn belongs in the upside story, not the server bill.
 
-## why the economics work
+## Why the economics work
 
 The economics work because three pieces line up.
 
