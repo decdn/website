@@ -858,9 +858,21 @@ a.underline-brutal:hover .arrow {
    in the color-mix() calls below. */
 
 .prose {
+  width: 100%; /* Pin this flex item to the column width. Its auto cross-axis
+                  margins (margin-inline: auto) opt it out of the flex default
+                  align-items: stretch, so without a definite width it is sized
+                  to content: short content collapses the column, and a child
+                  wider than the viewport (the wide table in post 06) balloons
+                  out to the 68ch max-width and overflows narrow screens.
+                  max-width then acts purely as a cap. */
   max-width: 68ch;
-  margin-inline: auto; /* center the reading column within the wide Frame */
+  margin-inline: auto; /* center the capped reading column on wide screens */
   color: var(--ink);
+  overflow-wrap: break-word; /* break long unbreakable inline tokens (long
+                                inline code, external links) so they wrap
+                                instead of overflowing the column. Fenced code
+                                blocks are unaffected — they scroll via
+                                .prose pre { overflow-x: auto }. */
 }
 
 .prose > * + * {
