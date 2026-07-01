@@ -129,7 +129,7 @@ export default async function BlogPost({
       <JsonLd data={postingSchema} />
       <JsonLd data={breadcrumbSchema} />
       <Frame id="post" tone="paper">
-        <article className="flex min-w-0 flex-col gap-10">
+        <article className="flex flex-col gap-10">
           <Link
             href="/blog/"
             aria-label="Back to field notes"
