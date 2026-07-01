@@ -989,7 +989,6 @@ a.underline-brutal:hover .arrow {
   border-bottom: 1px solid color-mix(in srgb, var(--ink) 14%, transparent);
   text-align: left;
   vertical-align: top;
-  overflow-wrap: break-word; /* let cells collapse to fit a narrow column */
 }
 
 .prose th {
