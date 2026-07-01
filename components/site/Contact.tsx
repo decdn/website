@@ -113,7 +113,7 @@ export function Contact() {
           <div
             data-reveal
             style={{ "--reveal-delay": "220ms" }}
-            className="flex flex-col gap-y-8"
+            className="flex flex-col gap-y-4 @md:gap-y-8"
           >
             <div className="flex flex-col flex-wrap gap-x-10 gap-y-4 @md:flex-row @md:items-baseline">
               <a
