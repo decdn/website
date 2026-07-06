@@ -16,7 +16,7 @@ Every blob is identified by its **BLAKE3 hash**. Clients and nodes verify receiv
 
 Delivery uses **bao** — an interleaved verified-stream encoding of the BLAKE3 tree. The `cdn/client/v1` payload is always bao bytes: content interleaved with the hash proofs needed to verify each 16 KiB chunk group against the root the client expects. There is no raw-bytes mode with an optional hasher fallback; the bao decoder verifies every chunk group as it arrives. A malicious node cannot insert a single corrupt byte and still earn — the client rejects the stream before paying for that chunk.
 
-Because every chunk group carries its own proof, a resumed or ranged fetch verifies **independently from any byte offset** once it aligns to the next unverified chunk group — no need to re-read from the start. Payment meters transmitted bytes, and the proof bytes are transmitted, so they are metered too: the verification overhead is roughly **0.4%** of blob size, not free metadata.
+Because every chunk group carries its own proof, a resumed or ranged fetch verifies **independently** — the decoder aligns the requested offset down to its 16 KiB chunk-group boundary, so there's no need to re-read from the start. Payment meters all transmitted bytes, including the proof bytes: the verification overhead is roughly **0.4%** of blob size, not free metadata.
 
 An origin-cold node must import or build the blob's **outboard** (its BLAKE3 tree) before it can serve verified ranges. Node-to-node cache-miss pulls stay bao-encoded and pipelined end to end.
 
