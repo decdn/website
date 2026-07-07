@@ -52,7 +52,7 @@ If pull-through is disabled in the node's config, the node returns a redirect po
 
 For a large blob, the client doesn't pull from a single node. A client-side scheduler splits the blob across several sources at once — full holders only for now — up to `max_sources` (a configurable cap on parallel sources). Each source is assigned bao-aligned **work units** (byte ranges the bao decoder can verify on their own).
 
-Assignment is dynamic: fast sources steal work from slow ones, every unit is verified as it lands, a failed unit is re-dispatched to another source, and the last few stragglers are hedged across sources so one slow peer can't stall completion. Aggregating parallel streams turns a 1 Gbps origin into multi-gigabit delivery.
+Assignment is dynamic: fast sources steal work from slow ones, every unit is verified as it lands, a failed unit is re-dispatched to another source, and the last few stragglers are hedged across sources so one slow peer can't stall completion. Aggregating parallel streams lets a blob be delivered at multi-gigabit speeds once it's cached across enough full holders — no single origin's uplink caps the transfer.
 
 There is no new wire surface — each source is just an ordinary paid `cdn/client/v1` stream, so channels, vouchers, and slashing work exactly as in the single-source paths above.
 
