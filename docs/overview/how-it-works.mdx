@@ -56,11 +56,12 @@ Assignment is dynamic: fast sources steal work from slow ones, every unit is ver
 
 There is no new wire surface — each source is just an ordinary paid `cdn/client/v1` stream, so channels, vouchers, and slashing work exactly as in the single-source paths above.
 
-## Payment channels in three lines
+## Payment channels in four lines
 
 1. **Open** — client opens a channel on-chain. Deposit is escrowed in the `PaymentChannel` contract.
 2. **Vouchers** — off-chain signed messages updating the cumulative amount owed. Cadence is negotiable per stream.
-3. **Close** — either party submits the latest voucher on-chain. A dispute window lets the counterparty submit a later-nonce voucher if the close is stale. When both parties are online and agree, a single co-signed transaction settles immediately with no dispute window (the cooperative fast path), falling back to the standard close if either side declines.
+3. **Close** — either party submits the latest voucher on-chain. A dispute window lets the counterparty submit a later-nonce voucher if the close is stale.
+4. **Cooperative close (fast path)** — when both parties are online and agree, a single co-signed transaction settles the channel immediately with no dispute window, falling back to the standard close if either side declines.
 
 ## What keeps the network honest
 
