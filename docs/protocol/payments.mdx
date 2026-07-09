@@ -28,6 +28,10 @@ sequenceDiagram
 
 The channel token is fixed (USDC) at deployment, so `openChannel` takes only the provider and deposit. Close is a three-step lifecycle — `closeChannel` (callable by either party) starts the dispute window, `disputeChannel` accepts a higher-nonce voucher during the window, and `settleChannel` distributes funds after it expires. A node may also `withdraw` accrued earnings against the latest voucher while the channel stays open — redeeming a monotonic client-signed claim needs no dispute window.
 
+## Cooperative close
+
+When both parties are online and agree on the final balance, they can skip the dispute window entirely. `cooperativeClose(channelId, amount, nonce, bytesDelivered, clientVoucherSig, providerCloseSig)` settles the channel **in a single transaction with no dispute window** — the provider signs an EIP-712 `CooperativeClose` waiver acknowledging the final voucher, and either party can submit it. This is purely additive: it is the fast path when both sides cooperate, and if the node declines or is offline, the client falls straight back to `closeChannel` and the standard dispute window. The client CLI exposes it as `decdn channel coop-close`.
+
 ## Vouchers
 
 Off-chain signed messages bound to a specific channel, carrying a strictly increasing **nonce** (starting at 1) and a **cumulative** amount and byte count. Each new voucher restates the running total owed — both amount and bytes are monotonically non-decreasing — and the highest-nonce voucher is the one that settles. Nodes persist the latest nonce rather than discarding older state, since `disputeChannel` only accepts a strictly higher nonce. Cadence is negotiated per stream.

@@ -7,6 +7,8 @@ description: Governance-controlled on-chain hash blacklist with regional bodies 
 
 A **`ContentBlacklist`** contract supports **global** (network-wide) and **regional** (jurisdiction-scoped) takedown. Standard governance entries have a **24-hour compliance window**; the emergency multisig path takes effect **immediately** with a **2-hour slash window**.
 
+The emergency takedown power is a **permanent** capability — unlike the multisig's protocol-wide `pause()`, which [sunsets at 12 months](/protocol/governance#emergency-multisig), emergency blacklisting does not sunset, since unlawful-content removal is an ongoing legal-compliance duty. (Individual emergency _entries_ still auto-expire unless ratified — see [Entry types](#entry-types) below.)
+
 ## Why on-chain
 
 The blacklist must be:
