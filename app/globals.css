@@ -1079,7 +1079,7 @@ a.underline-brutal:hover .arrow {
   -webkit-backdrop-filter: blur(6px) saturate(1.05);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 900ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 450ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .mm-overlay[data-open="true"] {
   opacity: 1;
@@ -1094,7 +1094,7 @@ a.underline-brutal:hover .arrow {
   color: var(--ink);
   pointer-events: none;
   transform: translate3d(100%, 0, 0);
-  transition: transform 900ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 450ms cubic-bezier(0.4, 0, 0.2, 1);
   padding: clamp(4.25rem, 16vw, 5.5rem) clamp(1.5rem, 6vw, 2rem)
     clamp(1.5rem, 6vw, 2rem);
   overflow-y: auto;
