@@ -1079,7 +1079,7 @@ a.underline-brutal:hover .arrow {
   -webkit-backdrop-filter: blur(6px) saturate(1.05);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 480ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: opacity 520ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 .mm-overlay[data-open="true"] {
   opacity: 1;
@@ -1092,8 +1092,11 @@ a.underline-brutal:hover .arrow {
   z-index: 60;
   background: var(--paper);
   color: var(--ink);
-  transform: translate3d(100%, 0, 0);
-  transition: transform 720ms cubic-bezier(0.16, 1, 0.3, 1);
+  opacity: 0;
+  transform: translate3d(4%, 0, 0);
+  transition:
+    opacity 520ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
   padding: clamp(4.25rem, 16vw, 5.5rem) clamp(1.5rem, 6vw, 2rem)
     clamp(1.5rem, 6vw, 2rem);
   overflow-y: auto;
@@ -1102,7 +1105,8 @@ a.underline-brutal:hover .arrow {
      interaction. aria-hidden is also set as the AT signal. */
 }
 .mm-panel[data-open="true"] {
-  transform: translate3d(0, 0, 0);
+  opacity: 1;
+  transform: none;
 }
 
 /* Full-bleed panel; the content stays a readable left-aligned column so
@@ -1118,11 +1122,15 @@ a.underline-brutal:hover .arrow {
   gap: 10px;
   margin-bottom: 2rem;
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(10px);
+  transition:
+    opacity 460ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 460ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 .mm-panel[data-open="true"] .mm-head {
-  animation: mm-rise 760ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: 140ms;
+  opacity: 1;
+  transform: none;
+  transition-delay: 120ms;
 }
 
 .mm-head-link {
@@ -1157,19 +1165,16 @@ a.underline-brutal:hover .arrow {
   text-decoration: none;
   min-height: 56px;
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(10px);
+  transition:
+    opacity 460ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 460ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mm-panel[data-open="true"] .mm-row {
-  animation: mm-rise 760ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  animation-delay: calc(var(--mm-i, 0) * 80ms + 220ms);
-}
-
-@keyframes mm-rise {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  opacity: 1;
+  transform: none;
+  transition-delay: calc(var(--mm-i, 0) * 55ms + 150ms);
 }
 
 .mm-label {
@@ -1240,11 +1245,16 @@ a.underline-brutal:hover .arrow {
     transform: none;
     opacity: 1;
   }
+  .mm-head,
+  .mm-row {
+    transition: none;
+    transform: none;
+  }
   .mm-panel[data-open="true"] .mm-head,
   .mm-panel[data-open="true"] .mm-row {
-    animation: none;
     opacity: 1;
     transform: none;
+    transition-delay: 0ms;
   }
   .mm-mark {
     transition: none;
