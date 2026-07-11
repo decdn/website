@@ -13,7 +13,7 @@ const geistSans = Geist({
   weight: ["400", "500", "600", "700"],
 });
 
-const TITLE = "deCDN — A decentralized delivery layer for bytes at scale";
+const TITLE = "deCDN — decentralized CDN for bytes at scale";
 const DESCRIPTION =
   "A decentralized CDN. Anyone can serve bytes; clients pay per megabyte in USDC. An open market that gets cheaper as it grows, at ~$0.01/GB, up to 90% below legacy CDN list pricing.";
 

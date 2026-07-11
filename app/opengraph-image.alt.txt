@@ -1,1 +1,1 @@
-deCDN — decentralized delivery layer.
+deCDN — decentralized CDN for bytes at scale
