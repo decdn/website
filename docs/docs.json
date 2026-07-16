@@ -16,6 +16,26 @@
   "appearance": {
     "default": "dark"
   },
+  "seo": {
+    "metatags": {
+      "og:image": "https://docs.decdn.org/og.png",
+      "og:image:width": "1200",
+      "og:image:height": "630",
+      "og:image:alt": "deCDN docs",
+      "twitter:image": "https://docs.decdn.org/og.png",
+      "twitter:card": "summary_large_image"
+    },
+    "organization": {
+      "name": "deCDN",
+      "url": "https://decdn.org",
+      "logo": "https://docs.decdn.org/d_logo.png",
+      "sameAs": [
+        "https://github.com/decdn",
+        "https://x.com/decdn_",
+        "https://www.linkedin.com/company/decdn"
+      ]
+    }
+  },
   "navigation": {
     "tabs": [
       {
