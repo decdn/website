@@ -2,6 +2,9 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Metadata } from "next";
 import matter from "gray-matter";
+// Relative, not `@/lib/metadata`: vitest has no path-alias resolution
+// configured, and this module is imported by lib/legal.test.ts.
+import { imagesField, OG_SITE, TWITTER_SITE, type OgImages } from "./metadata";
 
 const LEGAL_DIR = path.join(process.cwd(), "content", "legal");
 
@@ -108,7 +111,12 @@ export function getLegalDoc(slug: LegalSlug): LegalDoc {
   };
 }
 
-export function legalMetadata(slug: LegalSlug): Metadata {
+// `ogImages` is the caller's resolved parent images — see lib/metadata.ts for
+// why they have to be threaded through at all. Deliberately required rather
+// than defaulted: `twitter.card` below is `summary_large_image`, so an omitted
+// argument would render a blank card with nothing in the build to signal it.
+// Making it required turns that mistake into a compile error.
+export function legalMetadata(slug: LegalSlug, ogImages: OgImages): Metadata {
   const doc = getLegalDoc(slug);
   const canonical = `/legal/${slug}/`;
   return {
@@ -116,15 +124,22 @@ export function legalMetadata(slug: LegalSlug): Metadata {
     description: doc.description,
     alternates: { canonical },
     openGraph: {
+      ...OG_SITE,
       title: doc.title,
       description: doc.description,
       url: canonical,
       type: "article",
+      ...imagesField(ogImages),
     },
+    // `twitter.images` is stated for legibility; Next would autofill it from
+    // `openGraph.images` at final resolution anyway. What you can't do is read
+    // it off `parent.twitter.images` — that autofill hasn't run yet upstream.
     twitter: {
+      ...TWITTER_SITE,
       card: "summary_large_image",
       title: doc.title,
       description: doc.description,
+      ...imagesField(ogImages),
     },
   };
 }

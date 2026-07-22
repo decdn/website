@@ -5,6 +5,7 @@ import {
   legalMetadata,
   LEGAL_SLUGS,
 } from "./legal";
+import { OG_SITE, TWITTER_SITE } from "./metadata";
 
 describe("formatEffective", () => {
   it("renders a human-readable date with no leading zero on the day", () => {
@@ -54,11 +55,45 @@ describe("legalMetadata", () => {
   it.each(LEGAL_SLUGS)(
     "uses a relative canonical resolved via metadataBase for %s",
     (slug) => {
-      const meta = legalMetadata(slug);
+      // Empty images: this case is only about the canonical URL.
+      const meta = legalMetadata(slug, []);
       // Relative (not absolute) so it matches the blog convention and resolves
       // against `metadataBase`; see lib/links.ts.
       expect(meta.alternates?.canonical).toBe(`/legal/${slug}/`);
       expect(meta.openGraph?.url).toBe(`/legal/${slug}/`);
     },
   );
+
+  // Without the threading these pages declare `twitter:card=summary_large_image`
+  // with no image and render a blank card; see lib/metadata.ts for the rule.
+  // The fixture mirrors a real resolved parent image, not a bare `{ url }`.
+  it("passes the parent og images through to both openGraph and twitter", () => {
+    const images = [
+      {
+        url: "https://decdn.org/opengraph-image.png",
+        alt: "deCDN — decentralized CDN for bytes at scale",
+        width: 1200,
+        height: 630,
+        type: "image/png",
+      },
+    ];
+    const meta = legalMetadata("privacy", images);
+    expect(meta.openGraph?.images).toEqual(images);
+    expect(meta.twitter?.images).toEqual(images);
+  });
+
+  // An `images: []` is not equivalent to omitting the key — Next's
+  // static-metadata merge tests `hasOwnProperty("images")`, so writing it would
+  // block a future co-located `opengraph-image.*` under app/legal/.
+  it("omits the images key entirely when the parent resolved none", () => {
+    const meta = legalMetadata("privacy", []);
+    expect(Object.hasOwn(meta.openGraph!, "images")).toBe(false);
+    expect(Object.hasOwn(meta.twitter!, "images")).toBe(false);
+  });
+
+  it.each(LEGAL_SLUGS)("carries the site and X attribution for %s", (slug) => {
+    const meta = legalMetadata(slug, []);
+    expect(meta.openGraph?.siteName).toBe(OG_SITE.siteName);
+    expect(meta.twitter?.site).toBe(TWITTER_SITE.site);
+  });
 });
