@@ -1,7 +1,7 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { Frame } from "@/components/ui/Frame";
 import { BLOG_GRID_COLS, PostRow } from "@/components/ui/PostRow";
-import { listIndexPosts } from "@/lib/blog";
+import { listIndexPosts, postImageUrl } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
 import { BLOG_URL, ORG_ID, SITE_URL } from "@/lib/links";
 
@@ -74,7 +74,10 @@ export default function BlogIndex() {
         description: p.summary,
         url: postUrl,
         mainEntityOfPage: postUrl,
-        image: `${SITE_URL}opengraph-image.png`,
+        // Must agree with the `image` the post page emits for this same
+        // `@id`, so `postImageUrl` is the single source for both — it also
+        // honours a frontmatter `image:` override the site card can't.
+        image: postImageUrl(p, postUrl),
         keywords: p.tags?.join(", "),
         wordCount: p.words,
         datePublished: p.date,
