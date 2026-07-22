@@ -4,6 +4,12 @@ import { BLOG_GRID_COLS, PostRow } from "@/components/ui/PostRow";
 import { listIndexPosts, postImageUrl } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
 import { BLOG_URL, ORG_ID, SITE_URL } from "@/lib/links";
+import {
+  imagesField,
+  inheritedOgImages,
+  OG_SITE,
+  TWITTER_SITE,
+} from "@/lib/metadata";
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",
@@ -23,30 +29,35 @@ const breadcrumbSchema = {
 const TITLE = "field notes";
 const DESCRIPTION = "long-form posts on the deCDN protocol.";
 
-// openGraph shallow-replaces in Next 16, so re-pass `images` from parent
-// or the root og image is dropped. Twitter `images` set explicitly because
-// the og→twitter fallback fires at final resolution, not via ResolvingMetadata.
+// Defining `openGraph`/`twitter` here replaces the root's resolved objects
+// wholesale, so the site fields and the root og image have to be re-stated —
+// see lib/metadata.ts for the rule and the helpers.
 export async function generateMetadata(
   _: unknown,
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
-  const ogImages = (await parent).openGraph?.images ?? [];
+  const ogImages = await inheritedOgImages(parent);
   return {
     title: TITLE,
     description: DESCRIPTION,
     alternates: { canonical: "/blog/" },
     openGraph: {
+      ...OG_SITE,
       title: TITLE,
       description: DESCRIPTION,
       url: "/blog/",
       type: "website",
-      images: ogImages,
+      ...imagesField(ogImages),
     },
+    // `twitter.images` is stated for legibility; Next would autofill it from
+    // `openGraph.images` at final resolution anyway. What you can't do is read
+    // it off `parent.twitter.images` — that autofill hasn't run yet here.
     twitter: {
+      ...TWITTER_SITE,
       card: "summary_large_image",
       title: TITLE,
       description: DESCRIPTION,
-      images: ogImages,
+      ...imagesField(ogImages),
     },
   };
 }

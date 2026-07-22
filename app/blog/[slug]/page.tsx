@@ -18,6 +18,7 @@ import {
 } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
 import { BLOG_URL, ORG_ID, SITE_URL } from "@/lib/links";
+import { OG_SITE, TWITTER_SITE } from "@/lib/metadata";
 
 // Static export: enumerate every slug at build time and refuse anything
 // outside that set. `dynamicParams = false` mirrors the closed-world
@@ -51,6 +52,7 @@ export async function generateMetadata({
     description: post.summary,
     alternates: { canonical: `/blog/${post.slug}/` },
     openGraph: {
+      ...OG_SITE,
       title: post.title,
       description: post.summary,
       url: `/blog/${post.slug}/`,
@@ -60,6 +62,7 @@ export async function generateMetadata({
       ...(ogImages && { images: ogImages }),
     },
     twitter: {
+      ...TWITTER_SITE,
       card: "summary_large_image",
       title: post.title,
       description: post.summary,

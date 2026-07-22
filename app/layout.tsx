@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
-import { links, SITE_URL, INDEXABLE, ORG_ID, X_HANDLE } from "@/lib/links";
+import { links, SITE_URL, INDEXABLE, ORG_ID } from "@/lib/links";
+import { OG_SITE, TWITTER_SITE } from "@/lib/metadata";
 import { Chrome } from "@/components/site/Chrome";
 import { Footer } from "@/components/site/Footer";
 import { ScrollReveal } from "@/components/site/ScrollReveal";
@@ -26,19 +27,17 @@ export const metadata: Metadata = {
   description: DESCRIPTION,
   applicationName: "deCDN",
   openGraph: {
+    ...OG_SITE,
     title: TITLE,
     description: DESCRIPTION,
     url: "/",
-    siteName: "deCDN",
     type: "website",
-    locale: "en_US",
   },
   twitter: {
+    ...TWITTER_SITE,
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
-    site: X_HANDLE,
-    creator: X_HANDLE,
   },
   alternates: { canonical: "/" },
   robots: { index: INDEXABLE, follow: INDEXABLE },
