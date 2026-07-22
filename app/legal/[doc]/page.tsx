@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, ResolvingMetadata } from "next";
 import { notFound } from "next/navigation";
 import { LegalDoc } from "@/components/ui/LegalDoc";
 import { LEGAL_SLUGS, legalMetadata, type LegalSlug } from "@/lib/legal";
@@ -18,15 +18,18 @@ function parseDoc(doc: string): LegalSlug | null {
     : null;
 }
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ doc: string }>;
-}): Promise<Metadata> {
+// The root `app/opengraph-image.png` file convention only reaches routes that
+// don't define their own `openGraph` — Next 16 merges metadata shallowly. Read
+// the parent's resolved images and hand them to `legalMetadata` so these pages
+// keep the site card (see the note there).
+export async function generateMetadata(
+  { params }: { params: Promise<{ doc: string }> },
+  parent: ResolvingMetadata,
+): Promise<Metadata> {
   const { doc } = await params;
   const slug = parseDoc(doc);
   if (!slug) notFound();
-  return legalMetadata(slug);
+  return legalMetadata(slug, (await parent).openGraph?.images ?? []);
 }
 
 export default async function LegalPage({

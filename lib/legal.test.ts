@@ -61,4 +61,24 @@ describe("legalMetadata", () => {
       expect(meta.openGraph?.url).toBe(`/legal/${slug}/`);
     },
   );
+
+  // openGraph shallow-replaces in Next 16, so images have to be threaded
+  // through from the parent — without this the page declares
+  // `twitter:card=summary_large_image` with no image and renders a blank card.
+  it("re-passes the parent og images to both openGraph and twitter", () => {
+    const images = [{ url: "https://decdn.org/opengraph-image.png" }];
+    const meta = legalMetadata("privacy", images);
+    expect(meta.openGraph?.images).toBe(images);
+    expect(meta.twitter?.images).toBe(images);
+  });
+
+  // The card is declared `summary_large_image`, so an empty images list is a
+  // blank card on X — assert every slug carries the image through.
+  it.each(LEGAL_SLUGS)("carries an image on every surface for %s", (slug) => {
+    const meta = legalMetadata(slug, [
+      { url: "https://decdn.org/opengraph-image.png" },
+    ]);
+    expect(meta.openGraph?.images).not.toHaveLength(0);
+    expect(meta.twitter?.images).not.toHaveLength(0);
+  });
 });

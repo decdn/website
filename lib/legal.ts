@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { Metadata } from "next";
+import type { Metadata, ResolvedMetadata } from "next";
 import matter from "gray-matter";
 
 const LEGAL_DIR = path.join(process.cwd(), "content", "legal");
@@ -108,7 +108,18 @@ export function getLegalDoc(slug: LegalSlug): LegalDoc {
   };
 }
 
-export function legalMetadata(slug: LegalSlug): Metadata {
+/** Resolved `openGraph.images` shape, as handed back by `ResolvingMetadata`. */
+type OgImages = NonNullable<ResolvedMetadata["openGraph"]>["images"];
+
+// `ogImages` comes from the caller's `ResolvingMetadata` parent. openGraph
+// shallow-replaces in Next 16, so it must be re-passed or the root og image is
+// dropped — a `summary_large_image` card with no image renders blank. Twitter
+// `images` set explicitly because the og→twitter fallback fires at final
+// resolution, not via ResolvingMetadata. Same pattern as app/blog/page.tsx.
+export function legalMetadata(
+  slug: LegalSlug,
+  ogImages: OgImages = [],
+): Metadata {
   const doc = getLegalDoc(slug);
   const canonical = `/legal/${slug}/`;
   return {
@@ -120,11 +131,13 @@ export function legalMetadata(slug: LegalSlug): Metadata {
       description: doc.description,
       url: canonical,
       type: "article",
+      images: ogImages,
     },
     twitter: {
       card: "summary_large_image",
       title: doc.title,
       description: doc.description,
+      images: ogImages,
     },
   };
 }
