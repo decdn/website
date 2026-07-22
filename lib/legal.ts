@@ -1,7 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { Metadata, ResolvedMetadata } from "next";
+import type { Metadata } from "next";
 import matter from "gray-matter";
+// Relative, not `@/lib/metadata`: vitest has no path-alias resolution
+// configured, and this module is imported by lib/legal.test.ts.
+import { imagesField, OG_SITE, TWITTER_SITE, type OgImages } from "./metadata";
 
 const LEGAL_DIR = path.join(process.cwd(), "content", "legal");
 
@@ -108,18 +111,12 @@ export function getLegalDoc(slug: LegalSlug): LegalDoc {
   };
 }
 
-/** Resolved `openGraph.images` shape, as handed back by `ResolvingMetadata`. */
-type OgImages = NonNullable<ResolvedMetadata["openGraph"]>["images"];
-
-// `ogImages` comes from the caller's `ResolvingMetadata` parent. openGraph
-// shallow-replaces in Next 16, so it must be re-passed or the root og image is
-// dropped — a `summary_large_image` card with no image renders blank. Twitter
-// `images` set explicitly because the og→twitter fallback fires at final
-// resolution, not via ResolvingMetadata. Same pattern as app/blog/page.tsx.
-export function legalMetadata(
-  slug: LegalSlug,
-  ogImages: OgImages = [],
-): Metadata {
+// `ogImages` is the caller's resolved parent images — see lib/metadata.ts for
+// why they have to be threaded through at all. Deliberately required rather
+// than defaulted: `twitter.card` below is `summary_large_image`, so an omitted
+// argument would render a blank card with nothing in the build to signal it.
+// Making it required turns that mistake into a compile error.
+export function legalMetadata(slug: LegalSlug, ogImages: OgImages): Metadata {
   const doc = getLegalDoc(slug);
   const canonical = `/legal/${slug}/`;
   return {
@@ -127,17 +124,22 @@ export function legalMetadata(
     description: doc.description,
     alternates: { canonical },
     openGraph: {
+      ...OG_SITE,
       title: doc.title,
       description: doc.description,
       url: canonical,
       type: "article",
-      images: ogImages,
+      ...imagesField(ogImages),
     },
+    // `twitter.images` is stated for legibility; Next would autofill it from
+    // `openGraph.images` at final resolution anyway. What you can't do is read
+    // it off `parent.twitter.images` — that autofill hasn't run yet upstream.
     twitter: {
+      ...TWITTER_SITE,
       card: "summary_large_image",
       title: doc.title,
       description: doc.description,
-      images: ogImages,
+      ...imagesField(ogImages),
     },
   };
 }

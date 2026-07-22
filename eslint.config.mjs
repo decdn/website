@@ -15,7 +15,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Mintlify docs source: not part of the website build.
     "docs/**",
-    // Claude Code worktrees: full checkouts, linted in their own right.
+    // Claude Code worktrees are duplicate checkouts of this repo — without
+    // this, every finding gets reported once per worktree plus once here.
     ".claude/worktrees/**",
   ]),
   prettier,
