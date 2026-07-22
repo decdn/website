@@ -15,6 +15,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Mintlify docs source: not part of the website build.
     "docs/**",
+    // Claude Code worktrees: full checkouts, linted in their own right.
+    ".claude/worktrees/**",
   ]),
   prettier,
 ]);
