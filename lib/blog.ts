@@ -143,11 +143,20 @@ export const parseImage = (
       // check it actually ships. `public/<path>` is copied verbatim into the
       // static export; a typo here would 404 og:image, twitter:image, AND the
       // BlogPosting JSON-LD `image` (a schema.org field Google fetches) — all
-      // with a green build. `join` keeps the leading `/` from escaping public/.
-      const local = path.join(process.cwd(), "public", trimmed);
-      if (!fs.existsSync(local)) {
+      // with a green build. Resolve under public/ and require a regular file
+      // that stays inside it: a `..` segment could otherwise escape to a
+      // repo-root file (`/../package.json`) and a bare directory (`/presskit`)
+      // would pass `existsSync` yet 404 as a URL.
+      const publicDir = path.resolve(process.cwd(), "public");
+      const local = path.resolve(publicDir, `.${trimmed}`);
+      const insidePublic = local.startsWith(publicDir + path.sep);
+      if (
+        !insidePublic ||
+        !fs.existsSync(local) ||
+        !fs.statSync(local).isFile()
+      ) {
         throw new Error(
-          `[blog] ${filename}: frontmatter \`image\` "${trimmed}" does not exist at public${trimmed} — ` +
+          `[blog] ${filename}: frontmatter \`image\` "${trimmed}" does not resolve to a file under public/ — ` +
             `og:image, twitter:image, and the BlogPosting JSON-LD would all 404`,
         );
       }

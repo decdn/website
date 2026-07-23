@@ -24,7 +24,9 @@ const OUT_DIR = "out";
 // non-empty. Next emits attributes in `name … content` order.
 const DECLARES_LARGE_IMAGE =
   /name="twitter:card"\s+content="summary_large_image"/;
-const HAS_IMAGE = /name="twitter:image"\s+content="[^"]+"/;
+// Capture the content so a whitespace-only value (`content="   "`) counts as
+// no image — a non-empty match alone wouldn't render a usable card.
+const IMAGE_CONTENT = /name="twitter:image"\s+content="([^"]*)"/;
 
 const files = globSync(`${OUT_DIR}/**/index.html`);
 
@@ -37,7 +39,8 @@ if (files.length === 0) {
 
 const offenders = files.filter((file) => {
   const html = readFileSync(file, "utf8");
-  return DECLARES_LARGE_IMAGE.test(html) && !HAS_IMAGE.test(html);
+  const image = html.match(IMAGE_CONTENT)?.[1] ?? "";
+  return DECLARES_LARGE_IMAGE.test(html) && image.trim() === "";
 });
 
 if (offenders.length > 0) {

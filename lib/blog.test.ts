@@ -238,16 +238,19 @@ describe("parseImage", () => {
     },
   );
 
-  // A syntactically valid site-relative path that has no file under
-  // `public/` must throw — otherwise a typo ships a 404'd og:image,
-  // twitter:image, and BlogPosting JSON-LD image with a green build.
-  // Off-site absolute URLs can't be checked and are exempt.
+  // A site-relative path that doesn't resolve to a real file under `public/`
+  // must throw — otherwise a typo ships a 404'd og:image, twitter:image, and
+  // BlogPosting JSON-LD image with a green build. This also rejects a `..`
+  // escape to a repo-root file and a bare directory (both would slip past a
+  // plain `existsSync`). Off-site absolute URLs can't be checked and are exempt.
   it.each([
     ["missing top-level file", "/blog-cards/why-now.png"],
     ["missing nested file", "/a/b/c.png"],
-  ])("throws when a site-relative override doesn't exist (%s)", (_l, input) => {
+    ["a `..` escape to a repo-root file", "/../package.json"],
+    ["a directory rather than a file", "/presskit"],
+  ])("throws when %s", (_l, input) => {
     expect(() => parseImage(input, "bad.mdx")).toThrow(
-      /bad\.mdx.*does not exist/s,
+      /bad\.mdx.*does not resolve to a file under public\//s,
     );
   });
 });
