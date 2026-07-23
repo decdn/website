@@ -133,13 +133,15 @@ describe("parseImage", () => {
     expect(parseImage(undefined, "x.mdx")).toBeUndefined();
   });
 
+  // Site-relative inputs must point at a real file under `public/` (the
+  // existence check below), so these use assets that actually ship.
   it.each<[string, string, string]>([
+    ["site-relative path", "/d_logo.png", `${SITE_URL}d_logo.png`],
     [
-      "site-relative path",
-      "/blog-cards/foo.png",
-      `${SITE_URL}blog-cards/foo.png`,
+      "nested site-relative path",
+      "/presskit/decdn-presskit.zip",
+      `${SITE_URL}presskit/decdn-presskit.zip`,
     ],
-    ["nested site-relative path", "/a/b/c.png", `${SITE_URL}a/b/c.png`],
     [
       "absolute https URL",
       "https://example.test/foo.png",
@@ -179,8 +181,8 @@ describe("parseImage", () => {
   // into `https://decdn.org//foo.png`, or worse, `https://decdn.orgfoo`.
   it("returns a parseable absolute URL for every accepted shape", () => {
     const inputs = [
-      "/blog-cards/foo.png",
-      "/a/b/c.png",
+      "/d_logo.png",
+      "/presskit/decdn-presskit.zip",
       "https://example.test/foo.png",
       "http://example.test/foo.png",
     ];
@@ -233,6 +235,19 @@ describe("parseImage", () => {
       expect(() => parseImage(input, "bad.mdx")).toThrow(/is not a valid URL/);
     },
   );
+
+  // A syntactically valid site-relative path that has no file under
+  // `public/` must throw — otherwise a typo ships a 404'd og:image,
+  // twitter:image, and BlogPosting JSON-LD image with a green build.
+  // Off-site absolute URLs can't be checked and are exempt.
+  it.each([
+    ["missing top-level file", "/blog-cards/why-now.png"],
+    ["missing nested file", "/a/b/c.png"],
+  ])("throws when a site-relative override doesn't exist (%s)", (_l, input) => {
+    expect(() => parseImage(input, "bad.mdx")).toThrow(
+      /bad\.mdx.*does not exist/s,
+    );
+  });
 });
 
 describe("buildOgImages", () => {

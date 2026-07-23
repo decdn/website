@@ -118,9 +118,10 @@ export const parseTags = (
 
 // Frontmatter `image`: optional override for the generated OG card.
 // Accepts a site-relative path (leading `/` followed by a non-`/` char,
-// e.g. `/blog-cards/foo.png`) — resolved against `SITE_URL` — or an
-// absolute http/https URL. Anything else (relative without `/`,
-// protocol-relative `//`, `data:`/`mailto:`/`ftp:` schemes, non-string)
+// e.g. `/blog-cards/foo.png`) — resolved against `SITE_URL`, and required
+// to exist under `public/` — or an absolute http/https URL. Anything else
+// (relative without `/`, protocol-relative `//`, `data:`/`mailto:`/`ftp:`
+// schemes, non-string, or a site-relative path with no file on disk)
 // throws with file context. Exported for tests.
 //
 // The non-`/` next-char constraint on the site-relative regex is what
@@ -137,6 +138,18 @@ export const parseImage = (
   if (typeof value === "string") {
     const trimmed = value.trim();
     if (SITE_RELATIVE_PATH_RE.test(trimmed)) {
+      // A site-relative override resolves against our own origin, so we can
+      // check it actually ships. `public/<path>` is copied verbatim into the
+      // static export; a typo here would 404 og:image, twitter:image, AND the
+      // BlogPosting JSON-LD `image` (a schema.org field Google fetches) — all
+      // with a green build. `join` keeps the leading `/` from escaping public/.
+      const local = path.join(process.cwd(), "public", trimmed);
+      if (!fs.existsSync(local)) {
+        throw new Error(
+          `[blog] ${filename}: frontmatter \`image\` "${trimmed}" does not exist at public${trimmed} — ` +
+            `og:image, twitter:image, and the BlogPosting JSON-LD would all 404`,
+        );
+      }
       // `new URL(rel, base)` handles the trailing-slash join correctly
       // whether or not SITE_URL ends in `/`, so we don't depend on that
       // invariant. The result is a fully resolved absolute URL.
