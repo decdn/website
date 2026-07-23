@@ -2,9 +2,12 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Metadata } from "next";
 import matter from "gray-matter";
-// Relative, not `@/lib/metadata`: vitest has no path-alias resolution
-// configured, and this module is imported by lib/legal.test.ts.
-import { imagesField, OG_SITE, TWITTER_SITE, type OgImages } from "./metadata";
+import {
+  imagesField,
+  OG_SITE,
+  TWITTER_SITE,
+  type OgImages,
+} from "@/lib/metadata";
 
 const LEGAL_DIR = path.join(process.cwd(), "content", "legal");
 
