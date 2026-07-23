@@ -28,26 +28,49 @@ const DECLARES_LARGE_IMAGE =
 // no image — a non-empty match alone wouldn't render a usable card.
 const IMAGE_CONTENT = /name="twitter:image"\s+content="([^"]*)"/;
 
-const files = globSync(`${OUT_DIR}/**/index.html`);
+// `*.html`, not just `index.html`: `trailingSlash: true` routes are
+// `<path>/index.html`, but the export also emits a bare `out/404.html` that
+// inherits `summary_large_image` and would otherwise escape the check.
+const files = globSync(`${OUT_DIR}/**/*.html`);
 
 if (files.length === 0) {
   console.error(
-    `[check:og-image] no ${OUT_DIR}/**/index.html found — run \`pnpm build\` first`,
+    `[check:og-image] no ${OUT_DIR}/**/*.html found — run \`pnpm build\` first`,
   );
   process.exit(1);
 }
 
-const offenders = files.filter((file) => {
+const pages = files.map((file) => {
   const html = readFileSync(file, "utf8");
-  const image = html.match(IMAGE_CONTENT)?.[1] ?? "";
-  return DECLARES_LARGE_IMAGE.test(html) && image.trim() === "";
+  return {
+    file,
+    declaresLargeImage: DECLARES_LARGE_IMAGE.test(html),
+    image: html.match(IMAGE_CONTENT)?.[1] ?? "",
+  };
 });
+
+// Every page here inherits `summary_large_image` from the root layout, so
+// recognizing zero declarers means the matcher drifted against Next's HTML
+// (an attribute-order or spacing change) and the whole check has silently
+// become a no-op. Refuse to pass rather than print a cheerful green over a
+// guard that validated nothing — the exact failure mode #195 was about.
+const declarers = pages.filter((p) => p.declaresLargeImage);
+if (declarers.length === 0) {
+  console.error(
+    `[check:og-image] recognized 0 summary_large_image pages across ${files.length} built pages — ` +
+      "the twitter:card matcher almost certainly drifted against Next's HTML output. " +
+      "Refusing to pass a no-op check.",
+  );
+  process.exit(1);
+}
+
+const offenders = declarers.filter((p) => p.image.trim() === "");
 
 if (offenders.length > 0) {
   console.error(
     "[check:og-image] pages declare twitter:card=summary_large_image but ship no twitter:image:",
   );
-  for (const file of offenders) console.error(`  - ${file}`);
+  for (const { file } of offenders) console.error(`  - ${file}`);
   console.error(
     "\nEach would render a blank social card. Thread an image through the page's " +
       "openGraph/twitter metadata (see lib/metadata.ts).",
@@ -56,5 +79,5 @@ if (offenders.length > 0) {
 }
 
 console.log(
-  `[check:og-image] ${files.length} pages checked — every summary_large_image page carries an image.`,
+  `[check:og-image] ${declarers.length} of ${files.length} pages declare summary_large_image — all carry a non-empty image.`,
 );

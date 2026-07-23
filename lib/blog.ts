@@ -392,18 +392,38 @@ export const ogCardSlugs = (posts: PostMeta[]): { slug: Slug }[] =>
   posts.filter((p) => !p.image).map((p) => ({ slug: p.slug }));
 
 /** Canonical URL of a post — the one place the trailing slash is pinned.
- *  `output: "export"` + `trailingSlash: true` emit `/blog/<slug>/`, and a
- *  dropped slash on one side would fork the `@id` shared below (e.g.
- *  `…/why-nowopengraph-image`) with no test failing. */
+ *  `output: "export"` + `trailingSlash: true` emit `/blog/<slug>/`. A dropped
+ *  slash would corrupt every url-derived field of the shared node — e.g. the
+ *  `image` becomes `…/why-nowopengraph-image` (via `postImageUrl`) — which the
+ *  `postUrl` test ("pins exactly one trailing slash") now guards. */
 export const postUrl = (slug: Slug): string => `${BLOG_URL}${slug}/`;
+
+/** The concrete shape of a `BlogPosting` node, narrower than the loose
+ *  `Schema` both call sites accept: naming every required field here turns a
+ *  typo in the single builder literal (`headnline:`) into a compile error
+ *  instead of a schema.org field that silently vanishes at runtime. */
+type BlogPostingNode = Schema & {
+  "@type": "BlogPosting";
+  headline: string;
+  description: string;
+  url: string;
+  mainEntityOfPage: string;
+  image: string;
+  keywords?: string;
+  wordCount: number;
+  datePublished: IsoDate;
+  dateModified: IsoDate;
+  author: { "@id": string };
+  publisher: { "@id": string };
+};
 
 /** The shared `BlogPosting` JSON-LD node. The blog index nests it inside
  *  its `Blog` graph and the post page emits it top-level; both must agree
  *  on every field under the same `@id`, so it is assembled once here rather
- *  than twice in `app/`. Returns a full `Schema` (with `@context`/`@id`) so
- *  the post page can pass it straight to `<JsonLd>`; the index's nested copy
+ *  than twice in `app/`. Returns a full node (with `@context`/`@id`) so the
+ *  post page can pass it straight to `<JsonLd>`; the index's nested copy
  *  carries a redundant-but-inert `@context`. */
-export const blogPostingNode = (post: PostMeta): Schema => {
+export const blogPostingNode = (post: PostMeta): BlogPostingNode => {
   const url = postUrl(post.slug);
   return {
     "@context": "https://schema.org",

@@ -361,8 +361,8 @@ describe("postUrl", () => {
   it("pins exactly one trailing slash", () => {
     const url = postUrl("why-now" as Slug);
     expect(url).toBe(`${BLOG_URL}why-now/`);
-    // Guards the #199 regression where a dropped slash forked the shared
-    // @id into `.../why-nowopengraph-image`.
+    // Guards the #199 regression where a dropped slash corrupted the shared
+    // node's url-derived fields — e.g. `image` → `.../why-nowopengraph-image`.
     expect(url.endsWith("/")).toBe(true);
     expect(url.endsWith("//")).toBe(false);
   });
