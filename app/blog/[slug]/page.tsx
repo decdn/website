@@ -8,16 +8,17 @@ import { Pill } from "@/components/ui/Pill";
 import { META } from "@/components/ui/PostRow";
 import { Prose } from "@/components/ui/Prose";
 import {
+  blogPostingNode,
   buildOgImages,
   dottedDate,
   getPost,
   listPosts,
-  postImageUrl,
+  postUrl,
   readLabel,
   seriesLabel,
 } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
-import { BLOG_URL, ORG_ID, SITE_URL } from "@/lib/links";
+import { BLOG_URL, SITE_URL } from "@/lib/links";
 import { OG_SITE, TWITTER_SITE } from "@/lib/metadata";
 
 // Static export: enumerate every slug at build time and refuse anything
@@ -90,31 +91,14 @@ export default async function BlogPost({
   const tags = post.tags ?? [];
   const minutes = readLabel(post.readMin);
 
-  const postUrl = `${BLOG_URL}${post.slug}/`;
-  const postingSchema = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "@id": `${postUrl}#post`,
-    headline: post.title,
-    description: post.summary,
-    datePublished: post.date,
-    dateModified: post.date,
-    url: postUrl,
-    mainEntityOfPage: postUrl,
-    // Override-vs-fallback selection lives in `postImageUrl`; see the
-    // JSDoc there for the cache-buster mismatch between this URL and
-    // the og:image meta (same file underneath; Cloudflare ignores the
-    // query string on static assets).
-    image: postImageUrl(post, postUrl),
-    keywords: post.tags?.join(", "),
-    wordCount: post.words,
-    author: { "@id": ORG_ID },
-    publisher: { "@id": ORG_ID },
-  };
+  // BlogPosting assembly is shared with the blog index via `blogPostingNode`
+  // (lib/blog.ts) so the two can't diverge under the same `@id`.
+  const url = postUrl(post.slug);
+  const postingSchema = blogPostingNode(post);
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    "@id": `${postUrl}#breadcrumbs`,
+    "@id": `${url}#breadcrumbs`,
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
       {
@@ -123,7 +107,7 @@ export default async function BlogPost({
         name: "Blog",
         item: BLOG_URL,
       },
-      { "@type": "ListItem", position: 3, name: post.title, item: postUrl },
+      { "@type": "ListItem", position: 3, name: post.title, item: url },
     ],
   };
 

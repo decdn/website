@@ -1,7 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import { SITE_URL } from "./links";
+import type { Schema } from "./jsonld";
+import { BLOG_URL, ORG_ID, SITE_URL } from "./links";
 
 const POSTS_DIR = path.join(process.cwd(), "content", "blog");
 
@@ -380,3 +381,38 @@ export const postImageUrl = (post: PostMeta, postUrl: string): string =>
  *  doesn't emit a card PNG that no <meta> tag references. */
 export const ogCardSlugs = (posts: PostMeta[]): { slug: Slug }[] =>
   posts.filter((p) => !p.image).map((p) => ({ slug: p.slug }));
+
+/** Canonical URL of a post — the one place the trailing slash is pinned.
+ *  `output: "export"` + `trailingSlash: true` emit `/blog/<slug>/`, and a
+ *  dropped slash on one side would fork the `@id` shared below (e.g.
+ *  `…/why-nowopengraph-image`) with no test failing. */
+export const postUrl = (slug: Slug): string => `${BLOG_URL}${slug}/`;
+
+/** The shared `BlogPosting` JSON-LD node. The blog index nests it inside
+ *  its `Blog` graph and the post page emits it top-level; both must agree
+ *  on every field under the same `@id`, so it is assembled once here rather
+ *  than twice in `app/`. Returns a full `Schema` (with `@context`/`@id`) so
+ *  the post page can pass it straight to `<JsonLd>`; the index's nested copy
+ *  carries a redundant-but-inert `@context`. */
+export const blogPostingNode = (post: PostMeta): Schema => {
+  const url = postUrl(post.slug);
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "@id": `${url}#post`,
+    headline: post.title,
+    description: post.summary,
+    url,
+    mainEntityOfPage: url,
+    // Override-vs-fallback selection lives in `postImageUrl`; see the JSDoc
+    // there for the cache-buster mismatch with the og:image meta (same file
+    // underneath; Cloudflare ignores the query string on static assets).
+    image: postImageUrl(post, url),
+    keywords: post.tags?.join(", "),
+    wordCount: post.words,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: { "@id": ORG_ID },
+    publisher: { "@id": ORG_ID },
+  };
+};

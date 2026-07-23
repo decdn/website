@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  blogPostingNode,
   buildOgImages,
   countWords,
   dottedDate,
@@ -11,13 +12,14 @@ import {
   parseSlug,
   parseTags,
   postImageUrl,
+  postUrl,
   readingMinutes,
   readLabel,
   seriesLabel,
   type PostMeta,
   type Slug,
 } from "./blog";
-import { SITE_URL } from "./links";
+import { BLOG_URL, ORG_ID, SITE_URL } from "./links";
 
 describe("parseSlug", () => {
   it.each(["a", "a-b", "a-b-c", "abc123", "a1-b2"])("accepts %j", (input) => {
@@ -349,6 +351,54 @@ describe("ogCardSlugs", () => {
         post("b", "https://cdn.example/b.png"),
       ]),
     ).toEqual([]);
+  });
+});
+
+describe("postUrl", () => {
+  it("pins exactly one trailing slash", () => {
+    const url = postUrl("why-now" as Slug);
+    expect(url).toBe(`${BLOG_URL}why-now/`);
+    // Guards the #199 regression where a dropped slash forked the shared
+    // @id into `.../why-nowopengraph-image`.
+    expect(url.endsWith("/")).toBe(true);
+    expect(url.endsWith("//")).toBe(false);
+  });
+});
+
+describe("blogPostingNode", () => {
+  const base: PostMeta = {
+    slug: "why-now" as Slug,
+    title: "Why Now",
+    date: "2026-05-04" as PostMeta["date"],
+    summary: "x",
+    pinned: false,
+    seriesNumber: 1,
+    words: 100,
+    readMin: 1,
+  };
+
+  it("keys @id, url, image and mainEntityOfPage off the single postUrl source", () => {
+    const node = blogPostingNode(base);
+    const url = postUrl(base.slug);
+    expect(node.url).toBe(url);
+    expect(node["@id"]).toBe(`${url}#post`);
+    expect(node.mainEntityOfPage).toBe(url);
+    // Same source the index and post page must agree on for this @id.
+    expect(node.image).toBe(postImageUrl(base, url));
+  });
+
+  it("carries a full, self-contained JSON-LD shape", () => {
+    const node = blogPostingNode({ ...base, tags: ["a", "b"] });
+    expect(node["@context"]).toBe("https://schema.org");
+    expect(node["@type"]).toBe("BlogPosting");
+    expect(node.headline).toBe(base.title);
+    expect(node.description).toBe(base.summary);
+    expect(node.keywords).toBe("a, b");
+    expect(node.wordCount).toBe(base.words);
+    expect(node.datePublished).toBe(base.date);
+    expect(node.dateModified).toBe(base.date);
+    expect(node.author).toEqual({ "@id": ORG_ID });
+    expect(node.publisher).toEqual({ "@id": ORG_ID });
   });
 });
 

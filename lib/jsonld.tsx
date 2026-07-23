@@ -1,4 +1,4 @@
-type Schema = {
+export type Schema = {
   "@context": string;
   "@type": string;
   "@id": string;

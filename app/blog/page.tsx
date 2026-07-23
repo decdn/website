@@ -1,7 +1,7 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { Frame } from "@/components/ui/Frame";
 import { BLOG_GRID_COLS, PostRow } from "@/components/ui/PostRow";
-import { listIndexPosts, postImageUrl } from "@/lib/blog";
+import { blogPostingNode, listIndexPosts } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
 import { BLOG_URL, ORG_ID, SITE_URL } from "@/lib/links";
 import {
@@ -65,9 +65,9 @@ export async function generateMetadata(
 export default function BlogIndex() {
   const posts = listIndexPosts();
 
-  // Blog graph node — `blogPost` entries use the same stable @id
-  // (`${postUrl}#post`) emitted by app/blog/[slug]/page.tsx so the
-  // graph resolves to one canonical BlogPosting per post.
+  // Blog graph node — each `blogPost` entry is the same shared
+  // `blogPostingNode` (lib/blog.ts) the post page emits top-level, so the
+  // graph resolves to one canonical BlogPosting per post under a stable @id.
   const blogSchema = {
     "@context": "https://schema.org",
     "@type": "Blog",
@@ -76,27 +76,7 @@ export default function BlogIndex() {
     name: TITLE,
     description: DESCRIPTION,
     publisher: { "@id": ORG_ID },
-    blogPost: posts.map((p) => {
-      const postUrl = `${BLOG_URL}${p.slug}/`;
-      return {
-        "@type": "BlogPosting",
-        "@id": `${postUrl}#post`,
-        headline: p.title,
-        description: p.summary,
-        url: postUrl,
-        mainEntityOfPage: postUrl,
-        // Must agree with the `image` the post page emits for this same
-        // `@id`, so `postImageUrl` is the single source for both — it also
-        // honours a frontmatter `image:` override the site card can't.
-        image: postImageUrl(p, postUrl),
-        keywords: p.tags?.join(", "),
-        wordCount: p.words,
-        datePublished: p.date,
-        dateModified: p.date,
-        author: { "@id": ORG_ID },
-        publisher: { "@id": ORG_ID },
-      };
-    }),
+    blogPost: posts.map(blogPostingNode),
   };
 
   return (
