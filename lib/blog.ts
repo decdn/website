@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import type { Schema } from "./jsonld";
 import { BLOG_URL, ORG_ID, SITE_URL } from "./links";
 
 const POSTS_DIR = path.join(process.cwd(), "content", "blog");
@@ -46,7 +45,9 @@ export type PostMeta = {
    *  `BlogPosting.image` — bypasses the generated
    *  `app/blog/[slug]/opengraph-image.tsx` card. Site-relative paths
    *  (leading `/`, e.g. `/blog-cards/foo.png`) are resolved against
-   *  `SITE_URL` at parse time. Validated by `parseImage`. */
+   *  `SITE_URL` at parse time. Validated by `parseImage`: anything on our own
+   *  origin — written either way — must name a real file under `public/` or
+   *  the build fails. */
   image?: string;
   /** 1-based place in the series, oldest = 1. Assigned after the
    *  newest-first sort (see `readEntries`) so the index `#` column and
@@ -131,6 +132,49 @@ export const parseTags = (
 const ABSOLUTE_HTTP_URL_RE = /^https?:\/\//i;
 const SITE_RELATIVE_PATH_RE = /^\/[^/]/;
 
+/** Require an image URL on our own origin to name a real file under `public/`.
+ *
+ *  Shared by both accepted spellings, because `/blog-cards/x.png` and
+ *  `https://decdn.org/blog-cards/x.png` name the same file: checking only the
+ *  site-relative form would let the copy-a-URL-from-the-browser form ship a
+ *  404 with a green build.
+ *
+ *  `urlPath` must be a `URL.pathname` — query and fragment already gone, and
+ *  `..` collapsed the way a crawler collapses it. That matters twice over: a
+ *  cache-buster (`/d_logo.png?v=2`) must not be mistaken for part of the
+ *  filename, and a leading `..` is *dropped* by URL normalization, so
+ *  `/../public/d_logo.png` means `/public/d_logo.png` — resolving it as a
+ *  filesystem path instead would re-enter `public/` and wrongly accept a URL
+ *  that 404s.
+ *
+ *  Containment is still checked after decoding: `%2e%2e` survives URL
+ *  normalization and becomes `..` only here. `realpathSync` closes the same
+ *  hole for a symlink inside `public/` pointing out of it — `statSync` follows
+ *  symlinks, so a lexical check alone would pass one. */
+const requireShipped = (urlPath: string, raw: string, filename: string) => {
+  const publicDir = path.resolve(process.cwd(), "public");
+  const reject = () => {
+    throw new Error(
+      `[blog] ${filename}: frontmatter \`image\` "${raw}" does not resolve to a file under public/ — ` +
+        `og:image, twitter:image, and the BlogPosting JSON-LD would all 404`,
+    );
+  };
+
+  let decoded: string;
+  try {
+    decoded = decodeURIComponent(urlPath);
+  } catch {
+    reject();
+    return;
+  }
+
+  const local = path.resolve(publicDir, `.${decoded}`);
+  if (!local.startsWith(publicDir + path.sep)) reject();
+  if (!fs.statSync(local, { throwIfNoEntry: false })?.isFile()) reject();
+  if (!fs.realpathSync(local).startsWith(fs.realpathSync(publicDir) + path.sep))
+    reject();
+};
+
 export const parseImage = (
   value: unknown,
   filename: string,
@@ -143,27 +187,17 @@ export const parseImage = (
       // check it actually ships. `public/<path>` is copied verbatim into the
       // static export; a typo here would 404 og:image, twitter:image, AND the
       // BlogPosting JSON-LD `image` (a schema.org field Google fetches) — all
-      // with a green build. Resolve under public/ and require a regular file
-      // that stays inside it: a `..` segment could otherwise escape to a
-      // repo-root file (`/../package.json`) and a bare directory (`/presskit`)
-      // would pass `existsSync` yet 404 as a URL.
-      const publicDir = path.resolve(process.cwd(), "public");
-      const local = path.resolve(publicDir, `.${trimmed}`);
-      const insidePublic = local.startsWith(publicDir + path.sep);
-      if (
-        !insidePublic ||
-        !fs.existsSync(local) ||
-        !fs.statSync(local).isFile()
-      ) {
-        throw new Error(
-          `[blog] ${filename}: frontmatter \`image\` "${trimmed}" does not resolve to a file under public/ — ` +
-            `og:image, twitter:image, and the BlogPosting JSON-LD would all 404`,
-        );
-      }
-      // `new URL(rel, base)` handles the trailing-slash join correctly
-      // whether or not SITE_URL ends in `/`, so we don't depend on that
-      // invariant. The result is a fully resolved absolute URL.
-      return new URL(trimmed, SITE_URL).toString();
+      // with a green build. A bare directory (`/presskit`) would pass a plain
+      // `existsSync` yet 404 as a URL, so `requireShipped` insists on a
+      // regular file inside `public/`.
+      //
+      // `new URL(rel, base)` handles the trailing-slash join correctly whether
+      // or not SITE_URL ends in `/`, so we don't depend on that invariant. The
+      // result is a fully resolved absolute URL, and its `pathname` is what a
+      // crawler would actually fetch.
+      const resolved = new URL(trimmed, SITE_URL);
+      requireShipped(resolved.pathname, trimmed, filename);
+      return resolved.toString();
     }
     if (ABSOLUTE_HTTP_URL_RE.test(trimmed)) {
       // The regex only screens for an http(s) scheme — `new URL` is the
@@ -186,6 +220,12 @@ export const parseImage = (
         throw new Error(
           `[blog] ${filename}: frontmatter \`image\` "${trimmed}" is missing a hostname`,
         );
+      }
+      // An absolute URL on our own origin names a file we ship, so hold it to
+      // the same standard as the site-relative spelling. Off-site URLs are
+      // exempt — that server's disk isn't ours to inspect.
+      if (parsed.origin === new URL(SITE_URL).origin) {
+        requireShipped(parsed.pathname, trimmed, filename);
       }
       // Returned verbatim (not `parsed.toString()`) so authors keep
       // control over the exact bytes that hit og:image / JSON-LD —
@@ -362,10 +402,23 @@ export function getPost(slug: string): PostSource | null {
   return readEntries().find((e) => e.slug === valid) ?? null;
 }
 
-// --- pure metadata builders (single-sourced so app/blog/[slug]/page.tsx
-// and app/blog/[slug]/opengraph-image.tsx share the same shape). Each
-// is a tiny function on plain data, deliberately decoupled from `next`,
-// React, and the route handlers so the contract is unit-testable here.
+// --- pure metadata builders (single-sourced so app/blog/page.tsx,
+// app/blog/[slug]/page.tsx and app/blog/[slug]/opengraph-image.tsx share the
+// same shapes). Each is a tiny function on plain data, deliberately decoupled
+// from `next`, React, and the route handlers so the contract is unit-testable
+// here.
+
+/** Canonical URL of a post — the one place the shared JSON-LD node's URL, and
+ *  the trailing slash `output: "export"` + `trailingSlash: true` require, are
+ *  pinned. A dropped slash would corrupt every url-derived field of that node:
+ *  `image` becomes `…/why-nowopengraph-image` (via `postImageUrl`), and the
+ *  `@id` no longer matches the page the index links to.
+ *
+ *  Note this is not the only place the URL is built sitewide — `generateMetadata`
+ *  and the prev/next links in `app/blog/[slug]/page.tsx` need a *relative* path
+ *  (`metadataBase` resolves those), and `app/sitemap-pages.xml/route.ts` builds
+ *  its own from `SITE_URL`. */
+export const postUrl = (slug: Slug): string => `${BLOG_URL}${slug}/`;
 
 /** OG / Twitter `images` array when the post has a frontmatter `image:`
  *  override; `undefined` when absent so the file-convention card wins.
@@ -381,9 +434,13 @@ export const buildOgImages = (
  *  that's how Next writes the route to `out/blog/<slug>/opengraph-image`
  *  (no `.png`). The og:image meta gets a cache-busting `?<hash>` from
  *  Next that JSON-LD doesn't have; Cloudflare ignores the query on
- *  static assets so both resolve to the same file. */
-export const postImageUrl = (post: PostMeta, postUrl: string): string =>
-  post.image ?? `${postUrl}opengraph-image`;
+ *  static assets so both resolve to the same file.
+ *
+ *  Derives the base from `postUrl(post.slug)` rather than taking it as an
+ *  argument: a caller passing a slash-less URL was the one remaining way to
+ *  produce `…/why-nowopengraph-image`, the corruption #199 was about. */
+export const postImageUrl = (post: PostMeta): string =>
+  post.image ?? `${postUrl(post.slug)}opengraph-image`;
 
 /** Slugs that should get a generated OG card — i.e., posts WITHOUT a
  *  frontmatter `image:` override. Filtering here means the static export
@@ -391,18 +448,18 @@ export const postImageUrl = (post: PostMeta, postUrl: string): string =>
 export const ogCardSlugs = (posts: PostMeta[]): { slug: Slug }[] =>
   posts.filter((p) => !p.image).map((p) => ({ slug: p.slug }));
 
-/** Canonical URL of a post — the one place the trailing slash is pinned.
- *  `output: "export"` + `trailingSlash: true` emit `/blog/<slug>/`. A dropped
- *  slash would corrupt every url-derived field of the shared node — e.g. the
- *  `image` becomes `…/why-nowopengraph-image` (via `postImageUrl`) — which the
- *  `postUrl` test ("pins exactly one trailing slash") now guards. */
-export const postUrl = (slug: Slug): string => `${BLOG_URL}${slug}/`;
-
 /** The concrete shape of a `BlogPosting` node, narrower than the loose
- *  `Schema` both call sites accept: naming every required field here turns a
- *  typo in the single builder literal (`headnline:`) into a compile error
- *  instead of a schema.org field that silently vanishes at runtime. */
-type BlogPostingNode = Schema & {
+ *  `Schema` both call sites accept: naming every field here turns a typo in the
+ *  single builder literal (`headnline:`, `keywrds:`) into a compile error
+ *  instead of a schema.org field that silently vanishes at runtime.
+ *
+ *  Deliberately *not* `Schema & {…}`: `Schema`'s `Record<string, unknown>`
+ *  index signature suppresses excess-property checking, which let a typo on an
+ *  optional field through. A closed object alias still satisfies `Schema` at
+ *  the `<JsonLd data={…}>` boundary, so nothing is lost. */
+type BlogPostingNode = {
+  "@context": "https://schema.org";
+  "@id": string;
   "@type": "BlogPosting";
   headline: string;
   description: string;
@@ -433,10 +490,9 @@ export const blogPostingNode = (post: PostMeta): BlogPostingNode => {
     description: post.summary,
     url,
     mainEntityOfPage: url,
-    // Override-vs-fallback selection lives in `postImageUrl`; see the JSDoc
-    // there for the cache-buster mismatch with the og:image meta (same file
-    // underneath; Cloudflare ignores the query string on static assets).
-    image: postImageUrl(post, url),
+    // Override-vs-fallback selection, and the cache-buster mismatch with the
+    // og:image meta, are both explained in `postImageUrl`'s JSDoc.
+    image: postImageUrl(post),
     keywords: post.tags?.join(", "),
     wordCount: post.words,
     datePublished: post.date,

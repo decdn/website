@@ -26,5 +26,9 @@ jobs:
       - run: pnpm lint
       - run: pnpm format:check
       - run: pnpm test
+      # `pnpm build` already runs the social-card guard via its `postbuild`
+      # script — that is what makes it cover Cloudflare Pages, which runs its
+      # own build and never sees this workflow. Kept as an explicit step so
+      # dropping `postbuild` can't take the guard out of CI silently.
       - run: pnpm build
       - run: pnpm check:og-image

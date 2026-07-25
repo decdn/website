@@ -15,9 +15,10 @@ Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · TypeScript · pnpm. No
 ```bash
 pnpm install          # required — husky hooks and lint-staged invoke `pnpm exec`
 pnpm dev              # dev server on :3000
-pnpm build            # static export → ./out
+pnpm build            # static export → ./out (runs check:og-image as postbuild)
 pnpm start            # serve a prior `next build` output (not the static export)
 pnpm test             # vitest run — see `lib/blog.test.ts` for the pattern
+pnpm check:og-image   # post-build social-card guard over ./out (needs a build first)
 pnpm lint             # eslint (flat config)
 pnpm format           # prettier --write .
 pnpm format:check     # prettier --check . (CI)
@@ -31,6 +32,7 @@ pnpm format:check     # prettier --check . (CI)
 - `lib/` — shared helpers (`links.ts`, `blog.ts`, `faq.ts`, `legal.ts`, `jsonld.tsx`, …).
 - `content/blog/` — MDX posts loaded by `lib/blog.ts` and rendered via `app/blog/[slug]/page.tsx`.
 - `content/legal/` — MDX for the legal pages (`privacy`, `terms`, `disclaimer`) loaded by `lib/legal.ts` and rendered via `app/legal/[doc]/page.tsx`.
+- `scripts/` — build-time guards run against the export, not shipped with it (`check-og-image.mjs`, wired as `postbuild`). Node built-ins only, no dependencies; `scripts/*.test.ts` spawns them against fixture exports.
 - `docs/` — Mintlify source for `docs.decdn.org` (separate build pipeline, not part of the static export).
 - Path alias `@/*` → project root (e.g. `@/lib/links`, not `@/src/...`).
 
@@ -40,6 +42,6 @@ pnpm format:check     # prettier --check . (CI)
 - **`trailingSlash: true`.** `next.config.ts` emits every route as `<path>/index.html` and canonical/internal links should expect a trailing slash. Cloudflare Pages serves `out/` as-is.
 - **Tailwind v4.** `globals.css` uses `@import "tailwindcss"` and `@theme inline { … }`. There is no `tailwind.config.*` — theme tokens live in CSS. Don't reach for v3 directives.
 - **Conventional commits required.** `commitlint` runs in the `commit-msg` husky hook; non-conforming messages are rejected.
-- **`metadataBase` is live.** `lib/links.ts` `site` is the real origin and `INDEXABLE` is `true`. Anything anchored on this origin — OG and canonical (via `metadataBase`); JSON-LD, `app/sitemap.xml/route.ts`, `app/sitemap-pages.xml/route.ts`, `app/robots.txt/route.ts` (via `SITE_URL`) — ships to production. Adding a new non-blog page = append an entry to `app/sitemap-pages.xml/route.ts`; blog posts auto-derive from `content/blog/` and legal pages from the closed `LEGAL_SLUGS` list in `lib/legal.ts`. Flip `INDEXABLE` to mark pages noindex; `robots.txt` and the sitemap remain unchanged by design (see `lib/links.ts` for why).
+- **`metadataBase` is live.** `lib/links.ts` `site` is the real origin and `INDEXABLE` is `true`. Anything anchored on this origin — OG and canonical (via `metadataBase`); JSON-LD, `app/sitemap.xml/route.ts`, `app/sitemap-pages.xml/route.ts`, `app/robots.txt/route.ts` (via `SITE_URL`) — ships to production. Adding a new non-blog page = append an entry to `app/sitemap-pages.xml/route.ts`; blog posts auto-derive from `content/blog/` and legal pages from the closed `LEGAL_SLUGS` list in `lib/legal.ts`. Flip `INDEXABLE` to mark pages noindex; `robots.txt` and the sitemap remain unchanged by design (see `lib/links.ts` for why). Because every image URL is absolute on this origin, `scripts/check-og-image.mjs` resolves each one against `out/` after the build and cross-checks every `sitemap-pages.xml` entry against a real file — so a page or asset that silently failed to export fails the build.
 - **`docs/` is a different product.** Mintlify Cloud builds it from `docs/docs.json` and serves it at `docs.decdn.org` — independent of `pnpm build`. The website code must not import from `docs/`; ESLint and the website CI workflow ignore it. Edits to MDX go through the `docs` workflow (Prettier + `markdownlint-cli2` + `mintlify broken-links`).
 - **CSS custom properties in `style` props.** Known `--var` names are declared in `types/css.d.ts` (module-augmenting React's `CSSProperties`) so call sites can write `style={{ "--reveal-delay": "120ms" }}` without a cast. Add new vars there before using them.

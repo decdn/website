@@ -9,12 +9,13 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "postbuild": "pnpm check:og-image",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "check:og-image": "node scripts/check-twitter-image.mjs",
+    "check:og-image": "node scripts/check-og-image.mjs",
     "prepare": "husky"
   },
   "lint-staged": {
