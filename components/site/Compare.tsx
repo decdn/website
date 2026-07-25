@@ -1,8 +1,18 @@
-import { COMPARE_HEADLINE, COMPARE_LEAD } from "@/lib/copy";
+import { COMPARE_HEADLINE, COMPARE_LEAD, COMPARE_ROWS } from "@/lib/copy";
 import { highlightBrand } from "@/components/ui/brand";
 import { ComparisonRow } from "@/components/ui/ComparisonRow";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+
+// The <caption> a screen reader announces and a text extractor reads before
+// the cells. The axis list is derived rather than written out so it can't
+// drift from the rows below it; "seven" stays literal because the section
+// header promises it in prose, and lib/copy.test.ts pins the count.
+const AXES = COMPARE_ROWS.map((row) => row.axis);
+const CAPTION = `Traditional CDN compared with deCDN across seven axes: ${AXES.slice(
+  0,
+  -1,
+).join(", ")}, and ${AXES[AXES.length - 1]}.`;
 
 export function Compare() {
   return (
@@ -32,92 +42,62 @@ export function Compare() {
         </p>
       </div>
 
-      <div className="mt-auto flex flex-col pt-12">
-        <div
-          data-reveal
-          style={{ "--reveal-delay": "260ms" }}
-          className="grid gap-2 pb-3 @xl:grid-cols-12 @xl:gap-8"
-        >
-          <div className="meta opacity-0 @xl:col-span-2 @xl:block">axis</div>
-          <div className="grid grid-cols-2 gap-4 @xl:contents">
-            <div className="meta opacity-55 @xl:col-span-5">
+      <table
+        role="table"
+        aria-labelledby="compare-caption"
+        className="mt-auto flex flex-col pt-12"
+      >
+        <caption id="compare-caption" className="sr-only">
+          {CAPTION}
+        </caption>
+        <thead role="rowgroup" className="contents">
+          <tr
+            role="row"
+            data-reveal
+            style={{ "--reveal-delay": "260ms" }}
+            className="grid grid-cols-2 gap-x-4 gap-y-2 pb-3 @xl:grid-cols-12 @xl:gap-8"
+          >
+            {/* Deliberately invisible: the column exists to align the axis
+                labels below it and the design has no room for a visible header
+                over them. `opacity-0` keeps the word in the DOM for text
+                extractors and in the a11y tree for the rowheaders' scope,
+                where `hidden` would drop both. */}
+            <th
+              role="columnheader"
+              scope="col"
+              className="meta col-span-2 text-left font-normal opacity-0 @xl:col-span-2"
+            >
+              axis
+            </th>
+            <th
+              role="columnheader"
+              scope="col"
+              className="meta text-left font-normal opacity-55 @xl:col-span-5"
+            >
               traditional cdn
-            </div>
-            <div className="meta @xl:col-span-5">
+            </th>
+            <th
+              role="columnheader"
+              scope="col"
+              className="meta text-left font-normal @xl:col-span-5"
+            >
               decdn
               <span className="ml-2 opacity-60">/ decentralized</span>
-            </div>
-          </div>
-        </div>
-
-        {/* big price row */}
-        <div
-          data-reveal
-          style={{ "--reveal-delay": "340ms" }}
-          className="grid gap-3 border-t border-current/25 py-5 @xl:grid-cols-12 @xl:gap-8 @xl:py-8"
-        >
-          <div className="meta opacity-60 @xl:col-span-2 @xl:pt-2">price</div>
-          <div className="grid grid-cols-2 gap-4 @xl:contents">
-            <div className="@xl:col-span-5">
-              <div className="hug relative inline-flex text-price leading-[0.96] font-semibold tracking-[-0.04em]">
-                <span className="opacity-55">
-                  $0.04–$0.20
-                  <span className="meta ml-1 align-baseline opacity-70">
-                    /GB
-                  </span>
-                </span>
-                <span
-                  aria-hidden
-                  className="absolute inset-x-0 top-1/2 h-[2px] -translate-y-1/2 bg-paper @xl:h-[4px]"
-                />
-              </div>
-            </div>
-            <div className="@xl:col-span-5">
-              <div className="hug text-price leading-[0.96] font-semibold tracking-[-0.04em]">
-                $0.01
-                <span className="meta ml-1 align-baseline opacity-70">/GB</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <ComparisonRow
-          label="delivery"
-          traditional="fixed provisioning"
-          decdn="demand-shaped mesh"
-          delay={420}
-        />
-        <ComparisonRow
-          label="billing"
-          traditional="monthly minimums, annual contracts"
-          decdn="per megabyte, in usdc"
-          delay={480}
-        />
-        <ComparisonRow
-          label="operators"
-          traditional="three hyperscalers"
-          decdn="home labs to datacenters"
-          delay={540}
-        />
-        <ComparisonRow
-          label="integrity"
-          traditional="trust the origin"
-          decdn="blake3, verify every chunk"
-          delay={600}
-        />
-        <ComparisonRow
-          label="failure"
-          traditional="pop dies, region 503s"
-          decdn="peer drops, stream continues"
-          delay={660}
-        />
-        <ComparisonRow
-          label="scaling"
-          traditional="gets more expensive"
-          decdn="gets cheaper"
-          delay={720}
-        />
-      </div>
+            </th>
+          </tr>
+        </thead>
+        <tbody role="rowgroup" className="contents">
+          {COMPARE_ROWS.map((row, i) => (
+            // Reproduces the previous hand-written cascade: the price row led
+            // at 340ms and each row after it stepped by 60ms from 420ms.
+            <ComparisonRow
+              key={row.axis}
+              row={row}
+              delay={i === 0 ? 340 : 360 + i * 60}
+            />
+          ))}
+        </tbody>
+      </table>
     </Frame>
   );
 }
