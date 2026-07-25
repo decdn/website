@@ -1,11 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { listPosts } from "./blog";
 import { FAQ_ITEMS } from "./faq";
-import { ORG_ID, SERVICE_ID, SITE_ID } from "./links";
+import { getLegalDoc, LEGAL_SLUGS } from "./legal";
+import { EMAIL, ORG_ID, SERVICE_ID, SITE_ID } from "./links";
 import {
   blogNode,
   breadcrumbNode,
   faqPageNode,
+  legalWebPageNode,
   organizationNode,
   serviceNode,
   websiteNode,
@@ -41,6 +43,73 @@ describe("graph joins", () => {
     expect(websiteNode["@type"]).toBe("WebSite");
     expect(serviceNode["@type"]).toBe("Service");
     expect(faqPageNode["@type"]).toBe("FAQPage");
+  });
+});
+
+describe("serviceNode pricing", () => {
+  // The $0.01/GB target existed only as prose and og:description. Publishing
+  // it as structured data makes it quotable, so the hedge is load-bearing:
+  // asserted verbatim because dropping it would leave a target rate reading
+  // as a committed price.
+  it("publishes the target rate with its hedge", () => {
+    expect(serviceNode.offers).toEqual({
+      "@type": "Offer",
+      priceSpecification: {
+        "@type": "UnitPriceSpecification",
+        price: "0.01",
+        priceCurrency: "USD",
+        unitCode: "E34",
+        referenceQuantity: {
+          "@type": "QuantitativeValue",
+          value: 1,
+          unitCode: "E34",
+        },
+        description:
+          "Public target rate, not a protocol-enforced price. deCDN is at testnet v0; a public testnet and the open-source release are targeted for Q3 2026.",
+      },
+    });
+  });
+
+  it("points at the terms and the litepaper", () => {
+    expect(serviceNode.termsOfService).toBe("https://decdn.org/legal/terms/");
+    expect(serviceNode.subjectOf).toEqual({
+      "@type": "DigitalDocument",
+      name: "deCDN litepaper",
+      url: "https://decdn.org/decdn_litepaper.pdf",
+      encodingFormat: "application/pdf",
+    });
+  });
+});
+
+describe("contact and language", () => {
+  it("carries the organization's email", () => {
+    expect(organizationNode.email).toBe(EMAIL);
+  });
+
+  it("declares the site language", () => {
+    expect(websiteNode.inLanguage).toBe("en");
+  });
+});
+
+describe("legalWebPageNode", () => {
+  it.each(LEGAL_SLUGS)("identifies /legal/%s/", (slug) => {
+    const doc = getLegalDoc(slug);
+    expect(legalWebPageNode(doc)).toEqual({
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "@id": `https://decdn.org/legal/${slug}/#webpage`,
+      url: `https://decdn.org/legal/${slug}/`,
+      name: doc.title,
+      description: doc.description,
+      inLanguage: "en",
+      // Both dates are the document's effective date — lib/legal tracks
+      // exactly one date per document, and a separate modification date would
+      // be a claim we can't support.
+      datePublished: doc.effective,
+      dateModified: doc.effective,
+      isPartOf: { "@id": SITE_ID },
+      publisher: { "@id": ORG_ID },
+    });
   });
 });
 
