@@ -26,7 +26,12 @@ const posts = listPosts();
 // listPosts() is sorted newest-first in lib/blog.ts; reuse the latest post
 // date as lastmod for the home and blog index since they refresh whenever
 // blog content changes. The litepaper PDF has no honest lastmod tied to
-// content here, so we omit it — sitemap spec permits per-URL omission.
+// content here, so we omit it — sitemap spec permits per-URL omission. Same
+// for llms.txt and llms-full.txt: they are assembled from every other page,
+// so no single content date describes them. They are listed at all so the two
+// machine-readable surfaces are discoverable the same way every other URL on
+// this origin is, and so a build that stops emitting one is visible in the
+// sitemap diff rather than only by fetching the file.
 // Fallback only fires with zero posts.
 const siteLastMod = posts[0]?.date ?? new Date().toISOString().slice(0, 10);
 const postUrls = posts
@@ -48,6 +53,8 @@ const BODY = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${SITE_URL}</loc><lastmod>${siteLastMod}</lastmod></url>
   <url><loc>${SITE_URL}decdn_litepaper.pdf</loc></url>
+  <url><loc>${SITE_URL}llms.txt</loc></url>
+  <url><loc>${SITE_URL}llms-full.txt</loc></url>
   <url><loc>${SITE_URL}blog/</loc><lastmod>${siteLastMod}</lastmod></url>
 ${legalUrls}
 ${postUrls}
