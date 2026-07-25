@@ -15,11 +15,17 @@ const NODES: readonly Node[] = [
   { id: "lax-17", active: false, rate: "idle" },
 ] as const;
 
+// The dashboard is decorative for assistive tech, so the panel keeps
+// aria-hidden. Text extractors ignore aria-hidden entirely, though, and every
+// node id, per-node rate and Σ total below is invented — so the caption sits
+// outside the hidden subtree, where a crawler reads it next to the figures.
+// className moves to the <figure>; both call sites pass "block w-full", which
+// behaves identically there (preflight zeroes figure margin).
 export function FleetStatus({ className }: { className?: string }) {
   const active = NODES.filter((n) => n.active).length;
   return (
-    <div aria-hidden className={className}>
-      <div className="fleet">
+    <figure className={className}>
+      <div aria-hidden className="fleet">
         <div className="fleet-head">
           <span className="fleet-dot" />
           <span className="fleet-dot" />
@@ -73,6 +79,15 @@ export function FleetStatus({ className }: { className?: string }) {
           </div>
         </div>
       </div>
-    </div>
+      {/* Names /legal/disclaimer/ as plain text rather than an anchor: an
+          sr-only link is focusable but invisible, which is its own a11y
+          problem, and the footer already links the page. */}
+      <figcaption className="sr-only">
+        Illustrative deCDN fleet dashboard. The node identifiers, per-node
+        rates, and aggregate throughput and revenue figures shown are sample
+        values for demonstration, not live network telemetry. See the disclaimer
+        at /legal/disclaimer/ for forward-looking statements.
+      </figcaption>
+    </figure>
   );
 }

@@ -63,8 +63,15 @@ export function HeroTerminal({ className }: { className?: string }) {
   const s = SESSIONS[index % SESSIONS.length];
 
   return (
-    <div aria-hidden className={className}>
-      <div className="terminal">
+    // The terminal is decorative for assistive tech, so the panel keeps
+    // aria-hidden. Text extractors ignore aria-hidden entirely, though, and
+    // every hash, peer id, latency and settled amount below is invented — so
+    // the caption sits outside the hidden subtree, where a crawler reads it
+    // next to the figures. className moves to the <figure>; the call site
+    // passes "block w-full", which behaves identically there (preflight zeroes
+    // figure margin).
+    <figure className={className}>
+      <div aria-hidden className="terminal">
         <div className="terminal-head">
           <span className="terminal-dot" />
           <span className="terminal-dot" />
@@ -120,6 +127,16 @@ export function HeroTerminal({ className }: { className?: string }) {
           </div>
         </div>
       </div>
-    </div>
+      {/* Names /legal/disclaimer/ as plain text rather than an anchor: an
+          sr-only link is focusable but invisible, which is its own a11y
+          problem, and the footer already links the page. */}
+      <figcaption className="sr-only">
+        Illustrative deCDN fetch session. The BLAKE3 hash, peer identifiers,
+        peer count, latency, payload size, chunk count, settled amount, and
+        duration shown are sample values for demonstration, not live network
+        telemetry. See the disclaimer at /legal/disclaimer/ for forward-looking
+        statements.
+      </figcaption>
+    </figure>
   );
 }
