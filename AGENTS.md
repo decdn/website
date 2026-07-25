@@ -29,6 +29,7 @@ pnpm format:check     # prettier --check . (CI)
 - `components/site/` — page sections composed by `app/page.tsx` (Hero, Compare, Method, Faq, Contact, …) plus chrome (`Chrome`, `Footer`, `ScrollReveal`, …). Section components are named after their section `id` (e.g. `Contact.tsx` for `id="contact"`); `Hero` is the idiomatic exception for the top `id="intro"` section.
 - `components/ui/` — low-level primitives (Frame, SectionHeader, Prose, Figure, …).
 - `lib/` — shared helpers (`links.ts`, `blog.ts`, `faq.ts`, `legal.ts`, `jsonld.tsx`, …).
+- `lib/copy.ts` — every homepage string, as plain data. New or edited homepage prose goes here, not inline in a component: the comparison table maps over `COMPARE_ROWS` and `app/llms-full.txt/route.ts` serialises the same strings as markdown, so copy inlined in JSX silently drifts from the mirror. Render it through `highlightBrand` (`components/ui/brand.tsx`) wherever the sentence names the product.
 - `content/blog/` — MDX posts loaded by `lib/blog.ts` and rendered via `app/blog/[slug]/page.tsx`.
 - `content/legal/` — MDX for the legal pages (`privacy`, `terms`, `disclaimer`) loaded by `lib/legal.ts` and rendered via `app/legal/[doc]/page.tsx`.
 - `docs/` — Mintlify source for `docs.decdn.org` (separate build pipeline, not part of the static export).

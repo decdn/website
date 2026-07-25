@@ -1,3 +1,5 @@
+import { COMPARE_HEADLINE, COMPARE_LEAD } from "@/lib/copy";
+import { highlightBrand } from "@/components/ui/brand";
 import { ComparisonRow } from "@/components/ui/ComparisonRow";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -17,8 +19,8 @@ export function Compare() {
           id="compare-h"
           className="hug flex flex-col text-h2 leading-[0.92] font-semibold tracking-[-0.04em]"
         >
-          <span>information scaled.</span>
-          <span className="pl-[3vw] opacity-60">supply didn&apos;t.</span>
+          <span>{COMPARE_HEADLINE[0]}</span>
+          <span className="pl-[3vw] opacity-60">{COMPARE_HEADLINE[1]}</span>
         </h2>
 
         <p
@@ -26,10 +28,7 @@ export function Compare() {
           style={{ "--reveal-delay": "120ms" }}
           className="max-w-[62ch] text-body leading-[1.7] text-paper/75"
         >
-          the pattern repeats whenever something big ships: mirrors fork, cdns
-          rate-limit, small teams burn tens of thousands hosting bytes they
-          don&apos;t own. <span className="text-whisper">deCDN</span> inverts
-          every axis — supply forms around demand, not allocated to it.
+          {highlightBrand(COMPARE_LEAD)}
         </p>
       </div>
 

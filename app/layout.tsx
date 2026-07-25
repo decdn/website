@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
 import { links, SITE_URL, INDEXABLE, ORG_ID } from "@/lib/links";
+import { SITE_TITLE, SITE_DESCRIPTION } from "@/lib/copy";
 import { OG_SITE, TWITTER_SITE } from "@/lib/metadata";
 import { Chrome } from "@/components/site/Chrome";
 import { Footer } from "@/components/site/Footer";
@@ -14,30 +15,26 @@ const geistSans = Geist({
   weight: ["400", "500", "600", "700"],
 });
 
-const TITLE = "deCDN — decentralized CDN for bytes at scale";
-const DESCRIPTION =
-  "A decentralized CDN. Anyone can serve bytes; clients pay per megabyte in USDC. An open market that gets cheaper as it grows, at ~$0.01/GB, up to 90% below legacy CDN list pricing.";
-
 export const metadata: Metadata = {
   metadataBase: new URL(links.site),
   title: {
-    default: TITLE,
+    default: SITE_TITLE,
     template: "%s · deCDN",
   },
-  description: DESCRIPTION,
+  description: SITE_DESCRIPTION,
   applicationName: "deCDN",
   openGraph: {
     ...OG_SITE,
-    title: TITLE,
-    description: DESCRIPTION,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     url: "/",
     type: "website",
   },
   twitter: {
     ...TWITTER_SITE,
     card: "summary_large_image",
-    title: TITLE,
-    description: DESCRIPTION,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
   alternates: { canonical: "/" },
   robots: { index: INDEXABLE, follow: INDEXABLE },
@@ -69,7 +66,7 @@ const websiteSchema = {
   "@id": SITE_ID,
   url: SITE_URL,
   name: "deCDN",
-  description: DESCRIPTION,
+  description: SITE_DESCRIPTION,
   publisher: { "@id": ORG_ID },
 };
 
@@ -82,7 +79,7 @@ const serviceSchema = {
   serviceType: "Content Delivery Network",
   provider: { "@id": ORG_ID },
   areaServed: "Worldwide",
-  description: DESCRIPTION,
+  description: SITE_DESCRIPTION,
 };
 
 export default function RootLayout({
