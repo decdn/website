@@ -26,6 +26,14 @@ export const SITE_URL = new URL("/", links.site).toString();
 // `author` field so the structured-data graph joins correctly.
 export const ORG_ID = `${SITE_URL}#organization`;
 
+// Stable @ids for the WebSite and Service nodes. They sit beside ORG_ID
+// rather than in the route that renders them because other modules join on
+// them — `isPartOf: { "@id": SITE_ID }` on every legal page, for one — and an
+// @id that disagrees with the origin it is built from breaks the graph
+// silently.
+export const SITE_ID = `${SITE_URL}#website`;
+export const SERVICE_ID = `${SITE_URL}#service`;
+
 // Trailing-slash blog base, paired with SITE_URL so callers can concat
 // `${BLOG_URL}${slug}/` (post URL) and `${BLOG_URL}#blog` (stable @id)
 // without re-deriving the path. Must agree with `next.config.ts`'s

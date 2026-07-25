@@ -1,7 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
-import { links, SITE_URL, INDEXABLE, ORG_ID } from "@/lib/links";
+import { links, INDEXABLE } from "@/lib/links";
 import { SITE_TITLE, SITE_DESCRIPTION } from "@/lib/copy";
+import { organizationNode, serviceNode, websiteNode } from "@/lib/schema";
 import { OG_SITE, TWITTER_SITE } from "@/lib/metadata";
 import { Chrome } from "@/components/site/Chrome";
 import { Footer } from "@/components/site/Footer";
@@ -45,43 +46,6 @@ export const viewport: Viewport = {
   themeColor: "#000000",
 };
 
-const SITE_ID = `${SITE_URL}#website`;
-const SERVICE_ID = `${SITE_URL}#service`;
-
-const organizationSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "@id": ORG_ID,
-  name: "deCDN",
-  url: SITE_URL,
-  logo: `${SITE_URL}d_logo.png`,
-  description:
-    "Organization developing deCDN, a decentralized content delivery network with per-megabyte settlement in USDC.",
-  sameAs: [links.github, links.x, links.linkedin],
-};
-
-const websiteSchema = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "@id": SITE_ID,
-  url: SITE_URL,
-  name: "deCDN",
-  description: SITE_DESCRIPTION,
-  publisher: { "@id": ORG_ID },
-};
-
-const serviceSchema = {
-  "@context": "https://schema.org",
-  "@type": "Service",
-  "@id": SERVICE_ID,
-  name: "deCDN",
-  url: SITE_URL,
-  serviceType: "Content Delivery Network",
-  provider: { "@id": ORG_ID },
-  areaServed: "Worldwide",
-  description: SITE_DESCRIPTION,
-};
-
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -93,7 +57,7 @@ export default function RootLayout({
       className={`${geistSans.variable} h-full motion-safe:scroll-smooth`}
     >
       <head>
-        {[organizationSchema, websiteSchema, serviceSchema].map((schema) => (
+        {[organizationNode, websiteNode, serviceNode].map((schema) => (
           <JsonLd key={schema["@id"]} data={schema} />
         ))}
       </head>

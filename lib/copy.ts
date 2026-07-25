@@ -113,5 +113,11 @@ export const METHOD_STEPS: readonly MethodStep[] = [
   },
 ];
 
+/** Blog index identity. Read by app/blog/page.tsx for its metadata, by
+ *  `blogNode` for the `Blog` schema node, and by the llms.txt index — one
+ *  string so the three can't disagree about what the section is. */
+export const BLOG_TITLE = "field notes";
+export const BLOG_DESCRIPTION = "long-form posts on the deCDN protocol.";
+
 export const CONTACT_LEAD =
   "the network is open. so is our inbox. write us with questions, partnerships, or anything you'd run on a fleet of idle machines. we read everything.";

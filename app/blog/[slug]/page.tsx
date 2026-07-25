@@ -18,6 +18,7 @@ import {
 } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
 import { BLOG_URL, ORG_ID, SITE_URL } from "@/lib/links";
+import { breadcrumbNode } from "@/lib/schema";
 import { OG_SITE, TWITTER_SITE } from "@/lib/metadata";
 
 // Static export: enumerate every slug at build time and refuse anything
@@ -111,21 +112,11 @@ export default async function BlogPost({
     author: { "@id": ORG_ID },
     publisher: { "@id": ORG_ID },
   };
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "@id": `${postUrl}#breadcrumbs`,
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Blog",
-        item: BLOG_URL,
-      },
-      { "@type": "ListItem", position: 3, name: post.title, item: postUrl },
-    ],
-  };
+  const breadcrumbSchema = breadcrumbNode(`${postUrl}#breadcrumbs`, [
+    { name: "Home", item: SITE_URL },
+    { name: "Blog", item: BLOG_URL },
+    { name: post.title, item: postUrl },
+  ]);
 
   return (
     <main>
