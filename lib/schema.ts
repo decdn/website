@@ -1,8 +1,8 @@
-import { postImageUrl, type PostMeta } from "./blog";
+import { postImageUrl, postUrl, type PostMeta } from "./blog";
 import { BLOG_DESCRIPTION, BLOG_TITLE, SITE_DESCRIPTION } from "./copy";
 import { FAQ_ITEMS } from "./faq";
 import type { Schema } from "./jsonld";
-import type { LegalDoc } from "./legal";
+import { legalUrl, type LegalDoc } from "./legal";
 import {
   BLOG_URL,
   EMAIL,
@@ -17,14 +17,18 @@ import {
 //
 // Every node used to be written inline at the route that renders it, which put
 // the two BreadcrumbList builders in different files as near-duplicates and
-// left the graph's shape unassertable. `blogPostingNode`-shaped work stays
-// where it is: those nodes are derived from a post rather than from the site.
+// left the graph's shape unassertable. The standalone per-post `BlogPosting`
+// node stays in app/blog/[slug]/page.tsx: it is derived from a post rather
+// than from the site. It and the nested entries `blogNode` builds below carry
+// the same @id and the same thirteen fields, and nothing enforces that they
+// agree — lib/schema.test.ts checks it, since unifying them would reorder the
+// emitted JSON keys.
 //
 // Nodes join by @id — `publisher`/`provider`/`author` all reference ORG_ID,
 // and page-level nodes reference SITE_ID — so the constants live in lib/links
 // beside the origin they are built from.
 
-export const organizationNode: Schema = {
+export const organizationNode: Schema<"Organization"> = {
   "@context": "https://schema.org",
   "@type": "Organization",
   "@id": ORG_ID,
@@ -37,7 +41,7 @@ export const organizationNode: Schema = {
   sameAs: [links.github, links.x, links.linkedin],
 };
 
-export const websiteNode: Schema = {
+export const websiteNode: Schema<"WebSite"> = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "@id": SITE_ID,
@@ -48,7 +52,7 @@ export const websiteNode: Schema = {
   publisher: { "@id": ORG_ID },
 };
 
-export const serviceNode: Schema = {
+export const serviceNode: Schema<"Service"> = {
   "@context": "https://schema.org",
   "@type": "Service",
   "@id": SERVICE_ID,
@@ -61,8 +65,11 @@ export const serviceNode: Schema = {
   // The $0.01/GB target is the site's most-quoted claim and, before this,
   // existed only as prose and og:description. It ships with the same hedge
   // content/blog/06-show-me-the-money.mdx uses, because a target rate stated
-  // bare as structured data reads as a committed price. `unitCode: "E34"` is
-  // the UN/CEFACT Recommendation 20 code for gigabyte.
+  // bare as structured data reads as a committed price. The same hedge is
+  // prose in both machine surfaces via `statusBlock` (lib/copy.ts), in a
+  // different sentence order because there it opens the document rather than
+  // describing an Offer; if the claim changes, change it in both.
+  // `unitCode: "E34"` is the UN/CEFACT Recommendation 20 code for gigabyte.
   offers: {
     "@type": "Offer",
     priceSpecification: {
@@ -79,7 +86,7 @@ export const serviceNode: Schema = {
         "Public target rate, not a protocol-enforced price. deCDN is at testnet v0; a public testnet and the open-source release are targeted for Q3 2026.",
     },
   },
-  termsOfService: `${SITE_URL}legal/terms/`,
+  termsOfService: legalUrl("terms"),
   subjectOf: {
     "@type": "DigitalDocument",
     name: "deCDN litepaper",
@@ -91,7 +98,7 @@ export const serviceNode: Schema = {
 // FAQPage structured data must match visible content, so only the route that
 // renders <Faq /> may emit this (Google's structured-data policy). The rule is
 // restated at that call site.
-export const faqPageNode: Schema = {
+export const faqPageNode: Schema<"FAQPage"> = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   "@id": `${SITE_URL}#faq`,
@@ -109,8 +116,8 @@ export const faqPageNode: Schema = {
  * `effective` date: lib/legal.ts tracks exactly one date per document, and
  * inventing a separate modification date would be a claim we can't support.
  */
-export const legalWebPageNode = (doc: LegalDoc): Schema => {
-  const url = `${SITE_URL}legal/${doc.slug}/`;
+export const legalWebPageNode = (doc: LegalDoc): Schema<"WebPage"> => {
+  const url = legalUrl(doc.slug);
   return {
     "@context": "https://schema.org",
     "@type": "WebPage",
@@ -129,10 +136,16 @@ export const legalWebPageNode = (doc: LegalDoc): Schema => {
 /** One step of a breadcrumb trail; `position` is assigned from array order. */
 export type Crumb = { name: string; item: string };
 
+/** The two crumbs every trail on this site starts with. Not prepended
+ *  automatically by `breadcrumbNode` — a trail that doesn't show its first
+ *  step at the call site is harder to read than one that repeats a constant. */
+export const HOME_CRUMB: Crumb = { name: "Home", item: SITE_URL };
+export const BLOG_CRUMB: Crumb = { name: "Blog", item: BLOG_URL };
+
 export const breadcrumbNode = (
   id: string,
   trail: readonly Crumb[],
-): Schema => ({
+): Schema<"BreadcrumbList"> => ({
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   "@id": id,
@@ -147,7 +160,7 @@ export const breadcrumbNode = (
 // `blogPost` entries reuse the stable @id (`${postUrl}#post`) that
 // app/blog/[slug]/page.tsx emits, so the graph resolves to one canonical
 // BlogPosting per post rather than two competing descriptions of it.
-export const blogNode = (posts: PostMeta[]): Schema => ({
+export const blogNode = (posts: PostMeta[]): Schema<"Blog"> => ({
   "@context": "https://schema.org",
   "@type": "Blog",
   "@id": `${BLOG_URL}#blog`,
@@ -156,18 +169,18 @@ export const blogNode = (posts: PostMeta[]): Schema => ({
   description: BLOG_DESCRIPTION,
   publisher: { "@id": ORG_ID },
   blogPost: posts.map((p) => {
-    const postUrl = `${BLOG_URL}${p.slug}/`;
+    const url = postUrl(p.slug);
     return {
       "@type": "BlogPosting",
-      "@id": `${postUrl}#post`,
+      "@id": `${url}#post`,
       headline: p.title,
       description: p.summary,
-      url: postUrl,
-      mainEntityOfPage: postUrl,
+      url,
+      mainEntityOfPage: url,
       // Must agree with the `image` the post page emits for this same @id, so
       // `postImageUrl` is the single source for both — it also honours a
       // frontmatter `image:` override the site card can't.
-      image: postImageUrl(p, postUrl),
+      image: postImageUrl(p, url),
       keywords: p.tags?.join(", "),
       wordCount: p.words,
       datePublished: p.date,

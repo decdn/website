@@ -1,5 +1,5 @@
 import { links } from "@/lib/links";
-import { HERO_HEADLINE, HERO_LEAD } from "@/lib/copy";
+import { HERO_FIGURES, HERO_HEADLINE, HERO_LEAD } from "@/lib/copy";
 import { highlightBrand } from "@/components/ui/brand";
 import { Figure } from "@/components/ui/Figure";
 import { Frame } from "@/components/ui/Frame";
@@ -65,10 +65,9 @@ export function Hero() {
             </div>
 
             <div className="rise rise-5 grid grid-cols-2 gap-y-4 @xl:grid-cols-4">
-              <Figure label="target price" value="$0.01/GB" />
-              <Figure label="p50 latency" value="50–100 ms" />
-              <Figure label="settlement" value="per-MB · usdc" />
-              <Figure label="gas overhead" value="<1%" />
+              {HERO_FIGURES.map((figure) => (
+                <Figure key={figure.label} {...figure} />
+              ))}
             </div>
           </div>
 

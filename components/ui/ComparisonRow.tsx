@@ -57,6 +57,24 @@ function Rate({ value, strike }: { value: string; strike?: true }) {
  * tags still matter independently: extractors read `<tr>`/`<th>`/`<td>`, not
  * ARIA.
  */
+// The two visual variants, side by side rather than as four separate ternaries
+// down the JSX. `axis` spans both columns of the mobile grid and two of the
+// twelve at @xl — one utility, both jobs; `text-left font-normal` stops the
+// UA's bold, centred <th> defaults leaking through the .meta type.
+const EMPHASIS_STYLES = {
+  row: "grid grid-cols-2 gap-x-4 gap-y-3 border-t border-current/25 py-5 @xl:grid-cols-12 @xl:gap-8 @xl:py-8",
+  axis: "meta col-span-2 text-left font-normal opacity-60 @xl:col-span-2 @xl:pt-2",
+  traditional: "@xl:col-span-5",
+  decdn: "@xl:col-span-5",
+} as const;
+
+const PLAIN_STYLES = {
+  row: "grid grid-cols-2 gap-x-4 gap-y-2 border-t border-current/20 py-4 text-body @xl:grid-cols-12 @xl:gap-8 @xl:py-5",
+  axis: "meta col-span-2 text-left font-normal opacity-60 @xl:col-span-2",
+  traditional: "opacity-55 @xl:col-span-5",
+  decdn: "font-semibold tracking-[-0.01em] @xl:col-span-5",
+} as const;
+
 export function ComparisonRow({
   row,
   delay = 0,
@@ -65,43 +83,21 @@ export function ComparisonRow({
   delay?: number;
 }) {
   const emphasis = row.emphasis === true;
+  const style = emphasis ? EMPHASIS_STYLES : PLAIN_STYLES;
   return (
     <tr
       role="row"
       data-reveal
       style={{ "--reveal-delay": `${delay}ms` }}
-      className={
-        emphasis
-          ? "grid grid-cols-2 gap-x-4 gap-y-3 border-t border-current/25 py-5 @xl:grid-cols-12 @xl:gap-8 @xl:py-8"
-          : "grid grid-cols-2 gap-x-4 gap-y-2 border-t border-current/20 py-4 text-body @xl:grid-cols-12 @xl:gap-8 @xl:py-5"
-      }
+      className={style.row}
     >
-      {/* col-span-2 spans both columns of the mobile grid and two of the twelve
-          at @xl — one utility, both jobs. `text-left font-normal` stops the
-          UA's bold, centred <th> defaults leaking through the .meta type. */}
-      <th
-        role="rowheader"
-        scope="row"
-        className={`meta col-span-2 text-left font-normal opacity-60 @xl:col-span-2${
-          emphasis ? " @xl:pt-2" : ""
-        }`}
-      >
+      <th role="rowheader" scope="row" className={style.axis}>
         {row.axis}
       </th>
-      <td
-        role="cell"
-        className={emphasis ? "@xl:col-span-5" : "opacity-55 @xl:col-span-5"}
-      >
+      <td role="cell" className={style.traditional}>
         {emphasis ? <Rate value={row.traditional} strike /> : row.traditional}
       </td>
-      <td
-        role="cell"
-        className={
-          emphasis
-            ? "@xl:col-span-5"
-            : "font-semibold tracking-[-0.01em] @xl:col-span-5"
-        }
-      >
+      <td role="cell" className={style.decdn}>
         {emphasis ? <Rate value={row.decdn} /> : row.decdn}
       </td>
     </tr>

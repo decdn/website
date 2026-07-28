@@ -1,7 +1,12 @@
-import { listPosts } from "@/lib/blog";
-import { BLOG_DESCRIPTION, BLOG_TITLE, SITE_DESCRIPTION } from "@/lib/copy";
-import { getLegalDoc, LEGAL_SLUGS } from "@/lib/legal";
-import { BLOG_URL, links, SITE_URL } from "@/lib/links";
+import { listPosts, postUrl } from "@/lib/blog";
+import {
+  BLOG_DESCRIPTION,
+  BLOG_TITLE,
+  SITE_DESCRIPTION,
+  statusBlock,
+} from "@/lib/copy";
+import { getLegalDoc, LEGAL_SLUGS, legalUrl } from "@/lib/legal";
+import { BLOG_URL, DOCS_ORIGIN, links, SITE_URL } from "@/lib/links";
 
 // Curated machine-readable index of this origin, per https://llmstxt.org:
 // an H1, a blockquote summary, free-form prose, then H2-delimited file lists
@@ -9,9 +14,14 @@ import { BLOG_URL, links, SITE_URL } from "@/lib/links";
 // a consumer short on context may skip everything under it, so nothing
 // load-bearing lives there.
 //
-// Every entry derives from the same loaders the HTML routes use, so this file
-// cannot advertise a URL the build did not emit. Both llms surfaces are also
-// listed in app/sitemap-pages.xml/route.ts.
+// Page entries derive from the same loaders the HTML routes use (listPosts,
+// LEGAL_SLUGS), so this file cannot list an HTML route the build did not emit.
+// Four entries are not routes and get no such guarantee: the litepaper and
+// press kit are files under public/, and the two docs.decdn.org URLs are on a
+// host Mintlify builds independently of `pnpm build`. scripts/check-out.mjs
+// verifies the same-origin ones against out/ after a build; the docs host is
+// out of reach from here. Both llms surfaces are also listed in
+// app/sitemap-pages.xml/route.ts.
 
 // Required by Next 16 under `output: "export"` for route handlers that emit
 // static files at build time. GET-only is the only verb supported in export.
@@ -37,17 +47,13 @@ const entry = (label: string, url: string, note: string, field: string) =>
   `- [${assertMarkdownSafe(label, `${field} label`)}](${url}): ${assertMarkdownSafe(note, `${field} note`)}`;
 
 // The docs host serves its own llms.txt and llms-full.txt (Mintlify), so this
-// points at those two files rather than restating fourteen doc pages. Origin
-// is derived from links.docs the way app/sitemap.xml/route.ts derives the docs
-// sitemap.
-const DOCS_ORIGIN = new URL(links.docs).origin;
-
+// points at those two files rather than restating fourteen doc pages.
 const LITEPAPER_URL = new URL(links.litepaper, SITE_URL).toString();
 const PRESSKIT_URL = new URL(links.presskit, SITE_URL).toString();
 
 // Status and the target-rate hedge sit in the prose, not under `## Optional`,
 // because a consumer that skips the optional section must still see them.
-const STATUS = `Status: testnet v0. The protocol runs end-to-end in a test environment; a public testnet and the open-source release are targeted for Q3 2026. The $0.01/GB figure quoted across this site is a public target rate, not a protocol-enforced price.`;
+const STATUS = statusBlock("across this site");
 
 const posts = listPosts();
 
@@ -76,12 +82,7 @@ ${entry("docs.decdn.org llms-full.txt", `${DOCS_ORIGIN}/llms-full.txt`, "The ful
 
 ${posts
   .map((post) =>
-    entry(
-      post.title,
-      `${BLOG_URL}${post.slug}/`,
-      post.summary,
-      `post ${post.slug}`,
-    ),
+    entry(post.title, postUrl(post.slug), post.summary, `post ${post.slug}`),
   )
   .join("\n")}
 
@@ -91,12 +92,7 @@ ${entry("deCDN litepaper (PDF)", LITEPAPER_URL, "The protocol litepaper.", "lite
 ${entry("Press kit", PRESSKIT_URL, "Logos and wordmarks, as a zip archive.", "presskit")}
 ${LEGAL_SLUGS.map((slug) => {
   const doc = getLegalDoc(slug);
-  return entry(
-    doc.title,
-    `${SITE_URL}legal/${slug}/`,
-    doc.description,
-    `legal ${slug}`,
-  );
+  return entry(doc.title, legalUrl(slug), doc.description, `legal ${slug}`);
 }).join("\n")}
 `;
 

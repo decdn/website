@@ -1,45 +1,33 @@
 import { describe, expect, it } from "vitest";
 import { FleetStatus } from "./FleetStatus";
-import {
-  asElement,
-  attrs,
-  findAll,
-  findOne,
-  textOf,
-} from "@/test-utils/react-tree";
+import { DEMO_CAPTIONS } from "@/lib/copy";
+import { attrs, findAll, findOne, textOf } from "@/test-utils/react-tree";
 
-// HeroTerminal is "use client" and calls useState, so it cannot be invoked as
-// a plain function here — its caption is covered by the build-output check in
-// #205's acceptance steps instead. FleetStatus is a server component and can
-// be walked directly.
+// Both demo widgets delegate the <figure>/<figcaption> structure to
+// components/ui/DemoFigure, whose own test asserts that the caption sits
+// outside the aria-hidden subtree. What is left to check here is that each
+// widget actually composes it, with the right caption.
+//
+// FleetStatus is a server component and can be walked. HeroTerminal is
+// "use client" and calls useState, so it cannot be invoked as a plain
+// function — scripts/check-out.mjs greps the built HTML for both captions,
+// which is the only check that sees HeroTerminal render.
 
 const tree = FleetStatus({ className: "block w-full" });
 
 describe("FleetStatus", () => {
-  it("wraps the panel in a figure", () => {
-    const figure = asElement(tree);
-    expect(figure.type).toBe("figure");
+  it("renders through DemoFigure", () => {
+    const figure = findOne(tree, "figure");
     expect(attrs(figure).className).toBe("block w-full");
-  });
-
-  // The whole point of the caption: aria-hidden hides the numbers from
-  // assistive tech but not from text extractors, so the hedge has to sit
-  // outside the hidden subtree to travel with them.
-  it("captions the panel from outside the aria-hidden subtree", () => {
-    const caption = findOne(tree, "figcaption");
-    expect(attrs(caption)["aria-hidden"]).toBeUndefined();
-    const hidden = findAll(tree, "div").filter(
+    const panels = findAll(tree, "div").filter(
       (el) => attrs(el)["aria-hidden"] === true,
     );
-    expect(hidden).toHaveLength(1);
-    expect(findAll(hidden[0], "figcaption")).toHaveLength(0);
+    expect(panels).toHaveLength(1);
+    expect(attrs(panels[0]).className).toBe("fleet");
   });
 
-  it("says the figures are illustrative, not telemetry", () => {
-    const caption = textOf(findOne(tree, "figcaption")).toLowerCase();
-    expect(caption).toContain("illustrative");
-    expect(caption).toContain("not live network telemetry");
-    expect(caption).toContain("/legal/disclaimer/");
+  it("captions the panel with the fleet hedge", () => {
+    expect(textOf(findOne(tree, "figcaption"))).toBe(DEMO_CAPTIONS.fleet);
   });
 
   // The numbers themselves stay — they are part of the design, and they stay

@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { FaqItem } from "./FaqItem";
-import { asElement, childElements, textOf } from "@/test-utils/react-tree";
+import {
+  asElement,
+  attrs,
+  childElements,
+  textOf,
+} from "@/test-utils/react-tree";
 
 const Q = "Why does the network need a token?";
 const A = "TOKEN secures the network. deCDN settles in USDC.";
@@ -21,7 +26,7 @@ describe("FaqItem", () => {
   // class is what keeps the answer flush if that reset ever changes.
   it("zeroes the dd's inline-start margin explicitly", () => {
     const [, dd] = childElements(FaqItem({ q: Q, a: A }));
-    expect(dd.props.className).toContain("ms-0");
+    expect(attrs(dd).className).toContain("ms-0");
   });
 
   it("styles the brand inside the answer", () => {

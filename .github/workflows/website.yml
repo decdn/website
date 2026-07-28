@@ -25,5 +25,9 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm format:check
+      # `next build` only typechecks what it bundles, so test files were never
+      # checked — one had a type error on main.
+      - run: pnpm typecheck
       - run: pnpm test
+      # Also runs scripts/check-out.mjs against the export.
       - run: pnpm build

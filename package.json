@@ -8,12 +8,14 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "next build && pnpm check:out",
+    "check:out": "node scripts/check-out.mjs",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
+    "typecheck": "tsc --noEmit",
     "prepare": "husky"
   },
   "lint-staged": {

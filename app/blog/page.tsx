@@ -4,8 +4,8 @@ import { BLOG_GRID_COLS, PostRow } from "@/components/ui/PostRow";
 import { listIndexPosts } from "@/lib/blog";
 import { BLOG_DESCRIPTION, BLOG_TITLE } from "@/lib/copy";
 import { JsonLd } from "@/lib/jsonld";
-import { BLOG_URL, SITE_URL } from "@/lib/links";
-import { blogNode, breadcrumbNode } from "@/lib/schema";
+import { BLOG_URL } from "@/lib/links";
+import { BLOG_CRUMB, blogNode, breadcrumbNode, HOME_CRUMB } from "@/lib/schema";
 import {
   imagesField,
   inheritedOgImages,
@@ -14,8 +14,8 @@ import {
 } from "@/lib/metadata";
 
 const breadcrumbSchema = breadcrumbNode(`${BLOG_URL}#breadcrumbs`, [
-  { name: "Home", item: SITE_URL },
-  { name: "Blog", item: BLOG_URL },
+  HOME_CRUMB,
+  BLOG_CRUMB,
 ]);
 
 // Defining `openGraph`/`twitter` here replaces the root's resolved objects
@@ -66,7 +66,7 @@ export default function BlogIndex() {
             id="blog-h"
             className="hug rise rise-0 text-h2 leading-[0.92] font-bold"
           >
-            field notes
+            {BLOG_TITLE}
           </h1>
           {/* .rise forces opacity:1 at rest (fill: forwards), so the
               dimmed lead sits inside a .rise wrapper rather than carrying

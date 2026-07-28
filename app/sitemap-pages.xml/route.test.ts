@@ -25,10 +25,10 @@ describe("sitemap-pages.xml", () => {
     expect(locs).toContain("https://decdn.org/decdn_litepaper.pdf");
   });
 
-  // The two machine-readable surfaces are listed here so a build that stops
-  // emitting one shows up in the sitemap diff. There is no postbuild script in
-  // this repo verifying that every <loc> resolves to a file in out/, so this
-  // is the guard: it fails if the entries are dropped.
+  // Both machine-readable surfaces are listed. This asserts only that the
+  // entries are present — they are string literals in the route, so nothing
+  // here would notice if app/llms.txt/route.ts stopped emitting the file.
+  // scripts/check-out.mjs is what resolves every <loc> against out/.
   it.each(["https://decdn.org/llms.txt", "https://decdn.org/llms-full.txt"])(
     "lists %s",
     (url) => {

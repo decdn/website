@@ -35,10 +35,15 @@ export const SITE_ID = `${SITE_URL}#website`;
 export const SERVICE_ID = `${SITE_URL}#service`;
 
 // Trailing-slash blog base, paired with SITE_URL so callers can concat
-// `${BLOG_URL}${slug}/` (post URL) and `${BLOG_URL}#blog` (stable @id)
-// without re-deriving the path. Must agree with `next.config.ts`'s
-// `trailingSlash: true` and `links.blog`.
+// `${BLOG_URL}#blog` (stable @id) without re-deriving the path. Must agree
+// with `next.config.ts`'s `trailingSlash: true` and `links.blog`. For a post's
+// own URL use `postUrl` in lib/blog.ts rather than concatenating here.
 export const BLOG_URL = `${SITE_URL}blog/`;
+
+// `links.docs` is a deep link into the docs product, so every consumer that
+// wants the host has to strip the path. Three did it independently
+// (app/sitemap.xml, app/llms.txt, app/llms-full.txt); derive it once.
+export const DOCS_ORIGIN = new URL(links.docs).origin;
 
 // Twitter expects an `@handle`; derive from the X profile URL so the X
 // account is the single source of truth.

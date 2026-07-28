@@ -1,7 +1,20 @@
 import { describe, expect, it } from "vitest";
-import { assertNoTopLevelHeading, GET } from "./route";
+import {
+  assertHeadingText,
+  assertTableCell,
+  demoteHeadings,
+  GET,
+} from "./route";
 import { getPost, listPosts } from "@/lib/blog";
-import { COMPARE_ROWS, METHOD_STEPS } from "@/lib/copy";
+import {
+  COMPARE_ROWS,
+  HERO_FIGURES,
+  HERO_LEAD,
+  METHOD_FIGURES,
+  METHOD_STEPS,
+  STACK,
+  statusBlock,
+} from "@/lib/copy";
 import { FAQ_ITEMS } from "@/lib/faq";
 import { getLegalDoc, LEGAL_SLUGS } from "@/lib/legal";
 
@@ -9,17 +22,18 @@ const response = GET();
 const body = await response.text();
 const lines = body.split("\n");
 
-// Post and legal bodies are embedded verbatim, and all ten of them use `## `
-// for their own sections — so the raw document carries far more `## ` lines
-// than this route writes. `owned` is the document with those verbatim bodies
-// removed: the text this route actually composes, and the only part whose
-// outline it can promise anything about.
+// Post and legal bodies are embedded with their headings demoted, so `owned`
+// — the document with those bodies removed — is the text this route actually
+// composes. Kept for the placeholder scan below: "undefined" is ordinary
+// English inside a post body ("Compliance posture undefined"), so the raw
+// document is the wrong thing to search.
 const EMBEDDED = [
-  ...listPosts().map((meta) => getPost(meta.slug)!.body.trim()),
-  ...LEGAL_SLUGS.map((slug) => getLegalDoc(slug).body),
+  ...listPosts().map((meta) =>
+    demoteHeadings(getPost(meta.slug)!.body.trim(), "test"),
+  ),
+  ...LEGAL_SLUGS.map((slug) => demoteHeadings(getLegalDoc(slug).body, "test")),
 ];
 const owned = EMBEDDED.reduce((doc, text) => doc.replace(text, ""), body);
-const ownedLines = owned.split("\n");
 
 describe("llms-full.txt shape", () => {
   it("serves plain text", () => {
@@ -28,8 +42,6 @@ describe("llms-full.txt shape", () => {
     );
   });
 
-  // Embedded bodies keep their own deeper headings, but the H1 is what says
-  // which document this is — there can only be one.
   it("uses exactly one H1", () => {
     expect(lines.filter((line) => line.startsWith("# "))).toEqual([
       "# deCDN — full text",
@@ -40,34 +52,34 @@ describe("llms-full.txt shape", () => {
     expect(body).toContain("https://decdn.org/llms.txt");
   });
 
-  it("owns three sections and fifteen entries", () => {
-    expect(ownedLines.filter((line) => line.startsWith("## "))).toEqual([
+  // The outline is the whole document's, not a mix of this route's headings
+  // and ten embedded documents' — that is what demoteHeadings buys, and it is
+  // asserted against the *raw* body rather than `owned`, because the point is
+  // that no embedded heading reaches these levels.
+  it("has three sections and fifteen entries, embedded bodies included", () => {
+    expect(lines.filter((line) => line.startsWith("## "))).toEqual([
       "## Homepage",
       "## Field notes",
       "## Legal",
     ]);
     // 5 homepage subsections + 7 posts + 3 legal documents.
-    expect(ownedLines.filter((line) => line.startsWith("### "))).toHaveLength(
-      15,
-    );
+    expect(lines.filter((line) => line.startsWith("### "))).toHaveLength(15);
   });
 
-  // The tradeoff behind emitting bodies verbatim, stated so it is a decision
-  // rather than a surprise: a post's own `## ` sections sit at the same level
-  // as this document's, which is why the header prose tells a reader that
-  // headings inside an embedded document belong to that document.
-  it("says so when an embedded document brings its own headings", () => {
-    expect(
-      lines.filter((line) => line.startsWith("## ")).length,
-    ).toBeGreaterThan(3);
-    expect(body).toContain(
-      "the headings inside them belong to those documents rather than to this outline",
-    );
+  // The specific inversion this prevents: every legal document uses `## ` for
+  // its own sections, and the privacy policy has a `## Contact`. Undemoted,
+  // that line closes `## Legal` and strands the terms of use and the
+  // disclaimer outside the section that is supposed to contain them.
+  it("keeps every legal document inside the Legal section", () => {
+    const legalStart = lines.indexOf("## Legal");
+    expect(legalStart).toBeGreaterThan(-1);
+    const after = lines.slice(legalStart + 1);
+    expect(after.some((line) => line.startsWith("## "))).toBe(false);
+    for (const slug of LEGAL_SLUGS) {
+      expect(after).toContain(`### ${getLegalDoc(slug).title}`);
+    }
   });
 
-  // Scoped to the composed text: "undefined" is ordinary English and appears
-  // in a post body ("Compliance posture undefined"), so the raw document is
-  // the wrong thing to search.
   it("interpolates no placeholders", () => {
     expect(owned).not.toContain("undefined");
     expect(owned).not.toContain("[object Object]");
@@ -96,15 +108,52 @@ describe("homepage mirror", () => {
     expect(body).toContain(a);
   });
 
+  // The scalar homepage strings: without these, deleting `${HERO_LEAD}` from
+  // the template leaves every other assertion in this file green.
+  it.each([
+    ["hero lead", HERO_LEAD],
+    ["contact lead", "the network is open. so is our inbox."],
+    ["status hedge", statusBlock("throughout")],
+  ])("carries the %s", (_name, text) => {
+    expect(body).toContain(text);
+  });
+
+  // These two lines were hand-written paraphrases of inline JSX until the
+  // figures moved into lib/copy.ts. Asserting the serialised form is what
+  // makes the mirror provably the same data the page renders.
+  it.each([...HERO_FIGURES, ...METHOD_FIGURES])(
+    "mirrors the $label figure",
+    (figure) => {
+      expect(body).toContain(`${figure.label}: ${figure.value}`);
+    },
+  );
+
+  it("mirrors the stack chips in order", () => {
+    expect(lines).toContain(`Stack: ${STACK.join(" · ")}`);
+  });
+
+  // The header prose says "the three legal documents" in words, the way
+  // Compare.tsx says "seven axes". Pin the count so the prose can't go stale
+  // if LEGAL_SLUGS ever grows.
+  it("names as many legal documents as it embeds", () => {
+    expect(LEGAL_SLUGS).toHaveLength(3);
+    expect(body).toContain("the three legal documents");
+  });
+
   // The terminal and fleet-dashboard figures are invented sample values. In
   // HTML they sit inside a captioned <figure>; plain text strips that framing
   // entirely, so mirroring them would be worse than omitting them.
-  it.each(["15.1 GB/s", "$0.151 /s", "$0.1309", "probing 18 peers"])(
-    "omits the demo figure %s",
-    (figure) => {
-      expect(body).not.toContain(figure);
-    },
-  );
+  it.each([
+    "15.1 GB/s",
+    "$0.151 /s",
+    "$0.1309",
+    "$0.0055",
+    "$0.0411",
+    "550 MB",
+    "probing 18 peers",
+  ])("omits the demo figure %s", (figure) => {
+    expect(body).not.toContain(figure);
+  });
 });
 
 describe("embedded documents", () => {
@@ -112,38 +161,81 @@ describe("embedded documents", () => {
     const post = getPost(meta.slug);
     expect(lines).toContain(`### ${post!.title}`);
     expect(body).toContain(`https://decdn.org/blog/${meta.slug}/`);
-    expect(body).toContain(post!.body.trim());
+    expect(body).toContain(demoteHeadings(post!.body.trim(), "test"));
   });
 
   it.each(LEGAL_SLUGS)("embeds the %s document whole", (slug) => {
     const doc = getLegalDoc(slug);
     expect(lines).toContain(`### ${doc.title}`);
     expect(body).toContain(`https://decdn.org/legal/${slug}/`);
-    expect(body).toContain(doc.body);
+    expect(body).toContain(demoteHeadings(doc.body, "test"));
+  });
+
+  // Demotion moves the hashes and nothing else — the prose a consumer reads
+  // has to survive byte-for-byte.
+  it.each(listPosts())("changes only heading lines in $slug", (meta) => {
+    const original = getPost(meta.slug)!.body.trim();
+    const demoted = demoteHeadings(original, "test");
+    const strip = (text: string) =>
+      text.split("\n").map((line) => line.replace(/^#+ /, ""));
+    expect(strip(demoted)).toEqual(strip(original));
   });
 });
 
-describe("assertNoTopLevelHeading", () => {
-  it("returns a safe body unchanged", () => {
-    const safe = "## A section\n\nSome prose about #1 and #tag.";
-    expect(assertNoTopLevelHeading(safe, "post foo")).toBe(safe);
-  });
-
-  it.each([
-    { name: "a leading", value: "# Title\n\nprose" },
-    { name: "a mid-body", value: "prose\n\n# Title\n\nmore" },
-  ])("throws with field context on $name top-level heading", ({ value }) => {
-    expect(() => assertNoTopLevelHeading(value, "post foo")).toThrow(
-      /post foo/,
+describe("demoteHeadings", () => {
+  it("nests an embedded heading three levels down", () => {
+    expect(demoteHeadings("## A section\n\nprose", "post foo")).toBe(
+      "##### A section\n\nprose",
     );
+    expect(demoteHeadings("# Title", "post foo")).toBe("#### Title");
   });
 
   // `#1` and `#tag` are ordinary prose, not headings — the space is what makes
-  // a heading, and rejecting them would fail the build on a valid post.
+  // a heading, and rewriting them would corrupt a valid post.
   it.each(["#1 in the series", "tagged #tag here", "prose\n#nothashheading"])(
-    "allows %j",
+    "leaves %j alone",
     (value) => {
-      expect(() => assertNoTopLevelHeading(value, "post foo")).not.toThrow();
+      expect(demoteHeadings(value, "post foo")).toBe(value);
     },
   );
+
+  // content/blog/06-show-me-the-money.mdx already ships fences; a shell
+  // snippet's `# install deps` is a comment, not a heading.
+  it("does not touch lines inside a fenced block", () => {
+    const body = ["```text", "# not a heading", "```", "## real"].join("\n");
+    expect(demoteHeadings(body, "post foo")).toBe(
+      ["```text", "# not a heading", "```", "##### real"].join("\n"),
+    );
+  });
+
+  it("throws with field context on a heading too deep to demote", () => {
+    expect(() => demoteHeadings("#### too deep", "post foo")).toThrow(
+      /post foo/,
+    );
+  });
+});
+
+describe("markdown guards", () => {
+  it("passes safe values through", () => {
+    expect(assertTableCell("$0.01 /GB", "f")).toBe("$0.01 /GB");
+    expect(assertHeadingText("probe", "f")).toBe("probe");
+  });
+
+  // A `|` in a cell opens a column the header row doesn't have: every parser
+  // misaligns the row instead of failing, and the it.each above would still
+  // pass because it builds its expectation from the same corrupted value.
+  it.each(["monthly minimums | annual contracts", "two\nlines"])(
+    "rejects the table cell %j",
+    (value) => {
+      expect(() => assertTableCell(value, "compare price traditional")).toThrow(
+        /compare price traditional/,
+      );
+    },
+  );
+
+  it("rejects a line break in heading text", () => {
+    expect(() => assertHeadingText("a\nb", "faq[0] question")).toThrow(
+      /faq\[0\] question/,
+    );
+  });
 });

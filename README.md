@@ -24,6 +24,7 @@ pnpm install   # required (not npm/yarn) — husky hooks shell out to `pnpm exec
 pnpm dev       # dev server on :3000
 pnpm build     # static export → ./out
 pnpm test      # vitest run
+pnpm typecheck # tsc --noEmit
 pnpm lint      # eslint (flat config)
 pnpm format    # prettier --write .
 ```
@@ -33,8 +34,9 @@ pnpm format    # prettier --write .
 - `app/` — App Router entry (`layout.tsx`, `page.tsx`, `globals.css`) plus the blog routes (`blog/`, `blog/[slug]/`), the `legal/[doc]` route, the sitemap/robots handlers, the `llms.txt` / `llms-full.txt` handlers, and file-convention metadata assets.
 - `components/site/` — page sections composed by `app/page.tsx` (Hero, Compare, Method, Faq, Contact, …) plus chrome (`Chrome`, `Footer`, `ScrollReveal`, …).
 - `components/ui/` — low-level primitives (Frame, SectionHeader, Prose, Figure, …).
-- `lib/` — shared helpers (`links.ts`, `copy.ts`, `blog.ts`, `faq.ts`, `legal.ts`, `jsonld.tsx`, `schema.ts`, …). Homepage prose lives in `lib/copy.ts` as plain data — the comparison table maps over it and the `llms-full.txt` mirror serialises it, so copy inlined in a component would drift from the mirror.
+- `lib/` — shared helpers (`links.ts`, `copy.ts`, `blog.ts`, `faq.ts`, `legal.ts`, `jsonld.tsx`, `schema.ts`, …). The site's prose _and_ its displayed values live in `lib/copy.ts` as plain data — the comparison table maps over it and the `llms-full.txt` mirror serialises it, so anything inlined in a component drifts from the mirror.
 - `test-utils/` — test-only helpers for walking the element tree a server component returns.
+- `scripts/` — `check-out.mjs`, postbuild assertions run against `./out` by `pnpm build`.
 - `content/blog/` — MDX posts loaded by `lib/blog.ts` and rendered by `app/blog/[slug]/page.tsx`.
 - `content/legal/` — MDX for the legal pages (`privacy`, `terms`, `disclaimer`), loaded by `lib/legal.ts` and rendered by `app/legal/[doc]/page.tsx`.
 - `docs/` — Mintlify source for `docs.decdn.org`. Built and deployed independently of `pnpm build`; not part of the static export and not imported from the website code.
@@ -47,7 +49,7 @@ pnpm format    # prettier --write .
 - **Tailwind v4.** Theme tokens live in `app/globals.css` under `@theme inline { … }` — there is no `tailwind.config.*`.
 - **Conventional commits enforced.** `commitlint` runs in the `commit-msg` husky hook; non-conforming messages are rejected.
 - **`metadataBase` is live.** `lib/links.ts` `site` is the real origin and `INDEXABLE` is `true`. Anything anchored on this origin — OG and canonical (via `metadataBase`); JSON-LD and the sitemap/robots emitters (via `SITE_URL`) — ships to production. Adding a non-blog page means appending an entry to `app/sitemap-pages.xml/route.ts`; blog posts are auto-derived from `content/blog/`, while legal pages are driven by the closed `LEGAL_SLUGS` list in `lib/legal.ts` (add both the MDX file under `content/legal/` and a slug there). Flipping `INDEXABLE` flips `<meta name="robots">` only; `robots.txt` and the sitemap stay unconditional by design (rationale in `lib/links.ts`).
-- **Machine-readable surfaces.** `/llms.txt` is a curated index of this origin and `/llms-full.txt` is every page as one plain-text document; both derive their entries from `listPosts()`, `LEGAL_SLUGS` and `lib/copy.ts`, are listed in `app/sitemap-pages.xml/route.ts`, and are advertised through `alternates.types` in `app/layout.tsx` and a `Link:` header in `public/_headers`. The protocol documentation has its own pair on `docs.decdn.org`, served by Mintlify.
+- **Machine-readable surfaces.** `/llms.txt` is a curated index of this origin and `/llms-full.txt` is every page as one plain-text document; both derive their page entries from `listPosts()`, `LEGAL_SLUGS`, `lib/faq.ts` and `lib/copy.ts`, are listed in `app/sitemap-pages.xml/route.ts`, and are advertised through `alternates.types` in `app/layout.tsx` and a `Link:` header in `public/_headers`. `scripts/check-out.mjs` resolves every advertised same-origin URL against `out/` after a build. The protocol documentation has its own pair on `docs.decdn.org`, served by Mintlify.
 
 ## Deploy
 

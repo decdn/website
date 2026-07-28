@@ -6,11 +6,11 @@ import {
   getLegalDoc,
   LEGAL_SLUGS,
   legalMetadata,
+  legalUrl,
   type LegalSlug,
 } from "@/lib/legal";
-import { SITE_URL } from "@/lib/links";
 import { inheritedOgImages } from "@/lib/metadata";
-import { breadcrumbNode, legalWebPageNode } from "@/lib/schema";
+import { breadcrumbNode, HOME_CRUMB, legalWebPageNode } from "@/lib/schema";
 
 // Static export: enumerate every legal doc at build time and refuse anything
 // outside that set, mirroring the closed-world nature of `output: "export"`
@@ -50,13 +50,13 @@ export default async function LegalPage({
   const slug = parseDoc(doc);
   if (!slug) notFound();
   const legal = getLegalDoc(slug);
-  const url = `${SITE_URL}legal/${slug}/`;
+  const url = legalUrl(slug);
   return (
     <>
       <JsonLd data={legalWebPageNode(legal)} />
       <JsonLd
         data={breadcrumbNode(`${url}#breadcrumbs`, [
-          { name: "Home", item: SITE_URL },
+          HOME_CRUMB,
           { name: legal.title, item: url },
         ])}
       />

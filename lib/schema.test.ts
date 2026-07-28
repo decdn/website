@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { listPosts } from "./blog";
+import { listPosts, postImageUrl, postUrl } from "./blog";
 import { FAQ_ITEMS } from "./faq";
 import { getLegalDoc, LEGAL_SLUGS } from "./legal";
 import { EMAIL, ORG_ID, SERVICE_ID, SITE_ID } from "./links";
@@ -177,5 +177,44 @@ describe("blogNode", () => {
     expect(nested.map((p) => p["@id"])).toEqual(
       posts.map((p) => `https://decdn.org/blog/${p.slug}/#post`),
     );
+  });
+
+  // `image` is the field whose whole justification is that it agrees with the
+  // standalone node on the post page — and it was the one field the @id/@type
+  // assertions above didn't cover.
+  it("resolves each image through postImageUrl", () => {
+    const nested = node.blogPost as { url: string; image: string }[];
+    expect(nested.length).toBeGreaterThan(0);
+    for (const [i, post] of listPosts().entries()) {
+      expect(nested[i].image).toBe(postImageUrl(post, nested[i].url));
+    }
+  });
+
+  // The standalone BlogPosting in app/blog/[slug]/page.tsx and the nested one
+  // here describe the same @id with the same thirteen fields, written twice.
+  // Unifying them would reorder the emitted JSON keys, so this is what keeps
+  // them from drifting: the key *set* has to match, and the two fields that
+  // would fork the graph have to be equal.
+  it("carries the same fields as the standalone post node", () => {
+    const nested = (node.blogPost as Record<string, unknown>[])[0];
+    const post = listPosts()[0];
+    const url = postUrl(post.slug);
+    const standalone = {
+      "@type": "BlogPosting",
+      "@id": `${url}#post`,
+      headline: post.title,
+      description: post.summary,
+      datePublished: post.date,
+      dateModified: post.date,
+      url,
+      mainEntityOfPage: url,
+      image: postImageUrl(post, url),
+      keywords: post.tags?.join(", "),
+      wordCount: post.words,
+      author: { "@id": ORG_ID },
+      publisher: { "@id": ORG_ID },
+    };
+    expect(Object.keys(nested).sort()).toEqual(Object.keys(standalone).sort());
+    expect(nested).toEqual(standalone);
   });
 });

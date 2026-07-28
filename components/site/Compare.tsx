@@ -9,10 +9,8 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 // drift from the rows below it; "seven" stays literal because the section
 // header promises it in prose, and lib/copy.test.ts pins the count.
 const AXES = COMPARE_ROWS.map((row) => row.axis);
-const CAPTION = `Traditional CDN compared with deCDN across seven axes: ${AXES.slice(
-  0,
-  -1,
-).join(", ")}, and ${AXES[AXES.length - 1]}.`;
+const AXIS_LIST = `${AXES.slice(0, -1).join(", ")}, and ${AXES.at(-1)}`;
+const CAPTION = `Traditional CDN compared with deCDN across seven axes: ${AXIS_LIST}.`;
 
 export function Compare() {
   return (
@@ -89,7 +87,9 @@ export function Compare() {
         <tbody role="rowgroup" className="contents">
           {COMPARE_ROWS.map((row, i) => (
             // Reproduces the previous hand-written cascade: the price row led
-            // at 340ms and each row after it stepped by 60ms from 420ms.
+            // at 340ms and each row after it stepped by 60ms from 420ms. Keyed
+            // on array position, not on `row.emphasis` — so the price row has
+            // to stay first, which lib/copy.test.ts pins.
             <ComparisonRow
               key={row.axis}
               row={row}

@@ -2,9 +2,11 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Metadata } from "next";
 import matter from "gray-matter";
-// Relative, not `@/lib/metadata`: vitest has no path-alias resolution
-// configured, and this module is imported by lib/legal.test.ts.
+// Relative, not `@/lib/metadata`: lib-internal imports stay relative, matching
+// lib/blog.ts and lib/schema.ts. (vitest.config.ts does resolve `@` now, so
+// the alias would work — this is a convention, not a constraint.)
 import { imagesField, OG_SITE, TWITTER_SITE, type OgImages } from "./metadata";
+import { SITE_URL } from "./links";
 
 const LEGAL_DIR = path.join(process.cwd(), "content", "legal");
 
@@ -14,6 +16,11 @@ const LEGAL_DIR = path.join(process.cwd(), "content", "legal");
 // link is the only other manual step.
 export const LEGAL_SLUGS = ["privacy", "terms", "disclaimer"] as const;
 export type LegalSlug = (typeof LEGAL_SLUGS)[number];
+
+/** Canonical absolute URL for a legal document. Trailing slash for the same
+ *  reason as `postUrl` in lib/blog.ts — see the note there. */
+export const legalUrl = (slug: LegalSlug): string =>
+  `${SITE_URL}legal/${slug}/`;
 
 const ISO_DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const MONTHS = [
