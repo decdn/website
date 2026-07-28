@@ -11,21 +11,38 @@
   "favicon": "/favicon-dark.svg",
   "logo": {
     "light": "/logo/light.svg",
-    "dark": "/logo/dark.svg"
+    "dark": "/logo/dark.svg",
+    "href": "https://decdn.org"
   },
   "appearance": {
     "default": "dark"
   },
+  "navbar": {
+    "links": [
+      { "label": "decdn.org", "href": "https://decdn.org" },
+      { "label": "Blog", "href": "https://decdn.org/blog/" }
+    ]
+  },
   "seo": {
+    "metatags": {
+      "canonical": "https://docs.decdn.org"
+    },
     "organization": {
+      "id": "https://decdn.org/#organization",
       "name": "deCDN",
-      "url": "https://decdn.org",
-      "logo": "https://docs.decdn.org/logo/light.svg",
+      "url": "https://decdn.org/",
+      "logo": "https://decdn.org/d_logo.png",
       "sameAs": [
         "https://github.com/decdn",
         "https://x.com/decdn_",
         "https://www.linkedin.com/company/decdn"
       ]
+    }
+  },
+  "thumbnails": {
+    "appearance": "dark",
+    "fonts": {
+      "family": "Geist"
     }
   },
   "navigation": {
@@ -76,10 +93,23 @@
   },
   "footer": {
     "socials": {
+      "website": "https://decdn.org",
       "github": "https://github.com/decdn",
-      "x": "https://x.com/decdn_"
+      "x": "https://x.com/decdn_",
+      "linkedin": "https://www.linkedin.com/company/decdn"
     },
     "links": [
+      {
+        "header": "deCDN",
+        "items": [
+          { "label": "Website", "href": "https://decdn.org" },
+          { "label": "Blog", "href": "https://decdn.org/blog/" },
+          {
+            "label": "Litepaper",
+            "href": "https://decdn.org/decdn_litepaper.pdf"
+          }
+        ]
+      },
       {
         "header": "Contact",
         "items": [
