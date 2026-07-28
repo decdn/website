@@ -37,6 +37,21 @@ const read = (relative) => {
   return readFileSync(file, "utf8");
 };
 
+/** True when the URL is on this origin.
+ *
+ *  Compares the *parsed* origin rather than a string prefix: `ORIGIN` is a
+ *  prefix of `https://decdn.org.example.test/x`, which is a different host
+ *  entirely, so `startsWith(ORIGIN)` would hand an off-origin URL to
+ *  `assertResolves` and check its path against our own out/. Unparseable
+ *  input is not same-origin, which makes callers report it rather than throw. */
+const isSameOrigin = (url) => {
+  try {
+    return new URL(url).origin === ORIGIN;
+  } catch {
+    return false;
+  }
+};
+
 /** Map a same-origin URL to the file the static export should have written.
  *  `trailingSlash: true` means a directory route is `<path>/index.html`; a
  *  dotted final segment (llms.txt, sitemap.xml, the PDF) is a real file. */
@@ -58,8 +73,8 @@ if (sitemap) {
   const locs = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
   if (locs.length === 0) fail("sitemap-pages.xml: no <loc> entries");
   for (const loc of locs) {
-    if (!loc.startsWith(ORIGIN)) {
-      fail(`sitemap-pages.xml: off-origin <loc> ${loc}`);
+    if (!isSameOrigin(loc)) {
+      fail(`sitemap-pages.xml: <loc> is not on ${ORIGIN}: ${loc}`);
       continue;
     }
     assertResolves(loc, "sitemap-pages.xml");
@@ -73,7 +88,7 @@ for (const surface of ["llms.txt", "llms-full.txt"]) {
   if (!text) continue;
   const urls = [...text.matchAll(/https:\/\/[^\s)<>"']+/g)]
     .map((m) => m[0].replace(/[.,]$/, ""))
-    .filter((url) => url.startsWith(`${ORIGIN}/`));
+    .filter(isSameOrigin);
   const unique = [...new Set(urls)];
   if (unique.length === 0) fail(`${surface}: advertises no same-origin URL`);
   for (const url of unique) assertResolves(url, surface);
