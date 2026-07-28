@@ -22,13 +22,14 @@
 
   if (DUPLICATE_HOSTS.indexOf(window.location.hostname) === -1) return;
 
-  // `replace`, not `href`, so the duplicate host leaves no history entry for
-  // the Back button to land on. Path, query and hash carry over so a deep link
-  // survives the hop.
-  window.location.replace(
+  // Path, query and hash carry over so a deep link survives the hop.
+  var target =
     "https://docs.decdn.org" +
-      window.location.pathname +
-      window.location.search +
-      window.location.hash,
-  );
+    window.location.pathname +
+    window.location.search +
+    window.location.hash;
+
+  // `replace`, not `href`, so the duplicate host leaves no history entry for
+  // the Back button to land on.
+  window.location.replace(target);
 })();
