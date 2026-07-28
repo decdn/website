@@ -3,27 +3,16 @@ import { Contact } from "@/components/site/Contact";
 import { Faq } from "@/components/site/Faq";
 import { Hero } from "@/components/site/Hero";
 import { Method } from "@/components/site/Method";
-import { FAQ_ITEMS } from "@/lib/faq";
 import { JsonLd } from "@/lib/jsonld";
-import { SITE_URL } from "@/lib/links";
-
-// FAQPage structured data must match visible content; only the route that
-// renders <Faq /> may emit it (Google's structured-data policy).
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  "@id": `${SITE_URL}#faq`,
-  mainEntity: FAQ_ITEMS.map(({ q, a }) => ({
-    "@type": "Question",
-    name: q,
-    acceptedAnswer: { "@type": "Answer", text: a },
-  })),
-};
+import { faqPageNode } from "@/lib/schema";
 
 export default function Home() {
   return (
     <main>
-      <JsonLd data={faqSchema} />
+      {/* FAQPage structured data must match visible content, so only this
+          route — the one that renders <Faq /> — may emit it (Google's
+          structured-data policy). */}
+      <JsonLd data={faqPageNode} />
       <Hero />
       <Compare />
       <Method />

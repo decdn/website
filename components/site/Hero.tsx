@@ -1,4 +1,6 @@
 import { links } from "@/lib/links";
+import { HERO_FIGURES, HERO_HEADLINE, HERO_LEAD } from "@/lib/copy";
+import { highlightBrand } from "@/components/ui/brand";
 import { Figure } from "@/components/ui/Figure";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -14,28 +16,20 @@ export function Hero() {
           id="intro-h"
           className="hug flex flex-col text-h1 leading-[0.9] font-semibold tracking-[-0.04em]"
         >
-          <span className="rise rise-1">the delivery layer</span>
+          <span className="rise rise-1">{HERO_HEADLINE[0]}</span>
           <span className="rise rise-2 pl-[7vw]">
-            anyone can serve
+            {HERO_HEADLINE[1]}
             <span aria-hidden className="text-whisper">
               .
             </span>
           </span>
-          <span className="rise rise-2 pl-[12vw]">priced, not quoted.</span>
+          <span className="rise rise-2 pl-[12vw]">{HERO_HEADLINE[2]}</span>
         </h1>
 
         <div className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-end @4xl:gap-12">
           <div className="flex flex-col gap-8 @4xl:gap-12">
             <p className="rise rise-3 max-w-[64ch] text-body leading-[1.65]">
-              the first bytes of a 14-gigabyte file posted in berlin reach a
-              client in tokyo in under a second. the client streams from three
-              peers at once, verifies every chunk with blake3, and pays per
-              megabyte in usdc — whether the payload is a linux iso, a dataset,
-              a game patch, a media library, or an ai model.{" "}
-              <span className="text-whisper">deCDN</span> is demand-shaped,
-              locality-optimised delivery for large files at scale: supply forms
-              around demand, cost collapses as regional traffic concentrates.
-              the code is open. the network is open. the price is posted.
+              {highlightBrand(HERO_LEAD)}
             </p>
 
             <div className="rise rise-4 flex flex-col flex-wrap gap-x-8 gap-y-3 @md:flex-row @md:items-end">
@@ -71,10 +65,9 @@ export function Hero() {
             </div>
 
             <div className="rise rise-5 grid grid-cols-2 gap-y-4 @xl:grid-cols-4">
-              <Figure label="target price" value="$0.01/GB" />
-              <Figure label="p50 latency" value="50–100 ms" />
-              <Figure label="settlement" value="per-MB · usdc" />
-              <Figure label="gas overhead" value="<1%" />
+              {HERO_FIGURES.map((figure) => (
+                <Figure key={figure.label} {...figure} />
+              ))}
             </div>
           </div>
 

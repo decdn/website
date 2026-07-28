@@ -8,6 +8,7 @@
   Link: <https://docs.decdn.org/>; rel="service-doc"
   Link: </sitemap.xml>; rel="sitemap"
   Link: </decdn_litepaper.pdf>; rel="describedby"
+  Link: </llms.txt>; rel="alternate"; type="text/plain"; title="llms.txt"
 
 # Next emits the per-post OG image as an extensionless file
 # (out/blog/<slug>/opengraph-image, no .png). Cloudflare assigns

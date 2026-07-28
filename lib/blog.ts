@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import matter from "gray-matter";
-import { SITE_URL } from "./links";
+import { BLOG_URL, SITE_URL } from "./links";
 
 const POSTS_DIR = path.join(process.cwd(), "content", "blog");
 
@@ -352,6 +352,15 @@ export const buildOgImages = (
   post: PostMeta,
 ): { url: string; alt: string }[] | undefined =>
   post.image ? [{ url: post.image, alt: post.title }] : undefined;
+
+/** Canonical absolute URL for a post.
+ *
+ *  The trailing slash is load-bearing — `trailingSlash: true` in
+ *  next.config.ts means the emitted route is `out/blog/<slug>/index.html`, and
+ *  a canonical, a sitemap `<loc>` and a JSON-LD `@id` that disagree about it
+ *  describe two different pages. This was rebuilt by hand at five call sites,
+ *  one of which used a different base; assert it once here. */
+export const postUrl = (slug: string): string => `${BLOG_URL}${slug}/`;
 
 /** BlogPosting JSON-LD `image` URL. Frontmatter override wins, otherwise
  *  the extensionless file-convention card URL — extensionless because

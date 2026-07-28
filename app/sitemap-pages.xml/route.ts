@@ -1,6 +1,6 @@
 import { SITE_URL } from "@/lib/links";
-import { listPosts } from "@/lib/blog";
-import { LEGAL_SLUGS, getLegalDoc } from "@/lib/legal";
+import { listPosts, postUrl } from "@/lib/blog";
+import { LEGAL_SLUGS, getLegalDoc, legalUrl } from "@/lib/legal";
 
 // SITE_URL is interpolated raw into <loc> bodies below. SLUG_RE guards
 // the per-post slug; this guards the origin against a future accident
@@ -26,13 +26,23 @@ const posts = listPosts();
 // listPosts() is sorted newest-first in lib/blog.ts; reuse the latest post
 // date as lastmod for the home and blog index since they refresh whenever
 // blog content changes. The litepaper PDF has no honest lastmod tied to
-// content here, so we omit it — sitemap spec permits per-URL omission.
+// content here, so we omit it — sitemap spec permits per-URL omission. Same
+// for llms.txt and llms-full.txt: they are assembled from every other page,
+// so no single content date describes them. They are listed so the two
+// machine-readable surfaces are discoverable the same way every other URL on
+// this origin is.
+//
+// Note what listing them does *not* buy: those two <loc>s are literals below,
+// with no reference to the route handlers that emit the files, so deleting
+// app/llms.txt/route.ts would leave the entry in place and the sitemap
+// advertising a 404. scripts/check-out.mjs is what actually closes that —
+// it resolves every <loc> against out/ after a build.
 // Fallback only fires with zero posts.
 const siteLastMod = posts[0]?.date ?? new Date().toISOString().slice(0, 10);
 const postUrls = posts
   .map(
     (p) =>
-      `  <url><loc>${SITE_URL}blog/${p.slug}/</loc><lastmod>${p.date}</lastmod></url>`,
+      `  <url><loc>${postUrl(p.slug)}</loc><lastmod>${p.date}</lastmod></url>`,
   )
   .join("\n");
 
@@ -41,13 +51,15 @@ const postUrls = posts
 // can introduce XML-significant characters into the <loc>/<lastmod> bodies.
 const legalUrls = LEGAL_SLUGS.map((slug) => {
   const doc = getLegalDoc(slug);
-  return `  <url><loc>${SITE_URL}legal/${slug}/</loc><lastmod>${doc.effective}</lastmod></url>`;
+  return `  <url><loc>${legalUrl(slug)}</loc><lastmod>${doc.effective}</lastmod></url>`;
 }).join("\n");
 
 const BODY = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${SITE_URL}</loc><lastmod>${siteLastMod}</lastmod></url>
   <url><loc>${SITE_URL}decdn_litepaper.pdf</loc></url>
+  <url><loc>${SITE_URL}llms.txt</loc></url>
+  <url><loc>${SITE_URL}llms-full.txt</loc></url>
   <url><loc>${SITE_URL}blog/</loc><lastmod>${siteLastMod}</lastmod></url>
 ${legalUrls}
 ${postUrls}

@@ -1,6 +1,20 @@
-type Schema = {
-  "@context": string;
-  "@type": string;
+/**
+ * A top-level JSON-LD node.
+ *
+ * `@context` is pinned to the literal and `@type` is a type parameter, so a
+ * node annotated `Schema<"Organization">` rejects a misspelled `@type` at
+ * compile time — the failure mode this type otherwise can't see, since the
+ * `Record<string, unknown>` tail switches off excess-property checking and
+ * makes every other key (and every nested node under it) unchecked.
+ *
+ * That tail is the reason lib/schema.test.ts pins whole nodes with `toEqual`
+ * rather than trusting the compiler: today `offers.priceSpecification` could
+ * lose a field without a type error. Adding `schema-dts` would close the rest
+ * of the gap at the cost of a devDependency.
+ */
+export type Schema<T extends string = string> = {
+  "@context": "https://schema.org";
+  "@type": T;
   "@id": string;
 } & Record<string, unknown>;
 

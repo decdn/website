@@ -1,9 +1,11 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { Frame } from "@/components/ui/Frame";
 import { BLOG_GRID_COLS, PostRow } from "@/components/ui/PostRow";
-import { listIndexPosts, postImageUrl } from "@/lib/blog";
+import { listIndexPosts } from "@/lib/blog";
+import { BLOG_DESCRIPTION, BLOG_TITLE } from "@/lib/copy";
 import { JsonLd } from "@/lib/jsonld";
-import { BLOG_URL, ORG_ID, SITE_URL } from "@/lib/links";
+import { BLOG_URL } from "@/lib/links";
+import { BLOG_CRUMB, blogNode, breadcrumbNode, HOME_CRUMB } from "@/lib/schema";
 import {
   imagesField,
   inheritedOgImages,
@@ -11,23 +13,10 @@ import {
   TWITTER_SITE,
 } from "@/lib/metadata";
 
-const breadcrumbSchema = {
-  "@context": "https://schema.org",
-  "@type": "BreadcrumbList",
-  "@id": `${BLOG_URL}#breadcrumbs`,
-  itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-    {
-      "@type": "ListItem",
-      position: 2,
-      name: "Blog",
-      item: BLOG_URL,
-    },
-  ],
-};
-
-const TITLE = "field notes";
-const DESCRIPTION = "long-form posts on the deCDN protocol.";
+const breadcrumbSchema = breadcrumbNode(`${BLOG_URL}#breadcrumbs`, [
+  HOME_CRUMB,
+  BLOG_CRUMB,
+]);
 
 // Defining `openGraph`/`twitter` here replaces the root's resolved objects
 // wholesale, so the site fields and the root og image have to be re-stated —
@@ -38,13 +27,13 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const ogImages = await inheritedOgImages(parent);
   return {
-    title: TITLE,
-    description: DESCRIPTION,
+    title: BLOG_TITLE,
+    description: BLOG_DESCRIPTION,
     alternates: { canonical: "/blog/" },
     openGraph: {
       ...OG_SITE,
-      title: TITLE,
-      description: DESCRIPTION,
+      title: BLOG_TITLE,
+      description: BLOG_DESCRIPTION,
       url: "/blog/",
       type: "website",
       ...imagesField(ogImages),
@@ -55,8 +44,8 @@ export async function generateMetadata(
     twitter: {
       ...TWITTER_SITE,
       card: "summary_large_image",
-      title: TITLE,
-      description: DESCRIPTION,
+      title: BLOG_TITLE,
+      description: BLOG_DESCRIPTION,
       ...imagesField(ogImages),
     },
   };
@@ -65,39 +54,7 @@ export async function generateMetadata(
 export default function BlogIndex() {
   const posts = listIndexPosts();
 
-  // Blog graph node — `blogPost` entries use the same stable @id
-  // (`${postUrl}#post`) emitted by app/blog/[slug]/page.tsx so the
-  // graph resolves to one canonical BlogPosting per post.
-  const blogSchema = {
-    "@context": "https://schema.org",
-    "@type": "Blog",
-    "@id": `${BLOG_URL}#blog`,
-    url: BLOG_URL,
-    name: TITLE,
-    description: DESCRIPTION,
-    publisher: { "@id": ORG_ID },
-    blogPost: posts.map((p) => {
-      const postUrl = `${BLOG_URL}${p.slug}/`;
-      return {
-        "@type": "BlogPosting",
-        "@id": `${postUrl}#post`,
-        headline: p.title,
-        description: p.summary,
-        url: postUrl,
-        mainEntityOfPage: postUrl,
-        // Must agree with the `image` the post page emits for this same
-        // `@id`, so `postImageUrl` is the single source for both — it also
-        // honours a frontmatter `image:` override the site card can't.
-        image: postImageUrl(p, postUrl),
-        keywords: p.tags?.join(", "),
-        wordCount: p.words,
-        datePublished: p.date,
-        dateModified: p.date,
-        author: { "@id": ORG_ID },
-        publisher: { "@id": ORG_ID },
-      };
-    }),
-  };
+  const blogSchema = blogNode(posts);
 
   return (
     <main>
@@ -109,7 +66,7 @@ export default function BlogIndex() {
             id="blog-h"
             className="hug rise rise-0 text-h2 leading-[0.92] font-bold"
           >
-            field notes
+            {BLOG_TITLE}
           </h1>
           {/* .rise forces opacity:1 at rest (fill: forwards), so the
               dimmed lead sits inside a .rise wrapper rather than carrying
