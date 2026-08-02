@@ -50,10 +50,10 @@
 // order or spacing drifted in Next's HTML), an origin that cannot be
 // established, and zero URLs actually verified against disk.
 //
-// Runs against `out/` after `pnpm build`, wired as `postbuild` so it also
-// covers builders that never invoke our CI (Cloudflare Pages runs its own
-// `pnpm build`). It cannot be a vitest test: CI runs `pnpm test` before
-// `pnpm build`, so `out/` does not exist yet. `scripts/check-og-image.test.ts`
+// Runs against `out/` after `pnpm build`, chained off the `build` script
+// itself so it also covers builders that never invoke our CI (Cloudflare Pages
+// runs its own `pnpm build`). It cannot be a vitest test: CI runs `pnpm test`
+// before `pnpm build`, so `out/` does not exist yet. `scripts/check-og-image.test.ts`
 // covers it the other way round, spawning this file against fixture exports
 // via `CHECK_OG_OUT_DIR`.
 //
@@ -286,6 +286,37 @@ for (const file of files) {
   }
 }
 
+let failed = false;
+
+/**
+ * @param {string} headline
+ * @param {{ file: string, problem?: string }[]} offenders
+ * @param {string} hint
+ */
+const report = (headline, offenders, hint) => {
+  if (offenders.length === 0) return;
+  failed = true;
+  console.error(`[check:og-image] ${headline}`);
+  for (const { file, problem } of offenders) {
+    console.error(problem ? `  - ${file} — ${problem}` : `  - ${file}`);
+  }
+  console.error(`\n${hint}\n`);
+};
+
+// Named here rather than with the other reports below, because the refusal
+// guards that follow reason about what the *readable* pages declared. A file
+// that could not be opened declares nothing, so enough of them make the export
+// look tagless and the guard would exit with "this export contains no pages" —
+// a true statement about the wrong thing, with the EACCES or the truncated
+// file never mentioned. Reporting first only sets `failed`; an export whose
+// pages are otherwise fine still runs every check below and exits 1 at the end
+// exactly as before.
+report(
+  "pages could not be read:",
+  unreadable,
+  "Every other page was still checked. Fix the permissions or the truncated file and re-run.",
+);
+
 // Collect the raw tag values before grading any of them: whether a matcher saw
 // a tag at all is knowable without the site origin, and it gives the better
 // diagnosis when an export turns out to hold no pages.
@@ -407,40 +438,24 @@ for (const [, loc] of sitemapXml.matchAll(SITEMAP_LOC)) {
   if (problem !== null) missingFromExport.push({ file: loc, problem });
 }
 
-let failed = false;
-
-/**
- * @param {string} headline
- * @param {{ file: string, problem?: string }[]} offenders
- * @param {string} hint
- */
-const report = (headline, offenders, hint) => {
-  if (offenders.length === 0) return;
-  failed = true;
-  console.error(`[check:og-image] ${headline}`);
-  for (const { file, problem } of offenders) {
-    console.error(problem ? `  - ${file} — ${problem}` : `  - ${file}`);
-  }
-  console.error(`\n${hint}\n`);
-};
-
 /** @param {"card" | "og" | "twitter"} tag @param {TagOutcome["kind"][]} kinds */
 const offendersOf = (tag, ...kinds) =>
   pages
     .filter((p) => kinds.includes(p[tag].kind))
-    .map((p) => ({
-      file: p.file,
-      problem:
-        p[tag].kind === "missing"
-          ? "tag missing"
-          : /** @type {any} */ (p[tag]).detail,
-    }));
-
-report(
-  "pages could not be read:",
-  unreadable,
-  "Every other page was still checked. Fix the permissions or the truncated file and re-run.",
-);
+    .map((p) => {
+      // Narrowed on `kind` rather than cast: `detail` exists on exactly the two
+      // members that carry a diagnosis, and the union is what makes that
+      // checkable. An `any` cast here would have compiled just as happily after
+      // someone renamed the field.
+      const outcome = p[tag];
+      return {
+        file: p.file,
+        problem:
+          outcome.kind === "conflict" || outcome.kind === "unusable"
+            ? outcome.detail
+            : "tag missing",
+      };
+    });
 
 report(
   `pages do not declare twitter:card=${LARGE_CARD}:`,

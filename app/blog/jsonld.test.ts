@@ -1,4 +1,3 @@
-import { isValidElement, type ReactNode } from "react";
 import { describe, expect, it } from "vitest";
 import {
   blogPostingNode,
@@ -6,6 +5,7 @@ import {
   listPosts,
   postUrl,
 } from "@/lib/blog";
+import { childElements } from "@/test-utils/react-tree";
 import BlogIndex from "./page";
 import BlogPost from "./[slug]/page";
 
@@ -15,23 +15,24 @@ import BlogPost from "./[slug]/page";
 // away from it — re-inlining a literal, or spreading an extra field over one
 // copy. These tests render both pages and compare what they actually emit.
 //
-// Rendering `app/` from vitest is what the `@/` alias resolution added in #196
-// bought (`vitest.config.ts`). `MDXRemote` in the post page stays an
-// unevaluated React element, so no MDX compilation happens here.
+// Rendering `app/` from vitest is what the `@/` alias resolution in
+// `vitest.config.ts` bought.
 
-/** Every `<JsonLd data={…}>` prop in a rendered tree, in document order. */
-const jsonLdNodes = (node: ReactNode): Record<string, unknown>[] => {
-  if (Array.isArray(node)) return node.flatMap(jsonLdNodes);
-  if (!isValidElement(node)) return [];
-  const props = node.props as {
-    data?: Record<string, unknown>;
-    children?: ReactNode;
-  };
-  // Compare by shape, not by identity: `JsonLd` is imported through the `@/`
-  // alias here and relatively there, so the two module instances differ.
-  if (props.data !== undefined && "@type" in props.data) return [props.data];
-  return jsonLdNodes(props.children);
-};
+/** Every `<JsonLd data={…}>` prop a route emits, in document order.
+ *
+ *  `childElements` rather than `findAll`: it returns the elements the route
+ *  passed in without expanding them, which is what this test needs twice over.
+ *  Both routes emit their `<JsonLd>` as direct children of `<main>`, and
+ *  `MDXRemote` in the post page is an async component that the expanding
+ *  walkers would try to invoke — it stays an unevaluated element here, so no
+ *  MDX compilation happens. Same shape as app/legal/jsonld.test.ts.
+ *
+ *  Read by shape, not by identity: each `data` prop is a plain object, which
+ *  is what actually ships. */
+const jsonLdNodes = (tree: unknown): Record<string, unknown>[] =>
+  childElements(tree)
+    .map((el) => (el.props as { data?: Record<string, unknown> }).data)
+    .filter((data): data is Record<string, unknown> => data !== undefined);
 
 const nodeById = (nodes: Record<string, unknown>[], id: string) =>
   nodes.find((n) => n["@id"] === id);

@@ -95,6 +95,10 @@ const run = (outDir: string) => {
   const res = spawnSync(process.execPath, [SCRIPT], {
     encoding: "utf8",
     env: { ...process.env, CHECK_OG_OUT_DIR: outDir },
+    // vitest cannot interrupt a synchronous call, so a child that hangs would
+    // stall the whole suite rather than fail it. On timeout `status` is null,
+    // which matches no `expect(code).toBe(…)` and surfaces as a test failure.
+    timeout: 30_000,
   });
   return { code: res.status, output: `${res.stdout}${res.stderr}` };
 };
@@ -417,6 +421,27 @@ describe("check-og-image: unreadable inputs", () => {
         expect(output).toContain("EACCES");
         // The other page's real problem still surfaced.
         expect(output).toContain("empty content attribute");
+      } finally {
+        fs.chmodSync(locked, 0o644);
+      }
+    },
+  );
+
+  // When *every* page is unreadable the refusal guards see an export that
+  // declares nothing, and "this export contains no pages" is a true sentence
+  // about the wrong thing. The exit code was already 1; what was missing was
+  // any mention of the EACCES that caused it.
+  it.skipIf(process.getuid?.() === 0)(
+    "names the read failures when no page could be read at all",
+    () => {
+      const out = makeExport({ pages: [HOME] });
+      const locked = path.join(out, "index.html");
+      fs.chmodSync(locked, 0o000);
+      try {
+        const { code, output } = run(out);
+        expect(code).toBe(1);
+        expect(output).toContain("pages could not be read");
+        expect(output).toContain("EACCES");
       } finally {
         fs.chmodSync(locked, 0o644);
       }
