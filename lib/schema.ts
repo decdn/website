@@ -1,4 +1,4 @@
-import { postImageUrl, postUrl, type PostMeta } from "./blog";
+import { blogPostingNode, type PostMeta } from "./blog";
 import { BLOG_DESCRIPTION, BLOG_TITLE, SITE_DESCRIPTION } from "./copy";
 import { FAQ_ITEMS } from "./faq";
 import type { Schema } from "./jsonld";
@@ -17,12 +17,11 @@ import {
 //
 // Every node used to be written inline at the route that renders it, which put
 // the two BreadcrumbList builders in different files as near-duplicates and
-// left the graph's shape unassertable. The standalone per-post `BlogPosting`
-// node stays in app/blog/[slug]/page.tsx: it is derived from a post rather
-// than from the site. It and the nested entries `blogNode` builds below carry
-// the same @id and the same thirteen fields, and nothing enforces that they
-// agree — lib/schema.test.ts checks it, since unifying them would reorder the
-// emitted JSON keys.
+// left the graph's shape unassertable. The per-post `BlogPosting` node is the
+// one node that isn't here: it derives from a post rather than from the site,
+// so it lives in lib/blog.ts as `blogPostingNode` and both call sites — the
+// post page's top-level node and the entries `blogNode` nests below — build
+// from it. See #199 for why an agreement test over two literals wasn't enough.
 //
 // Nodes join by @id — `publisher`/`provider`/`author` all reference ORG_ID,
 // and page-level nodes reference SITE_ID — so the constants live in lib/links
@@ -157,9 +156,11 @@ export const breadcrumbNode = (
   })),
 });
 
-// `blogPost` entries reuse the stable @id (`${postUrl}#post`) that
-// app/blog/[slug]/page.tsx emits, so the graph resolves to one canonical
-// BlogPosting per post rather than two competing descriptions of it.
+// `blogPost` entries are the very node app/blog/[slug]/page.tsx emits top-level
+// — same builder, same stable @id (`${postUrl(slug)}#post`) — so the graph
+// resolves to one canonical BlogPosting per post rather than two descriptions
+// of it that agree only as long as someone keeps them in step. The nested copy
+// carries a redundant-but-inert `@context`; see `blogPostingNode`.
 export const blogNode = (posts: PostMeta[]): Schema<"Blog"> => ({
   "@context": "https://schema.org",
   "@type": "Blog",
@@ -168,25 +169,5 @@ export const blogNode = (posts: PostMeta[]): Schema<"Blog"> => ({
   name: BLOG_TITLE,
   description: BLOG_DESCRIPTION,
   publisher: { "@id": ORG_ID },
-  blogPost: posts.map((p) => {
-    const url = postUrl(p.slug);
-    return {
-      "@type": "BlogPosting",
-      "@id": `${url}#post`,
-      headline: p.title,
-      description: p.summary,
-      url,
-      mainEntityOfPage: url,
-      // Must agree with the `image` the post page emits for this same @id, so
-      // `postImageUrl` is the single source for both — it also honours a
-      // frontmatter `image:` override the site card can't.
-      image: postImageUrl(p, url),
-      keywords: p.tags?.join(", "),
-      wordCount: p.words,
-      datePublished: p.date,
-      dateModified: p.date,
-      author: { "@id": ORG_ID },
-      publisher: { "@id": ORG_ID },
-    };
-  }),
+  blogPost: posts.map(blogPostingNode),
 });

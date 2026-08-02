@@ -8,17 +8,16 @@ import { Pill } from "@/components/ui/Pill";
 import { META } from "@/components/ui/PostRow";
 import { Prose } from "@/components/ui/Prose";
 import {
+  blogPostingNode,
   buildOgImages,
   dottedDate,
   getPost,
   listPosts,
-  postImageUrl,
   postUrl,
   readLabel,
   seriesLabel,
 } from "@/lib/blog";
-import { JsonLd, type Schema } from "@/lib/jsonld";
-import { ORG_ID } from "@/lib/links";
+import { JsonLd } from "@/lib/jsonld";
 import { BLOG_CRUMB, breadcrumbNode, HOME_CRUMB } from "@/lib/schema";
 import { OG_SITE, TWITTER_SITE } from "@/lib/metadata";
 
@@ -92,27 +91,11 @@ export default async function BlogPost({
   const tags = post.tags ?? [];
   const minutes = readLabel(post.readMin);
 
+  // BlogPosting assembly is shared with the blog index's `Blog` graph via
+  // `blogPostingNode` (lib/blog.ts) so the two can't diverge under the same
+  // `@id`.
   const url = postUrl(post.slug);
-  const postingSchema: Schema<"BlogPosting"> = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "@id": `${url}#post`,
-    headline: post.title,
-    description: post.summary,
-    datePublished: post.date,
-    dateModified: post.date,
-    url,
-    mainEntityOfPage: url,
-    // Override-vs-fallback selection lives in `postImageUrl`; see the
-    // JSDoc there for the cache-buster mismatch between this URL and
-    // the og:image meta (same file underneath; Cloudflare ignores the
-    // query string on static assets).
-    image: postImageUrl(post, url),
-    keywords: post.tags?.join(", "),
-    wordCount: post.words,
-    author: { "@id": ORG_ID },
-    publisher: { "@id": ORG_ID },
-  };
+  const postingSchema = blogPostingNode(post);
   const breadcrumbSchema = breadcrumbNode(`${url}#breadcrumbs`, [
     HOME_CRUMB,
     BLOG_CRUMB,

@@ -54,6 +54,9 @@ export async function generateMetadata(
 export default function BlogIndex() {
   const posts = listIndexPosts();
 
+  // Each `blogPost` entry is the same shared `blogPostingNode` (lib/blog.ts)
+  // the post page emits top-level, so the graph resolves to one canonical
+  // BlogPosting per post under a stable @id.
   const blogSchema = blogNode(posts);
 
   return (

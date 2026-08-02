@@ -8,13 +8,14 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build && pnpm check:out",
+    "build": "next build && pnpm check:out && pnpm check:og-image",
     "check:out": "node scripts/check-out.mjs",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
+    "check:og-image": "node scripts/check-og-image.mjs",
     "typecheck": "tsc --noEmit",
     "prepare": "husky"
   },

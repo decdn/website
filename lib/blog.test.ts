@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  blogPostingNode,
   buildOgImages,
   countWords,
   dottedDate,
@@ -11,13 +12,14 @@ import {
   parseSlug,
   parseTags,
   postImageUrl,
+  postUrl,
   readingMinutes,
   readLabel,
   seriesLabel,
   type PostMeta,
   type Slug,
 } from "./blog";
-import { SITE_URL } from "./links";
+import { BLOG_URL, ORG_ID, SITE_URL } from "./links";
 
 describe("parseSlug", () => {
   it.each(["a", "a-b", "a-b-c", "abc123", "a1-b2"])("accepts %j", (input) => {
@@ -133,13 +135,15 @@ describe("parseImage", () => {
     expect(parseImage(undefined, "x.mdx")).toBeUndefined();
   });
 
+  // Site-relative inputs must point at a real file under `public/` (the
+  // existence check below), so these use assets that actually ship.
   it.each<[string, string, string]>([
+    ["site-relative path", "/d_logo.png", `${SITE_URL}d_logo.png`],
     [
-      "site-relative path",
-      "/blog-cards/foo.png",
-      `${SITE_URL}blog-cards/foo.png`,
+      "nested site-relative path",
+      "/presskit/decdn-presskit.zip",
+      `${SITE_URL}presskit/decdn-presskit.zip`,
     ],
-    ["nested site-relative path", "/a/b/c.png", `${SITE_URL}a/b/c.png`],
     [
       "absolute https URL",
       "https://example.test/foo.png",
@@ -179,8 +183,8 @@ describe("parseImage", () => {
   // into `https://decdn.org//foo.png`, or worse, `https://decdn.orgfoo`.
   it("returns a parseable absolute URL for every accepted shape", () => {
     const inputs = [
-      "/blog-cards/foo.png",
-      "/a/b/c.png",
+      "/d_logo.png",
+      "/presskit/decdn-presskit.zip",
       "https://example.test/foo.png",
       "http://example.test/foo.png",
     ];
@@ -233,6 +237,48 @@ describe("parseImage", () => {
       expect(() => parseImage(input, "bad.mdx")).toThrow(/is not a valid URL/);
     },
   );
+
+  // An image on our own origin that doesn't resolve to a real file under
+  // `public/` must throw — otherwise a typo ships a 404'd og:image,
+  // twitter:image, and BlogPosting JSON-LD image with a green build. Both
+  // accepted spellings are held to it: the absolute form is what you get by
+  // copying a URL out of the browser, so exempting it would leave the likelier
+  // mistake unguarded. Off-site absolute URLs can't be checked and stay exempt.
+  it.each([
+    ["missing top-level file", "/blog-cards/why-now.png"],
+    ["missing nested file", "/a/b/c.png"],
+    ["a `..` escape to a repo-root file", "/../package.json"],
+    // URL normalization drops a leading `..` instead of following it, so this
+    // means `/public/d_logo.png` — which does not ship. Resolving it as a
+    // filesystem path would collapse back into `public/` and wrongly accept.
+    ["a `..` that re-enters public/", "/../public/d_logo.png"],
+    // `%2e%2e` survives URL normalization and becomes `..` only after
+    // decoding, so containment has to be re-checked at that point.
+    ["a percent-encoded `..` escape", "/%2e%2e/package.json"],
+    ["a directory rather than a file", "/presskit"],
+    [
+      "a same-origin absolute URL with no file behind it",
+      `${SITE_URL}typo.png`,
+    ],
+    ["a same-origin absolute URL naming a directory", `${SITE_URL}presskit`],
+  ])("throws when given %s", (_l, input) => {
+    expect(() => parseImage(input, "bad.mdx")).toThrow(
+      /bad\.mdx.*does not resolve to a file under public\//s,
+    );
+  });
+
+  // The disk check runs against the URL *path*, so a cache-buster or fragment
+  // is not mistaken for part of the filename. These all point at a real asset
+  // and must survive, with the author's exact bytes preserved in the output.
+  it.each([
+    ["a query string", "/d_logo.png?v=2"],
+    ["a fragment", "/d_logo.png#hero"],
+    ["a percent-escaped path", "/d_logo%2Epng"],
+    ["a same-origin absolute URL", `${SITE_URL}d_logo.png`],
+    ["a same-origin absolute URL with a query", `${SITE_URL}d_logo.png?v=2`],
+  ])("accepts a shipping asset named with %s", (_l, input) => {
+    expect(parseImage(input, "ok.mdx")).toContain("d_logo");
+  });
 });
 
 describe("buildOgImages", () => {
@@ -270,7 +316,7 @@ describe("buildOgImages", () => {
 
 describe("postImageUrl", () => {
   const base: PostMeta = {
-    slug: "p" as Slug,
+    slug: "why-now" as Slug,
     title: "Why Now",
     date: "2026-05-04" as PostMeta["date"],
     summary: "x",
@@ -280,19 +326,18 @@ describe("postImageUrl", () => {
     readMin: 1,
   };
 
+  // Hardcoded, not built from BLOG_URL: an expectation derived from the same
+  // constant the implementation uses can't fail when that constant is wrong.
   it("falls back to the extensionless file-convention URL when no override", () => {
-    expect(postImageUrl(base, "https://decdn.org/blog/why-now/")).toBe(
+    expect(postImageUrl(base)).toBe(
       "https://decdn.org/blog/why-now/opengraph-image",
     );
   });
 
   it("returns the override URL verbatim when image is set", () => {
-    expect(
-      postImageUrl(
-        { ...base, image: "https://cdn.example/x.png" },
-        "https://decdn.org/blog/why-now/",
-      ),
-    ).toBe("https://cdn.example/x.png");
+    expect(postImageUrl({ ...base, image: "https://cdn.example/x.png" })).toBe(
+      "https://cdn.example/x.png",
+    );
   });
 });
 
@@ -334,6 +379,65 @@ describe("ogCardSlugs", () => {
         post("b", "https://cdn.example/b.png"),
       ]),
     ).toEqual([]);
+  });
+});
+
+describe("postUrl", () => {
+  // Spelled out rather than built from BLOG_URL: `expect(url).toBe(
+  // `${BLOG_URL}why-now/`)` restates the implementation, so it would still
+  // pass if BLOG_URL itself lost its trailing slash and postUrl started
+  // returning `https://decdn.org/blogwhy-now/`. Guards the failure mode the
+  // #199 hoist made single-sourced: a dropped slash corrupts every
+  // url-derived field of the shared node at once.
+  it("builds the canonical post URL with exactly one trailing slash", () => {
+    expect(postUrl("why-now" as Slug)).toBe("https://decdn.org/blog/why-now/");
+  });
+
+  it("agrees with BLOG_URL, which the sitemap and index links also use", () => {
+    expect(postUrl("why-now" as Slug)).toBe(`${BLOG_URL}why-now/`);
+  });
+});
+
+describe("blogPostingNode", () => {
+  const base: PostMeta = {
+    slug: "why-now" as Slug,
+    title: "Why Now",
+    date: "2026-05-04" as PostMeta["date"],
+    summary: "x",
+    pinned: false,
+    seriesNumber: 1,
+    words: 100,
+    readMin: 1,
+  };
+
+  it("keys @id, url, image and mainEntityOfPage off the single postUrl source", () => {
+    const node = blogPostingNode(base);
+    const url = postUrl(base.slug);
+    expect(node.url).toBe(url);
+    expect(node["@id"]).toBe(`${url}#post`);
+    expect(node.mainEntityOfPage).toBe(url);
+    // Same source the index and post page must agree on for this @id.
+    expect(node.image).toBe(postImageUrl(base));
+  });
+
+  // `keywords: post.tags?.join(", ")` must stay absent — not `""` — when a post
+  // has no tags, or every untagged post ships an empty schema.org field.
+  it("omits keywords entirely when the post has no tags", () => {
+    expect(JSON.stringify(blogPostingNode(base))).not.toContain("keywords");
+  });
+
+  it("carries a full, self-contained JSON-LD shape", () => {
+    const node = blogPostingNode({ ...base, tags: ["a", "b"] });
+    expect(node["@context"]).toBe("https://schema.org");
+    expect(node["@type"]).toBe("BlogPosting");
+    expect(node.headline).toBe(base.title);
+    expect(node.description).toBe(base.summary);
+    expect(node.keywords).toBe("a, b");
+    expect(node.wordCount).toBe(base.words);
+    expect(node.datePublished).toBe(base.date);
+    expect(node.dateModified).toBe(base.date);
+    expect(node.author).toEqual({ "@id": ORG_ID });
+    expect(node.publisher).toEqual({ "@id": ORG_ID });
   });
 });
 

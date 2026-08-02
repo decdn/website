@@ -29,5 +29,10 @@ jobs:
       # checked — one had a type error on main.
       - run: pnpm typecheck
       - run: pnpm test
-      # Also runs scripts/check-out.mjs against the export.
+      # `pnpm build` chains both export guards itself (check-out.mjs, then
+      # check-og-image.mjs) — that is what makes them cover Cloudflare Pages,
+      # which runs its own build and never sees this workflow. The social-card
+      # guard is repeated as an explicit step so unchaining it from `build`
+      # can't take it out of CI silently.
       - run: pnpm build
+      - run: pnpm check:og-image
