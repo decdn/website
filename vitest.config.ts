@@ -1,16 +1,22 @@
+import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
+const root = fileURLToPath(new URL(".", import.meta.url));
+
 export default defineConfig({
-  // Resolve the `@/*` alias from tsconfig.json so tests (and the modules they
-  // import) can use `@/lib/...` instead of relative paths. Two suites depend on
-  // it: `lib/legal.test.ts` (whose subject imports `@/lib/metadata`) and
-  // `app/blog/jsonld.test.ts`, which renders route components that import
-  // `@/lib/...` — that is what makes anything under app/ unit-testable.
+  // Mirrors the `@/*` → project-root mapping in tsconfig.json. Without it a
+  // test can only reach modules that import relatively, which rules out the
+  // route handlers and section components — every one of them imports
+  // `@/lib/...`.
   //
-  // Native to the vite bundled with vitest, so no `vite-tsconfig-paths` plugin
-  // is needed. Marked `@experimental` in vite 8's types, so re-check it on the
-  // next major upgrade rather than assuming the plugin is still redundant.
-  resolve: { tsconfigPaths: true },
+  // Anchored on `@/` rather than bare `@`: a bare prefix also matches scoped
+  // package names, so a future `@scope/pkg` import would be rewritten to
+  // `<root>scope/pkg`. Resolving to the same absolute path the relative
+  // specifiers produce keeps each module a single instance, so a module reached
+  // both ways yields one set of exports rather than two.
+  resolve: {
+    alias: [{ find: /^@\//, replacement: root }],
+  },
   test: {
     include: ["**/*.test.ts"],
     // `.claude/worktrees/**` holds full checkouts (with their own

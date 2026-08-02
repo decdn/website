@@ -39,6 +39,11 @@ jobs:
         run: pnpm exec prettier --check "docs/**/*.{md,mdx,json}"
       - name: markdownlint
         run: pnpm exec markdownlint-cli2
+      # `website.yml` has `paths-ignore: docs/**`, so a docs-only change never
+      # runs the suite there. `docs/canonical-host.js` is the one piece of
+      # executable code under `docs/` and it has a test, so run vitest here too.
+      - name: Tests
+        run: pnpm test
       - name: Mintlify broken-link check
         working-directory: docs
         run: npx -y mintlify@4.2.555 broken-links

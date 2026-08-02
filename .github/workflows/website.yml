@@ -25,10 +25,14 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm lint
       - run: pnpm format:check
+      # `next build` only typechecks what it bundles, so test files were never
+      # checked — one had a type error on main.
+      - run: pnpm typecheck
       - run: pnpm test
-      # `pnpm build` already runs the social-card guard via its `postbuild`
-      # script — that is what makes it cover Cloudflare Pages, which runs its
-      # own build and never sees this workflow. Kept as an explicit step so
-      # dropping `postbuild` can't take the guard out of CI silently.
+      # `pnpm build` chains both export guards itself (check-out.mjs, then
+      # check-og-image.mjs) — that is what makes them cover Cloudflare Pages,
+      # which runs its own build and never sees this workflow. The social-card
+      # guard is repeated as an explicit step so unchaining it from `build`
+      # can't take it out of CI silently.
       - run: pnpm build
       - run: pnpm check:og-image

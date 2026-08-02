@@ -1,4 +1,6 @@
 import { EMAIL, links } from "@/lib/links";
+import { CONTACT_LEAD } from "@/lib/copy";
+import { highlightBrand } from "@/components/ui/brand";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { FleetStatus } from "@/components/site/FleetStatus";
@@ -105,9 +107,7 @@ export function Contact() {
             style={{ "--reveal-delay": "120ms" }}
             className="max-w-[64ch] text-body leading-[1.7]"
           >
-            the network is open. so is our inbox. write us with questions,
-            partnerships, or anything you&apos;d run on a fleet of idle
-            machines. we read everything.
+            {highlightBrand(CONTACT_LEAD)}
           </p>
 
           <div

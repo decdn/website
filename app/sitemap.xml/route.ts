@@ -1,4 +1,4 @@
-import { SITE_URL, links } from "@/lib/links";
+import { DOCS_ORIGIN, SITE_URL } from "@/lib/links";
 
 // Required by Next 16 under `output: "export"` for route handlers that emit
 // static files at build time. GET-only is the only verb supported in export.
@@ -6,7 +6,7 @@ export const dynamic = "force-static";
 
 // Cross-host sitemap entries are only honored by Google when both hosts are
 // verified in Search Console.
-const DOCS_SITEMAP = `${new URL(links.docs).origin}/sitemap.xml`;
+const DOCS_SITEMAP = `${DOCS_ORIGIN}/sitemap.xml`;
 
 const BODY = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

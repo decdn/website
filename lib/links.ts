@@ -26,11 +26,24 @@ export const SITE_URL = new URL("/", links.site).toString();
 // `author` field so the structured-data graph joins correctly.
 export const ORG_ID = `${SITE_URL}#organization`;
 
+// Stable @ids for the WebSite and Service nodes. They sit beside ORG_ID
+// rather than in the route that renders them because other modules join on
+// them — `isPartOf: { "@id": SITE_ID }` on every legal page, for one — and an
+// @id that disagrees with the origin it is built from breaks the graph
+// silently.
+export const SITE_ID = `${SITE_URL}#website`;
+export const SERVICE_ID = `${SITE_URL}#service`;
+
 // Trailing-slash blog base, paired with SITE_URL so callers can concat
-// `${BLOG_URL}${slug}/` (post URL) and `${BLOG_URL}#blog` (stable @id)
-// without re-deriving the path. Must agree with `next.config.ts`'s
-// `trailingSlash: true` and `links.blog`.
+// `${BLOG_URL}#blog` (stable @id) without re-deriving the path. Must agree
+// with `next.config.ts`'s `trailingSlash: true` and `links.blog`. For a post's
+// own URL use `postUrl` in lib/blog.ts rather than concatenating here.
 export const BLOG_URL = `${SITE_URL}blog/`;
+
+// `links.docs` is a deep link into the docs product, so every consumer that
+// wants the host has to strip the path. Three did it independently
+// (app/sitemap.xml, app/llms.txt, app/llms-full.txt); derive it once.
+export const DOCS_ORIGIN = new URL(links.docs).origin;
 
 // Twitter expects an `@handle`; derive from the X profile URL so the X
 // account is the single source of truth.

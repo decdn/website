@@ -18,7 +18,7 @@ import {
   seriesLabel,
 } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
-import { BLOG_URL, SITE_URL } from "@/lib/links";
+import { BLOG_CRUMB, breadcrumbNode, HOME_CRUMB } from "@/lib/schema";
 import { OG_SITE, TWITTER_SITE } from "@/lib/metadata";
 
 // Static export: enumerate every slug at build time and refuse anything
@@ -91,25 +91,16 @@ export default async function BlogPost({
   const tags = post.tags ?? [];
   const minutes = readLabel(post.readMin);
 
-  // BlogPosting assembly is shared with the blog index via `blogPostingNode`
-  // (lib/blog.ts) so the two can't diverge under the same `@id`.
+  // BlogPosting assembly is shared with the blog index's `Blog` graph via
+  // `blogPostingNode` (lib/blog.ts) so the two can't diverge under the same
+  // `@id`.
   const url = postUrl(post.slug);
   const postingSchema = blogPostingNode(post);
-  const breadcrumbSchema = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    "@id": `${url}#breadcrumbs`,
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: SITE_URL },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: "Blog",
-        item: BLOG_URL,
-      },
-      { "@type": "ListItem", position: 3, name: post.title, item: url },
-    ],
-  };
+  const breadcrumbSchema = breadcrumbNode(`${url}#breadcrumbs`, [
+    HOME_CRUMB,
+    BLOG_CRUMB,
+    { name: post.title, item: url },
+  ]);
 
   return (
     <main>

@@ -1,8 +1,16 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { notFound } from "next/navigation";
 import { LegalDoc } from "@/components/ui/LegalDoc";
-import { LEGAL_SLUGS, legalMetadata, type LegalSlug } from "@/lib/legal";
+import { JsonLd } from "@/lib/jsonld";
+import {
+  getLegalDoc,
+  LEGAL_SLUGS,
+  legalMetadata,
+  legalUrl,
+  type LegalSlug,
+} from "@/lib/legal";
 import { inheritedOgImages } from "@/lib/metadata";
+import { breadcrumbNode, HOME_CRUMB, legalWebPageNode } from "@/lib/schema";
 
 // Static export: enumerate every legal doc at build time and refuse anything
 // outside that set, mirroring the closed-world nature of `output: "export"`
@@ -41,5 +49,18 @@ export default async function LegalPage({
   const { doc } = await params;
   const slug = parseDoc(doc);
   if (!slug) notFound();
-  return <LegalDoc slug={slug} />;
+  const legal = getLegalDoc(slug);
+  const url = legalUrl(slug);
+  return (
+    <>
+      <JsonLd data={legalWebPageNode(legal)} />
+      <JsonLd
+        data={breadcrumbNode(`${url}#breadcrumbs`, [
+          HOME_CRUMB,
+          { name: legal.title, item: url },
+        ])}
+      />
+      <LegalDoc slug={slug} />
+    </>
+  );
 }

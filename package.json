@@ -8,14 +8,15 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "postbuild": "pnpm check:og-image",
+    "build": "next build && pnpm check:out && pnpm check:og-image",
+    "check:out": "node scripts/check-out.mjs",
     "start": "next start",
     "lint": "eslint",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
     "check:og-image": "node scripts/check-og-image.mjs",
+    "typecheck": "tsc --noEmit",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -32,7 +33,7 @@
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
-    "next": "16.2.9",
+    "next": "16.2.12",
     "next-mdx-remote": "^6.0.0",
     "react": "19.2.7",
     "react-dom": "19.2.7",

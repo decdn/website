@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist } from "next/font/google";
-import { links, SITE_URL, INDEXABLE, ORG_ID } from "@/lib/links";
+import { links, INDEXABLE, SITE_URL } from "@/lib/links";
+import { SITE_TITLE, SITE_DESCRIPTION } from "@/lib/copy";
+import { organizationNode, serviceNode, websiteNode } from "@/lib/schema";
 import { OG_SITE, TWITTER_SITE } from "@/lib/metadata";
 import { Chrome } from "@/components/site/Chrome";
 import { Footer } from "@/components/site/Footer";
@@ -14,75 +16,43 @@ const geistSans = Geist({
   weight: ["400", "500", "600", "700"],
 });
 
-const TITLE = "deCDN — decentralized CDN for bytes at scale";
-const DESCRIPTION =
-  "A decentralized CDN. Anyone can serve bytes; clients pay per megabyte in USDC. An open market that gets cheaper as it grows, at ~$0.01/GB, up to 90% below legacy CDN list pricing.";
-
 export const metadata: Metadata = {
   metadataBase: new URL(links.site),
   title: {
-    default: TITLE,
+    default: SITE_TITLE,
     template: "%s · deCDN",
   },
-  description: DESCRIPTION,
+  description: SITE_DESCRIPTION,
   applicationName: "deCDN",
   openGraph: {
     ...OG_SITE,
-    title: TITLE,
-    description: DESCRIPTION,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     url: "/",
     type: "website",
   },
   twitter: {
     ...TWITTER_SITE,
     card: "summary_large_image",
-    title: TITLE,
-    description: DESCRIPTION,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
   },
-  alternates: { canonical: "/" },
+  alternates: {
+    canonical: "/",
+    // Renders <link rel="alternate" type="text/plain" href=".../llms.txt">.
+    // It sits in the root layout so the site-level index is discoverable from
+    // the homepage. Routes that set their own `alternates` (app/blog/page.tsx,
+    // app/blog/[slug]/page.tsx, lib/legal.ts) replace the parent's wholesale
+    // under Next's shallow merge, exactly as they do for `openGraph` — that is
+    // accepted rather than threaded through every route.
+    types: { "text/plain": `${SITE_URL}llms.txt` },
+  },
   robots: { index: INDEXABLE, follow: INDEXABLE },
 };
 
 export const viewport: Viewport = {
   colorScheme: "light",
   themeColor: "#000000",
-};
-
-const SITE_ID = `${SITE_URL}#website`;
-const SERVICE_ID = `${SITE_URL}#service`;
-
-const organizationSchema = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "@id": ORG_ID,
-  name: "deCDN",
-  url: SITE_URL,
-  logo: `${SITE_URL}d_logo.png`,
-  description:
-    "Organization developing deCDN, a decentralized content delivery network with per-megabyte settlement in USDC.",
-  sameAs: [links.github, links.x, links.linkedin],
-};
-
-const websiteSchema = {
-  "@context": "https://schema.org",
-  "@type": "WebSite",
-  "@id": SITE_ID,
-  url: SITE_URL,
-  name: "deCDN",
-  description: DESCRIPTION,
-  publisher: { "@id": ORG_ID },
-};
-
-const serviceSchema = {
-  "@context": "https://schema.org",
-  "@type": "Service",
-  "@id": SERVICE_ID,
-  name: "deCDN",
-  url: SITE_URL,
-  serviceType: "Content Delivery Network",
-  provider: { "@id": ORG_ID },
-  areaServed: "Worldwide",
-  description: DESCRIPTION,
 };
 
 export default function RootLayout({
@@ -96,7 +66,7 @@ export default function RootLayout({
       className={`${geistSans.variable} h-full motion-safe:scroll-smooth`}
     >
       <head>
-        {[organizationSchema, websiteSchema, serviceSchema].map((schema) => (
+        {[organizationNode, websiteNode, serviceNode].map((schema) => (
           <JsonLd key={schema["@id"]} data={schema} />
         ))}
       </head>
