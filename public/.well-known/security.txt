@@ -1,0 +1,12 @@
+# Security contact and release-signing key for decdn.org
+# See https://decdn.org/KEYS for the release-signing public key.
+
+Contact: mailto:security@decdn.org
+Encryption: https://decdn.org/KEYS
+Preferred-Languages: en
+Canonical: https://decdn.org/.well-known/security.txt
+Expires: 2027-08-06T14:45:25Z
+
+# Release-signing key (releases, tags, binaries, SBOM, image digest):
+#   decdn <security@decdn.org>
+#   Fingerprint: D015 6386 7CEE 34A3 6C44  736B 9BC3 D940 1928 D2B9
