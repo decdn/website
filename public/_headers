@@ -23,3 +23,9 @@
 # Pages headers preview. Revisit on a Next major bump.
 /blog/*/opengraph-image
   Content-Type: image/png
+
+# The release-signing public key has no file extension, so Cloudflare would
+# serve it as application/octet-stream and the global nosniff header would
+# force a download. Pin the registered armored-key type so it renders inline.
+/KEYS
+  Content-Type: application/pgp-keys
