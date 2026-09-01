@@ -65,7 +65,7 @@ describe("llms-full.txt shape", () => {
   });
 
   // The outline is the whole document's, not a mix of this route's headings
-  // and ten embedded documents' — that is what demoteHeadings buys, and it is
+  // and every embedded document's — that is what demoteHeadings buys, and it is
   // asserted against the *raw* body rather than `owned`, because the point is
   // that no embedded heading reaches these levels.
   it("has three sections and one entry per document, embedded bodies included", () => {
