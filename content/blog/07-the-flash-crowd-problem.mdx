@@ -17,7 +17,7 @@ Twitch never published a root cause, so the honest reading is a demand spike tha
 
 The shape has a name, and it is the hardest load a CDN can be handed.
 
-## why one object is worse than a million
+## Why one object is worse than a million
 
 A flash crowd is not "more traffic." Traffic you can grow into. A flash crowd is demand for **one object**, converging on **one moment**, at a multiple nobody can size in advance.
 
@@ -25,7 +25,7 @@ Everyone knew the premiere time. Nobody knew whether the answer was 2× a normal
 
 That makes conventional CDN capacity a bet. You provision headroom, you pay rent on it through the eleven months nothing happens, and if you bet low you find out at the exact minute it matters. Both sides of the bet cost money: egress overage when you guess high, an outage when you guess low.
 
-## how decdn absorbs it
+## How decdn absorbs it
 
 Here is the part worth sitting with. On decdn, the thing that makes a flash crowd hard is the thing that makes it easy.
 
@@ -45,7 +45,7 @@ Now the part we will not dress up. None of this is elastic in the cloud sense. *
 
 So the architecture does not change how fast new machines arrive. It changes how many of the machines already there can answer any given request, and during a flash crowd that number climbs while the crowd is still showing up.
 
-## what it costs
+## What it costs
 
 $0.01/GB, per byte delivered. No commitment, no egress tier, no minimum. That runs 7–20× below the major traditional CDNs.
 
@@ -53,7 +53,7 @@ The rate is the boring half. The shape of the bill is the interesting half: **a 
 
 One cost does bite, and it deserves naming. Origin egress. A node backed by S3 pays $0.09/GB to fetch what it lacks and loses money on every miss at market rate. A node backed by a zero-egress origin such as R2, B2 or Wasabi does not. Under a flash crowd, that single line drives most of the economics.
 
-## the part where we do not oversell it
+## The part where we do not oversell it
 
 decdn did not keep Twitch online on August 27. We were not in the path, the outage was not ours to fix, and the network runs on a public testnet rather than as a production service with a track record under four million concurrent anything. Anyone telling you their decentralized network would have rescued a platform it has never carried a byte for is selling something.
 
