@@ -1,0 +1,66 @@
+---
+title: "The Flash Crowd Problem"
+slug: the-flash-crowd-problem
+date: 2026-09-01
+summary: "Why a flash crowd, millions wanting one object at one moment, is the hardest load a CDN can take, and how content addressing turns every cache miss into a new server."
+bucket: pillar
+tags: [cdn, flash-crowd, economics, testnet]
+---
+
+Twitch went down on August 27 because too many people wanted to watch other people watch a video game trailer.
+
+That is the whole story, and it is a more serious one than it sounds.
+
+Rockstar put 26 minutes of Grand Theft Auto VI on Netflix at 3 p.m. ET. Netflix outage reports spiked past 3,000 at the premiere. An hour later Twitch, where the internet had gone to watch reactions, started throwing errors across web, chat and video, with more than 17,000 Downdetector reports behind it.
+
+Twitch never published a root cause, so the honest reading is a demand spike that outran the headroom someone had provisioned for it. Streams Charts put peak concurrent viewership across reaction streams at roughly 3.97 million, spread over 9,038 channels. That is a third-party estimate rather than an official count, and Netflix published no viewership figure at all. Treat it as a shape, not a measurement.
+
+The shape has a name, and it is the hardest load a CDN can be handed.
+
+## why one object is worse than a million
+
+A flash crowd is not "more traffic." Traffic you can grow into. A flash crowd is demand for **one object**, converging on **one moment**, at a multiple nobody can size in advance.
+
+Everyone knew the premiere time. Nobody knew whether the answer was 2× a normal Thursday or 40×.
+
+That makes conventional CDN capacity a bet. You provision headroom, you pay rent on it through the eleven months nothing happens, and if you bet low you find out at the exact minute it matters. Both sides of the bet cost money: egress overage when you guess high, an outage when you guess low.
+
+## how decdn absorbs it
+
+Here is the part worth sitting with. On decdn, the thing that makes a flash crowd hard is the thing that makes it easy.
+
+Every file carries the hash of its contents as its name, so any node holding those bytes is a valid source. No origin has to answer, no authoritative edge owns a URL, and nothing singular can drown. A client asking for a hash sends probes and takes the best replies, capped at a 500 ms collection window, and it exits early as soon as enough holders answer.
+
+Three mechanisms then compound, and demand strengthens every one of them.
+
+**Every cache miss builds a new server.** A node that lacks the bytes pulls them from a peer and pays for the pull, and that operator-to-operator settlement takes the same fee split as any other delivery. The puller keeps the copy. A miss is not a cost to absorb. It is replication somebody already paid for.
+
+**Nodes advertise before they finish downloading.** A node publishes to the discovery layer as soon as it holds a single verified 64 MiB block, and the record carries a bitmap naming exactly which ranges it has. It becomes a source partway through becoming a copy. The second wave of requests has more places to go than the first did, and the third has more than the second.
+
+**The hottest object is the hardest to evict.** A probe pins the blob against cache eviction for 35 seconds, and one hold covers every peer asking for the same hash. Under a flash crowd, the file everyone wants becomes the file least likely to get dropped. Least-recently-used eviction does the opposite to you when a cache comes under pressure.
+
+The network fails sideways rather than downward. A saturated node does not queue you behind the crowd. It returns a signed overload response and sends you elsewhere. The client carries three attempts per file and spends them on three different machines. Large files pull from up to four holders at once. One QUIC connection to a peer carries up to 100 concurrent streams instead of 100 handshakes.
+
+Now the part we will not dress up. None of this is elastic in the cloud sense. **No protocol actor adds capacity when load rises.** decdn has no autoscaler. Capacity comes from operators who bonded ahead of time against the bandwidth they declare, and an operator sitting on spare capacity raises that declaration with a bond top-up and a single transaction, with no waiting period on the way in, on a chain with sub-second blocks. Each implementation decides what a node does when it genuinely saturates, meaning which requests it takes and which it turns away. The protocol does not fix that.
+
+So the architecture does not change how fast new machines arrive. It changes how many of the machines already there can answer any given request, and during a flash crowd that number climbs while the crowd is still showing up.
+
+## what it costs
+
+$0.01/GB, per byte delivered. No commitment, no egress tier, no minimum. That runs 7–20× below the major traditional CDNs.
+
+The rate is the boring half. The shape of the bill is the interesting half: **a spike costs exactly what it moves.** You rent no headroom through the quiet months and hit no overage cliff in the loud hour. For the operators serving it, a spike is not a cost centre at all. It is the best revenue day of the quarter, and it lands on whoever cached the right object first.
+
+One cost does bite, and it deserves naming. Origin egress. A node backed by S3 pays $0.09/GB to fetch what it lacks and loses money on every miss at market rate. A node backed by a zero-egress origin such as R2, B2 or Wasabi does not. Under a flash crowd, that single line drives most of the economics.
+
+## the part where we do not oversell it
+
+decdn did not keep Twitch online on August 27. We were not in the path, the outage was not ours to fix, and the network runs on a public testnet rather than as a production service with a track record under four million concurrent anything. Anyone telling you their decentralized network would have rescued a platform it has never carried a byte for is selling something.
+
+We make a smaller claim, and we would argue a more durable one. Twitch's bad afternoon came down to a very large number of people wanting one thing at one time. An architecture built around a fixed set of edges has to guess that number in advance and eat the difference. An architecture where every delivery leaves a copy behind, and every copy becomes a source, grows incrementally more capable each time someone asks it for something.
+
+That promises nothing about uptime. It describes which way the system leans when demand goes vertical.
+
+---
+
+_Outage details are public reporting: Newsweek on the Twitch outage and Downdetector figures (August 27, 2026), Ynetnews on Netflix outage reports, Inven Global on the Streams Charts concurrent-viewership estimate, and Engadget and the Rockstar Newswire on the premiere schedule. Twitch has not published a root cause._
