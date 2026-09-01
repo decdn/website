@@ -444,6 +444,16 @@ describe("blogPostingNode", () => {
 describe("listPosts metadata", () => {
   const posts = listPosts();
 
+  // A floor, not an exact count: publishing a post must not break this, but
+  // losing one silently must. `draft: true` and the `.mdx` filename filter both
+  // drop an entry with no error, and every consumer counts what the loader
+  // returns — app/llms-full.txt derives its expected entry count from
+  // listPosts() on both sides, and the series assertions below renumber the
+  // survivors 1..N because seriesNumber is positional. Nothing else fails.
+  it("loads every published post", () => {
+    expect(posts.length).toBeGreaterThanOrEqual(7);
+  });
+
   it("derives a positive word count and reading time per post", () => {
     expect(posts.length).toBeGreaterThan(0);
     for (const p of posts) {

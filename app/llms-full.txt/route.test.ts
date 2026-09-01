@@ -35,6 +35,18 @@ const EMBEDDED = [
 ];
 const owned = EMBEDDED.reduce((doc, text) => doc.replace(text, ""), body);
 
+// The only `### ` entries this route writes literally: every other one is
+// generated from listPosts() or LEGAL_SLUGS. Spelling these out — and nothing
+// else — is what lets the entry count below be derived rather than a magic
+// number that goes stale the next time a post is published.
+const HOMEPAGE_SUBSECTIONS = [
+  "### Intro",
+  "### Side by side",
+  "### How it works",
+  "### FAQ",
+  "### Contact",
+];
+
 describe("llms-full.txt shape", () => {
   it("serves plain text", () => {
     expect(response.headers.get("Content-Type")).toBe(
@@ -53,17 +65,28 @@ describe("llms-full.txt shape", () => {
   });
 
   // The outline is the whole document's, not a mix of this route's headings
-  // and ten embedded documents' — that is what demoteHeadings buys, and it is
+  // and every embedded document's — that is what demoteHeadings buys, and it is
   // asserted against the *raw* body rather than `owned`, because the point is
   // that no embedded heading reaches these levels.
-  it("has three sections and fifteen entries, embedded bodies included", () => {
+  it("has three sections and one entry per document, embedded bodies included", () => {
     expect(lines.filter((line) => line.startsWith("## "))).toEqual([
       "## Homepage",
       "## Field notes",
       "## Legal",
     ]);
-    // 5 homepage subsections + 7 posts + 3 legal documents.
-    expect(lines.filter((line) => line.startsWith("### "))).toHaveLength(15);
+    // The homepage's own entries are pinned by name, not by count, so this
+    // still catches one being dropped or duplicated; the posts and the legal
+    // documents are counted from the loaders that generate them.
+    const homepage = lines.slice(
+      lines.indexOf("## Homepage"),
+      lines.indexOf("## Field notes"),
+    );
+    expect(homepage.filter((line) => line.startsWith("### "))).toEqual(
+      HOMEPAGE_SUBSECTIONS,
+    );
+    expect(lines.filter((line) => line.startsWith("### "))).toHaveLength(
+      HOMEPAGE_SUBSECTIONS.length + listPosts().length + LEGAL_SLUGS.length,
+    );
   });
 
   // The specific inversion this prevents: every legal document uses `## ` for
