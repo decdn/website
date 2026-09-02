@@ -2,7 +2,7 @@
 title: "The Flash Crowd Problem"
 slug: the-flash-crowd-problem
 date: 2026-09-02
-summary: "Why a flash crowd, millions wanting one object at one moment, is the hardest load a CDN can take, and how content addressing turns every cache miss into a new server."
+summary: "A flash crowd is demand for one object at one moment, at a multiple nobody can size in advance. Why that shape breaks provisioned capacity, what it costs on decdn, and who actually has this problem at a size we can take."
 bucket: pillar
 tags: [cdn, flash-crowd, economics, testnet]
 ---
@@ -11,7 +11,9 @@ Twitch went down on August 27 because too many people wanted to watch other peop
 
 Rockstar put 26 minutes of Grand Theft Auto VI on Netflix at 3 p.m. ET. Netflix outage reports spiked past 3,000 at the premiere. An hour later Twitch, where the internet had gone to watch reactions, started throwing errors across web, chat and video, with more than 17,000 Downdetector reports behind it.
 
-Twitch never published a root cause, so the honest reading is a demand spike that outran the headroom someone had provisioned for it. Streams Charts put peak concurrent viewership across reaction streams at roughly 3.97 million, spread over 9,038 channels. That is a third-party estimate rather than an official count, and Netflix published no viewership figure at all. Treat it as a shape, not a measurement.
+Twitch never published a root cause, so the honest reading is a demand spike that outran the headroom someone had provisioned for it. Streams Charts put peak concurrent viewership across reaction streams at roughly 3.97 million, spread over 9,038 channels.
+
+There is a name for this: the flash crowd.
 
 ## Why one object is worse than a million
 
@@ -21,40 +23,50 @@ Everyone knew the premiere time. Nobody knew whether the answer was 2× a normal
 
 That makes conventional CDN capacity a bet. You provision headroom, you pay rent on it through the eleven months nothing happens, and if you bet low you find out at the exact minute it matters. Both sides of the bet cost money: egress overage when you guess high, an outage when you guess low.
 
-## How decdn absorbs it
+## Whose problem this actually is
 
-Every file carries the hash of its contents as its name, so any node holding those bytes is a valid source. No origin has to answer, no authoritative edge owns a URL, and nothing singular can drown. A client asking for a hash sends probes and takes the best replies, capped at a 500 ms collection window, and it exits early as soon as enough holders answer.
+Not Twitch's. Yours, if you have ever shipped something on a date.
 
-Three mechanisms then compound, and demand strengthens every one of them.
+The shape is ordinary. It lands on much smaller teams, far more often, every time something big ships: a game patch, a Linux ISO, a model release, a dataset everyone wants the week it drops. Mirrors buckle, CDNs rate-limit, and a small team burns tens of thousands of dollars hosting bytes it does not own.
 
-**Every cache miss builds a new server.** A node that lacks the bytes pulls them from a peer and pays for the pull, and that operator-to-operator settlement takes the same fee split as any other delivery. The puller keeps the copy. A miss is not a cost to absorb. It is replication somebody already paid for.
-
-**Nodes advertise before they finish downloading.** A node publishes to the discovery layer as soon as it holds a single verified 64 MiB block, and the record carries a bitmap naming exactly which ranges it has. It becomes a source partway through becoming a copy. The second wave of requests has more places to go than the first did, and the third has more than the second.
-
-**The hottest object is the hardest to evict.** A probe pins the blob against cache eviction for 35 seconds, and one hold covers every peer asking for the same hash. Under a flash crowd, the file everyone wants becomes the file least likely to get dropped. Least-recently-used eviction does the opposite to you when a cache comes under pressure.
-
-The network fails sideways rather than downward. A saturated node does not queue you behind the crowd. It returns a signed overload response and sends you elsewhere. The client carries three attempts per file and spends them on three different machines. Large files pull from up to four holders at once. One QUIC connection to a peer carries up to 100 concurrent streams instead of 100 handshakes.
-
-None of this is elastic in the cloud sense. **No protocol actor adds capacity when load rises.** decdn has no autoscaler. Capacity comes from operators who bonded ahead of time against the bandwidth they declare, and an operator sitting on spare capacity raises that declaration with a bond top-up and an immediate re-declaration, with no waiting period on the way in, on a chain with sub-second blocks. Each implementation decides what a node does when it genuinely saturates, meaning which requests it takes and which it turns away. The protocol does not fix that.
-
-So the architecture does not change how fast new machines arrive. It changes how many of the machines already there can answer any given request, and during a flash crowd that number climbs while the crowd is still showing up.
+Those teams have Twitch's bet with none of Twitch's budget. A launch day is a known date and an unknown multiple, and the conventional answer is to sign an annual commitment sized for a spike that happens twice a year. That is the customer this post is about: the same 40× question, asked of a much smaller baseline, on a date they already have in the calendar.
 
 ## What it costs
 
 $0.01/GB, per byte delivered. No commitment, no egress tier, no minimum. That runs 7–20× below the major traditional CDNs.
 
-**A spike costs exactly what it moves.** You rent no headroom through the quiet months and hit no overage cliff in the loud hour. For the operators serving it, a spike is not a cost centre at all. It is the best revenue day of the quarter, and it lands on whoever cached the right object first.
+**A spike costs exactly what it moves.** You rent no headroom through the quiet months and hit no overage cliff in the loud hour. For the operators serving it, a spike is not a cost centre at all. It is [the best revenue day of the quarter](/blog/show-me-the-money/), and it lands on whoever cached the right object first.
 
-One cost does bite: origin egress. A node backed by S3 pays $0.09/GB to fetch what it lacks and loses money on every miss at market rate. A node backed by a zero-egress origin such as R2, B2 or Wasabi does not. Under a flash crowd, that single line drives most of the economics.
+Origin egress is the one cost the crowd does not multiply. The first fetch of a cold object comes from [your origin](/blog/we-dont-store-we-serve/) at market rate. After that, the object is in the network: the next node pulls from a peer rather than the origin, and once a copy exists nearby, requests in that locale stop reaching back for it at all. The larger the flash crowd, the more deliveries that one origin fetch is spread across.
 
-## The part where we do not oversell it
+## Why that price survives the spike
 
-decdn did not keep Twitch online on August 27. We were not in the path, the outage was not ours to fix, and the network runs on a public testnet rather than as a production service with a track record under four million concurrent anything. Anyone telling you their decentralized network would have rescued a platform it has never carried a byte for is selling something.
+Any node holding the bytes is a valid source. No origin has to answer, no authoritative edge owns a URL, and nothing singular can drown. A client asking for a file sends probes and takes the best replies, and it starts pulling the file as soon as enough holders answer.
 
-Twitch's bad afternoon came down to a very large number of people wanting one thing at one time. An architecture built around a fixed set of edges has to guess that number in advance and eat the difference. An architecture where every delivery leaves a copy behind, and every copy becomes a source, grows incrementally more capable each time someone asks it for something.
+Three mechanisms then compound, and demand strengthens every one of them.
 
-That promises nothing about uptime. It describes which way the system leans when demand goes vertical.
+**Every cache miss builds a new server.** A node that lacks the bytes pulls them from a peer and pays for the pull. The puller keeps the copy. A miss is not a cost to absorb. It is replication somebody already paid for.
+
+**Nodes advertise before they finish downloading.** A node publishes to the discovery layer as soon as it holds a single verified 64 MiB block. It becomes a source partway through becoming a copy. The second wave of requests has more places to go than the first did, and the third has more than the second.
+
+**The hottest object is the hardest to evict.** A probe pins the blob against cache eviction for 35 seconds, and one hold covers every peer asking for the same hash. Under a flash crowd, the file everyone wants becomes the file least likely to get dropped.
+
+**The network fails sideways rather than downward.** A saturated node does not queue you behind the crowd. Load-shedding is explicit: it returns a signed overload response and sends you elsewhere. The client tries to pull from different machines rather than waiting.
+
+**Capacity is permissionless, and the door has no queue at it.** An operator can bond and serve immediately, with no activation delay. One already registered and sitting on spare bandwidth can raise their declaration in a second. Leaving is the slow direction, not joining, because bond takes 14 days to withdraw, so supply that shows up is committed supply. The bond curve is super-linear on purpose, which means the cheap way to add capacity is more operators rather than a bigger one. Because every file is addressed by its hash, a machine is fungible the moment it arrives: no point of presence to configure, no origin affinity, no content to pre-place.
+
+There are two clocks. On the minutes a flash crowd actually lasts, what answers is the fleet that was already bonded, and what changes is how many of those machines can serve any given request, which climbs while the crowd is still showing up. On the longer clock, adding supply ahead of time is a simpler decision, and can be done in minutes, rather than a procurement cycle, and the spike itself is the signal that pays for it. Both of them beat guessing a number eleven months in advance.
+
+## Where this actually stands
+
+decdn runs on a [public testnet](/blog/road-to-testnet/), and it has no track record under four million concurrent anything.
+
+The claim is smaller and we would argue more durable. An architecture built around a fixed set of edges has to guess the multiple in advance and eat the difference either way. A decentralized architecture where every delivery leaves a copy behind, and every copy becomes a source, grows incrementally more capable each time someone asks it for something.
+
+That is not a promise about uptime. It describes which way the system leans when demand goes vertical.
+
+If you are shipping something big and you already know the date, that is the traffic we want on the testnet, and we would like to hear about it before the day rather than after. Write to us at [info@decdn.org](mailto:info@decdn.org).
 
 ---
 
-_Outage details are public reporting: Newsweek on the Twitch outage and Downdetector figures (August 27, 2026), Ynetnews on Netflix outage reports, Inven Global on the Streams Charts concurrent-viewership estimate, and Engadget and the Rockstar Newswire on the premiere schedule. Twitch has not published a root cause._
+_Outage details are public reporting: [Newsweek](https://www.newsweek.com/twitch-down-app-not-working-streaming-gta-vi-12377595) on the Twitch outage and Downdetector figures (August 27, 2026), [Ynetnews](https://www.ynetnews.com/tech-and-digital/article/bklysbadfl) on Netflix outage reports, [Inven Global](https://www.invenglobal.com/articles/25362/gta6-tops-netflix-draws-397-million-concurrent-viewers) on the Streams Charts concurrent-viewership estimate, and the [Rockstar Newswire](https://www.rockstargames.com/newswire/article/9k2kaa1o3297k9/grand-theft-auto-vi-an-extended-look) on the premiere schedule. Twitch has not published a root cause._

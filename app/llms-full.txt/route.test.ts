@@ -62,8 +62,8 @@ describe("llms-full.txt shape", () => {
       "## Field notes",
       "## Legal",
     ]);
-    // 5 homepage subsections + 7 posts + 3 legal documents.
-    expect(lines.filter((line) => line.startsWith("### "))).toHaveLength(15);
+    // 5 homepage subsections + 8 posts + 3 legal documents.
+    expect(lines.filter((line) => line.startsWith("### "))).toHaveLength(16);
   });
 
   // The specific inversion this prevents: every legal document uses `## ` for
