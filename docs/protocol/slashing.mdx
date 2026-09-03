@@ -14,14 +14,14 @@ Every probe and stream response carries a mandatory signature over its security-
 
 ## What is not slashable
 
-- **Corrupted delivery.** Absorbed at the wire: the client verifies each chunk group as it arrives and signs no voucher for a corrupt window, so the node ships garbage unpaid. There is no on-chain path.
+- **Corrupted delivery.** Absorbed at the wire: the payer verifies each chunk group as it arrives and pays only behind verification — it withholds the preimage that would meter a corrupt chunk, and signs no voucher covering it. The node ships garbage unpaid, and its local reputation drops. There is no on-chain path.
 - **Refusing to serve.** A node may decline any request — for price, capacity, or policy reasons. The client re-routes to another provider and pays only a latency cost.
 
 ## Commit–reveal challenges
 
 Submitting evidence is a two-phase flow: a `commitChallenge` registers an opaque commitment that moves no funds, and the reveal resolves synchronously once the commitment matures.
 
-The phases exist because the reveal must disclose the full evidence — the signed responses themselves — in its calldata. Without a prior commitment, a mempool watcher could copy a pending honest challenge, resubmit it under its own address, and capture the challenger reward. The bond round-trips either way, so only the reward is at risk; but that reward is the entire incentive for off-path witnesses, so leaving it extractable would hollow out enforcement.
+The phases exist because the reveal must disclose the full evidence — the signed responses themselves — in its calldata. Without a prior commitment, a mempool watcher could copy a pending honest challenge, resubmit it under its own address, and capture the challenger reward. The bond is never what's at stake here — it is returned on a successful challenge and never transferred at all on a failed one — so the reward is the whole exposure, and it is also the entire incentive for off-path witnesses. Leaving it extractable would hollow out enforcement.
 
 ## Evidence staleness
 
