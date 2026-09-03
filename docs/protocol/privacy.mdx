@@ -9,28 +9,30 @@ Privacy is treated as an **accountability-first** design: probes are public, on-
 
 ## Adversary model (four tiers)
 
-| Tier                        | Example adversary                                   | What they can observe                                                  |
-| --------------------------- | --------------------------------------------------- | ---------------------------------------------------------------------- |
-| **Passive observer**        | On-path network middlebox                           | QUIC metadata (IPs, SNI unless ECH is deployed), timing, volume        |
-| **Active participant**      | Malicious node or client                            | Probes, stream requests, payment pool opens and redemptions            |
-| **Infrastructure operator** | L2 RPC provider, relay host                         | On-chain events at read time; relay endpoints see encrypted QUIC flows |
-| **Compromised endpoint**    | Malicious origin or content-provider infrastructure | Plaintext bytes, client subscription identity                          |
+Each tier subsumes the one above it.
+
+| Tier                        | Example adversary                                | What they can observe                                                                             |
+| --------------------------- | ------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| **Passive observer**        | ISP, blockchain analytics firm                   | QUIC connection metadata (IP pairs, timing, volume), the negotiated ALPN, and everything on-chain |
+| **Active participant**      | Competing CDN, curious node operator, researcher | Plus: probes it receives, stream requests, and the probe responses it collects                    |
+| **Infrastructure operator** | RPC provider, relay host                         | Plus: which registry and blacklist queries a client makes, and IP pairs on relayed connections    |
+| **Compromised endpoint**    | Device theft, malware, warrant                   | Plus: memory and disk on that one machine — including the network key, unencrypted today          |
 
 ## Privacy surfaces
 
 The protocol inventories its distinct privacy surfaces with explicit dispositions (accept or mitigate). Highlights:
 
 - **On-chain settlement volume leakage.** Anyone can read pool deposits and per-node redemptions on-chain. Accepted: auditable settlement is what makes the payment layer trustless.
-- **Signed protocol messages as non-repudiable content commitments.** A node that signs an availability response has provably committed to serving that hash. Accepted: the same signature is what enables on-chain accountability.
-- **Probe traffic.** Who probes what is visible to the probed node. Accepted: selection depends on probing; fully private probing would require PIR at O(log N) blow-up.
+- **Signed protocol messages as a content inventory.** A signed availability response is non-repudiable proof that the node held (or did not hold) a specific hash at a specific time, and accumulated signatures build a verifiable inventory. Accepted: the same signature is what enables on-chain accountability.
+- **Probe traffic.** Who probes what is visible to every candidate probed, not just the one selected. Accepted: the delivering node must learn the hash regardless, so hiding the request from the others adds bandwidth without changing the underlying property.
 - **Registry enumeration.** Anyone can read the active set and each node's self-reported region and addresses. Accepted: an enumerable, slashable operator set is the point.
 
 ## Mitigations
 
 Both are pre-mainnet commitments:
 
-1. **Client key encryption via platform keychain.** Clients store Ethereum keys in macOS Keychain, Windows Credential Manager, or Gnome Keyring — not plaintext files.
-2. **Multi-source RPC.** Clients and nodes use multiple independent RPC providers to reduce single-vendor deanonymization surface.
+1. **Client key encryption via platform keychain.** The client's network key sits unencrypted on disk today. Production moves it into the macOS Keychain, Windows Credential Manager, or the Linux Secret Service. (The Ethereum key is already held in an encrypted keystore.)
+2. **Operational RPC guidance.** Document that clients and nodes should query through multiple independent RPC providers, or a self-hosted node, so no single vendor sees the whole query pattern.
 
 ## Assessed and not adopted
 
@@ -40,5 +42,5 @@ Both are pre-mainnet commitments:
 
 ## Scope clarifications
 
-- **Content plaintext** is a content-provider concern. If sensitivity requires it, the content provider encrypts before publishing.
-- **Client IP addresses** are visible to peers. Tor-style relaying is out of scope — adding a layer of indirection conflicts with the pay-per-byte accountability model.
+- **Content plaintext** is a content-provider concern, and application-level privacy is out of scope. If sensitivity requires it, the content provider encrypts before publishing.
+- **Client IP addresses** are visible to peers, and to a relay host on any relayed connection. Network-level anonymity is not a protocol goal.

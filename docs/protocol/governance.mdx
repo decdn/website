@@ -5,14 +5,15 @@ description: Voting weight is bytes actually delivered, not TOKEN held — a 4% 
 
 ## Decision
 
-OpenZeppelin Governor whose voting weight is an operator's **delivered bytes over a trailing window** — not TOKEN balance — with a **4% quorum** and a **2-day timelock**. All governable parameters have hardcoded safety bounds that governance cannot override. A **3-of-5 emergency multisig** can pause contracts, add emergency blacklist entries, decide slash appeals, and suspend a compromised regional governance body. Its sunset is **split by capability**: the protocol-wide `pause()` brake has a **12-month sunset** enforced via an immutable constructor deadline — governance cannot extend it; prolonging `pause()` past the deadline requires deploying a new contract version and migrating through the standard upgrade path. The narrow unlawful-content-removal power — emergency blacklisting — is **permanent**, discharging an ongoing legal-compliance duty the ~11-day governance takedown path cannot meet.
+OpenZeppelin Governor whose voting weight is an operator's **delivered bytes over a trailing window** — not TOKEN balance — with a **4% quorum** and a **2-day timelock**. All governable parameters have hardcoded safety bounds that governance cannot override. A **3-of-5 emergency multisig** can pause contracts, add emergency blacklist entries, decide slash appeals, and suspend a compromised regional governance body. Its sunset is **split by capability**: the protocol-wide `pause()` brake has a **12-month sunset** enforced via an immutable constructor deadline — governance cannot extend it; prolonging `pause()` past the deadline requires deploying a new contract version and migrating through the standard upgrade path. The narrow unlawful-content-removal power — emergency blacklisting — is **permanent**, discharging an ongoing legal-compliance duty the ~10-day governance cycle cannot meet.
 
 ## Voting weight
 
-Voting weight is each operator's **served bytes over a trailing window** (default ~1 quarter, governable), scaled by a tenure ramp and capped per operator (default 5% of the window's bytes).
+Voting weight is each operator's **served bytes over a trailing window** (default ~1 quarter, governable), scaled by a tenure ramp and capped per operator (default 5% of the window's bytes). Bytes are counted a week at a time, and each week's count is additionally capped at what the capacity the operator declared that week could physically have delivered.
 
 - **Passive TOKEN holders have no vote.** Governance power tracks real delivery, not holdings — you must operate a node and serve bytes to vote.
 - **Fresh operators ramp in.** A new operator that serves heavily on day one still votes at a fraction of its byte share until the tenure ramp completes over several months.
+- **Declared capacity caps weight; it never grants it.** Bytes above what an operator's declared tier could deliver in a week earn no weight, and an operator that declared zero capacity contributes zero for that week however many bytes it served. This is what stops a lightly-bonded operator inflating its weight by serving traffic to accounts it controls.
 - **Slashing zeroes out the vote.** A slashed operator's weight drops to zero for the rest of the window, then recovers as the window slides past the slash.
 
 Bytes are read from the on-chain `FeeRouter` settlement counter, so weight is auditable and cannot be claimed without paid delivery. Voting power is delegable by signed message; the bond itself is not.
@@ -27,20 +28,20 @@ The phase ends when the multisig judges the operator set broad and diverse enoug
 
 Even governance cannot set parameters outside these bounds:
 
-| Parameter                                 | Default   | Bounds        |
-| ----------------------------------------- | --------- | ------------- |
-| Operator revenue share (`FeeRouter` base) | 60%       | 40% – 90%     |
-| Burn share (`FeeRouter`)                  | 30%       | 5% – 50%      |
-| Treasury share (`FeeRouter`)              | 10%       | 0% – 30%      |
-| Redemption grace window                   | 48 h      | 48 h – 72 h   |
-| Per-operator voting cap                   | 5%        | 1% – 25%      |
-| Trailing vote window                      | 13 epochs | 4 – 26 epochs |
-| Capacity-curve exponent (α)               | 1.2       | 1.0 – 1.8     |
-| Unbonding window                          | 14 days   | 7 – 60 days   |
+| Parameter                                 | Default  | Bounds       |
+| ----------------------------------------- | -------- | ------------ |
+| Operator revenue share (`FeeRouter` base) | 60%      | 40% – 90%    |
+| Burn share (`FeeRouter`)                  | 30%      | 5% – 50%     |
+| Treasury share (`FeeRouter`)              | 10%      | 0% – 30%     |
+| Redemption grace window                   | 48 h     | 48 h – 72 h  |
+| Per-operator voting cap                   | 5%       | 1% – 25%     |
+| Trailing vote window                      | 13 weeks | 4 – 26 weeks |
+| Capacity-curve exponent (α)               | 1.2      | 1.0 – 1.8    |
+| Unbonding window                          | 14 days  | 7 – 60 days  |
 
 The three `FeeRouter` shares must sum to exactly 100% on every update. The burn share is the one that also accepts **zero** — the dormant launch configuration, with the split at 90/0/10 until governance activates the buyback sink toward the 60/30/10 steady state. It is therefore either off or at 5% or more; governance cannot leave it nominally on at a negligible share.
 
-Bounds are enforced in `require()` checks in the setter functions. A malicious governance proposal that attempts to push the operator revenue share below its floor simply reverts. (Slashing tiers — 5% / 15% / 50% by lifetime offense count — are fixed constants, not governable parameters; see [slashing](/protocol/slashing).)
+Bounds are enforced in `require()` checks in the setter functions. A malicious governance proposal that attempts to push the operator revenue share below its floor simply reverts. (The 5% / 15% / 50% slash tiers are themselves governable, within a hardcoded 5%–50% per-offense bound. What governance cannot touch is the 1× / 2× / 4× escalation applied to the _reset period_ on lifetime offense count — that is hardcoded so the anti-gaming curve cannot be flattened. See [slashing](/protocol/slashing).)
 
 ## Emergency multisig
 
@@ -49,7 +50,7 @@ Bounds are enforced in `require()` checks in the setter functions. A malicious g
 - **Pause** any contract (`Pausable`)
 - **Add emergency blacklist entries** (with 14-day auto-expiry or 90-day for CSAM/terrorist categories — see [takedown](/protocol/takedown))
 - **Decide slash appeals** — fast-track or reject an open appeal; the escrow movement itself is performed deterministically by the bond contract
-- **Suspend a regional governance body** — subject to governance ratifying or reversing within 14 days
+- **Suspend a regional governance body** — governance must ratify or reverse within 14 days, and silence _lapses_ the suspension rather than sustaining it
 
 Can **not**:
 
@@ -57,7 +58,11 @@ Can **not**:
 - Change parameters
 - Grant roles
 
-The sunset is **split by capability**. The protocol-wide `pause()` brake carries a **12-month sunset** enforced in the multisig's constructor as an immutable deadline — after it, `pause()` reverts on-chain. Emergency **blacklisting does not sunset**: `emergencyAdd()`, `emergencyAddOrigin()`, and `suspendRegionalBody()` are permanent, because unlawful-content removal (CSAM / court-ordered / sanctions) is a time-critical legal duty the ~11-day governance takedown path cannot meet, and touches no economic, treasury, or governance lever. Governance **cannot** modify the `pause()` deadline; retaining `pause()` past the sunset requires deploying a new contract version with a new deadline and migrating to it via the standard upgrade path (timelock + governance vote). This guarantees the `pause()` sunset cannot be silently extended.
+The sunset is **split by capability**, and the split is structural rather than a shared clock. The 12-month deadline attaches to **`pause()` alone**: every pausable contract fixes it as an immutable at its own construction, after which `pause()` reverts for every caller — governance included. The pause is the protocol-wide brake and the most centralization-sensitive power the multisig holds, so it is the one that expires.
+
+The other three capabilities carry **no deadline**. Emergency blacklisting (`emergencyAdd`, `emergencyAddOrigin`) and the regional-body suspension backing it live on the non-pausable blacklist contract, discharging a permanent, time-critical legal duty — CSAM, court-ordered and sanctions removal — that the ~10-day governance cycle cannot meet, and touching no economic, treasury or governance lever. Deciding slash appeals likewise never expires; it moves only already-escrowed funds along deterministic grant/uphold paths.
+
+Governance **cannot** modify the `pause()` deadline; retaining `pause()` past the sunset requires deploying a new contract version with a new deadline and migrating to it via the standard upgrade path (timelock + governance vote). This guarantees the sunset cannot be silently extended.
 
 ## Proposal flow
 
@@ -72,7 +77,7 @@ The combined ~10-day minimum delay (voting delay + 7-day period + 48-hour timelo
 
 ## Why 4% quorum
 
-Low enough that realistic participation can reach quorum; high enough that no single operator can unilaterally pass a proposal — and the per-operator weight cap bounds concentration directly. 4% maps to established DAO practice (Compound, Uniswap) and works in conjunction with the hardcoded safety bounds — the bounds mean a bad quorum can still only move parameters within the safe range.
+Low enough that realistic participation can reach it — voting weight tracks active service delivery rather than circulating supply, so a bar calibrated against holdings would quickly exceed engaged voting power. Quorum is not the concentration defense and is not sized as one: the per-operator cap is what bounds any single operator. Note that at their defaults the cap (5%) sits above the quorum bar (4%), so quorum alone does not stop one operator reaching it. The hardcoded safety bounds do the rest — even a captured vote can only move parameters within the safe range.
 
 ## Regional governance bodies
 

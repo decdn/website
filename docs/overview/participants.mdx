@@ -22,22 +22,22 @@ Two deployment shapes:
 | **Pure cache**    | No origin backend. Pulls missed blobs from other nodes.                                                                     | You want to earn on popular content; you don't control any origin.                       |
 | **Origin-backed** | Configured with an S3-compatible backend, NFS mount, or local disk. The hash→object-key mapping is a local content catalog. | You are the content provider, or you are running a "last-mile" seed node for a provider. |
 
-"Origin-backed" is a deployment choice, not a protocol distinction — the network cannot tell them apart at runtime.
+"Origin-backed" is a deployment choice, not a protocol distinction — the network cannot tell them apart at runtime. It is also per-blob: for anything outside its own backend, an origin-backed node is a cache node and pays upstream like any other.
 
 ## Clients
 
 A **client** is a lightweight QUIC endpoint that consumes content and pays for it.
 
-- **Identity.** Ephemeral network keypair — no stake, no on-chain registration.
+- **Identity.** A network keypair generated at first startup and persistent across sessions, plus a per-connection binding to an Ethereum address that the node discards on disconnect — no stake, no on-chain registration.
 - **Discovery.** Reads the on-chain registry for its peer set and queries the DHT for holders. Publishes nothing and holds no network role.
 - **Payment.** Opens one on-chain USDC pool, reuses it for every node it buys from, and signs cumulative off-chain vouchers as bytes flow ([payments](/protocol/payments)).
 - **Trust model.** Verifies hashes on all bytes received. Trusts no node for content, and none for availability either — a node may decline to serve, and the client simply re-routes without paying for the attempt.
 
-Clients can run a multi-source parallel download for large files, pulling disjoint ranges from several holders at once, and resume crashed transfers from the last verified byte.
+Clients can run a multi-source parallel download for large files, pulling disjoint segments from several holders at once, and resume crashed transfers from the last verified chunk-group boundary.
 
 ## External components
 
-These are **not CDN protocol participants**. They ride the same QUIC transport but do not register, probe, or bond.
+These are **not CDN protocol participants**. A node reaches its backend over that backend's own interface — HTTP, the S3 API, a filesystem — not over a CDN protocol. A backend never registers, probes, or bonds.
 
 ### Origin backend
 
@@ -45,8 +45,8 @@ An S3 bucket, R2 bucket, MinIO instance, NFS mount, or local disk. Holds the can
 
 ## Who bonds, who pays
 
-| Participant        | Bonds?   | Pays?                          | Earns?                    |
-| ------------------ | -------- | ------------------------------ | ------------------------- |
-| Pure cache node    | ✅ TOKEN | ✅ Pays upstream on cache miss | ✅ Per-MB voucher revenue |
-| Origin-backed node | ✅ TOKEN | ❌                             | ✅ Per-MB voucher revenue |
-| Client             | ❌       | ✅ Per-MB voucher              | ❌                        |
+| Participant        | Bonds?   | Pays?                            | Earns?                    |
+| ------------------ | -------- | -------------------------------- | ------------------------- |
+| Pure cache node    | ✅ TOKEN | ✅ Pays upstream on cache miss   | ✅ Per-MB voucher revenue |
+| Origin-backed node | ✅ TOKEN | ✅ For blobs outside its backend | ✅ Per-MB voucher revenue |
+| Client             | ❌       | ✅ Per-MB voucher                | ❌                        |

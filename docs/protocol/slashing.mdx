@@ -7,7 +7,7 @@ description: Two slashable offenses — rate manipulation and blacklist violatio
 
 Two slashable offenses, each resting on cryptographically dispositive signed evidence:
 
-1. **Rate manipulation** — charged a rate different from the rate quoted in a signed probe response within the slashing window.
+1. **Rate manipulation** — charged a rate **higher** than the rate quoted in a signed probe response within the slashing window. (Charging less than quoted is not an offense.)
 2. **Blacklist violation** — served a blacklisted hash after the compliance window.
 
 Every probe and stream response carries a mandatory signature over its security-relevant fields, produced with the node's Ethereum key, so any protocol message is portable evidence verifiable on-chain. A unified on-chain judge adjudicates both offenses synchronously and triggers the bond reduction immediately upon verification — there is no in-protocol counter-evidence window. The reduced bond is then held in escrow pending a post-slash appeal (below), not distributed on the spot.
@@ -22,6 +22,12 @@ Every probe and stream response carries a mandatory signature over its security-
 Submitting evidence is a two-phase flow: a `commitChallenge` registers an opaque commitment that moves no funds, and the reveal resolves synchronously once the commitment matures.
 
 The phases exist because the reveal must disclose the full evidence — the signed responses themselves — in its calldata. Without a prior commitment, a mempool watcher could copy a pending honest challenge, resubmit it under its own address, and capture the challenger reward. The bond is never what's at stake here — it is returned on a successful challenge and never transferred at all on a failed one — so the reward is the whole exposure, and it is also the entire incentive for off-path witnesses. Leaving it extractable would hollow out enforcement.
+
+## The slashing window
+
+A node's last probe-quoted rate is binding for **30 seconds**. Any stream opened inside that window must be served at or below the quoted rate; a legitimate rate change waits the window out before serving at the new price. Two signed messages from the same node disagreeing about its own rate inside 30 seconds are non-repudiable, which is what makes the offense adjudicable without a counter-evidence step.
+
+This is distinct from **evidence staleness** below: the slashing window bounds when an offense can be _committed_, evidence age bounds how long it can be _submitted_.
 
 ## Evidence staleness
 

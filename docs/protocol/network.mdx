@@ -17,7 +17,7 @@ The same active set seeds the DHT routing table, so a freshly started node parti
 
 A cache miss issues a DHT lookup for the hash, which returns candidate holders along with a coarse **coverage bitmap** per holder — so a requester can prune candidates that do not hold the range it wants. Candidates are then probed in parallel to confirm live availability, fresh coverage, latency and price. Collection stops as soon as enough blob-holding candidates answer to fill the failover budget, and otherwise at a 500 ms ceiling that accommodates inter-continental round trips.
 
-When a lookup returns no providers, the on-chain origin directory is the deterministic fallback. If that returns nothing either, the blob is not available in the network.
+When a lookup returns no providers for a request that names a namespace, the namespace's on-chain origin set is the deterministic fallback. A request naming no namespace has no directory to fall back to — it has no authorized origins — so a miss there simply fails. Either way, if nothing answers, the blob is not available in the network.
 
 ## Selection
 
@@ -35,4 +35,4 @@ Regions inform selection rather than partition the mesh: a client in Frankfurt p
 
 ## NAT traversal
 
-The transport handles hole-punching automatically; nodes update their registered addresses when their public-facing address changes. When direct P2P fails, traffic routes through a stateless, content-blind QUIC relay. Relays are protocol infrastructure (treasury-funded), not an incentivized network role — paying relays per byte would create a perverse incentive to prevent direct connections.
+The transport handles hole-punching automatically; nodes update their registered addresses when their public-facing address changes. When direct P2P fails, traffic routes through a stateless, content-blind QUIC relay. Relays are not protocol participants — they cannot inspect, cache, or modify content — and they are not an incentivized network role: paying relays per byte would create a perverse incentive to prevent direct connections. Deployments self-host them as operational infrastructure, funded from the protocol treasury or from node staking fees.

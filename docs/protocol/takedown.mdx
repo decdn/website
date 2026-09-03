@@ -41,9 +41,9 @@ The emergency path takes effect immediately in terms of "don't serve this", but 
 
 ## Regional scoping
 
-A **regional** entry applies only to nodes that advertise a matching region. The right to add regional entries is granted to regional governance bodies on a per-region basis; the emergency multisig can suspend a compromised body immediately, subject to governance ratifying or reversing the suspension within 14 days. Suspension bounds a body's future authority — entries it already issued stay live.
+A **regional** entry applies only to nodes that advertise a matching region. The right to add regional entries is granted to regional governance bodies on a per-region basis; the emergency multisig can suspend a compromised body immediately. Governance must then ratify or reverse within 14 days, and **silence lapses the suspension** — the body resumes writing, exactly as an unratified emergency entry expires. Neither is a standing act of governance, and sustaining one on silence alone would let the multisig disable a jurisdiction permanently with no vote ever taken. Suspension also bounds only a body's _future_ authority: entries it already issued stay live.
 
-A node serving a globally-blacklisted hash is always slashable. A node in `region: DE` serving a `DE`-regional entry is slashable; that same node serving the entry via a US client is a gray area — current guidance is that operators adopt the strictest jurisdiction their node's region subjects them to. A node cannot shed exposure by flipping regions after the fact: slash eligibility is evaluated against the region in force when the bytes were served.
+Scope follows the **operator's** declared region — never the requester's. A node serving a globally-blacklisted hash is always slashable. A node declaring `DE` is slashable for a `DE`-regional entry; a node declaring `US` is not slashable for a hash blacklisted only by the EU body, regardless of where its clients are — the requester's location is not an input. A node cannot shed exposure by flipping regions after the fact either: slash eligibility is evaluated against the region in force when the bytes were served.
 
 ## Sub-day removal orders
 

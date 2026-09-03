@@ -18,7 +18,7 @@ Delivery uses **bao** — an interleaved verified-stream encoding of the BLAKE3 
 
 Because every chunk group carries its own proof, a resumed or ranged fetch verifies **independently** — the decoder aligns the requested offset down to its 16 KiB chunk-group boundary, so there's no need to re-read from the start. Payment meters all transmitted bytes, including the proof bytes: the verification overhead is roughly **0.4%** of blob size, not free metadata.
 
-An origin-cold node must import or build the blob's **outboard** (its BLAKE3 tree) before it can serve verified ranges. Node-to-node cache-miss pulls stay bao-encoded and pipelined end to end.
+Where an origin publishes the blob's **outboard** (its BLAKE3 tree) as a sidecar, an origin-cold node streams the origin's bytes straight through to the paying client while teeing them into its own store, verifying each group against the root as it goes. Only when the origin publishes no outboard must the node import the blob and build one first, at a one-time import latency. Node-to-node cache-miss pulls stay bao-encoded and pipelined end to end.
 
 ## Publishers and namespaces
 
@@ -43,9 +43,9 @@ This also protects origin operators from direct egress cost attacks: an adversar
 
 ## What clients verify vs. trust
 
-| Property          | Verified         | Trusted                                                             |
-| ----------------- | ---------------- | ------------------------------------------------------------------- |
-| Byte correctness  | BLAKE3 hash tree | —                                                                   |
-| Blob availability | —                | Node may decline to serve; the client re-routes and re-pays nothing |
-| Rate honesty      | —                | Quoted rate is binding within the slashing window (slashable)       |
-| Origin durability | —                | Origin operator's S3/NFS configuration (off-protocol)               |
+| Property          | Verified         | Trusted                                                                                                 |
+| ----------------- | ---------------- | ------------------------------------------------------------------------------------------------------- |
+| Byte correctness  | BLAKE3 hash tree | —                                                                                                       |
+| Blob availability | —                | Node may decline to serve; the client re-routes and re-pays nothing                                     |
+| Rate honesty      | —                | Quoted rate is binding within the [slashing window](/protocol/slashing#the-slashing-window) (slashable) |
+| Origin durability | —                | Origin operator's S3/NFS configuration (off-protocol)                                                   |

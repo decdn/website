@@ -48,9 +48,9 @@ See [Participants](/overview/participants) for a deeper breakdown per role.
 
 1. **Client bootstrap** — client generates a keypair, queries the on-chain registry for the active node set, and caches it.
 2. **Discovery** — a DHT lookup locates holders of the blob hash, and a parallel probe confirms which of them will actually serve the wanted range, at what rate and latency.
-3. **Selection** — returned candidates are scored by price, latency, and reputation; lowest cost wins.
+3. **Selection** — returned candidates are scored by price, latency, and reputation into one selection score; the lowest score wins, so a cheap or nearby node can outrank a better-reputed one.
 4. **Payment** — the client pays from a USDC pool it opened once, off the fetch path, and reuses for every node ([payments](/protocol/payments)).
-5. **Streaming + vouchers** — node streams to the client; client signs a cumulative voucher and releases one hash-chain preimage per megabyte as bytes flow.
+5. **Streaming + vouchers** — node streams to the client; client signs a cumulative voucher and, on an optional hash chain, releases one preimage per 1 MiB chunk as bytes flow.
 6. **Cache-miss fan-out** — if the node doesn't have the blob, it pulls from other holders (paid). Every byte delivered in the network is paid.
 7. **Redemption** — the node redeems its own vouchers on-chain whenever it likes; the owner closes the pool to reclaim the unspent remainder.
 
@@ -71,3 +71,4 @@ See [Participants](/overview/participants) for a deeper breakdown per role.
 - Search, discovery, or recommendation
 - Mobile or web clients
 - Erasure coding — full replication only
+- Multi-chain settlement — a single L2

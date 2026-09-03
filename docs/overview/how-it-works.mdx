@@ -13,7 +13,7 @@ sequenceDiagram
     participant P as PaymentPool (on-chain)
 
     C->>N: Probe(hash)
-    N-->>C: Probe response (coverage, rate, signed)
+    N-->>C: Probe response (rate signed; coverage unsigned)
     C->>N: Stream request(hash, namespace)
     N-->>C: Bytes (hash-verified on receipt)
     C-->>N: Voucher (signed, cumulative)
@@ -55,7 +55,7 @@ For a large blob, the client doesn't pull from a single node. A client-side sche
 
 Assignment follows **coverage**: discovery and probes carry a bitmap of which 64 MiB blocks each holder will serve, so each block goes to a holder that already has it. A block no admitted holder covers is a genuine gap, warmed once from origin — and that warmer's new coverage becomes discoverable supply for the next fetch.
 
-Assignment is dynamic. When a source finishes, it steals the largest remaining range from a peer, splitting it on a verifiable boundary; every range is verified as it lands, and a stalled or failed source's _unfinished remainder_ is reassigned to another source without restarting the download. There is deliberately no hedging — racing a range against idle sources would mean paying for the copies that lose, so the tail is bounded by deadline-based reassignment instead. Aggregating parallel streams lets a blob be delivered at multi-gigabit speeds once enough holders cover it — no single origin's uplink caps the transfer.
+Assignment is dynamic. When a source finishes its **segment**, it steals the largest remaining one from a peer, splitting it on a verifiable boundary; every segment is verified as it lands, and a stalled or failed source's _unfinished remainder_ is reassigned without restarting the download. There is deliberately no hedging — racing a segment against idle sources would mean paying for the copies that lose, so the tail is bounded by deadline-based reassignment instead. Aggregate throughput therefore scales with the number of admitted sources rather than any one holder's uplink.
 
 There is no new wire surface — each source is just an ordinary paid stream, so pools, vouchers, and slashing work exactly as in the single-source paths above. Every source draws on the client's one pool, on its own independent lane.
 
@@ -63,7 +63,7 @@ There is no new wire surface — each source is just an ordinary paid stream, so
 
 1. **Open** — the payer escrows one USDC deposit in the `PaymentPool` contract. Once, off the fetch path, reused for every node.
 2. **Delegate** — the owner signs capped, expiring capabilities for whichever keys may spend from the pool. One capability is valid at every node.
-3. **Meter** — a signed cumulative voucher anchors the amount owed, and a released hash-chain preimage advances it one megabyte at a time with no further signature.
+3. **Meter** — a signed cumulative voucher anchors the amount owed, and an optional hash chain advances it by one 1 MiB **payment chunk** per released preimage, with no further signature. A voucher opening no chain is sealed at the amount it signs.
 4. **Redeem** — the node settles its own vouchers on-chain whenever it likes; the owner closes the pool to reclaim the remainder, after a grace window that lets nodes redeem first.
 
 ## What keeps the network honest

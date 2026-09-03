@@ -5,7 +5,7 @@ description: Clients pay nodes per MB with off-chain vouchers backed by one shar
 
 ## Decision
 
-Clients pay nodes **per MB** with off-chain **vouchers backed by a shared on-chain pool**. All pools are denominated in **USDC**, fixed at contract deployment. On a cache miss, nodes pay peers per MB for content pulls, then amortize that cost across many client deliveries. Origin-backed nodes set the effective price ceiling (their backend egress costs). Rates are fully market-driven within governance-set bounds.
+Clients pay nodes **per MB** with off-chain **vouchers backed by a shared on-chain pool**. All pools are denominated in **USDC**, fixed at contract deployment. On a cache miss, nodes pay peers per MB for content pulls, then amortize that cost across many client deliveries. Origin-backed nodes set the effective price ceiling (their backend egress costs). Rates are otherwise fully market-driven, above a governance-set floor.
 
 One funded pool backs payments from **many capped signers** to **many nodes**. There is no channel per node and no channel per client: the owner opens a pool once, reuses it, and closes it to reclaim the unspent remainder.
 
@@ -49,7 +49,7 @@ Off-chain signed messages over `{pool_id, signer, provider, amount, bytes_delive
 
 ## Hash-chain metering
 
-Between signatures, delivery is metered by a **hash chain** rather than a new signature per interval. The payer commits `chain_root = keccak^255(seed)` in the voucher, and after verifying chunk `k` releases `keccak^(255−k)(seed)`. The node hashes that preimage forward until it reaches a value it already trusts.
+Between signatures, delivery is metered by a **hash chain** rather than a new signature per interval. The payer commits the chain's root in the voucher and, after verifying each delivered chunk, releases the next **preimage** down the chain. The node hashes that preimage forward until it reaches a value it already trusts.
 
 Redemption resolves both objects with one formula:
 
@@ -59,18 +59,16 @@ claimed = amount + chain_index × chunk_price
 
 A preimage is self-proving — nobody derives a deeper one without the seed — so accepting a tick costs one hash, with no signature, no round trip and nothing to persist before the next chunk ships. Signatures are therefore O(1) per transfer rather than one per interval.
 
-The payment quantum is `chunk_bytes` = **1 MiB (1,048,576 bytes)**, a protocol constant. Nothing negotiates it and no message carries it: the payer and node must price a released preimage identically, and a fixed constant removes the disagreement rather than negotiating it away.
-
-The protocol's **MB is that same 1,048,576 bytes** — the price unit and the payment quantum are one number, so a chunk costs exactly the node's advertised `rate_per_mb` with no rounding at any rate. `chunk_price` is therefore just that quoted rate, signed into the voucher, and the node rejects any voucher whose signed `chunk_price` does not equal its own quote.
+The payment quantum is the **payment chunk**: `chunk_bytes` = **1 MiB (1,048,576 bytes)**, a protocol constant that nothing negotiates and no message carries. A released preimage has to be worth the same to payer and node, and a fixed constant removes that disagreement instead of negotiating it away. The protocol's **MB is that same 1,048,576 bytes**, so a chunk costs exactly the node's advertised `rate_per_mb` with no rounding at any rate — `chunk_price` is just that quoted rate, signed into the voucher, and a node rejects any metering voucher whose signed `chunk_price` does not match its own quote. A voucher that seals a lane meters nothing and carries `chunk_price = 0`, so the check does not apply to it.
 
 ## Credit window
 
-A node's exposure is bounded by a per-lane **credit window** — the unpaid balance it will carry before it pauses — not by the meter's resolution. The window starts at a floor and ramps as the lane pays, so a new payer proves itself on small credit before a node extends more.
+Payments from one signer to one node out of one pool form a **lane**: an independent running total, with its own watermark and its own chain. A node's exposure on a lane is bounded by a **credit window** — the unpaid balance it will carry before it pauses — not by the meter's resolution. The window starts at a floor and ramps as the lane pays, so a new payer proves itself on small credit before a node extends more.
 
 ## Rate discovery
 
-Each node advertises its own per-MB rate, quoted in every signed probe response. Governance sets rate bounds (in USDC); a node advertising outside the bounds is ignored by selection. A quoted rate is binding for any stream opened inside the slashing window ([slashing](/protocol/slashing)).
+Each node advertises its own per-MB rate, quoted in every signed probe response. Governance sets a **floor**, not a ceiling: a node whose configured rate falls below the current floor raises its quote to the floor and logs a warning rather than refusing to serve, and redemption clamps the byte credit on any voucher priced under it. No governance ceiling caps a node's rate from above — only the wire format's own upper bound — because the buyer sees the signed rate before it pays anything, which is what makes a ceiling unnecessary. A requester rejecting an expensive quote is local policy rather than a protocol rule. A quoted rate is binding for any stream opened inside the [slashing window](/protocol/slashing#the-slashing-window).
 
 ## Minimum deposit
 
-`openPool` enforces a governance-set `minDeposit` on the credited deposit. It is a Sybil knob: the per-pool solvency floor bounds loss within one pool, and an attacker escapes it by fanning out across many pools, so the floor taxes the capital locked in simultaneous pools. Deposits stay fully refundable, and the parameter **ships dormant at zero** so small honest pools remain available; governance arms it if Sybil pressure warrants.
+`openPool` enforces a governance-set `minDeposit` on the credited deposit. It is a Sybil knob: the per-pool solvency floor bounds loss within one pool, and an attacker escapes it by fanning out across many pools, so the floor taxes the capital locked in simultaneous pools. Deposits stay fully refundable, and the parameter is bounded at **0 to $100** — there is no floor on the knob itself, and the ceiling keeps governance from pricing small honest buyers out of opening a pool. It **ships dormant at zero**; governance arms it if Sybil pressure warrants.
