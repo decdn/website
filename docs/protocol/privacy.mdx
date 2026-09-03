@@ -1,11 +1,11 @@
 ---
 title: Privacy analysis
-description: An accountability-first privacy design — a four-tier adversary model, an inventory of privacy surfaces, and the two mitigations committed pre-mainnet.
+description: An accountability-first privacy design — a four-tier adversary model, an inventory of privacy surfaces, and the two mitigations it commits to.
 ---
 
 ## Decision
 
-Privacy is treated as an **accountability-first** design: probes are public, on-chain settlement is what makes payment auditable, and the registry is what makes nodes discoverable and slashable. Most privacy surfaces are accepted as inherent. Two mitigations are committed pre-mainnet; deeper techniques are assessed and deferred.
+Privacy is treated as an **accountability-first** design: probes are public, on-chain settlement is what makes payment auditable, and the registry is what makes nodes discoverable and slashable. Most privacy surfaces are accepted as inherent. Two are mitigated; deeper techniques are assessed and not adopted.
 
 ## Adversary model (four tiers)
 
@@ -16,7 +16,7 @@ Each tier subsumes the one above it.
 | **Passive observer**        | ISP, blockchain analytics firm                   | QUIC connection metadata (IP pairs, timing, volume), the negotiated ALPN, and everything on-chain |
 | **Active participant**      | Competing CDN, curious node operator, researcher | Plus: probes it receives, stream requests, and the probe responses it collects                    |
 | **Infrastructure operator** | RPC provider, relay host                         | Plus: which registry and blacklist queries a client makes, and IP pairs on relayed connections    |
-| **Compromised endpoint**    | Device theft, malware, warrant                   | Plus: memory and disk on that one machine — including the network key, unencrypted today          |
+| **Compromised endpoint**    | Device theft, malware, warrant                   | Plus: memory and disk on that one machine                                                         |
 
 ## Privacy surfaces
 
@@ -29,16 +29,14 @@ The protocol inventories its distinct privacy surfaces with explicit disposition
 
 ## Mitigations
 
-Both are pre-mainnet commitments:
-
-1. **Client key encryption via platform keychain.** The client's network key sits unencrypted on disk today. Production moves it into the macOS Keychain, Windows Credential Manager, or the Linux Secret Service. (The Ethereum key is already held in an encrypted keystore.)
-2. **Operational RPC guidance.** Document that clients and nodes should query through multiple independent RPC providers, or a self-hosted node, so no single vendor sees the whole query pattern.
+1. **Client key storage.** Client keys are held in OS-level secure storage — the macOS Keychain, Windows Credential Manager, or the Linux Secret Service — rather than plaintext files on disk.
+2. **Operational RPC guidance.** Clients and nodes query through multiple independent RPC providers, or a self-hosted node, so no single vendor sees the whole query pattern.
 
 ## Assessed and not adopted
 
 - **Client identity rotation.** Rotating the transport identity between sessions is a supported capability, but it is not a privacy commitment: every request carries the pool identifier, and a serving node must resolve the signer's address to be paid at all. That stable payment identity is what an observer correlates on, regardless of node count — so rotation obscures only non-serving probers, whose view is already accepted above.
-- **Dummy probes.** Cover-traffic probes hide requests only from nodes that were never going to deliver — the delivering node must learn the hash regardless. Deferred post-mainnet: 3–5× the probe traffic for marginal benefit.
-- **Payment pool mixing.** Breaking the on-chain payer↔provider link needs regulatory analysis before any design work. Deferred post-mainnet; pools are long-lived and amortized across many sessions, so they reveal less than per-transfer settlement would.
+- **Dummy probes.** Cover-traffic probes hide requests only from nodes that were never going to deliver — the delivering node must learn the hash regardless — 3–5× the probe traffic for marginal benefit.
+- **Payment pool mixing.** Breaking the on-chain payer↔provider link needs regulatory analysis before any design work. Pools are also long-lived and amortized across many sessions, so they reveal less than per-transfer settlement would.
 
 ## Scope clarifications
 

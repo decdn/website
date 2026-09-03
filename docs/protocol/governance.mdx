@@ -39,9 +39,9 @@ Even governance cannot set parameters outside these bounds:
 | Capacity-curve exponent (α)               | 1.2      | 1.0 – 1.8    |
 | Unbonding window                          | 14 days  | 7 – 60 days  |
 
-The three `FeeRouter` shares must sum to exactly 100% on every update. The burn share is the one that also accepts **zero** — the dormant launch configuration, with the split at 90/0/10 until governance activates the buyback sink toward the 60/30/10 steady state. It is therefore either off or at 5% or more; governance cannot leave it nominally on at a negligible share.
+The three `FeeRouter` shares must sum to exactly 100% on every update. The burn share is the one that also accepts **zero**, so the buyback sink can be switched off entirely; what it cannot be is nominally on at a negligible share — either off, or at 5% or more.
 
-Bounds are enforced in `require()` checks in the setter functions. A malicious governance proposal that attempts to push the operator revenue share below its floor simply reverts. (The 5% / 15% / 50% slash tiers are themselves governable, within a hardcoded 5%–50% per-offense bound. What governance cannot touch is the 1× / 2× / 4× escalation applied to the _reset period_ on lifetime offense count — that is hardcoded so the anti-gaming curve cannot be flattened. See [slashing](/protocol/slashing).)
+Bounds are enforced in `require()` checks in the setter functions. A malicious governance proposal that attempts to push the operator revenue share below its floor simply reverts. (The 5% / 15% / 50% slash tiers are governable too, within a hardcoded 5%–50% per-offense bound — see [slashing](/protocol/slashing).)
 
 ## Emergency multisig
 
@@ -77,7 +77,7 @@ The combined ~10-day minimum delay (voting delay + 7-day period + 48-hour timelo
 
 ## Why 4% quorum
 
-Low enough that realistic participation can reach it — voting weight tracks active service delivery rather than circulating supply, so a bar calibrated against holdings would quickly exceed engaged voting power. Quorum is not the concentration defense and is not sized as one: the per-operator cap is what bounds any single operator. Note that at their defaults the cap (5%) sits above the quorum bar (4%), so quorum alone does not stop one operator reaching it. The hardcoded safety bounds do the rest — even a captured vote can only move parameters within the safe range.
+Low enough that realistic participation can reach it — voting weight tracks active service delivery rather than circulating supply, so a bar calibrated against holdings would quickly exceed engaged voting power. Quorum is not the concentration defense and is not sized as one: the per-operator cap is what bounds any single operator. The hardcoded safety bounds do the rest — even a captured vote can only move parameters within the safe range.
 
 ## Regional governance bodies
 

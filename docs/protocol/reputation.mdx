@@ -28,11 +28,11 @@ interaction_score = 0.4 × speed + 0.4 × correctness + 0.2 × reachability
 
 Speed is normalized on a log curve against a node-local reference throughput (default 1 GiB/s) that deliberately **does not saturate** — a materially faster peer earns a materially better score instead of tying with every other fast peer.
 
-A single interaction moves a peer's score by at most **±0.05**, so one bad exchange cannot destroy a good peer's standing. With α = 0.1 the EWMA itself keeps most deltas well under that; the clamp only binds when the gap between the peer's score and the interaction exceeds 0.5.
+A single interaction moves a peer's score by at most **±0.05**, so one bad exchange cannot destroy a good peer's standing.
 
 ## Why correctness is only one signal among several
 
-Reputation measures service quality, not honesty. Corruption is absorbed at the wire: progressive BLAKE3 verification means a corrupt window yields no voucher, so the node ships garbage unpaid. The reputation hit compounds on top — a corruption event zeros the correctness component, moves the EWMA down by up to the per-interaction clamp, and degrades selection through a quadratic reputation penalty. Lost revenue plus lost traffic make sustained corruption irrational without an on-chain path.
+Reputation measures service quality, not honesty. Corruption is absorbed at the wire: progressive BLAKE3 verification means a corrupt window yields no voucher, so the node ships garbage unpaid. The reputation hit compounds on top — a corruption event zeros the correctness component, moves the EWMA down, and degrades selection through a quadratic reputation penalty. Lost revenue plus lost traffic make sustained corruption irrational without an on-chain path.
 
 ## Decay toward neutral
 
