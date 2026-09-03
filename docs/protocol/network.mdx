@@ -1,25 +1,37 @@
 ---
 title: Network topology
-description: A flat mesh of staked nodes — gossip on regional and global topics for node discovery, a Kademlia-subset DHT for content, and on-chain registration.
+description: A flat mesh of staked nodes — the on-chain registry for node discovery, a Kademlia-subset DHT for content, and probes to confirm availability before paying.
 ---
 
 ## Decision
 
-All staked nodes form a **flat mesh**. Node metadata propagates over a gossip overlay on regional and global topics. Content discovery uses a Kademlia-subset DHT, with broadcast probe fan-out as bootstrap/emergency fallback.
+All staked nodes form a **flat mesh** with no routing hierarchy. Node discovery reads the on-chain registry's active set. Content discovery uses a Kademlia-subset DHT, with the on-chain origin directory as the deterministic last-resort fallback. A probe confirms live availability and measures latency before any paid pull.
+
+## Node discovery
+
+The on-chain registry's active set is the sole membership source. A node reads it at startup and keeps it fresh by subscribing to registration, address-update, deregistration and auto-ejection events; sub-second L2 block times keep the staleness window small. Clients do the same and re-read periodically, falling back to a cached peer list — with its age surfaced — when the RPC endpoint is unreachable.
+
+The same active set seeds the DHT routing table, so a freshly started node participates in lookups immediately. A node dials any peer by its network identity, which resolves to reachable transport addresses on its own — there is no separate address-exchange layer, and no metadata broadcast.
+
+## Content discovery
+
+A cache miss issues a DHT lookup for the hash, which returns candidate holders along with a coarse **coverage bitmap** per holder — so a requester can prune candidates that do not hold the range it wants. Candidates are then probed in parallel to confirm live availability, fresh coverage, latency and price. Collection stops as soon as enough blob-holding candidates answer to fill the failover budget, and otherwise at a 500 ms ceiling that accommodates inter-continental round trips.
+
+When a lookup returns no providers, the on-chain origin directory is the deterministic fallback. If that returns nothing either, the blob is not available in the network.
 
 ## Selection
 
-Clients and nodes both rank candidates by a unified score combining advertised price, observed latency, and reputation. Lower is better. The exact weighting is part of the protocol implementation.
+Clients and nodes both rank candidates by a unified score combining advertised price, observed latency, and reputation, with a quadratic reputation penalty. Lower is better.
 
 ## On-chain registration
 
 Nodes register through an on-chain staking registry that binds a network identity to an Ethereum address. Registration requires proof of control of both keys — preventing identity squatting and ensuring every staked node is slashable. Registration also carries acceptance of the DAO-canonical operator terms hash, signed into the registration message and enforced on-chain; the terms hash is governance-swappable, so the accepted version is recorded at registration. Key rotation remains available post-registration.
 
-## Regional topics
+## Regions
 
-Nodes subscribe to a region topic plus the global topic. Regional topics reduce gossip noise for latency-sensitive selection: a client in Frankfurt typically prefers DE/NL/AT candidates over US ones, and the regional topic surfaces those preferentially.
+A node declares its region — an ISO 3166-1 alpha-2 country code — on-chain at registration, and the registry watcher resolves the active set into a region map. The claim is self-attested and accepted at face value; a requester applies a reputation penalty when observed latency contradicts it, and region-scoped takedown obligations follow it ([takedown](/protocol/takedown)). A stability window after a region change stops a node shedding blacklist scope by flipping regions reactively.
 
-Clients subscribe but do not publish.
+Regions inform selection rather than partition the mesh: a client in Frankfurt prefers nearby candidates because they score better on latency, not because it sees a different peer set.
 
 ## NAT traversal
 

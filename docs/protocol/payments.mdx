@@ -1,45 +1,74 @@
 ---
 title: Payments
-description: Clients pay nodes per MB over off-chain USDC payment channels with on-chain settlement, at market-driven rates inside governance-set bounds.
+description: Clients pay nodes per MB with off-chain vouchers backed by one shared on-chain USDC pool, metered by a hash chain and redeemed per node.
 ---
 
 ## Decision
 
-Clients pay nodes **per MB** over off-chain **payment channels** settled on-chain. All channels are denominated in **USDC**, fixed at contract deployment. On a cache miss, nodes pay peers per MB for initial content pulls, then amortize that cost across many client deliveries. Origin-backed nodes set the effective price ceiling (their backend egress costs). Rates are fully market-driven within governance-set bounds.
+Clients pay nodes **per MB** with off-chain **vouchers backed by a shared on-chain pool**. All pools are denominated in **USDC**, fixed at contract deployment. On a cache miss, nodes pay peers per MB for content pulls, then amortize that cost across many client deliveries. Origin-backed nodes set the effective price ceiling (their backend egress costs). Rates are fully market-driven within governance-set bounds.
 
-## Channel lifecycle
+One funded pool backs payments from **many capped signers** to **many nodes**. There is no channel per node and no channel per client: the owner opens a pool once, reuses it, and closes it to reclaim the unspent remainder.
+
+## Pool lifecycle
 
 ```mermaid
 sequenceDiagram
-    participant C as Client
+    participant C as Client (pool owner)
     participant N as Node
-    participant CH as PaymentChannel (on-chain)
+    participant P as PaymentPool (on-chain)
 
-    C->>CH: openChannel(provider, deposit)
+    C->>P: openPool(deposit)
+    Note over C,N: Capability signed off-chain:<br/>{signer, spending_cap, pool_id, expiry}
     loop Per stream
-        C->>N: Cumulative voucher (off-chain, signed, nonce++)
+        C->>N: Voucher (off-chain, signed, cumulative amount)
+        C->>N: Preimage per 1 MiB chunk delivered
     end
-    N->>CH: closeChannel(latest voucher)
-    Note over CH: Dispute window — either party<br/>can submit a higher-nonce voucher<br/>via disputeChannel
-    CH->>CH: settleChannel
-    CH-->>N: Settle → provider
-    CH-->>C: Refund remaining deposit
+    N->>P: redeem(voucher, preimage)
+    P-->>N: Settle → provider (via FeeRouter)
+    C->>P: closePool
+    Note over P: Redemption grace window<br/>lets nodes redeem first
+    P-->>C: Reclaim unspent remainder
 ```
 
-The channel token is fixed (USDC) at deployment, so `openChannel` takes only the provider and deposit. Close is a three-step lifecycle — `closeChannel` (callable by either party) starts the dispute window, `disputeChannel` accepts a higher-nonce voucher during the window, and `settleChannel` distributes funds after it expires. A node may also `withdraw` accrued earnings against the latest voucher while the channel stays open — redeeming a monotonic client-signed claim needs no dispute window.
+`openPool` happens **once and off the fetch path**, so it is not latency-critical; `topUp` refills a pool that has been drawn down. A node redeems whenever it likes while the pool is open — redeeming a signed, monotone claim needs no dispute window. The owner closes the pool to reclaim what is left, after a **redemption grace window** (48 hours by default, governable within 48h–72h) during which nodes settle outstanding vouchers.
 
-## Cooperative close
+## Capabilities
 
-When both parties are online and agree on the final balance, they can skip the dispute window entirely. `cooperativeClose(channelId, amount, nonce, bytesDelivered, clientVoucherSig, providerCloseSig)` settles the channel **in a single transaction with no dispute window** — the provider signs an EIP-712 `CooperativeClose` waiver acknowledging the final voucher, and either party can submit it. This is purely additive: it is the fast path when both sides cooperate, and if the node declines or is offline, the client falls straight back to `closeChannel` and the standard dispute window. The client CLI exposes it as `decdn channel coop-close`.
+The pool owner authorizes each voucher signer with an off-chain **capability** signed over `{signer, spending_cap, pool_id, expiry}`. It is **node-agnostic** — one capability is valid at every node — and it is registered on-chain once, on that signer's first redemption.
+
+Delegation bounds the damage a compromised key does: `spending_cap` bounds what the key can authorize, `expiry` retires it if the owner doesn't renew. The owner keeps sole control of top-up and close. A single user makes its own key the sole signer; a client fanning out to per-device or per-session keys issues each a small capped capability from one pool.
+
+The sum of the caps may exceed the deposit. Nodes keep a pool solvent by reserving a refundable minimum remaining balance and stopping service before the pool reaches it.
 
 ## Vouchers
 
-Off-chain signed messages bound to a specific channel, carrying a strictly increasing **nonce** (starting at 1) and a **cumulative** amount and byte count. Each new voucher restates the running total owed — both amount and bytes are monotonically non-decreasing — and the highest-nonce voucher is the one that settles. Nodes persist the latest nonce rather than discarding older state, since `disputeChannel` only accepts a strictly higher nonce. Cadence is negotiated per stream.
+Off-chain signed messages over `{pool_id, signer, provider, amount, bytes_delivered, chain_root, chunk_price}`. Two properties matter:
+
+- **Node-addressed.** The voucher names its payee, so one node cannot redeem a voucher meant for another and each node keeps its own independent ordering.
+- **Cumulative.** `amount` is a settlement anchor that only moves up. A re-submitted voucher pays zero; there is no nonce and no dispute window.
+
+## Hash-chain metering
+
+Between signatures, delivery is metered by a **hash chain** rather than a new signature per interval. The payer commits `chain_root = keccak^255(seed)` in the voucher, and after verifying chunk `k` releases `keccak^(255−k)(seed)`. The node hashes that preimage forward until it reaches a value it already trusts.
+
+Redemption resolves both objects with one formula:
+
+```text
+claimed = amount + chain_index × chunk_price
+```
+
+A preimage is self-proving — nobody derives a deeper one without the seed — so accepting a tick costs one hash, with no signature, no round trip and nothing to persist before the next chunk ships. Signatures are therefore O(1) per transfer rather than one per interval.
+
+The payment quantum is `chunk_bytes` = **1 MiB**, a protocol constant. Nothing negotiates it and no message carries it: the payer and node must price a released preimage identically, and a fixed constant removes the disagreement rather than negotiating it away. Because a chunk is exactly one MB of price, `chunk_price` is the node's advertised `rate_per_mb` — and the node rejects any voucher whose signed `chunk_price` does not equal its own quote.
+
+## Credit window
+
+A node's exposure is bounded by a per-lane **credit window** — the unpaid balance it will carry before it pauses — not by the meter's resolution. The window starts at a floor and ramps as the lane pays, so a new payer proves itself on small credit before a node extends more.
 
 ## Rate discovery
 
-Each node advertises its own per-MB rate. Governance sets rate bounds (in USDC); a node advertising outside the bounds is ignored by selection. Rates can change between streams.
+Each node advertises its own per-MB rate, quoted in every signed probe response. Governance sets rate bounds (in USDC); a node advertising outside the bounds is ignored by selection. A quoted rate is binding for any stream opened inside the slashing window ([slashing](/protocol/slashing)).
 
-## Dispute window
+## Minimum deposit
 
-A window after `closeChannel` during which either party can submit a later (higher-nonce) voucher via `disputeChannel` if a stale close was filed. Default 48 hours, governable within 12h–72h.
+`openPool` enforces a governance-set `minDeposit` on the credited deposit. It is a Sybil knob: the per-pool solvency floor bounds loss within one pool, and an attacker escapes it by fanning out across many pools, so the floor taxes the capital locked in simultaneous pools. Deposits stay fully refundable, and the parameter **ships dormant at zero** so small honest pools remain available; governance arms it if Sybil pressure warrants.

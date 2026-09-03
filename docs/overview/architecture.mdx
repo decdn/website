@@ -1,6 +1,6 @@
 ---
 title: Architecture
-description: The node, client, and origin-backend roles, plus the full path of a paid delivery — discovery, selection, channel open, streamed bytes, vouchers.
+description: The node, client, and origin-backend roles, plus the full path of a paid delivery — discovery, selection, streamed bytes, vouchers, redemption.
 ---
 
 ## System diagram
@@ -32,30 +32,27 @@ graph TD
     C3 -->|"paid delivery"| N3
 
     N2 -.->|opaque fetch| S3
-
-    N1 <-.->|"gossip"| N2
-    N2 <-.->|"gossip"| N3
 ```
 
 ## Participant roles
 
-| Role                     | Operated by                                      | Participates in CDN?                                      |
-| ------------------------ | ------------------------------------------------ | --------------------------------------------------------- |
-| **Node (pure cache)**    | Independent node operator                        | Yes — bonds, gossips, probes, delivers                    |
-| **Node (origin-backed)** | Content provider _or_ node operator with storage | Yes — same protocol, plus a DAO-recognized origin backend |
-| **Client**               | End-user or application                          | Pays for bytes; subscribes to gossip but does not publish |
+| Role                     | Operated by                                      | Participates in CDN?                                        |
+| ------------------------ | ------------------------------------------------ | ----------------------------------------------------------- |
+| **Node (pure cache)**    | Independent node operator                        | Yes — bonds, probes, publishes to the DHT, delivers         |
+| **Node (origin-backed)** | Content provider _or_ node operator with storage | Yes — same protocol, plus a publisher-seated origin backend |
+| **Client**               | End-user or application                          | Pays for bytes; reads the registry but holds no role        |
 
 See [Participants](/overview/participants) for a deeper breakdown per role.
 
 ## Life of a paid delivery
 
-1. **Client bootstrap** — client generates a keypair, queries the on-chain registry, seeds a peer table, and subscribes to regional + global gossip topics.
-2. **Discovery** — client probes its known peers for a blob hash. On miss, any peer performs a DHT lookup to locate holders.
+1. **Client bootstrap** — client generates a keypair, queries the on-chain registry for the active node set, and caches it.
+2. **Discovery** — a DHT lookup locates holders of the blob hash, and a parallel probe confirms which of them will actually serve the wanted range, at what rate and latency.
 3. **Selection** — returned candidates are scored by price, latency, and reputation; lowest cost wins.
-4. **Payment channel open** — client opens a USDC payment channel with the selected node on-chain ([payments](/protocol/payments)).
-5. **Streaming + vouchers** — node streams to the client; client signs off-chain vouchers as bytes flow.
-6. **Cache-miss fan-out** — if the node doesn't have the blob, it pulls from another peer (paid). Every byte delivered in the network is paid.
-7. **Channel close** — either party initiates settlement on-chain, with a dispute window for stale closes.
+4. **Payment** — the client pays from a USDC pool it opened once, off the fetch path, and reuses for every node ([payments](/protocol/payments)).
+5. **Streaming + vouchers** — node streams to the client; client signs a cumulative voucher and releases one hash-chain preimage per megabyte as bytes flow.
+6. **Cache-miss fan-out** — if the node doesn't have the blob, it pulls from other holders (paid). Every byte delivered in the network is paid.
+7. **Redemption** — the node redeems its own vouchers on-chain whenever it likes; the owner closes the pool to reclaim the unspent remainder.
 
 ## Key invariants
 
@@ -64,7 +61,7 @@ See [Participants](/overview/participants) for a deeper breakdown per role.
 - A node cannot join the mesh without bonding — registration enforces a capacity bond (`bond = k × Mbps^α`) scaled to declared bandwidth, rather than a flat minimum.
 - A node cannot register an identity it does not control — both keys must sign at registration.
 - Safety bounds on all governable parameters are hardcoded — governance cannot set fees to 100% or push the operator revenue share below its floor.
-- Being recognized as an origin is DAO-governed — configuring an origin backend locally without authorization means the node's bytes are served only as cache.
+- Being recognized as an origin is gated on-chain — governance vets a publisher wallet, and the vetted publisher seats its own origin operators per namespace. Configuring an origin backend locally without being seated means the node's bytes are served only as cache.
 - A node cannot serve a blacklisted hash after the compliance window — doing so is slashable.
 
 ## Non-goals

@@ -1,6 +1,6 @@
 ---
 title: Content addressing
-description: Every blob is addressed by its BLAKE3 hash and verified in-stream with bao, so clients never trust a node to return the right bytes.
+description: Every blob is addressed by its BLAKE3 hash and verified in-stream with bao, with a namespace naming who is authorized to serve it from origin.
 ---
 
 ## Decision
@@ -14,32 +14,38 @@ Every blob is identified by its **BLAKE3 hash**. Clients and nodes verify receiv
 
 ## Verified streaming
 
-Delivery uses **bao** — an interleaved verified-stream encoding of the BLAKE3 tree. The `cdn/client/v1` paid-delivery payload is always bao bytes: content interleaved with the hash proofs needed to verify each 16 KiB chunk group against the root the client expects. The bao decoder verifies every chunk group as it arrives. A malicious node cannot insert a single corrupt byte and still earn — the client rejects the stream before paying for that chunk group.
+Delivery uses **bao** — an interleaved verified-stream encoding of the BLAKE3 tree. The paid-delivery payload is always bao bytes: content interleaved with the hash proofs needed to verify each 16 KiB chunk group against the root the client expects. The bao decoder verifies every chunk group as it arrives. A malicious node cannot insert a single corrupt byte and still earn — the client rejects the stream before paying for that chunk group.
 
 Because every chunk group carries its own proof, a resumed or ranged fetch verifies **independently** — the decoder aligns the requested offset down to its 16 KiB chunk-group boundary, so there's no need to re-read from the start. Payment meters all transmitted bytes, including the proof bytes: the verification overhead is roughly **0.4%** of blob size, not free metadata.
 
 An origin-cold node must import or build the blob's **outboard** (its BLAKE3 tree) before it can serve verified ranges. Node-to-node cache-miss pulls stay bao-encoded and pipelined end to end.
 
+## Publishers and namespaces
+
+A hash answers "what is this blob?". It does not answer "who is responsible for serving it?" — that is a **namespace**, a publisher-owned identifier for a content set and the unit of origin addressing. A delivery request pairs the hash with the namespace its content is published under, and the node routes on it:
+
+| Namespace        | How the node resolves a miss                                                                                                   |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| Named (non-zero) | Routes to that namespace's authorized origins. If none hold the bytes, the fetch fails.                                        |
+| Default (zero)   | No publisher, no authorized origins — served best-effort from cache or DHT-discovered holders, with no availability guarantee. |
+
+The namespace is a **routing hint, not a trust anchor**: bytes are verified against the hash independently, so a wrong or hostile namespace can only cause a failed fetch, never corrupt or mis-attributed delivery. Cache-only serving stays permissionless — any staked operator may re-serve bytes it holds, for any hash, under any namespace. Only the origin role is namespace-gated ([takedown](/protocol/takedown#origin-assignment)).
+
 ## Hash-to-object-key mapping
 
-Origin backends speak their own namespace: S3 objects are addressed by key, NFS by path, local disk by filename. Blobs are addressed by BLAKE3 hash. The mapping lives in a **content catalog** — a small database (PostgreSQL or SQLite) maintained by the operator:
-
-```text
-catalog: hash → { s3_bucket, s3_key, size_bytes, content_type }
-```
-
-The catalog is not on-chain; it is an operational concern. Origin-backed nodes query it on cache miss to locate the pull URL.
+Origin backends speak their own namespace: S3 objects are addressed by key, NFS by path, local disk by filename. Blobs are addressed by BLAKE3 hash. The mapping between them is a private catalog held by the operator and queried on cache miss to locate the bytes. It is not on-chain and not part of the protocol — the protocol only requires that a node deliver the correct bytes for a given hash.
 
 ## Why the origin is hidden
 
-Leaking the origin URL would bypass the pay-per-byte economic model — anyone could download directly from S3 and skip the CDN entirely. Redirects point to other nodes, never to an external URL. The origin backend is not addressable from outside the node process.
+Leaking the origin URL would bypass the pay-per-byte economic model — anyone could download directly from S3 and skip the CDN entirely. A stream response carries no route hint of any kind, so the backend topology of origin-backed nodes is fully hidden from the network, and the origin backend is not addressable from outside the node process.
 
 This also protects origin operators from direct egress cost attacks: an adversary cannot generate S3 traffic by pointing clients at the bucket URL.
 
 ## What clients verify vs. trust
 
-| Property          | Verified         | Trusted                                                                    |
-| ----------------- | ---------------- | -------------------------------------------------------------------------- |
-| Byte correctness  | BLAKE3 hash tree | —                                                                          |
-| Blob availability | —                | Node's signed availability claim (slashable via phantom-announcement path) |
-| Origin durability | —                | Origin operator's S3/NFS configuration (off-protocol)                      |
+| Property          | Verified         | Trusted                                                             |
+| ----------------- | ---------------- | ------------------------------------------------------------------- |
+| Byte correctness  | BLAKE3 hash tree | —                                                                   |
+| Blob availability | —                | Node may decline to serve; the client re-routes and re-pays nothing |
+| Rate honesty      | —                | Quoted rate is binding within the slashing window (slashable)       |
+| Origin durability | —                | Origin operator's S3/NFS configuration (off-protocol)               |

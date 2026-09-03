@@ -11,7 +11,7 @@ A **node** is a bonded QUIC endpoint that caches and serves content-addressed bl
 
 - **Identity.** A network keypair bound on-chain to an Ethereum address at registration ([network](/protocol/network)).
 - **Bond.** A capacity bond in TOKEN, scaled to declared bandwidth (`bond = k × Mbps^α`) — the only TOKEN-side requirement to join the mesh; the bond scales with declared capacity rather than a flat minimum.
-- **Gossip.** Publishes node metadata on a global topic and a regional topic. Also emits rate-change updates.
+- **Discovery.** Registered on-chain with its addresses and region; publishes a DHT record for each blob it caches, and quotes its current rate in every signed probe response.
 - **Delivery.** Serves the paid-delivery protocol — the sole rail for both client→node and node→node traffic.
 - **Earnings.** Per-MB voucher revenue in USDC.
 
@@ -29,15 +29,15 @@ Two deployment shapes:
 A **client** is a lightweight QUIC endpoint that consumes content and pays for it.
 
 - **Identity.** Ephemeral network keypair — no stake, no on-chain registration.
-- **Gossip.** Subscribes to topics but does not publish.
-- **Payment.** Opens an on-chain USDC payment channel with each node it buys from, then signs off-chain vouchers as bytes flow ([payments](/protocol/payments)).
-- **Trust model.** Verifies hashes on all bytes received. Trusts nodes for availability (slashable if claimed and not delivered), not for content.
+- **Discovery.** Reads the on-chain registry for its peer set and queries the DHT for holders. Publishes nothing and holds no network role.
+- **Payment.** Opens one on-chain USDC pool, reuses it for every node it buys from, and signs cumulative off-chain vouchers as bytes flow ([payments](/protocol/payments)).
+- **Trust model.** Verifies hashes on all bytes received. Trusts no node for content, and none for availability either — a node may decline to serve, and the client simply re-routes without paying for the attempt.
 
-Clients can run a multi-node parallel download for large files and resume crashed transfers from the last verified byte.
+Clients can run a multi-source parallel download for large files, pulling disjoint ranges from several holders at once, and resume crashed transfers from the last verified byte.
 
 ## External components
 
-These are **not CDN protocol participants**. They ride the same QUIC transport but do not gossip, probe, or bond.
+These are **not CDN protocol participants**. They ride the same QUIC transport but do not register, probe, or bond.
 
 ### Origin backend
 
