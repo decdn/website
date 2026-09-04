@@ -36,11 +36,11 @@ graph TD
 
 ## Participant roles
 
-| Role                     | Operated by                                      | Participates in CDN?                                        |
-| ------------------------ | ------------------------------------------------ | ----------------------------------------------------------- |
-| **Node (pure cache)**    | Independent node operator                        | Yes — bonds, probes, publishes to the DHT, delivers         |
-| **Node (origin-backed)** | Content provider _or_ node operator with storage | Yes — same protocol, plus a publisher-seated origin backend |
-| **Client**               | End-user or application                          | Pays for bytes; reads the registry but holds no role        |
+| Role                     | Operated by                                      | Participates in CDN?                                                          |
+| ------------------------ | ------------------------------------------------ | ----------------------------------------------------------------------------- |
+| **Node (pure cache)**    | Independent node operator                        | Yes — bonds, probes, publishes to the DHT, delivers                           |
+| **Node (origin-backed)** | Content provider _or_ node operator with storage | Yes — same protocol, plus authorization to serve as an origin for a namespace |
+| **Client**               | End-user or application                          | Pays for bytes; reads the registry but holds no role                          |
 
 See [Participants](/overview/participants) for a deeper breakdown per role.
 

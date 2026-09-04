@@ -28,16 +28,16 @@ The phase ends when the multisig judges the operator set broad and diverse enoug
 
 Even governance cannot set parameters outside these bounds:
 
-| Parameter                                 | Default  | Bounds       |
-| ----------------------------------------- | -------- | ------------ |
-| Operator revenue share (`FeeRouter` base) | 60%      | 40% – 90%    |
-| Burn share (`FeeRouter`)                  | 30%      | 5% – 50%     |
-| Treasury share (`FeeRouter`)              | 10%      | 0% – 30%     |
-| Redemption grace window                   | 48 h     | 48 h – 72 h  |
-| Per-operator voting cap                   | 5%       | 1% – 25%     |
-| Trailing vote window                      | 13 weeks | 4 – 26 weeks |
-| Capacity-curve exponent (α)               | 1.2      | 1.0 – 1.8    |
-| Unbonding window                          | 14 days  | 7 – 60 days  |
+| Parameter                                 | Default          | Bounds               |
+| ----------------------------------------- | ---------------- | -------------------- |
+| Operator revenue share (`FeeRouter` base) | 60%              | 40% – 90%            |
+| Burn share (`FeeRouter`)                  | 30% (0% dormant) | 5% – 50% when active |
+| Treasury share (`FeeRouter`)              | 10%              | 0% – 30%             |
+| Redemption grace window                   | 48 h             | 48 h – 72 h          |
+| Per-operator voting cap                   | 5%               | 1% – 25%             |
+| Trailing vote window                      | 13 weeks         | 4 – 26 weeks         |
+| Capacity-curve exponent (α)               | 1.2              | 1.0 – 1.8            |
+| Unbonding window                          | 14 days          | 7 – 60 days          |
 
 The three `FeeRouter` shares must sum to exactly 100% on every update. The burn share is the one that also accepts **zero**, so the buyback sink can be switched off entirely; what it cannot be is nominally on at a negligible share — either off, or at 5% or more.
 
