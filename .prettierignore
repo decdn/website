@@ -7,3 +7,6 @@ next-env.d.ts
 .husky/_/
 .claude/settings.local.json
 .claude/worktrees/
+# `gh aw compile` output. Prettier rewrites the quoting and splits `run: | # zizmor: ignore[...]`
+# onto two lines, detaching the directive from the step it annotates. Update via `gh aw compile`.
+.github/workflows/*.lock.yml
