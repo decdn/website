@@ -22,3 +22,9 @@ updates:
     directory: "/"
     schedule:
       interval: "monthly"
+    ignore:
+      # The *.lock.yml workflows are `gh aw compile` output. Bumping this pin on its own
+      # desynchronises it from the awf binary version, the gh-aw-firewall image tag and the
+      # embedded gh-aw-manifest header, which only a recompile can move together. Update it
+      # with `gh aw compile` instead.
+      - dependency-name: "github/gh-aw-actions/setup"

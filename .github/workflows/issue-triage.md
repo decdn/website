@@ -15,6 +15,11 @@ permissions: read-all
 
 network: defaults
 
+# Collect awf container logs / exit codes into the firewall-audit-logs artifact when the
+# sandbox fails to start. See https://github.github.com/gh-aw/reference/feature-flags/
+features:
+  awf-diagnostic-logs: true
+
 # # This workflow runs often, so you can use a small model to keep costs down.
 # engine:
 #   model: small
@@ -26,6 +31,9 @@ safe-outputs:
 
 tools:
   web-fetch:
+  # Required explicitly under the compiler's strict mode because github.min-integrity is
+  # 'none'. The prompt's only shell need is `gh label list` (step 3).
+  bash: ["gh label list"]
   github:
     toolsets: [issues]
     min-integrity: none # This workflow is allowed to examine and comment on any issues
