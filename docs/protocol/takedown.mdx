@@ -1,11 +1,14 @@
 ---
 title: Content takedown
-description: An on-chain hash blacklist with global and regional entries, a 24-hour compliance window for governance takedowns, and an immediate emergency path.
+description: Symmetric on-chain authority over origins — a hash blacklist with global, regional and emergency entries, plus publisher-seated origin assignment.
 ---
 
 ## Decision
 
-A **`ContentBlacklist`** contract supports **global** (network-wide) and **regional** (jurisdiction-scoped) takedown. Standard governance entries have a **24-hour compliance window**; the emergency multisig path takes effect **immediately** with a **2-hour slash window**.
+Content governance over origins has two symmetric authorities, both DAO-controlled:
+
+- **Negative — `ContentBlacklist`.** Removes hashes and operators through a **global** (network-wide) path and a **regional** (jurisdiction-scoped) path. Standard governance entries carry a **24-hour compliance window**; the emergency multisig path takes effect **immediately** with a **2-hour slash grace**.
+- **Positive — `OriginAssignment`.** Authorizes specific operators to act as origins for specific namespaces ([content addressing](/protocol/content-addressing#publishers-and-namespaces)).
 
 The emergency takedown power is a **permanent** capability — unlike the multisig's protocol-wide `pause()`, which [sunsets at 12 months](/protocol/governance#emergency-multisig), emergency blacklisting does not sunset, since unlawful-content removal is an ongoing legal-compliance duty. (Individual emergency _entries_ still auto-expire unless ratified — see [Entry types](#entry-types) below.)
 
@@ -17,7 +20,7 @@ The blacklist must be:
 - **Atomic per-node.** Every node polls the same source of truth. No partial propagation.
 - **Auditable.** Anyone can see what has been blacklisted and when.
 
-Gossip-only blacklists fail all three. On-chain entries with governance gating meet them.
+Off-chain distribution fails all three. On-chain entries with governance gating meet them.
 
 ## Entry types
 
@@ -28,26 +31,43 @@ Gossip-only blacklists fail all three. On-chain entries with governance gating m
 | Emergency                    | 3-of-5 multisig          | Immediately (with 2 h slash grace)            | 14 days                      |
 | Emergency (CSAM / terrorist) | 3-of-5 multisig          | Immediately                                   | 90 days                      |
 
-Emergency entries **auto-expire unless ratified by governance** before the deadline — preventing the multisig from maintaining a permanent de-facto blacklist without oversight.
+Emergency entries **auto-expire unless ratified by governance** before the deadline — preventing the multisig from maintaining a permanent de-facto blacklist without oversight. Expiry needs no transaction: the entry simply stops being enforceable, and anyone may then clean it out of storage permissionlessly.
+
+The emergency path is deliberately one-way with respect to governance — it can always make enforcement stricter, never looser. Both compliance windows are governable within one set of hardcoded bounds: minimum 1 hour, maximum 7 days. The floor is what keeps the emergency path honest — governance cannot compress the window below a single poll cycle and slash nodes for entries they had no opportunity to learn about.
 
 ## Why the 2-hour slash grace
 
-The emergency path takes effect immediately in terms of "don't serve this", but the first 2 hours cannot result in a slash. This absorbs gossip propagation lag and clock skew — a node that genuinely hasn't seen the entry yet is given a realistic reaction window before liability attaches.
+The emergency path takes effect immediately in terms of "don't serve this", but the first 2 hours cannot result in a slash. This absorbs blacklist-poll lag and clock skew — a node that genuinely hasn't seen the entry yet is given a realistic reaction window before liability attaches.
 
 ## Regional scoping
 
-A **regional** entry applies only to nodes that advertise a matching region. The right to add regional entries is granted to regional governance bodies on a per-region basis.
+A **regional** entry applies only to nodes that advertise a matching region. The right to add regional entries is granted to regional governance bodies on a per-region basis; the emergency multisig can suspend a compromised body immediately. Governance must then ratify or reverse within 14 days, and **silence lapses the suspension** — the body resumes writing, exactly as an unratified emergency entry expires. Neither is a standing act of governance, and sustaining one on silence alone would let the multisig disable a jurisdiction permanently with no vote ever taken. Suspension also bounds only a body's _future_ authority: entries it already issued stay live.
 
-A node serving a globally-blacklisted hash is always slashable. A node in `region: DE` serving a `DE`-regional entry is slashable; that same node serving the entry via a US client is a gray area — current guidance is that operators adopt the strictest jurisdiction their node's region subjects them to.
+Scope follows the **operator's** declared region — never the requester's. A node serving a globally-blacklisted hash is always slashable. A node declaring `DE` is slashable for a `DE`-regional entry; a node declaring `US` is not slashable for a hash blacklisted only by the EU body, regardless of where its clients are — the requester's location is not an input. A node cannot shed exposure by flipping regions after the fact either: slash eligibility is evaluated against the region in force when the bytes were served.
+
+## Sub-day removal orders
+
+Some statutory regimes bind the operator that receives a removal order to a sub-day deadline — the EU Terrorist Content Online Regulation's one-hour clock is the tightest. Such an order is discharged at the operator level, on the [local denylist](#local-denylist): it takes effect on the next reload, needs no governance round-trip, and binds exactly what the order binds — the recipient's own serving. Network-wide removal on that clock goes through the emergency multisig.
+
+## Origin assignment
+
+The blacklist is the DAO's authority to _remove_ an origin. `OriginAssignment` is the symmetric authority to _grant_ one, and it separates two planes:
+
+- **Vetting** is governance's job, done once per publisher wallet under a swappable vetting policy.
+- **Seating** is the publisher's job. A vetted publisher picks its own origin operators from the bonded set, per namespace, instantly and with no further governance action. Multiple operators may serve one namespace, so redundancy is a namespace-level property.
+
+Without positive authority, origin assignment would be entirely off-protocol: no Sybil resistance on origin claims, no enforced redundancy, and no way to pre-authorize rather than punish after the fact. Cache-only serving remains permissionless throughout — only the origin role is gated here.
 
 ## Origin blacklisting
 
-Re-uploading blacklisted content under a fresh hash (trivial re-encoding) is defeated by **origin blacklisting** — the blacklist contract can blacklist an **operator address**. Re-uploading requires fresh stake under a new identity. This raises the cost of hash evasion from "re-encode" to "spin up a new operator, restake, re-register".
+Re-uploading blacklisted content under a fresh hash (trivial re-encoding) is defeated by **origin blacklisting** — the blacklist contract can blacklist an **operator address**. A blacklisted operator is ejected from the registry, drops out of every namespace's authorized origin set, has its remaining bond enter forced unbonding, and cannot re-register under the same address while the entry stands. It cannot self-reinstate by re-bonding: lifting the ban is a governance action.
+
+Ejection is not slashing — the bond is returned after unbonding absent a separate offense. Serving a blacklisted hash is the slashable act; repeatedly sourcing blacklisted content is what gets an operator ejected. Together they raise the cost of hash evasion from "re-encode" to "spin up a new operator, restake, re-register".
 
 ## Local denylist
 
-Each node maintains a **local denylist** for direct legal notices (e.g., a DMCA takedown served to one operator). Local denylists don't propagate and don't trigger slashes elsewhere — they're a per-operator compliance tool.
+Each node maintains a **local denylist** for direct legal notices (e.g., a DMCA takedown served to one operator). Local denylists don't propagate and don't trigger slashes elsewhere — they're a per-operator compliance tool, and the fastest removal path the protocol offers.
 
 ## Slash schedule
 
-Blacklist violations use an escalating schedule: **5% / 15% / 50%** for first / second / third offense (capped at 50% per offense). Offenses accumulate over the operator's lifetime; a node whose bond falls below 50% of the minimum is auto-ejected.
+Blacklist violations use an escalating schedule — **5% / 15% / 50%** by default for first / second / third offense, capped at 50% per offense. Offenses accumulate over the operator's lifetime; a node whose bond falls below 50% of the minimum is auto-ejected.

@@ -1,17 +1,33 @@
 ---
 title: Slashing & on-chain verification
-description: Three slashable offenses — phantom announcement, rate manipulation, blacklist violation — adjudicated on-chain, with a 30-day operator appeal.
+description: Two slashable offenses — rate manipulation and blacklist violation — adjudicated on-chain via commit–reveal, with a 30-day operator appeal.
 ---
 
 ## Decision
 
-Three slashable offenses with concrete on-chain evidence paths:
+Two slashable offenses, each resting on cryptographically dispositive signed evidence:
 
-1. **Phantom announcement** — claimed availability, failed to deliver.
-2. **Rate manipulation** — charged a rate different from the advertised rate.
-3. **Blacklist violation** — served a blacklisted hash after the compliance window.
+1. **Rate manipulation** — charged a rate **higher** than the rate quoted in a signed probe response within the slashing window. (Charging less than quoted is not an offense.)
+2. **Blacklist violation** — served a blacklisted hash after the compliance window.
 
-A unified on-chain judge adjudicates all three synchronously and triggers the bond reduction immediately upon verification — there is no in-protocol counter-evidence window, because each offense rests on cryptographically dispositive signed evidence. The reduced bond is then held in escrow pending a post-slash appeal (below), not distributed on the spot.
+Every probe and stream response carries a mandatory signature over its security-relevant fields, produced with the node's Ethereum key, so any protocol message is portable evidence verifiable on-chain. A unified on-chain judge adjudicates both offenses synchronously and triggers the bond reduction immediately upon verification — there is no in-protocol counter-evidence window. The reduced bond is then held in escrow pending a post-slash appeal (below), not distributed on the spot.
+
+## What is not slashable
+
+- **Corrupted delivery.** Absorbed at the wire: the payer verifies each chunk group as it arrives and pays only behind verification — it withholds the preimage that would meter a corrupt chunk, and signs no voucher covering it. The node ships garbage unpaid, and its local reputation drops. There is no on-chain path.
+- **Refusing to serve.** A node may decline any request — for price, capacity, or policy reasons. The client re-routes to another provider and pays only a latency cost.
+
+## Commit–reveal challenges
+
+Submitting evidence is a two-phase flow: a `commitChallenge` registers an opaque commitment that moves no funds, and the reveal resolves synchronously once the commitment matures.
+
+The phases exist because the reveal must disclose the full evidence — the signed responses themselves — in its calldata. Without a prior commitment, a mempool watcher could copy a pending honest challenge, resubmit it under its own address, and capture the challenger reward. The bond is never what's at stake here — it is returned on a successful challenge and never transferred at all on a failed one — so the reward is the whole exposure, and it is also the entire incentive for off-path witnesses. Leaving it extractable would hollow out enforcement.
+
+## The slashing window
+
+A node's last probe-quoted rate is binding for **30 seconds**. Any stream opened inside that window must be served at or below the quoted rate; a legitimate rate change waits the window out before serving at the new price. Two signed messages from the same node disagreeing about its own rate inside 30 seconds are non-repudiable, which is what makes the offense adjudicable without a counter-evidence step.
+
+This is distinct from **evidence staleness** below: the slashing window bounds when an offense can be _committed_, evidence age bounds how long it can be _submitted_.
 
 ## Evidence staleness
 
@@ -19,8 +35,8 @@ Evidence has a maximum age, set strictly below the unbonding period — so an ac
 
 ## Escrow and appeals
 
-The bond reduction is immediate, but the slashed TOKEN sits in `CapacityBond` escrow rather than being paid out at slash time. The slashed **operator** — and only the operator — may file an **operational-failure appeal** within **30 days** (e.g. a genuine network outage, NTP drift, or hosting incident prevented compliance), posting a TOKEN appeal bond. The emergency multisig fast-tracks or rejects within a fixed window; the Governor then grants or upholds. A **granted** appeal refunds the full escrowed bond to the operator; a **failed** appeal distributes the escrow like an unappealed slash. The lifetime offense counter is unchanged either way — an appeal restitutes capital, not standing.
+The bond reduction is immediate, but the slashed TOKEN sits in escrow rather than being paid out at slash time. The slashed **operator** — and only the operator — may file an **operational-failure appeal** within **30 days** (e.g. a genuine network outage, NTP drift, or hosting incident prevented compliance), posting a TOKEN appeal bond. The emergency multisig fast-tracks or rejects within a fixed window; the Governor then grants or upholds. A **granted** appeal refunds the full escrowed bond to the operator; a **failed** appeal burns the appeal bond and distributes the escrow like an unappealed slash. The lifetime offense counter is unchanged either way — an appeal restitutes capital, not standing.
 
 ## Challenger incentives
 
-Submitting evidence requires a **100 TOKEN** bond. A challenge that fails on-chain verification simply reverts — the challenger only loses gas, and the bond is not transferred. A challenge that passes always slashes the node and the bond is returned. At finality (≤ 30 days with no appeal, later if one is filed) the escrowed bond is split **50% to the challenger / 50% burned**, unless the operator's appeal is granted, in which case the operator is refunded and no challenger reward is paid.
+Submitting evidence requires a **100 TOKEN** bond, transferred at the reveal. A reveal that fails on-chain verification simply reverts — the challenger only loses gas, and the bond is not transferred. A challenge that passes always slashes the node and the bond is returned. At finality (≤ 30 days with no appeal, later if one is filed) the escrowed bond is split **50% to the challenger / 50% burned**, unless the operator's appeal is granted, in which case the operator is refunded and no challenger reward is paid.

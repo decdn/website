@@ -1,35 +1,50 @@
 ---
 title: Reputation
-description: Nodes are scored 0.0–1.0 from local delivery outcomes plus weighted gossip from staked peers, with per-report clamps, decay, and a cold-start bonus.
+description: Each node scores its peers 0.0–1.0 from its own delivery outcomes alone — an EWMA over speed, correctness and reachability, decaying toward neutral.
 ---
 
 ## Decision
 
-Nodes are ranked by a **reputation score** in `[0.0, 1.0]` derived from a combination of direct local observation and signed gossip reports from staked nodes. Local experience dominates; gossip sharpens the picture for nodes you have not yet interacted with.
+Reputation is **local-only**. Each node scores its peers from its own direct delivery observations and nothing else: no propagation, no cross-node aggregation, no network-wide score, no on-chain reputation state. A node's ranking of a peer reflects only interactions it witnessed itself — the same tit-for-tat principle BitTorrent uses for peer selection, which needs no global reputation to work at scale.
 
-Only staked nodes may submit gossip reports. Clients contribute to local scores only.
+Reputation is **not** the Sybil or corruption defense — stake, the capacity bond, mandatory progressive BLAKE3 verification and no-payment-on-failed-delivery are. It is not an eligibility gate, a governance input, or a component of settlement or vote weight. It only tunes each requester's selection probability among otherwise-eligible nodes.
 
-## Reporter weighting
+## Scoring
 
-A report's weight is a function of the reporter's track record and counterparty diversity, computed against on-chain settlement history. A node that has only ever settled with itself and a few colluders is heavily down-weighted; a node that has settled fairly with many counterparties is trusted more. Reporter weight is bounded so no single party dominates.
+Scores live in `[0.0, 1.0]`. A peer a node has never used is **unscored and treated as neutral (0.5)**, so it stays fully selectable — traffic keeps exploring rather than converging on incumbents.
 
-## Clamping and cold-start
+After each interaction the node folds the outcome in with an EWMA (α = 0.1):
 
-- **Per-report clamp.** A single report can move a target's score by at most a bounded amount, preventing flash-crashes from coordinated negatives.
-- **Decay toward neutral.** In the absence of fresh reports, scores drift toward a neutral value over time.
-- **Cold-start bootstrap.** New nodes get a small initial reputation bonus so they can earn their first traffic. The bootstrap is one-time per operator address — re-staking under a new identity does not replay it.
+```text
+local_score      = ewma(local_score, interaction_score, alpha = 0.1)
+interaction_score = 0.4 × speed + 0.4 × correctness + 0.2 × reachability
+```
 
-## What triggers reports
+| Signal                                     | Range        | Weight |
+| ------------------------------------------ | ------------ | ------ |
+| Delivery speed (bytes/sec vs. a reference) | 0.0–1.0, log | 40%    |
+| Data correctness (BLAKE3 verified)         | 0.0 or 1.0   | 40%    |
+| Connection success (reachable?)            | 0.0 or 1.0   | 20%    |
 
-Interaction outcomes generate reports. Examples:
+Speed is normalized on a log curve against a node-local reference throughput (default 1 GiB/s) that deliberately **does not saturate** — a materially faster peer earns a materially better score instead of tying with every other fast peer.
 
-| Event                                        | Local score change | Gossip report?                                    |
-| -------------------------------------------- | ------------------ | ------------------------------------------------- |
-| Clean delivery, valid voucher accepted       | Small positive     | Optional                                          |
-| Hash mismatch mid-stream                     | Large negative     | Yes                                               |
-| Probe claimed availability but stream failed | Negative           | Yes (candidate for phantom-announcement slashing) |
-| Charged rate ≠ advertised rate               | Negative           | Yes (candidate for rate-manipulation slashing)    |
+A single interaction moves a peer's score by at most **±0.05**, so one bad exchange cannot destroy a good peer's standing.
 
-## Why not purely on-chain?
+## Why correctness is only one signal among several
 
-On-chain reputation scales poorly — thousands of report transactions per hour would be cost-prohibitive. Reports stay in gossip and only escalate to on-chain slashing when the evidentiary bar is crossed. Reporter weighting still anchors to on-chain settlement history, so it remains auditable.
+Reputation measures service quality, not honesty. Corruption is absorbed at the wire: progressive BLAKE3 verification means a corrupt window yields no voucher, so the node ships garbage unpaid. The reputation hit compounds on top — a corruption event zeros the correctness component, moves the EWMA down, and degrades selection through a quadratic reputation penalty. Lost revenue plus lost traffic make sustained corruption irrational without an on-chain path.
+
+## Decay toward neutral
+
+Without fresh data a score decays back to 0.5, applied closed-form at read time from the last update:
+
+```text
+score_new = 0.5 + (score_old − 0.5) × 0.5 ^ (elapsed / half_life)
+```
+
+`half_life` is node-local, default 3 days. Each half-life halves the distance to neutral, so a peer that stops being used drifts back to unopinionated rather than holding a stale high or low score.
+
+## What does not move a score
+
+- **Requester-side aborts.** A pull abandoned because throughput fell below the requester's floor produces no interaction outcome and never updates the EWMA. The slowness may come from the link, from congestion, or from the requester's own consumption, and a throughput signal is spoofable — so it is not evidence about the peer. The requester still stops using that peer for that blob, as a local, reputation-neutral suppression.
+- **Anything a peer reported.** Scores never travel between nodes, so there are no third-party reports to weight, replay, or coordinate.
