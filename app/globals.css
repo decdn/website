@@ -1313,7 +1313,7 @@ a.underline-brutal:hover .arrow {
   padding: var(--faq-pad);
   border: 1px solid var(--faq-edge);
   /* box-shadow follows the border-box radius, so the offset block rounds too. */
-  border-radius: 0.9rem;
+  border-radius: 10px;
   box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--paper) 12%, transparent);
 }
 .faq-card[data-selected="true"] {
