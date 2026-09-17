@@ -1245,3 +1245,154 @@ a.underline-brutal:hover .arrow {
     display: none;
   }
 }
+
+/* --- faq: question list + answer card (§04) ---------------------------
+   One <dl>, two columns. Questions (dt) stack on the left; every answer (dd)
+   is pinned to the top of the right column and only the selected one is
+   visible. The selected row's ordinal turns whisper to match the ghost
+   ordinal pinned to the card's bottom-right corner.
+
+   Every dd shares one grid area — all question rows plus a trailing
+   minmax(0, 1fr) sink row — and stretches to fill it, so every card is the
+   same size: the height of the longest answer (or of the question list, if
+   that is taller), never the height of the answer currently showing. An
+   item that crosses a flexible track is excluded from the auto rows'
+   intrinsic sizing (css-grid §12.5), so the longest answer grows the sink,
+   not the question rows. At phone width the cards stack under their own
+   question and take their content height, so nothing can be clipped.
+
+   Breakpoints are container queries against Frame's @container wrapper —
+   these rules are unlayered and would beat @xl: utilities. */
+
+.faq-grid {
+  --faq-gap: clamp(2rem, 5vw, 5rem);
+  --faq-pad: clamp(1.5rem, 3vw, 2.75rem);
+  --faq-rule: color-mix(in srgb, currentColor 20%, transparent);
+  --faq-edge: color-mix(in srgb, var(--paper) 30%, transparent);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  margin: 0;
+  border-bottom: 1px solid var(--faq-rule);
+}
+
+.faq-row {
+  border-top: 1px solid var(--faq-rule);
+}
+
+.faq-q {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  width: 100%;
+  padding: 1.5rem 0;
+  text-align: left;
+  color: color-mix(in srgb, currentColor 55%, transparent);
+  cursor: pointer;
+  transition: color 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.faq-q:hover,
+.faq-row[data-selected="true"] .faq-q {
+  color: inherit;
+}
+.faq-ordinal {
+  transition: color 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.faq-row[data-selected="true"] .faq-ordinal {
+  color: var(--whisper);
+}
+.faq-q:focus-visible {
+  outline: 1px dashed currentColor;
+  outline-offset: 4px;
+  border-radius: 1px;
+}
+
+.faq-card {
+  position: relative;
+  display: none;
+  margin: 0 0 1.5rem;
+  padding: var(--faq-pad);
+  border: 1px solid var(--faq-edge);
+  box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--paper) 12%, transparent);
+}
+.faq-card[data-selected="true"] {
+  display: block;
+}
+
+/* Restarts each time a card becomes the selected one: the animation-name
+   flips from none to brutal-rise, which is what kicks it off. */
+.faq-card[data-selected="true"] .faq-answer {
+  animation: brutal-rise 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.faq-ghost {
+  display: none;
+}
+
+@container (width >= 36rem) {
+  .faq-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-rows: repeat(var(--faq-n), auto) minmax(0, 1fr);
+    column-gap: var(--faq-gap);
+    border-bottom: 0;
+  }
+  .faq-row {
+    grid-column: 1;
+  }
+  /* Closing rule under the last question. Not :last-of-type on the dt —
+     each dt is the only dt inside its `contents` wrapper, so that would
+     match every row. A zero-height item in the sink row does the job. */
+  .faq-grid::after {
+    content: "";
+    grid-column: 1;
+    grid-row: calc(var(--faq-n) + 1);
+    align-self: start;
+    border-top: 1px solid var(--faq-rule);
+  }
+  .faq-q {
+    padding: 1.75rem 0;
+  }
+
+  /* Both selectors: the phone-width display:block on the selected card is
+     more specific than a bare .faq-card and would win otherwise. */
+  .faq-card,
+  .faq-card[data-selected="true"] {
+    display: flex;
+    flex-direction: column;
+    grid-column: 2;
+    grid-row: 1 / -1;
+    align-self: stretch;
+    margin: 0;
+    visibility: hidden;
+  }
+  /* Reserves the ghost ordinal's corner so a long answer's last line can
+     never run under it. */
+  .faq-card .faq-answer {
+    padding-bottom: calc(var(--text-h3) + var(--faq-pad) * 0.5);
+  }
+  .faq-card[data-selected="true"] {
+    visibility: visible;
+  }
+
+  .faq-ghost {
+    display: block;
+    position: absolute;
+    right: var(--faq-pad);
+    bottom: calc(var(--faq-pad) * 0.6);
+    font-size: var(--text-h3);
+    line-height: 1;
+    font-weight: 600;
+    opacity: 0.15;
+    pointer-events: none;
+    user-select: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-q,
+  .faq-ordinal {
+    transition: none;
+  }
+  .faq-card[data-selected="true"] .faq-answer {
+    animation: none;
+  }
+}
