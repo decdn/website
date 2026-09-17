@@ -20,7 +20,7 @@ export function FaqItem({
 }) {
   const answerId = `faq-a-${index}`;
   return (
-    // The wrapping div stays: HTML5 explicitly permits a div inside a <dl>
+    // The wrapping div is valid HTML: HTML5 permits a div inside a <dl>
     // grouping one <dt> with its <dd>, and the pairing is what the FAQPage
     // JSON-LD restates. `contents` lifts dt and dd into the <dl>'s grid so
     // the questions can stack in one column while every answer shares the
@@ -33,13 +33,19 @@ export function FaqItem({
         className="faq-row"
       >
         {/* Disclosure, not tabs: a native button keeps Tab/Enter/Space for
-            free and lets the dt/dd pairing survive without ARIA overrides. */}
+            free and lets the dt/dd pairing survive without ARIA overrides.
+            One answer is always open, so the open one can't be collapsed:
+            aria-disabled (not disabled) says so while keeping the button
+            reachable, per the APG accordion pattern. */}
         <button
           type="button"
           className="faq-q"
           aria-expanded={selected}
+          aria-disabled={selected || undefined}
           aria-controls={answerId}
-          onClick={() => onSelect(index)}
+          onClick={() => {
+            if (!selected) onSelect(index);
+          }}
         >
           <span
             aria-hidden
@@ -52,15 +58,14 @@ export function FaqItem({
           </span>
         </button>
       </dt>
-      {/* <dd> carries a UA margin-inline-start: 40px. Preflight zeroes it, but
-          ms-0 says so at the call site rather than depending on preflight's
-          reset list surviving a Tailwind upgrade. */}
+      {/* No data-reveal here: at phone width the card toggles display, and a
+          view()-timeline reveal created mid-scroll would leave a freshly
+          opened answer dim until the reader scrolls. The .faq-answer rise
+          is the card's entrance instead. */}
       <dd
         id={answerId}
-        data-reveal
         data-selected={selected ? "true" : undefined}
-        style={{ "--reveal-delay": "120ms" }}
-        className="faq-card ms-0"
+        className="faq-card"
       >
         <p className="faq-answer max-w-[60ch] text-body leading-[1.7] text-paper/85">
           {highlightBrand(a)}

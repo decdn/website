@@ -1248,9 +1248,10 @@ a.underline-brutal:hover .arrow {
 
 /* --- faq: question list + answer card (§04) ---------------------------
    One <dl>, two columns. Questions (dt) stack on the left; every answer (dd)
-   is pinned to the top of the right column and only the selected one is
-   visible. The selected row's ordinal turns whisper to match the ghost
-   ordinal pinned to the card's bottom-right corner.
+   occupies the whole right column and only the selected one is visible.
+   The selected row's ordinal turns whisper; the same number is ghosted
+   (inherited colour, 15% opacity) in the card's bottom-right corner to
+   tether the card to its row.
 
    Every dd shares one grid area — all question rows plus a trailing
    minmax(0, 1fr) sink row — and stretches to fill it, so every card is the
@@ -1303,6 +1304,9 @@ a.underline-brutal:hover .arrow {
 .faq-row[data-selected="true"] .faq-ordinal {
   color: var(--whisper);
 }
+.faq-q[aria-disabled="true"] {
+  cursor: default;
+}
 .faq-q:focus-visible {
   outline: 1px dashed currentColor;
   outline-offset: 4px;
@@ -1349,7 +1353,7 @@ a.underline-brutal:hover .arrow {
   .faq-grid::after {
     content: "";
     grid-column: 1;
-    grid-row: calc(var(--faq-n) + 1);
+    grid-row: -2; /* the sink row: last line is -1, its start is -2 */
     align-self: start;
     border-top: 1px solid var(--faq-rule);
   }
@@ -1357,8 +1361,9 @@ a.underline-brutal:hover .arrow {
     padding: 1.75rem 0;
   }
 
-  /* Both selectors: the phone-width display:block on the selected card is
-     more specific than a bare .faq-card and would win otherwise. */
+  /* Both selectors: the base `.faq-card[data-selected="true"] { display:
+     block }` above is more specific than a bare .faq-card and would win
+     inside this query otherwise. */
   .faq-card,
   .faq-card[data-selected="true"] {
     display: flex;

@@ -20,7 +20,7 @@ describe("Faq", () => {
     const [, body] = childElements(section);
     const [h2, list] = childElements(body);
     expect(h2.type).toBe("h2");
-    expect(attrs(h2).id).toBe("faq-h");
+    expect(attrs(h2).id).toBe(`${attrs(section).id}-h`);
     expect(list.type).toBe(FaqList);
   });
 
