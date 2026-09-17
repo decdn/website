@@ -1,12 +1,15 @@
-import { FaqItem } from "@/components/ui/FaqItem";
+import { FaqList } from "@/components/site/FaqList";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { FAQ_ITEMS } from "@/lib/faq";
+
+// Shared with the row ordinals ("04.1" …) so the numbering can't drift from
+// the section header.
+const SECTION = "04";
 
 export function Faq() {
   return (
     <Frame id="faq" tone="ink">
-      <SectionHeader index="04" label="FAQ" timestamp="field notes" />
+      <SectionHeader index={SECTION} label="FAQ" timestamp="field notes" />
 
       <div className="mt-14 flex flex-col gap-10">
         <h2
@@ -17,11 +20,7 @@ export function Faq() {
           frequently asked.
         </h2>
 
-        <dl className="flex flex-col divide-y divide-current/20">
-          {FAQ_ITEMS.map((item, i) => (
-            <FaqItem key={item.q} delay={i * 80} q={item.q} a={item.a} />
-          ))}
-        </dl>
+        <FaqList section={SECTION} />
       </div>
     </Frame>
   );
