@@ -20,12 +20,12 @@ export function FaqItem({
 }) {
   const answerId = `faq-a-${index}`;
   return (
-    // The wrapping div is valid HTML: HTML5 permits a div inside a <dl>
-    // grouping one <dt> with its <dd>, and the pairing is what the FAQPage
-    // JSON-LD restates. `contents` lifts dt and dd into the <dl>'s grid so
-    // the questions can stack in one column while every answer shares the
-    // card cell in the other (see .faq-grid in globals.css).
-    <div className="contents">
+    // dt and dd are direct children of the <dl> — the canonical form, and
+    // the pairing is what the FAQPage JSON-LD restates. No wrapper, so both
+    // are grid items of .faq-grid as-is (questions stack in one column,
+    // every answer shares the card cell in the other) and `dt:last-of-type`
+    // means the last question rather than every question.
+    <>
       <dt
         data-reveal
         data-selected={selected ? "true" : undefined}
@@ -77,6 +77,6 @@ export function FaqItem({
           {ordinal}
         </span>
       </dd>
-    </div>
+    </>
   );
 }

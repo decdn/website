@@ -1347,15 +1347,8 @@ a.underline-brutal:hover .arrow {
   .faq-row {
     grid-column: 1;
   }
-  /* Closing rule under the last question. Not :last-of-type on the dt —
-     each dt is the only dt inside its `contents` wrapper, so that would
-     match every row. A zero-height item in the sink row does the job. */
-  .faq-grid::after {
-    content: "";
-    grid-column: 1;
-    grid-row: -2; /* the sink row: last line is -1, its start is -2 */
-    align-self: start;
-    border-top: 1px solid var(--faq-rule);
+  .faq-grid > dt:last-of-type {
+    border-bottom: 1px solid var(--faq-rule);
   }
   .faq-q {
     padding: 1.75rem 0;
