@@ -29,7 +29,7 @@ Off-chain distribution fails all three. On-chain entries with governance gating 
 | Standard governance          | Governor                 | 24 h after vote execution (compliance window) | None (governance can remove) |
 | Regional                     | Regional governance body | 24 h                                          | None                         |
 | Emergency                    | 3-of-5 multisig          | Immediately (with 2 h slash grace)            | 14 days                      |
-| Emergency (CSAM / terrorist) | 3-of-5 multisig          | Immediately                                   | 90 days                      |
+| Emergency (CSAM / terrorist) | 3-of-5 multisig          | Immediately (with 2 h slash grace)            | 90 days                      |
 
 Emergency entries **auto-expire unless ratified by governance** before the deadline — preventing the multisig from maintaining a permanent de-facto blacklist without oversight. Expiry needs no transaction: the entry simply stops being enforceable, and anyone may then clean it out of storage permissionlessly.
 
@@ -70,4 +70,4 @@ Each node maintains a **local denylist** for direct legal notices (e.g., a DMCA 
 
 ## Slash schedule
 
-Blacklist violations use an escalating schedule — **5% / 15% / 50%** by default for first / second / third offense, capped at 50% per offense. Offenses accumulate over the operator's lifetime; a node whose bond falls below 50% of the minimum is auto-ejected.
+Blacklist violations use a fixed escalating ladder — **5% / 15% / 50%** for first / second / third offense, capped at 50% per offense. Offenses accumulate over the operator's lifetime; a node whose bond falls below 50% of the minimum is auto-ejected.

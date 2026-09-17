@@ -41,7 +41,7 @@ Even governance cannot set parameters outside these bounds:
 
 The three `FeeRouter` shares must sum to exactly 100% on every update. The burn share is the one that also accepts **zero**, so the buyback sink can be switched off entirely; what it cannot be is nominally on at a negligible share — either off, or at 5% or more.
 
-Bounds are enforced in `require()` checks in the setter functions. A malicious governance proposal that attempts to push the operator revenue share below its floor simply reverts. (The 5% / 15% / 50% slash tiers are governable too, within a hardcoded 5%–50% per-offense bound — see [slashing](/protocol/slashing).)
+Bounds are enforced in `require()` checks in the setter functions. A malicious governance proposal that attempts to push the operator revenue share below its floor simply reverts. (The 5% / 15% / 50% slash ladder is a fixed constant in the bond contract, not a governable parameter — see [slashing](/protocol/slashing).)
 
 ## Emergency multisig
 

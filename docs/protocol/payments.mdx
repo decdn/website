@@ -59,7 +59,7 @@ claimed = amount + chain_index × chunk_price
 
 A preimage is self-proving — nobody derives a deeper one without the seed — so accepting a tick costs one hash, with no signature, no round trip and nothing to persist before the next chunk ships. Signatures are therefore O(1) per transfer rather than one per interval.
 
-The payment quantum is the **payment chunk**: `chunk_bytes` = **1 MiB (1,048,576 bytes)**, a protocol constant that nothing negotiates and no message carries. A released preimage has to be worth the same to payer and node, and a fixed constant removes that disagreement instead of negotiating it away. The protocol's **MB is that same 1,048,576 bytes**, so a chunk costs exactly the node's advertised `rate_per_mb` with no rounding at any rate — `chunk_price` is just that quoted rate, signed into the voucher, and a node rejects any voucher whose signed `chunk_price` does not match its own quote.
+The payment quantum is the **payment chunk**: `chunk_bytes` = **1 MiB (1,048,576 bytes)**, a protocol constant that nothing negotiates and no message carries. A released preimage has to be worth the same to payer and node, and a fixed constant removes that disagreement instead of negotiating it away. The protocol's **MB is that same 1,048,576 bytes**, so a chunk costs exactly the node's advertised `rate_per_mb` with no rounding at any rate — `chunk_price` is just that quoted rate, signed into the voucher, and a node rejects any _metering_ voucher whose signed `chunk_price` does not match its own quote. A sealed voucher — the cooperative-close shape — meters no chunk and carries `chunk_price = 0`, so the equality check does not apply to it.
 
 ## Credit window
 

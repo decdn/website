@@ -26,7 +26,7 @@ interaction_score = 0.4 × speed + 0.4 × correctness + 0.2 × reachability
 | Data correctness (BLAKE3 verified)         | 0.0 or 1.0   | 40%    |
 | Connection success (reachable?)            | 0.0 or 1.0   | 20%    |
 
-Speed is normalized on a log curve against a node-local reference throughput (default 1 GiB/s) that deliberately **does not saturate** — a materially faster peer earns a materially better score instead of tying with every other fast peer.
+Speed is normalized on a log curve against a node-local reference throughput (default 1 GiB/s), reaching its maximum at that reference. Below it the curve keeps climbing rather than **flattening at a low baseline** — a materially faster peer earns a materially better score instead of tying with every other fast peer.
 
 A single interaction moves a peer's score by at most **±0.05**, so one bad exchange cannot destroy a good peer's standing.
 

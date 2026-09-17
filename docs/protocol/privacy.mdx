@@ -29,7 +29,7 @@ The protocol inventories its distinct privacy surfaces with explicit disposition
 
 ## Mitigations
 
-1. **Client key storage.** Client keys are held in OS-level secure storage — the macOS Keychain, Windows Credential Manager, or the Linux Secret Service — rather than plaintext files on disk.
+1. **Client key storage.** The design keeps client keys in OS-level secure storage — the macOS Keychain, Windows Credential Manager, or the Linux Secret Service — rather than plaintext files on disk.
 2. **Operational RPC guidance.** Clients and nodes query through multiple independent RPC providers, or a self-hosted node, so no single vendor sees the whole query pattern.
 
 ## Assessed and not adopted
