@@ -1271,7 +1271,10 @@ a.underline-brutal:hover .arrow {
   --faq-edge: color-mix(in srgb, var(--paper) 30%, transparent);
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  margin: 0;
+  /* On top of the parent's gap-10: the h2 is display-sized, so the list
+     needs more air under it than a paragraph would. Unlayered, so a
+     Tailwind mt-* on the <dl> would lose to this rule. */
+  margin: clamp(1rem, 3vw, 2.5rem) 0 0;
   border-bottom: 1px solid var(--faq-rule);
 }
 
