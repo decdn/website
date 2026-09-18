@@ -1,7 +1,7 @@
 export const FAQ_ITEMS = [
   {
     q: "What about free-egress storage like Cloudflare R2 or Backblaze B2?",
-    a: "It's real, and for a small project it's the right call. But that free egress is a revocable vendor arrangement, not a guarantee: R2 is Cloudflare's own loss-leader, repriceable at its discretion, and B2's free egress rides the Bandwidth Alliance, a pact among rivals that any member can exit. Either way, you depend on one provider's roadmap, terms, and outage surface. deCDN is the opposite: an open market where operators set their own rates and compete for every request, so the price falls as the network grows, on capacity that's already paid for at the edge rather than in hyperscale datacenters. We don't claim to beat free on the egress line, and no token subsidy props up demand. Against a CloudFront-plus-S3 bill today ($0.04 to $0.20 per gigabyte, list pricing), deCDN is materially cheaper: around $0.01/GB and trending down.",
+    a: "It's real, and for a small project it's the right call. But \"free egress\" is a pricing model, not a zero bill: R2 and B2 still charge for storage and per operation, the zero-egress line is a loss-leader the vendor can reprice or pull at will, and it ties you to one provider. deCDN is a different model, not a worse one — you pay per delivered byte on an open market where operators compete for every request, the price falls as the network grows, and no single vendor can reprice or pull it.",
   },
   {
     q: "How is byte-level integrity enforced?",
