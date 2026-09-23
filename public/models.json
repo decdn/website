@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "models": [
+    {
+      "id": "mistralai-mistral-7b-instruct-v0.3",
+      "name": "Mistral 7B Instruct v0.3",
+      "repo": "mistralai/Mistral-7B-Instruct-v0.3",
+      "license": "Apache-2.0",
+      "hash": "b3:9194000d7b356650e6924a7746ec4afb0b705838b65913c0e46cba6b15af69e5",
+      "bytes": 28995469846
+    },
+    {
+      "id": "openai-gpt-oss-20b",
+      "name": "gpt-oss-20b",
+      "repo": "openai/gpt-oss-20b",
+      "license": "Apache-2.0",
+      "hash": "b3:ea8ae18fbfaddfd7cda8995d5fc431b165c6984dfd8fccb3eda1e0e44c333a97",
+      "bytes": 41301463946
+    },
+    {
+      "id": "qwen-qwen2.5-7b-instruct",
+      "name": "Qwen2.5 7B Instruct",
+      "repo": "Qwen/Qwen2.5-7B-Instruct",
+      "license": "Apache-2.0",
+      "hash": "b3:6e9b67de35340aed7b502fb8b2ed907ba70e10170d9cead869d9aafda194c6cd",
+      "bytes": 15242805751
+    },
+    {
+      "id": "openai-whisper-large-v3",
+      "name": "Whisper large-v3",
+      "repo": "openai/whisper-large-v3",
+      "license": "Apache-2.0",
+      "hash": "b3:b7df87129ebb6b1119b27432ff01fe234799a38c62bfffbba2b0b51206e36031",
+      "bytes": 24701693968
+    },
+    {
+      "id": "stabilityai-stable-diffusion-xl-base-1.0",
+      "name": "Stable Diffusion XL base 1.0",
+      "repo": "stabilityai/stable-diffusion-xl-base-1.0",
+      "license": "OpenRAIL++-M",
+      "hash": "b3:4621f13ec126975bff9f4f7a90283569bc5f81fc902e8f3dfc1ac9acadf954ed",
+      "bytes": 76912763729
+    }
+  ]
+}
