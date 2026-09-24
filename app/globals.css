@@ -253,6 +253,53 @@ a.underline-brutal:hover .arrow {
   color: var(--whisper);
 }
 
+/* The hero's single primary action: a solid ink block with the same hard
+   offset shadow as the tool panels, so it reads as the page's one button
+   rather than a fourth underlined link. */
+a.cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: var(--text-cta);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 5px 5px 0 0 var(--whisper);
+  transition:
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+a.cta-primary .arrow {
+  color: var(--whisper);
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+a.cta-primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 0 var(--whisper);
+}
+
+a.cta-primary:hover .arrow {
+  transform: translateX(6px);
+}
+
+a.cta-primary:focus-visible {
+  outline: 1px dashed var(--ink);
+  outline-offset: 9px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.cta-primary,
+  a.cta-primary .arrow {
+    transition: none;
+  }
+}
+
 /* --- hero terminal -----------------------------------------------------
    Mocks a single decdn CLI session: probe → stream → verify → settle.
    All lines share one 4.5s loop; each line fades in at its own delay.

@@ -9,7 +9,7 @@ import { HeroTerminal } from "@/components/site/HeroTerminal";
 export function Hero() {
   return (
     <Frame id="intro" tone="paper" className="overflow-hidden">
-      <SectionHeader index="01" label="Hero" timestamp="testnet · v0" />
+      <SectionHeader timestamp="testnet · v0" />
 
       <div className="mt-10 flex flex-col gap-8 @4xl:gap-12">
         <h1
@@ -26,15 +26,17 @@ export function Hero() {
           <span className="rise rise-2 pl-[12vw]">{HERO_HEADLINE[2]}</span>
         </h1>
 
-        <div className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-end @4xl:gap-12">
+        <div className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-start @4xl:gap-12">
           <div className="flex flex-col gap-8 @4xl:gap-12">
             <p className="rise rise-3 max-w-[64ch] text-body leading-[1.65]">
               {highlightBrand(HERO_LEAD)}
             </p>
 
-            <div className="rise rise-4 flex flex-col flex-wrap gap-x-8 gap-y-3 @md:flex-row @md:items-end">
+            {/* One primary action; docs and source sit beside it as quieter
+                text links so the eye lands on the litepaper first. */}
+            <div className="rise rise-4 flex flex-col items-start gap-x-8 gap-y-5 @md:flex-row @md:items-center">
               <a
-                className="underline-brutal text-cta font-semibold tracking-[0.14em] uppercase"
+                className="cta-primary"
                 href={links.litepaper}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -44,24 +46,26 @@ export function Hero() {
                   →
                 </span>
               </a>
-              <a
-                className="underline-brutal text-cta font-semibold tracking-[0.14em] uppercase"
-                href={links.docs}
-              >
-                read the docs
-                <span className="arrow" aria-hidden>
-                  →
-                </span>
-              </a>
-              <a
-                className="underline-brutal text-cta font-semibold tracking-[0.14em] uppercase"
-                href={links.github}
-              >
-                source
-                <span className="arrow" aria-hidden>
-                  →
-                </span>
-              </a>
+              <div className="flex gap-x-8">
+                <a
+                  className="underline-brutal text-cta font-medium tracking-[0.14em] uppercase opacity-70 hover:opacity-100"
+                  href={links.docs}
+                >
+                  read the docs
+                  <span className="arrow" aria-hidden>
+                    →
+                  </span>
+                </a>
+                <a
+                  className="underline-brutal text-cta font-medium tracking-[0.14em] uppercase opacity-70 hover:opacity-100"
+                  href={links.github}
+                >
+                  source
+                  <span className="arrow" aria-hidden>
+                    →
+                  </span>
+                </a>
+              </div>
             </div>
 
             <div className="rise rise-5 grid grid-cols-2 gap-y-4 @xl:grid-cols-4">
