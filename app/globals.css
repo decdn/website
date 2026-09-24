@@ -494,10 +494,11 @@ a.cta-primary:focus-visible {
 }
 
 /* --- fleet status panel (§05) -----------------------------------------
-   Sits on the black Close section. Shares the dashed-border "tool
-   panel" vocabulary with .terminal but with an ops-dashboard layout
-   instead of a CLI log: a list of nodes with pulsing serving
-   indicators plus two aggregate stat bars that breathe. */
+   Sits on the paper Contact section as an inverted panel. Same "tool
+   panel" vocabulary as .terminal — square corners, dashed border, hard
+   offset shadow — with an ops-dashboard layout instead of a CLI log: a
+   list of nodes with pulsing serving indicators plus two aggregate stat
+   bars that breathe. Not interactive, so no hover transform. */
 
 .fleet {
   font-family:
@@ -506,25 +507,10 @@ a.cta-primary:focus-visible {
   font-size: clamp(11px, 1.1vw, 12px);
   line-height: 1.55;
   color: var(--paper);
-  /* soft top-to-bottom gradient on a mid-charcoal base so the panel
-     reads as a lit surface rather than a heavy ink slab. */
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--paper) 18%, var(--ink)) 0%,
-    color-mix(in srgb, var(--paper) 12%, var(--ink)) 100%
-  );
+  background: color-mix(in srgb, var(--paper) 12%, var(--ink));
   border: 1px dashed color-mix(in srgb, var(--paper) 26%, transparent);
-  border-radius: 14px;
   overflow: hidden;
-  box-shadow:
-    7px 7px 0 0 color-mix(in srgb, var(--ink) 12%, transparent),
-    inset 0 1px 0 0 color-mix(in srgb, var(--paper) 8%, transparent);
-  transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  cursor: default;
-}
-
-.fleet:hover {
-  transform: scale(1.03);
+  box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--ink) 12%, transparent);
 }
 
 .fleet-head {
@@ -1365,9 +1351,8 @@ a.cta-primary:focus-visible {
   display: none;
   margin: 0 0 1.5rem;
   padding: var(--faq-pad);
-  border: 1px solid var(--faq-edge);
-  /* box-shadow follows the border-box radius, so the offset block rounds too. */
-  border-radius: 10px;
+  /* Square and dashed, matching .terminal and .fleet. */
+  border: 1px dashed var(--faq-edge);
   box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--paper) 12%, transparent);
 }
 .faq-card[data-selected="true"] {
