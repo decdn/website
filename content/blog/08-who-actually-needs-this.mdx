@@ -29,21 +29,17 @@ One honest limit: this proves you got the file the publisher named, not that the
 
 ## 2. no single vendor can reprice you or cut you off
 
-This is the one people underrate, so it gets the most examples.
-
 Cheap pricing is a business decision, not a contract. Cloudflare can reprice a loss leader whenever it wants. The Bandwidth Alliance, the pact that waives egress fees between member clouds, is a voluntary agreement between rivals, and any member can walk out. Either way, you are buying total dependence on one company's pricing, terms, uptime, and mood.
 
 decdn has no such company in the middle. Files are served by independent operators competing on price, so no single vendor can reprice you, throttle you, or cut you off to make a point. Removal is not gone, but it is not one company's call either: a file comes down only through open, on-chain governance and only for unlawful content, the kind every operator is legally bound to drop anyway, with a public reason on every entry and a delay built into the standard path. That is a different thing from a support agent deciding on a Tuesday that your account is more trouble than it is worth.
 
-**When this actually mattered, three ways:**
+**When this actually mattered, two ways:**
 
 **The price changed.** In late 2020 Docker Hub started limiting how many times you could download images for free. Overnight, build pipelines at companies all over the world began failing, because everyone had quietly built on the assumption that pulls were unlimited and free. Nothing was broken. The terms just changed. After Broadcom acquired VMware, licensing was restructured toward subscriptions and many customers faced large, sudden cost increases with no realistic way to leave quickly. Free and cheap are only as durable as the vendor's current strategy.
 
-**The vendor switched someone off.** In January 2021, AWS removed Parler from its infrastructure and the service went dark within days. Cloudflare has cut off customers before, and said publicly it was uncomfortable doing so precisely because it showed one company could. You do not have to agree with any of those decisions to notice what they proved: the ability exists, it is used, and it is fast.
-
 **Everyone went down together.** Big outages at AWS and Cloudflare have repeatedly taken large parts of the internet offline at the same moment, because so many unrelated services sit behind the same few providers. If your delivery, your competitor's delivery, and your status page are all behind one vendor, they all fail on the same afternoon.
 
-A second CDN helps with that last one. It does nothing for the first two, because a second vendor holds the same powers as the first.
+A second CDN helps with the outage. It does nothing for the price change, because a second vendor can reprice you just as easily as the first.
 
 ## 3. one download pulls from many machines at once
 
@@ -70,10 +66,18 @@ In order of fit:
 
 If you are serving small images on a normal website, use a normal CDN. It is better at that and always will be. What decdn is for is big, valuable files where being certain of the bytes matters, and where you do not want one company deciding next quarter what delivery costs.
 
+## what adopting it looks like
+
+Your files stay where they are. An origin node reads them straight from the storage you already use, whether that is S3, R2, B2, or a local disk, and that storage is never exposed to the network. Each file is fingerprinted once when you publish it, and that fingerprint becomes the address people download it by.
+
+On the download side, your app fetches through the decdn client SDK, a Rust library that finds nodes, pays them per megabyte in USDC, and runs the byte-by-byte check from section 1. By default the downloader pays for what it receives. A publisher can choose to cover that for its own users instead.
+
 ## want to see it on your own files?
 
-If your workload is anywhere on that list, we want to hear from you. The network runs on a public testnet today, and we are taking pilots now. Email us at [info@decdn.org](mailto:info@decdn.org), and we will help you put a real catalog on it and measure what you get.
+If your workload is anywhere on that list, a pilot is the fastest way to find out. The network runs on a public testnet today. In a pilot we set up an origin node in front of your storage with you, publish a real catalog from it using our tooling, and wire the client SDK into whatever does your downloading, so you measure the result on your own files rather than on our benchmarks. Email us at [info@decdn.org](mailto:info@decdn.org) to start one.
+
+Not ready to talk yet? [The docs](https://docs.decdn.org/overview/introduction) explain how the network works, from content addressing to payments.
 
 ---
 
-_Incident references are public reporting: [ESET WeLiveSecurity](https://www.welivesecurity.com/2017/05/08/malware-warning-mac-users-handbrake-mirror-download-server-hacked/) on the HandBrake mirror-server compromise (May 2017), [Sansec](https://sansec.io/research/polyfill-supply-chain-attack) on the polyfill.io CDN supply-chain attack (June 2024), [The Register](https://www.theregister.com/2020/10/28/docker_pull_rate_limit_1_november/) on Docker Hub's pull-rate limits (November 2020), [The Register](https://www.theregister.com/software/2024/10/01/att-claims-vmware-offered-it-a-1050-percent-price-rise/511969) on Broadcom's post-acquisition VMware pricing, and [TechCrunch](https://techcrunch.com/2021/01/09/amazon-web-services-gives-parler-24-hour-notice-that-it-will-suspend-services-to-the-company/) on AWS's removal of Parler (January 2021)._
+_Incident references are public reporting: [ESET WeLiveSecurity](https://www.welivesecurity.com/2017/05/08/malware-warning-mac-users-handbrake-mirror-download-server-hacked/) on the HandBrake mirror-server compromise (May 2017), [Sansec](https://sansec.io/research/polyfill-supply-chain-attack) on the polyfill.io CDN supply-chain attack (June 2024), [The Register](https://www.theregister.com/2020/10/28/docker_pull_rate_limit_1_november/) on Docker Hub's pull-rate limits (November 2020), and [The Register](https://www.theregister.com/software/2024/10/01/att-claims-vmware-offered-it-a-1050-percent-price-rise/511969) on Broadcom's post-acquisition VMware pricing._
