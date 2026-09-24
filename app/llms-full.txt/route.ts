@@ -153,7 +153,7 @@ const compareTable = [
   }),
 ].join("\n");
 
-const tryWindows = `On Windows, in PowerShell: \`${pullCommand("<hash>", "windows")}\``;
+const tryWindows = `On Windows, in PowerShell: \`${pullCommand("b3:<hash>", "windows")}\``;
 
 const tryModels = MODELS.map(
   (m) =>
