@@ -70,7 +70,7 @@ If you are serving small images on a normal website, use a normal CDN. It is bet
 
 Your files stay where they are. An origin node reads them straight from the storage you already use, whether that is S3, R2, B2, or a local disk, and that storage is never exposed to the network. Each file is fingerprinted once when you publish it, and that fingerprint becomes the address people download it by.
 
-On the download side, your app fetches through the decdn client SDK, a Rust library that finds nodes, pays them per megabyte in USDC, and runs the byte-by-byte check from section 1. By default the downloader pays for what it receives. A publisher can choose to cover that for its own users instead.
+On the download side, your app fetches through the decdn client SDK, a Rust library that finds nodes and runs the byte-by-byte check from section 1. You pay for delivery: you fund one pool in USDC, nodes are paid from it per megabyte they serve, and your users' downloads draw from it. Your users never see a wallet or a bill. To them, it is just a download.
 
 ## want to see it on your own files?
 
