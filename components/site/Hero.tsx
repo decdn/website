@@ -5,6 +5,7 @@ import { Figure } from "@/components/ui/Figure";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { HeroTerminal } from "@/components/site/HeroTerminal";
+import { TryIt } from "@/components/site/TryIt";
 
 export function Hero() {
   return (
@@ -77,6 +78,8 @@ export function Hero() {
           <HeroTerminal className="block w-full" />
         </div>
       </div>
+
+      <TryIt />
     </Frame>
   );
 }

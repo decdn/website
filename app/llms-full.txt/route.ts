@@ -13,10 +13,14 @@ import {
   SITE_DESCRIPTION,
   STACK,
   statusBlock,
+  TRY_HEADLINE,
+  TRY_LEAD,
+  TRY_NOTES,
 } from "@/lib/copy";
 import { FAQ_ITEMS } from "@/lib/faq";
 import { getLegalDoc, LEGAL_SLUGS, legalUrl } from "@/lib/legal";
 import { DOCS_ORIGIN, EMAIL, links, SITE_URL } from "@/lib/links";
+import { MODELS, formatSize, pullCommand } from "@/lib/models";
 
 // The whole origin as one plain-text document, so an agent grounding on deCDN
 // fetches this instead of stripping HTML from the homepage, the blog index,
@@ -149,6 +153,13 @@ const compareTable = [
   }),
 ].join("\n");
 
+const tryWindows = `On Windows, in PowerShell: \`${pullCommand("<hash>", "windows")}\``;
+
+const tryModels = MODELS.map(
+  (m) =>
+    `- ${m.name} (${formatSize(m.bytes)}, ${m.license}): \`${pullCommand(m.hash)}\``,
+).join("\n");
+
 const methodSteps = METHOD_STEPS.map(
   (step) =>
     `#### ${step.n} ${assertHeadingText(step.word, `method ${step.n} word`)}\n\n${step.body}`,
@@ -204,6 +215,16 @@ ${HERO_HEADLINE.join(" ")}
 ${HERO_LEAD}
 
 ${figureList(HERO_FIGURES)}
+
+${TRY_HEADLINE}
+
+${TRY_LEAD}
+
+${tryModels}
+
+${tryWindows}
+
+${TRY_NOTES.join(" ")}
 
 ### Side by side
 
