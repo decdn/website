@@ -31,7 +31,7 @@ One honest limit: this proves you got the file the publisher named, not that the
 
 This is the one people underrate, so it gets the most examples.
 
-Cheap pricing is a business decision, not a contract. Cloudflare can reprice a loss leader whenever it wants. The Bandwidth Alliance is a pact between rivals, and any of them can walk out; Cloudflare, a member, now points customers at its own product instead. Either way, you are buying total dependence on one company's pricing, terms, uptime, and mood.
+Cheap pricing is a business decision, not a contract. Cloudflare can reprice a loss leader whenever it wants. The Bandwidth Alliance, the pact that waives egress fees between member clouds, is a voluntary agreement between rivals, and any member can walk out. Either way, you are buying total dependence on one company's pricing, terms, uptime, and mood.
 
 decdn has no such company in the middle. Files are served by independent operators competing on price, so no single vendor can reprice you, throttle you, or cut you off to make a point. Removal is not gone, but it is not one company's call either: a file comes down only through open, on-chain governance and only for unlawful content, the kind every operator is legally bound to drop anyway, with a public reason on every entry and a delay built into the standard path. That is a different thing from a support agent deciding on a Tuesday that your account is more trouble than it is worth.
 
@@ -42,6 +42,8 @@ decdn has no such company in the middle. Files are served by independent operato
 **The vendor switched someone off.** In January 2021, AWS removed Parler from its infrastructure and the service went dark within days. Cloudflare has cut off customers before, and said publicly it was uncomfortable doing so precisely because it showed one company could. You do not have to agree with any of those decisions to notice what they proved: the ability exists, it is used, and it is fast.
 
 **Everyone went down together.** Big outages at AWS and Cloudflare have repeatedly taken large parts of the internet offline at the same moment, because so many unrelated services sit behind the same few providers. If your delivery, your competitor's delivery, and your status page are all behind one vendor, they all fail on the same afternoon.
+
+A second CDN helps with that last one. It does nothing for the first two, because a second vendor holds the same powers as the first.
 
 ## 3. one download pulls from many machines at once
 
@@ -55,17 +57,7 @@ What decdn changes is who the sources are: paid operators competing to serve you
 
 **When this actually mattered:** This is the one where the incumbents have already proved the need, by building it themselves. Microsoft ships peer-to-peer distribution inside Windows Update, so machines on the same network pull updates from each other instead of all hammering Microsoft. Game companies have used peer-assisted downloads for large patches for years, because launch day for a big title moves more data than a normal CDN plan is sized for. Hugging Face built a dedicated high-speed download tool because ordinary single-connection downloads were too slow for people fetching multi-gigabyte AI models, and many of those users reach for multi-connection download tools anyway.
 
-Every one of those is the same admission: for big files, one connection to one server is not enough, and the fix is to pull from more than one place at once.
-
-## so who needs it?
-
-Three capabilities, and the buyer who feels each one hardest:
-
-**Pulling from many machines at once.** Microsoft, game publishers, and Hugging Face all built their own version of this because one connection was not enough. The need is proven. We turn it into something you can buy instead of build.
-
-**Not depending on one vendor.** The incidents are real, recent, and repeated. We win exactly where a second CDN cannot help you: price shocks, terms changes, and being switched off, because a second vendor holds the same powers as the first.
-
-**You never keep a corrupt byte.** The threat is real and the industry is spending heavily on it. We make the check unavoidable rather than optional, run it during the download rather than after, and keep it trustworthy even when you do not trust the machine that served you.
+Every one of those is the same admission: for big files, one connection to one server is not enough, and the fix is to pull from more than one place at once. The need is proven. decdn turns it into something you can buy instead of build.
 
 ## who this is for
 
@@ -84,4 +76,4 @@ If your workload is anywhere on that list, we want to hear from you. The network
 
 ---
 
-_Incident and pricing references are public reporting: the HandBrake mirror-server compromise (May 2017), the polyfill.io CDN supply-chain attack (June 2024), Docker Hub's pull-rate limits (November 2020), Broadcom's post-acquisition VMware licensing changes, AWS's removal of Parler (January 2021), and published AWS and Cloudflare pricing pages._
+_Incident references are public reporting: [ESET WeLiveSecurity](https://www.welivesecurity.com/2017/05/08/malware-warning-mac-users-handbrake-mirror-download-server-hacked/) on the HandBrake mirror-server compromise (May 2017), [Sansec](https://sansec.io/research/polyfill-supply-chain-attack) on the polyfill.io CDN supply-chain attack (June 2024), [The Register](https://www.theregister.com/2020/10/28/docker_pull_rate_limit_1_november/) on Docker Hub's pull-rate limits (November 2020), [The Register](https://www.theregister.com/software/2024/10/01/att-claims-vmware-offered-it-a-1050-percent-price-rise/511969) on Broadcom's post-acquisition VMware pricing, and [TechCrunch](https://techcrunch.com/2021/01/09/amazon-web-services-gives-parler-24-hour-notice-that-it-will-suspend-services-to-the-company/) on AWS's removal of Parler (January 2021)._
