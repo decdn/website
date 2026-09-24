@@ -7,3 +7,6 @@ next-env.d.ts
 .husky/_/
 .claude/settings.local.json
 .claude/worktrees/
+# Vendored by `npx impeccable install` — refresh with `npx impeccable update`, don't reformat.
+.claude/skills/impeccable/
+.claude/agents/impeccable-*.md

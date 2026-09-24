@@ -43,3 +43,7 @@ next-env.d.ts
 # Claude Code local-only state
 .claude/settings.local.json
 .claude/worktrees/
+
+# Impeccable engine binary — platform-specific, fetched by the skill's
+# launcher into ~/.impeccable/bin/ on first run when absent.
+.claude/skills/impeccable/scripts/bin/

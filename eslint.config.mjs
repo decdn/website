@@ -18,6 +18,8 @@ const eslintConfig = defineConfig([
     // Claude Code worktrees are duplicate checkouts of this repo — without
     // this, every finding gets reported once per worktree plus once here.
     ".claude/worktrees/**",
+    // Vendored by `npx impeccable install`; refreshed with `npx impeccable update`.
+    ".claude/skills/impeccable/**",
   ]),
   prettier,
 ]);
