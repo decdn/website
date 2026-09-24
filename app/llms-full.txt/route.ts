@@ -3,12 +3,12 @@ import {
   COMPARE_HEADLINE,
   COMPARE_LEAD,
   COMPARE_ROWS,
+  CONTACT_HEADLINE,
   CONTACT_LEAD,
   type FigureCopy,
   HERO_FIGURES,
   HERO_HEADLINE,
   HERO_LEAD,
-  METHOD_FIGURES,
   METHOD_STEPS,
   SITE_DESCRIPTION,
   STACK,
@@ -217,8 +217,6 @@ ${compareTable}
 
 Stack: ${STACK.join(" · ")}
 
-${figureList(METHOD_FIGURES)}
-
 ${methodSteps}
 
 ### FAQ
@@ -226,6 +224,8 @@ ${methodSteps}
 ${faq}
 
 ### Contact
+
+${CONTACT_HEADLINE.join(" ")}
 
 ${CONTACT_LEAD}
 

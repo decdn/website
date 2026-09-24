@@ -10,7 +10,6 @@ import {
   COMPARE_ROWS,
   HERO_FIGURES,
   HERO_LEAD,
-  METHOD_FIGURES,
   METHOD_STEPS,
   STACK,
   statusBlock,
@@ -141,15 +140,12 @@ describe("homepage mirror", () => {
     expect(body).toContain(text);
   });
 
-  // These two lines were hand-written paraphrases of inline JSX until the
+  // This line was a hand-written paraphrase of inline JSX until the
   // figures moved into lib/copy.ts. Asserting the serialised form is what
   // makes the mirror provably the same data the page renders.
-  it.each([...HERO_FIGURES, ...METHOD_FIGURES])(
-    "mirrors the $label figure",
-    (figure) => {
-      expect(body).toContain(`${figure.label}: ${figure.value}`);
-    },
-  );
+  it.each([...HERO_FIGURES])("mirrors the $label figure", (figure) => {
+    expect(body).toContain(`${figure.label}: ${figure.value}`);
+  });
 
   it("mirrors the stack chips in order", () => {
     expect(lines).toContain(`Stack: ${STACK.join(" · ")}`);

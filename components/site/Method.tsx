@@ -1,6 +1,5 @@
 import { Fragment } from "react";
-import { METHOD_FIGURES, METHOD_STEPS, STACK } from "@/lib/copy";
-import { Figure } from "@/components/ui/Figure";
+import { METHOD_STEPS, STACK } from "@/lib/copy";
 import { Frame } from "@/components/ui/Frame";
 import { MethodRow } from "@/components/ui/MethodRow";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -39,11 +38,6 @@ export function Method() {
               )}
               <span>{name}</span>
             </Fragment>
-          ))}
-        </div>
-        <div className="mt-5 grid grid-cols-2 gap-y-4 @xl:grid-cols-4">
-          {METHOD_FIGURES.map((figure) => (
-            <Figure key={figure.label} {...figure} />
           ))}
         </div>
       </div>
