@@ -1,9 +1,9 @@
 ---
 title: Design decisions
-description: The accepted architecture decision records that define deCDN — topology, content addressing, payments, reputation, governance, slashing, tokenomics.
+description: The architecture decision records that define deCDN — topology, content addressing, payments, reputation, governance, slashing, tokenomics.
 ---
 
-The protocol is shaped by a set of accepted ADRs. The table below names each one. Full text is not yet public; numbering gaps reflect superseded or withdrawn proposals.
+The protocol is shaped by a set of ADRs, which together are its canonical specification. The table below names each one; individual records range from draft to accepted. Full text is not yet public, and numbering gaps reflect superseded or withdrawn proposals.
 
 | ADR | Decision                       |
 | --- | ------------------------------ |
@@ -18,7 +18,6 @@ The protocol is shaped by a set of accepted ADRs. The table below names each one
 | 012 | Client architecture            |
 | 013 | Schema evolution               |
 | 014 | On-chain slashing verification |
-| 015 | QUIC 0-RTT                     |
 | 016 | Smart contract interaction     |
 | 017 | Privacy                        |
 | 018 | Liquidity strategy             |
@@ -28,8 +27,9 @@ The protocol is shaped by a set of accepted ADRs. The table below names each one
 | 026 | Tokenomics                     |
 | 028 | Slashing appeals               |
 | 030 | Region self-attestation        |
-| 031 | Content blacklist appeals      |
 | 036 | Served-bytes voting weight     |
 | 037 | Regional proxy warming         |
 | 038 | Bao verified-range streaming   |
 | 039 | Multi-source parallel fetch    |
+| 040 | Cache admission & eviction     |
+| 041 | Refuse-to-serve economics      |

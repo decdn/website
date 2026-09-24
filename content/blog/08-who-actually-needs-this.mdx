@@ -1,0 +1,83 @@
+---
+title: "Who Actually Needs a Network Like This?"
+slug: who-actually-needs-this
+date: 2026-09-24
+summary: "Three things decdn does that a normal CDN cannot: verify every byte as it arrives, take any single vendor out of your pricing and uptime, and pull one download from many machines at once. Each one grounded in a real incident, and an honest list of who it is for."
+bucket: publisher
+tags: [publishers, security, supply-chain, cdn]
+---
+
+Most posts about decentralized infrastructure start with why the technology is clever. This one starts with the harder question: **does anyone actually need it?**
+
+The honest answer is: not always. If your files are public, low-stakes, and you do not care which machine hands them over, a normal CDN is the right tool and always will be. Use one, with our blessing.
+
+But that describes a lot less traffic than people assume. What follows is three things decdn does that a normal CDN cannot, and for each one, a real situation where a company needed exactly that.
+
+## 1. You never keep a corrupt byte
+
+A normal CDN works like this. You ask a web address for a file. A computer you do not own answers. You get bytes back. Your only real guarantee is that the connection was encrypted, which proves you talked to the right server. It does not prove the server sent you the right thing.
+
+A fingerprint proves it, but only if you check, and most tools check at the end, after the whole file has already landed. decdn checks as the download runs. Every file is named by a fingerprint of its own contents, and decdn verifies that fingerprint piece by piece, the instant each piece arrives. A piece that fails is thrown out on the spot and refetched from another machine, so corruption is caught the moment it appears, not after the whole file has landed. Nothing bad ever reaches your file.
+
+**When this actually mattered:** In May 2017, one of the mirror servers that handed out HandBrake, a popular Mac video tool, was broken into. For four days it served some downloaders a copy of the app with a remote-access trojan stitched in. The program was fine. The developers were fine. The copy on the main mirror was fine. One machine in the delivery path had been compromised and was quietly serving different bytes. The only way to catch it was to compare the download against the fingerprint the project published, and the poisoned copy did not match.
+
+That comparison is exactly the check decdn runs for you, on every byte, while the download is still arriving, against the fingerprint you asked for. A machine that serves you the wrong bytes is caught the instant it tries, so you never have to trust it. On a normal CDN you are trusting the edge to hand you what the origin meant to send. decdn takes that trust out of the loop.
+
+The same shape keeps recurring, and the bigger the network, the bigger the blast radius. In June 2024, polyfill.io, a script more than 100,000 sites loaded straight from a shared CDN, changed hands and began serving altered, malicious code to every site that trusted it. The web's defense against exactly this is Subresource Integrity: pin the fingerprint of the file you expect, and the browser throws out anything else. Package managers do the same, checking every download against a fingerprint from a signed index instead of trusting the mirror it came from. The industry already agrees you should not trust the server. decdn just makes the check automatic and unavoidable instead of something you have to remember to turn on.
+
+One honest limit: this proves you got the file the publisher named, not that the publisher named a good one. A backdoor the author ships themselves is a job for code signing and reproducible builds, not for delivery. What decdn guarantees is that nothing between them and you changed a byte.
+
+## 2. No single vendor can reprice you or cut you off
+
+Cheap pricing is a business decision, not a contract. Cloudflare can reprice a loss leader whenever it wants. The Bandwidth Alliance, the pact that waives egress fees between member clouds, is a voluntary agreement between rivals, and any member can walk out. Either way, you are buying total dependence on one company's pricing, terms, uptime, and mood.
+
+decdn has no such company in the middle. Files are served by independent operators competing on price, so no single vendor can reprice you, throttle you, or cut you off to make a point. Removal is not gone, but it is not one company's call either: a file comes down only through open, on-chain governance and only for unlawful content, the kind every operator is legally bound to drop anyway, with a public reason on every entry and a delay built into the standard path. That is a different thing from a support agent deciding on a Tuesday that your account is more trouble than it is worth.
+
+**When this actually mattered, two ways:**
+
+**The price changed.** In late 2020 Docker Hub started limiting how many times you could download images for free. Overnight, build pipelines at companies all over the world began failing, because everyone had quietly built on the assumption that pulls were unlimited and free. Nothing was broken. The terms just changed. After Broadcom acquired VMware, licensing was restructured toward subscriptions and many customers faced large, sudden cost increases with no realistic way to leave quickly. Free and cheap are only as durable as the vendor's current strategy.
+
+**Everyone went down together.** Big outages at AWS and Cloudflare have repeatedly taken large parts of the internet offline at the same moment, because so many unrelated services sit behind the same few providers. If your delivery, your competitor's delivery, and your status page are all behind one vendor, they all fail on the same afternoon.
+
+A second CDN helps with the outage. It does nothing for the price change, because a second vendor can reprice you just as easily as the first.
+
+## 3. One download pulls from many machines at once
+
+On a normal CDN your download is one connection to one location. However fast that one machine is, that is your ceiling. If it is having a bad day, so are you.
+
+decdn splits a file into pieces and pulls them from several machines at the same time. Fast machines naturally get handed more pieces. Slow ones get handed fewer.
+
+This is basically BitTorrent, and that is the point. Splitting a file across many sources and checking each piece against a hash is a model that has moved a huge share of the internet's bytes for twenty years. It works, and it is exactly right for big files.
+
+What decdn changes is who the sources are: paid operators competing to serve you, not a volunteer swarm that may not have a seeder online when you need one. You get the proven model with a paid network's reliability behind it.
+
+**When this actually mattered:** This is the one where the incumbents have already proved the need, by building it themselves. Microsoft ships peer-to-peer distribution inside Windows Update, so machines on the same network pull updates from each other instead of all hammering Microsoft. Game companies have used peer-assisted downloads for large patches for years, because launch day for a big title moves more data than a normal CDN plan is sized for. Hugging Face built a dedicated high-speed download tool because ordinary single-connection downloads were too slow for people fetching multi-gigabyte AI models, and many of those users reach for multi-connection download tools anyway.
+
+Every one of those is the same admission: for big files, one connection to one server is not enough, and the fix is to pull from more than one place at once. The need is proven. decdn turns it into something you can buy instead of build.
+
+## Who this is for
+
+In order of fit:
+
+1. **Anyone shipping AI models or large datasets.** Big, fixed, valuable, spiky on release day, and expensive enough that fixed monthly allowances are always the wrong size.
+2. **Anyone whose software downloads are a supply-chain risk.** Installers, container images, packages, firmware. This is where automatic verification is worth more than any price.
+3. **Game patches and large updates.** Exactly the workload multi-machine downloading was designed for.
+4. **Anyone paying enormous cloud bills to publish data.** Big egress and CDN invoices for pushing large files out to the world, where paying per delivered byte on an open market is simply cheaper. The one case where cost alone makes the argument.
+
+What decdn is for is valuable files where being certain of the bytes matters, and where you do not want one company deciding next quarter what delivery costs.
+
+## What adopting it looks like
+
+Your files stay where they are. An origin node reads them straight from the storage you already use, whether that is S3, R2, B2, or a local disk, and that storage is never exposed to the network. Each file is fingerprinted once when you publish it, and that fingerprint becomes the address people download it by.
+
+On the download side, your app fetches through the decdn client SDK, a Rust library that finds nodes and runs the byte-by-byte check from section 1. You pay for delivery: you fund one pool in USDC, nodes are paid from it per megabyte they serve, and your users' downloads draw from it. Your users never see a wallet or a bill. To them, it is just a download.
+
+## Want to see it on your own files?
+
+If your workload is anywhere on that list, a pilot is the fastest way to find out. The network runs on a public testnet today. In a pilot we set up an origin node in front of your storage with you, publish a real catalog from it using our tooling, and wire the client SDK into whatever does your downloading, so you measure the result on your own files rather than on our benchmarks. Delivery during the pilot is on us: your users' downloads draw from a pool we fund, so there is nothing for you to pay for or set up on that side. Email us at [info@decdn.org](mailto:info@decdn.org) to start one.
+
+Not ready to talk yet? [The docs](https://docs.decdn.org/overview/introduction) explain how the network works, from content addressing to payments.
+
+---
+
+_Incident references are public reporting: [ESET WeLiveSecurity](https://www.welivesecurity.com/2017/05/08/malware-warning-mac-users-handbrake-mirror-download-server-hacked/) on the HandBrake mirror-server compromise (May 2017), [Sansec](https://sansec.io/research/polyfill-supply-chain-attack) on the polyfill.io CDN supply-chain attack (June 2024), [The Register](https://www.theregister.com/2020/10/28/docker_pull_rate_limit_1_november/) on Docker Hub's pull-rate limits (November 2020), and [The Register](https://www.theregister.com/software/2024/10/01/att-claims-vmware-offered-it-a-1050-percent-price-rise/511969) on Broadcom's post-acquisition VMware pricing._
