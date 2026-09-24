@@ -13,7 +13,7 @@ The honest answer is: not always. If your files are public, low-stakes, and you 
 
 But that describes a lot less traffic than people assume. What follows is three things decdn does that a normal CDN cannot, and for each one, a real situation where a company needed exactly that.
 
-## 1. you never keep a corrupt byte
+## 1. You never keep a corrupt byte
 
 A normal CDN works like this. You ask a web address for a file. A computer you do not own answers. You get bytes back. Your only real guarantee is that the connection was encrypted, which proves you talked to the right server. It does not prove the server sent you the right thing.
 
@@ -27,7 +27,7 @@ The same shape keeps recurring, and the bigger the network, the bigger the blast
 
 One honest limit: this proves you got the file the publisher named, not that the publisher named a good one. A backdoor the author ships themselves is a job for code signing and reproducible builds, not for delivery. What decdn guarantees is that nothing between them and you changed a byte.
 
-## 2. no single vendor can reprice you or cut you off
+## 2. No single vendor can reprice you or cut you off
 
 Cheap pricing is a business decision, not a contract. Cloudflare can reprice a loss leader whenever it wants. The Bandwidth Alliance, the pact that waives egress fees between member clouds, is a voluntary agreement between rivals, and any member can walk out. Either way, you are buying total dependence on one company's pricing, terms, uptime, and mood.
 
@@ -41,7 +41,7 @@ decdn has no such company in the middle. Files are served by independent operato
 
 A second CDN helps with the outage. It does nothing for the price change, because a second vendor can reprice you just as easily as the first.
 
-## 3. one download pulls from many machines at once
+## 3. One download pulls from many machines at once
 
 On a normal CDN your download is one connection to one location. However fast that one machine is, that is your ceiling. If it is having a bad day, so are you.
 
@@ -55,7 +55,7 @@ What decdn changes is who the sources are: paid operators competing to serve you
 
 Every one of those is the same admission: for big files, one connection to one server is not enough, and the fix is to pull from more than one place at once. The need is proven. decdn turns it into something you can buy instead of build.
 
-## who this is for
+## Who this is for
 
 In order of fit:
 
@@ -66,13 +66,13 @@ In order of fit:
 
 If you are serving small images on a normal website, use a normal CDN. It is better at that and always will be. What decdn is for is big, valuable files where being certain of the bytes matters, and where you do not want one company deciding next quarter what delivery costs.
 
-## what adopting it looks like
+## What adopting it looks like
 
 Your files stay where they are. An origin node reads them straight from the storage you already use, whether that is S3, R2, B2, or a local disk, and that storage is never exposed to the network. Each file is fingerprinted once when you publish it, and that fingerprint becomes the address people download it by.
 
 On the download side, your app fetches through the decdn client SDK, a Rust library that finds nodes and runs the byte-by-byte check from section 1. You pay for delivery: you fund one pool in USDC, nodes are paid from it per megabyte they serve, and your users' downloads draw from it. Your users never see a wallet or a bill. To them, it is just a download.
 
-## want to see it on your own files?
+## Want to see it on your own files?
 
 If your workload is anywhere on that list, a pilot is the fastest way to find out. The network runs on a public testnet today. In a pilot we set up an origin node in front of your storage with you, publish a real catalog from it using our tooling, and wire the client SDK into whatever does your downloading, so you measure the result on your own files rather than on our benchmarks. Delivery during the pilot is on us: your users' downloads draw from a pool we fund, so there is nothing for you to pay for or set up on that side. Email us at [info@decdn.org](mailto:info@decdn.org) to start one.
 
