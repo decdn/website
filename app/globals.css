@@ -178,7 +178,7 @@ body {
 
 [data-reveal] {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(16px);
   transition:
     opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1),
     transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -198,7 +198,10 @@ body {
        explicit non-zero duration for safety. */
     animation: reveal-wipe 1s linear both;
     animation-timeline: view();
-    animation-range: entry 8% cover 28%;
+    /* Keyed to the element's own entry, not to how far it covers the
+       viewport: a short table row finishes as soon as it is mostly in view
+       instead of staying dim while it is being read. */
+    animation-range: entry 0% entry 70%;
     transition: none;
   }
 }
@@ -206,7 +209,7 @@ body {
 @keyframes reveal-wipe {
   from {
     opacity: 0;
-    transform: translate3d(0, 72px, 0);
+    transform: translate3d(0, 24px, 0);
   }
   to {
     opacity: 1;
