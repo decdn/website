@@ -24,13 +24,12 @@ export const SITE_TITLE = "deCDN — decentralized CDN for bytes at scale";
 export const SITE_DESCRIPTION =
   "A decentralized CDN. Anyone can serve bytes; clients pay per megabyte in USDC. An open market that gets cheaper as it grows, at ~$0.01/GB, up to 90% below legacy CDN list pricing.";
 
-/** The three h1 lines, each its own span — lines 2 and 3 carry their own
- *  indent and line 2 an aria-hidden full stop, so they stay explicit at the
- *  call site rather than being mapped over. */
+/** The two h1 lines, each its own span — line 2 carries its own indent and
+ *  an aria-hidden full stop, so they stay explicit at the call site rather
+ *  than being mapped over. */
 export const HERO_HEADLINE = [
   "the delivery layer",
   "anyone can serve",
-  "priced, not quoted.",
 ] as const;
 
 export const HERO_LEAD =

@@ -23,7 +23,6 @@ export function Hero() {
               .
             </span>
           </span>
-          <span className="rise rise-2 pl-[12vw]">{HERO_HEADLINE[2]}</span>
         </h1>
 
         <div className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-start @4xl:gap-12">
