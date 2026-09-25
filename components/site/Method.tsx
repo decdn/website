@@ -24,7 +24,7 @@ export function Method() {
         ))}
       </div>
 
-      <div data-reveal className="mt-auto pt-12">
+      <div data-reveal className="pt-12">
         <span className="meta mb-3 block opacity-60">stack</span>
         <div className="hug flex flex-wrap items-baseline gap-x-5 gap-y-2 text-h3 font-semibold tracking-[-0.03em]">
           {/* The `·` is a separator between chips, not part of one, so it is

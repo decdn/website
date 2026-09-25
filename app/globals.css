@@ -31,7 +31,6 @@
     9vw,
     7rem
   ); /* floor coupled to nav height — see --nav-h note above */
-  --spacing-frame-min-h: min(100svh, 54rem);
 
   /* Type scale: micro and CTA are fixed; body and headlines scale with viewport.
      Named under Tailwind v4's --text-* namespace so `text-body`, `text-h1`, …

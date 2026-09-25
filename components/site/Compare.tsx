@@ -43,7 +43,7 @@ export function Compare() {
       <table
         role="table"
         aria-labelledby="compare-caption"
-        className="mt-auto flex flex-col pt-12"
+        className="flex flex-col pt-12"
       >
         <caption id="compare-caption" className="sr-only">
           {CAPTION}
