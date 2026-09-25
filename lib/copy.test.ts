@@ -54,7 +54,10 @@ const ALL_STRINGS: readonly [string, string][] = [
     [`METHOD_STEPS.${s.n}.word`, s.word],
     [`METHOD_STEPS.${s.n}.body`, s.body],
   ]),
-  ...STACK.map((s, i): [string, string] => [`STACK[${i}]`, s]),
+  ...STACK.flatMap((s): [string, string][] => [
+    [`STACK.${s.name}.name`, s.name],
+    [`STACK.${s.name}.role`, s.role],
+  ]),
   ["DEMO_CAPTIONS.terminal", DEMO_CAPTIONS.terminal],
   ["DEMO_CAPTIONS.fleet", DEMO_CAPTIONS.fleet],
   ...CONTACT_HEADLINE.map((s, i): [string, string] => [
@@ -75,6 +78,20 @@ describe("copy strings", () => {
       expect(value).not.toContain("|");
     },
   );
+});
+
+describe("STACK", () => {
+  // components/site/Method.tsx lays the strip out 2 / 3 / 6 across, and its
+  // hairlines only close when the count divides evenly by the column count.
+  it("has exactly six items", () => {
+    expect(STACK).toHaveLength(6);
+  });
+
+  // `name` is the React key in Method.tsx and the label in ALL_STRINGS above.
+  it("names each item once", () => {
+    const names = STACK.map((s) => s.name);
+    expect(new Set(names).size).toBe(names.length);
+  });
 });
 
 describe("COMPARE_ROWS", () => {
