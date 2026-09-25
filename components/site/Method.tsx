@@ -24,20 +24,27 @@ export function Method() {
       </div>
 
       <div data-reveal className="pt-12">
-        <span className="meta mb-3 block opacity-60">stack</span>
+        <span id="method-stack" className="meta mb-3 block opacity-60">
+          stack
+        </span>
         {/* Hairlines come from the list's top/left edge plus each cell's
             right/bottom edge, so the grid stays single-ruled at any column
-            count. In one row of six, --text-h3 overflows a cell ("BLAKE3"),
-            so names size off the frame's container width instead. The role
-            label is `.meta` spelled out at 12px — `.meta` pins 11px outside
-            any cascade layer, so a size utility beside it can't win. */}
-        <ul className="grid grid-cols-2 border-t border-l border-current/20 @xl:grid-cols-3 @6xl:grid-cols-6">
+            count — and closed while STACK.length divides evenly by it. In one
+            row of six the longest name (currently "BLAKE3") overflows
+            --text-h3, so names size off the frame's container width instead.
+            `.meta` and `.hug` sit outside any cascade layer, so a utility
+            beside either can't override it; the role label therefore spells
+            `.meta` out at 12px rather than adding a size to it. */}
+        <ul
+          aria-labelledby="method-stack"
+          className="grid grid-cols-2 border-t border-l border-current/20 @xl:grid-cols-3 @6xl:grid-cols-6"
+        >
           {STACK.map(({ name, role }) => (
             <li
               key={name}
               className="flex flex-col gap-3 border-r border-b border-current/20 px-5 py-6 @xl:px-6 @xl:py-7 @6xl:px-5"
             >
-              <span className="hug text-h3 leading-none font-semibold tracking-[-0.03em] @6xl:text-[3.4cqi]">
+              <span className="hug text-h3 leading-none font-semibold @6xl:text-[3.4cqi]">
                 {name}
               </span>
               <span className="flex items-start gap-2.5 text-[12px] leading-[1.2] font-medium tracking-[0.22em] uppercase opacity-60">

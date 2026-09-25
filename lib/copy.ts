@@ -155,9 +155,9 @@ export type StackItem = {
   role: string;
 };
 
-/** The stack strip under the method steps: one ruled cell per item, name over
- *  role. Order is the render order. This is the section's only stack summary —
- *  a figure strip beside it used to restate QUIC, iroh and USDC. */
+/** The stack under the method steps, in render order. Rendered by `Method`;
+ *  serialised by `stackLine()`. This is the section's only stack summary: put
+ *  per-piece detail in `role`, not in a separate strip beside it. */
 export const STACK: readonly StackItem[] = [
   { name: "Rust", role: "node & client" },
   { name: "BLAKE3", role: "verification" },

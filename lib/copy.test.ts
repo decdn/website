@@ -80,6 +80,20 @@ describe("copy strings", () => {
   );
 });
 
+describe("STACK", () => {
+  // components/site/Method.tsx lays the strip out 2 / 3 / 6 across, and its
+  // hairlines only close when the count divides evenly by the column count.
+  it("has exactly six items", () => {
+    expect(STACK).toHaveLength(6);
+  });
+
+  // `name` is the React key in Method.tsx and the label in ALL_STRINGS above.
+  it("names each item once", () => {
+    const names = STACK.map((s) => s.name);
+    expect(new Set(names).size).toBe(names.length);
+  });
+});
+
 describe("COMPARE_ROWS", () => {
   // Hardcoded, not `COMPARE_ROWS.length`: the section header says "seven
   // axes" in prose (components/site/Compare.tsx), so the count is a published
