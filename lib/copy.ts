@@ -33,7 +33,7 @@ export const HERO_HEADLINE = [
 ] as const;
 
 export const HERO_LEAD =
-  "The first bytes of a 14-gigabyte file posted in Berlin reach a client in Tokyo in under a second — streamed from three peers at once, every chunk verified with BLAKE3, paid for per megabyte in USDC. The code is open. The network is open. The price is posted.";
+  "A 14-gigabyte file posted in Berlin streams to a client in Tokyo from up to four nodes at once, every chunk verified with BLAKE3, paid for per megabyte in USDC. The code is open. The network is open. The price is posted.";
 
 /** A label/value pair rendered by `components/ui/Figure`. Named `FigureCopy`
  *  rather than `Figure` so a call site can import both the copy and the
@@ -111,7 +111,7 @@ export const COMPARE_ROWS = [
   {
     axis: "failure",
     traditional: "PoP dies, region 503s",
-    decdn: "peer drops, stream continues",
+    decdn: "node drops, stream continues",
   },
   {
     axis: "scaling",
@@ -135,12 +135,12 @@ export const METHOD_STEPS: readonly MethodStep[] = [
   {
     n: "01",
     word: "probe",
-    body: "In a single handshake, the client asks nearby peers who has the file. Peers answer with what they've cached, their rate per megabyte, and how fast they can serve — the round trip averages under 100 milliseconds. The client ranks the answers by price, latency, and reputation; the best-priced, fastest, most-reputable peer wins, or several win in parallel for a large file.",
+    body: "The client draws candidate nodes from the on-chain CapacityBond registry, or from its own peer store of nodes it has measured before — if that store is fresh, it skips the probe entirely. Otherwise it probes candidates in parallel for who holds the file and how fast they answer, in a window capped at 500 milliseconds. It ranks holders by measured round-trip time alone. Price is not a rank key: the client pays the rate the node signs, and can cap it with a ceiling of its own. No reputation score is kept.",
   },
   {
     n: "02",
     word: "swarm",
-    body: "Bytes flow directly from the chosen node; for files over ten gigabytes the client opens parallel streams to several peers at once and aggregates their throughput — a 1 Gbps origin turns into multi-gigabit delivery to the client. Every chunk is verified against the BLAKE3 tree hash the instant it lands; tampered bytes trigger immediate disconnect and a fraud proof against the node's stake. Trust no node — verify every byte.",
+    body: "Bytes stream directly from the chosen node. For files over 64 MiB with at least two holders, the client splits the fetch across up to four nodes — one per operator — and fills its downlink from all of them at once. Every chunk is verified against the BLAKE3 tree hash as it lands. Bytes that fail verification never get a voucher, so the node that sent them is paid nothing for that range, and the client refetches it from another node. Trust no node — verify every byte.",
   },
   {
     n: "03",
