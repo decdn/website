@@ -31,7 +31,6 @@
     9vw,
     7rem
   ); /* floor coupled to nav height — see --nav-h note above */
-  --spacing-frame-min-h: min(100svh, 54rem);
 
   /* Type scale: micro and CTA are fixed; body and headlines scale with viewport.
      Named under Tailwind v4's --text-* namespace so `text-body`, `text-h1`, …
@@ -178,7 +177,7 @@ body {
 
 [data-reveal] {
   opacity: 0;
-  transform: translateY(28px);
+  transform: translateY(16px);
   transition:
     opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1),
     transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -198,7 +197,10 @@ body {
        explicit non-zero duration for safety. */
     animation: reveal-wipe 1s linear both;
     animation-timeline: view();
-    animation-range: entry 8% cover 28%;
+    /* Keyed to the element's own entry, not to how far it covers the
+       viewport: a short table row finishes as soon as it is mostly in view
+       instead of staying dim while it is being read. */
+    animation-range: entry 0% entry 70%;
     transition: none;
   }
 }
@@ -206,7 +208,7 @@ body {
 @keyframes reveal-wipe {
   from {
     opacity: 0;
-    transform: translate3d(0, 72px, 0);
+    transform: translate3d(0, 24px, 0);
   }
   to {
     opacity: 1;
@@ -251,6 +253,53 @@ a.underline-brutal .arrow {
 a.underline-brutal:hover .arrow {
   transform: translateX(6px);
   color: var(--whisper);
+}
+
+/* The hero's single primary action: a solid ink block with the same hard
+   offset shadow as the tool panels, so it reads as the page's one button
+   rather than a fourth underlined link. */
+a.cta-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.25rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: var(--text-cta);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  box-shadow: 5px 5px 0 0 var(--whisper);
+  transition:
+    transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+a.cta-primary .arrow {
+  color: var(--whisper);
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+a.cta-primary:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: 7px 7px 0 0 var(--whisper);
+}
+
+a.cta-primary:hover .arrow {
+  transform: translateX(6px);
+}
+
+a.cta-primary:focus-visible {
+  outline: 1px dashed var(--ink);
+  outline-offset: 9px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.cta-primary,
+  a.cta-primary .arrow {
+    transition: none;
+  }
 }
 
 /* --- hero terminal -----------------------------------------------------
@@ -447,10 +496,11 @@ a.underline-brutal:hover .arrow {
 }
 
 /* --- fleet status panel (§05) -----------------------------------------
-   Sits on the black Close section. Shares the dashed-border "tool
-   panel" vocabulary with .terminal but with an ops-dashboard layout
-   instead of a CLI log: a list of nodes with pulsing serving
-   indicators plus two aggregate stat bars that breathe. */
+   Sits on the paper Contact section as an inverted panel. Same "tool
+   panel" vocabulary as .terminal — square corners, dashed border, hard
+   offset shadow — with an ops-dashboard layout instead of a CLI log: a
+   list of nodes with pulsing serving indicators plus two aggregate stat
+   bars that breathe. Not interactive, so no hover transform. */
 
 .fleet {
   font-family:
@@ -459,25 +509,10 @@ a.underline-brutal:hover .arrow {
   font-size: clamp(11px, 1.1vw, 12px);
   line-height: 1.55;
   color: var(--paper);
-  /* soft top-to-bottom gradient on a mid-charcoal base so the panel
-     reads as a lit surface rather than a heavy ink slab. */
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--paper) 18%, var(--ink)) 0%,
-    color-mix(in srgb, var(--paper) 12%, var(--ink)) 100%
-  );
+  background: color-mix(in srgb, var(--paper) 12%, var(--ink));
   border: 1px dashed color-mix(in srgb, var(--paper) 26%, transparent);
-  border-radius: 14px;
   overflow: hidden;
-  box-shadow:
-    7px 7px 0 0 color-mix(in srgb, var(--ink) 12%, transparent),
-    inset 0 1px 0 0 color-mix(in srgb, var(--paper) 8%, transparent);
-  transition: transform 320ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  cursor: default;
-}
-
-.fleet:hover {
-  transform: scale(1.03);
+  box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--ink) 12%, transparent);
 }
 
 .fleet-head {
@@ -1318,9 +1353,8 @@ a.underline-brutal:hover .arrow {
   display: none;
   margin: 0 0 1.5rem;
   padding: var(--faq-pad);
-  border: 1px solid var(--faq-edge);
-  /* box-shadow follows the border-box radius, so the offset block rounds too. */
-  border-radius: 10px;
+  /* Square and dashed, matching .terminal and .fleet. */
+  border: 1px dashed var(--faq-edge);
   box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--paper) 12%, transparent);
 }
 .faq-card[data-selected="true"] {

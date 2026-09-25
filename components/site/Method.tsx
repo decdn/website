@@ -1,6 +1,5 @@
 import { Fragment } from "react";
-import { METHOD_FIGURES, METHOD_STEPS, STACK } from "@/lib/copy";
-import { Figure } from "@/components/ui/Figure";
+import { METHOD_STEPS, STACK } from "@/lib/copy";
 import { Frame } from "@/components/ui/Frame";
 import { MethodRow } from "@/components/ui/MethodRow";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -25,7 +24,7 @@ export function Method() {
         ))}
       </div>
 
-      <div data-reveal className="mt-auto pt-12">
+      <div data-reveal className="pt-12">
         <span className="meta mb-3 block opacity-60">stack</span>
         <div className="hug flex flex-wrap items-baseline gap-x-5 gap-y-2 text-h3 font-semibold tracking-[-0.03em]">
           {/* The `·` is a separator between chips, not part of one, so it is
@@ -39,11 +38,6 @@ export function Method() {
               )}
               <span>{name}</span>
             </Fragment>
-          ))}
-        </div>
-        <div className="mt-5 grid grid-cols-2 gap-y-4 @xl:grid-cols-4">
-          {METHOD_FIGURES.map((figure) => (
-            <Figure key={figure.label} {...figure} />
           ))}
         </div>
       </div>

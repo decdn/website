@@ -3,13 +3,13 @@ import {
   COMPARE_HEADLINE,
   COMPARE_LEAD,
   COMPARE_ROWS,
+  CONTACT_HEADLINE,
   CONTACT_LEAD,
   type CompareRow,
   DEMO_CAPTIONS,
   HERO_FIGURES,
   HERO_HEADLINE,
   HERO_LEAD,
-  METHOD_FIGURES,
   METHOD_STEPS,
   SITE_DESCRIPTION,
   SITE_TITLE,
@@ -55,12 +55,12 @@ const ALL_STRINGS: readonly [string, string][] = [
     [`METHOD_STEPS.${s.n}.body`, s.body],
   ]),
   ...STACK.map((s, i): [string, string] => [`STACK[${i}]`, s]),
-  ...METHOD_FIGURES.flatMap((f): [string, string][] => [
-    [`METHOD_FIGURES.${f.label}.label`, f.label],
-    [`METHOD_FIGURES.${f.label}.value`, f.value],
-  ]),
   ["DEMO_CAPTIONS.terminal", DEMO_CAPTIONS.terminal],
   ["DEMO_CAPTIONS.fleet", DEMO_CAPTIONS.fleet],
+  ...CONTACT_HEADLINE.map((s, i): [string, string] => [
+    `CONTACT_HEADLINE[${i}]`,
+    s,
+  ]),
   ["CONTACT_LEAD", CONTACT_LEAD],
 ];
 

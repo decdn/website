@@ -7,12 +7,6 @@ type FrameProps = {
   tone: Tone;
   /** Extra classes on the outer <section>. */
   className?: string;
-  /**
-   * Full-viewport min-height (default true). Set false for a
-   * content-height section, e.g. the closing section directly above
-   * the footer, where the floor would just manufacture dead space.
-   */
-  fill?: boolean;
   children: ReactNode;
 };
 
@@ -21,16 +15,9 @@ const TONE_CLASS: Record<Tone, string> = {
   paper: "bg-paper text-ink",
 };
 
-export function Frame({
-  id,
-  tone,
-  className = "",
-  fill = true,
-  children,
-}: FrameProps) {
+export function Frame({ id, tone, className = "", children }: FrameProps) {
   const sectionClass = [
     "relative flex flex-col scroll-mt-[var(--nav-h)] px-frame-gutter py-frame-pad-y",
-    fill && "min-h-frame-min-h",
     TONE_CLASS[tone],
     className,
   ]

@@ -11,7 +11,7 @@ export function LegalDoc({ slug }: { slug: LegalSlug }) {
   const doc = getLegalDoc(slug);
   return (
     <main>
-      <Frame id={slug} tone="paper" fill={false}>
+      <Frame id={slug} tone="paper">
         <article className="flex flex-col gap-10">
           <header className="flex flex-col gap-4">
             <h1

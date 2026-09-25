@@ -1,11 +1,9 @@
 import { EMAIL, links } from "@/lib/links";
-import { CONTACT_LEAD } from "@/lib/copy";
+import { CONTACT_HEADLINE, CONTACT_LEAD } from "@/lib/copy";
 import { highlightBrand } from "@/components/ui/brand";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { FleetStatus } from "@/components/site/FleetStatus";
-
-const wordmarkH = "clamp(4.75rem, 14vw, 11.5rem)";
 
 // Solid monochrome glyphs leading each contact link. Decorative — every link
 // carries its own visible text label — so each <svg> is aria-hidden. iconClass
@@ -74,7 +72,7 @@ function XIcon() {
 
 export function Contact() {
   return (
-    <Frame id="contact" tone="paper" className="overflow-hidden" fill={false}>
+    <Frame id="contact" tone="paper" className="overflow-hidden">
       <SectionHeader
         index="05"
         label="Contact"
@@ -83,24 +81,16 @@ export function Contact() {
 
       <div className="mt-14 grid gap-12 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,460px)] @4xl:items-start @4xl:gap-14">
         <div className="flex flex-col gap-12">
-          <h2 id="contact-h" className="sr-only">
-            Contact
-          </h2>
-
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          {/* A display line, not the wordmark: the nav already carries the
+              logo, and repeating it at 11rem said nothing about the section. */}
+          <h2
             data-reveal
-            src="/wordmark-light.svg"
-            alt="decdn"
-            width={411}
-            height={110}
-            className="block"
-            style={{
-              height: wordmarkH,
-              width: "auto",
-              marginLeft: `calc(${wordmarkH} * -0.18)`,
-            }}
-          />
+            id="contact-h"
+            className="hug flex flex-col text-h2 leading-[0.92] font-semibold tracking-[-0.04em]"
+          >
+            <span>{CONTACT_HEADLINE[0]}</span>
+            <span className="pl-[3vw] opacity-60">{CONTACT_HEADLINE[1]}</span>
+          </h2>
 
           <p
             data-reveal
@@ -144,7 +134,7 @@ export function Contact() {
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                <XIcon />x (twitter)
+                <XIcon />X
                 <span className="arrow" aria-hidden>
                   →
                 </span>
