@@ -11,7 +11,7 @@ import {
   HERO_LEAD,
   METHOD_STEPS,
   SITE_DESCRIPTION,
-  STACK,
+  stackLine,
   statusBlock,
 } from "@/lib/copy";
 import { FAQ_ITEMS } from "@/lib/faq";
@@ -215,7 +215,7 @@ ${compareTable}
 
 ### How it works
 
-Stack: ${STACK.join(" · ")}
+Stack: ${stackLine()}
 
 ${methodSteps}
 

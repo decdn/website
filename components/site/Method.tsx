@@ -1,4 +1,3 @@
-import { Fragment } from "react";
 import { METHOD_STEPS, STACK } from "@/lib/copy";
 import { Frame } from "@/components/ui/Frame";
 import { MethodRow } from "@/components/ui/MethodRow";
@@ -26,20 +25,31 @@ export function Method() {
 
       <div data-reveal className="pt-12">
         <span className="meta mb-3 block opacity-60">stack</span>
-        <div className="hug flex flex-wrap items-baseline gap-x-5 gap-y-2 text-h3 font-semibold tracking-[-0.03em]">
-          {/* The `·` is a separator between chips, not part of one, so it is
-              aria-hidden and rendered only between items. */}
-          {STACK.map((name, i) => (
-            <Fragment key={name}>
-              {i > 0 && (
-                <span aria-hidden className="opacity-30">
-                  ·
-                </span>
-              )}
-              <span>{name}</span>
-            </Fragment>
+        {/* Hairlines come from the list's top/left edge plus each cell's
+            right/bottom edge, so the grid stays single-ruled at any column
+            count. In one row of six, --text-h3 overflows a cell ("BLAKE3"),
+            so names size off the frame's container width instead. The role
+            label is `.meta` spelled out at 12px — `.meta` pins 11px outside
+            any cascade layer, so a size utility beside it can't win. */}
+        <ul className="grid grid-cols-2 border-t border-l border-current/20 @xl:grid-cols-3 @6xl:grid-cols-6">
+          {STACK.map(({ name, role }) => (
+            <li
+              key={name}
+              className="flex flex-col gap-3 border-r border-b border-current/20 px-5 py-6 @xl:px-6 @xl:py-7 @6xl:px-5"
+            >
+              <span className="hug text-h3 leading-none font-semibold tracking-[-0.03em] @6xl:text-[3.4cqi]">
+                {name}
+              </span>
+              <span className="flex items-start gap-2.5 text-[12px] leading-[1.2] font-medium tracking-[0.22em] uppercase opacity-60">
+                <span
+                  aria-hidden
+                  className="mt-[0.33em] size-1.5 shrink-0 bg-current"
+                />
+                {role}
+              </span>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </Frame>
   );

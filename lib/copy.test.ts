@@ -54,7 +54,10 @@ const ALL_STRINGS: readonly [string, string][] = [
     [`METHOD_STEPS.${s.n}.word`, s.word],
     [`METHOD_STEPS.${s.n}.body`, s.body],
   ]),
-  ...STACK.map((s, i): [string, string] => [`STACK[${i}]`, s]),
+  ...STACK.flatMap((s): [string, string][] => [
+    [`STACK.${s.name}.name`, s.name],
+    [`STACK.${s.name}.role`, s.role],
+  ]),
   ["DEMO_CAPTIONS.terminal", DEMO_CAPTIONS.terminal],
   ["DEMO_CAPTIONS.fleet", DEMO_CAPTIONS.fleet],
   ...CONTACT_HEADLINE.map((s, i): [string, string] => [

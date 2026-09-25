@@ -149,10 +149,27 @@ export const METHOD_STEPS: readonly MethodStep[] = [
   },
 ];
 
-/** The stack chips under the method steps, rendered with an aria-hidden `·`
- *  between each. Order is the render order. This is the section's only stack
- *  summary — a figure strip beside it used to restate QUIC, iroh and USDC. */
-export const STACK = ["Rust", "BLAKE3", "QUIC", "iroh", "USDC", "EVM"] as const;
+export type StackItem = {
+  name: string;
+  /** What the piece does in the protocol — the small label under the name. */
+  role: string;
+};
+
+/** The stack strip under the method steps: one ruled cell per item, name over
+ *  role. Order is the render order. This is the section's only stack summary —
+ *  a figure strip beside it used to restate QUIC, iroh and USDC. */
+export const STACK: readonly StackItem[] = [
+  { name: "Rust", role: "node & client" },
+  { name: "BLAKE3", role: "verification" },
+  { name: "QUIC", role: "transport" },
+  { name: "iroh", role: "connectivity" },
+  { name: "USDC", role: "payment" },
+  { name: "EVM", role: "settlement" },
+];
+
+/** The stack as one line of text, for the machine mirror. */
+export const stackLine = (): string =>
+  STACK.map(({ name, role }) => `${name} (${role})`).join(" · ");
 
 /** The target price, as the page and both machine surfaces quote it. */
 export const TARGET_RATE = "$0.01/GB";

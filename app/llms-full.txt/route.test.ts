@@ -147,8 +147,10 @@ describe("homepage mirror", () => {
     expect(body).toContain(`${figure.label}: ${figure.value}`);
   });
 
-  it("mirrors the stack chips in order", () => {
-    expect(lines).toContain(`Stack: ${STACK.join(" · ")}`);
+  it("mirrors the stack strip in order", () => {
+    expect(lines).toContain(
+      `Stack: ${STACK.map((s) => `${s.name} (${s.role})`).join(" · ")}`,
+    );
   });
 
   // The header prose says "the three legal documents" in words, the way
