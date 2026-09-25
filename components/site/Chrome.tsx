@@ -12,13 +12,21 @@ import {
 import { MobileMenu } from "@/components/site/MobileMenu";
 import { resolveActiveSection } from "@/components/site/chrome-active";
 
-const SECTION_IDS = ["intro", "compare", "method", "faq", "contact"] as const;
+const SECTION_IDS = [
+  "intro",
+  "compare",
+  "method",
+  "try",
+  "faq",
+  "contact",
+] as const;
 // Hash anchors are written `/#section`. Required because this nav also
 // renders on /blog/*, where a bare `#section` resolves against the
 // current URL (e.g. /blog/foo/#section) instead of the home page.
 const NAV = [
   { id: "compare", label: "compare" },
   { id: "method", label: "method" },
+  { id: "try", label: "try it" },
   { id: "faq", label: "faq" },
   { id: "contact", label: "contact" },
 ] as const;
