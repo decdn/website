@@ -5,7 +5,6 @@ import { Figure } from "@/components/ui/Figure";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { HeroTerminal } from "@/components/site/HeroTerminal";
-import { TryIt } from "@/components/site/TryIt";
 
 export function Hero() {
   return (
@@ -32,16 +31,11 @@ export function Hero() {
               {highlightBrand(HERO_LEAD)}
             </p>
 
-            {/* One primary action; docs and source sit beside it as quieter
-                text links so the eye lands on the litepaper first. */}
+            {/* One primary action; the litepaper and source sit beside it as
+                quieter text links so the eye lands on the try-it section. */}
             <div className="rise rise-4 flex flex-col items-start gap-x-8 gap-y-5 @md:flex-row @md:items-center">
-              <a
-                className="cta-primary"
-                href={links.litepaper}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                read the litepaper
+              <a className="cta-primary" href="#try">
+                try it out
                 <span className="arrow" aria-hidden>
                   →
                 </span>
@@ -49,9 +43,11 @@ export function Hero() {
               <div className="flex gap-x-8">
                 <a
                   className="underline-brutal text-cta font-medium tracking-[0.14em] uppercase opacity-70 hover:opacity-100"
-                  href={links.docs}
+                  href={links.litepaper}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  read the docs
+                  litepaper
                   <span className="arrow" aria-hidden>
                     →
                   </span>
@@ -78,8 +74,6 @@ export function Hero() {
           <HeroTerminal className="block w-full" />
         </div>
       </div>
-
-      <TryIt />
     </Frame>
   );
 }

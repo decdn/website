@@ -216,16 +216,6 @@ ${HERO_LEAD}
 
 ${figureList(HERO_FIGURES)}
 
-${TRY_HEADLINE}
-
-${TRY_LEAD}
-
-${tryModels}
-
-${tryWindows}
-
-${TRY_NOTES.join(" ")}
-
 ### Side by side
 
 ${COMPARE_HEADLINE.join(" ")}
@@ -239,6 +229,18 @@ ${compareTable}
 Stack: ${STACK.join(" · ")}
 
 ${methodSteps}
+
+### Try it
+
+${TRY_HEADLINE}
+
+${TRY_LEAD}
+
+${tryModels}
+
+${tryWindows}
+
+${TRY_NOTES.join(" ")}
 
 ### FAQ
 

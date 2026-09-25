@@ -53,7 +53,7 @@ export const HERO_FIGURES = [
   { label: "gas overhead", value: "<1%" },
 ] as const satisfies readonly FigureCopy[];
 
-/** The try-it block at the foot of the hero. */
+/** The #try section between How it works and the FAQ. */
 export const TRY_HEADLINE = "try it: pull a real model.";
 
 export const TRY_LEAD =
