@@ -498,8 +498,9 @@ a.cta-primary:focus-visible {
 
 /* --- fleet status panel (§05) -----------------------------------------
    Sits on the paper Contact section as an inverted panel. Same "tool
-   panel" vocabulary as .terminal — square corners, dashed border, hard
-   offset shadow — with an ops-dashboard layout instead of a CLI log:
+   panel" vocabulary as .terminal — square corners, hard offset shadow —
+   but ruled in solid lines, since it frames charts rather than a CLI
+   log, with an ops-dashboard layout:
    registered nodes (region, operator, last settlement) with a pulse for
    each one that settled recently, plus two 24h
    aggregates over hourly spark strips. Filled from the live stats file
@@ -513,7 +514,7 @@ a.cta-primary:focus-visible {
   line-height: 1.55;
   color: var(--paper);
   background: color-mix(in srgb, var(--paper) 12%, var(--ink));
-  border: 1px dashed color-mix(in srgb, var(--paper) 26%, transparent);
+  border: 1px solid color-mix(in srgb, var(--paper) 26%, transparent);
   overflow: hidden;
   box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--ink) 12%, transparent);
 }
@@ -523,7 +524,7 @@ a.cta-primary:focus-visible {
   align-items: center;
   gap: 6px;
   padding: 10px 14px;
-  border-bottom: 1px dashed color-mix(in srgb, var(--paper) 30%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
 }
 
 .fleet-dot {
@@ -711,7 +712,7 @@ a.cta-primary:focus-visible {
    the threshold. The active section's nav item shows a full-width
    whisper-green underline (scales in from the left) and a brighter
    label opacity; hover shows a short underline preview. Focus paints
-   a dashed outline that matches the terminal / fleet border
+   a dashed outline that matches the terminal border
    vocabulary. No mix-blend-mode is used — the parent nav toggles
    `data-tone` per-section to work around Safari's bug with
    `mix-blend-mode: difference` on `position: fixed` elements
@@ -1330,7 +1331,7 @@ a.cta-primary:focus-visible {
   display: none;
   margin: 0 0 1.5rem;
   padding: var(--faq-pad);
-  /* Square and dashed, matching .terminal and .fleet. */
+  /* Square and dashed, matching .terminal. */
   border: 1px dashed var(--faq-edge);
   box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--paper) 12%, transparent);
 }
