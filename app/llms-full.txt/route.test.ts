@@ -16,6 +16,7 @@ import {
 } from "@/lib/copy";
 import { FAQ_ITEMS } from "@/lib/faq";
 import { getLegalDoc, LEGAL_SLUGS } from "@/lib/legal";
+import { STATS_URL } from "@/lib/stats";
 
 const response = GET();
 const body = await response.text();
@@ -161,19 +162,10 @@ describe("homepage mirror", () => {
     expect(body).toContain("the three legal documents");
   });
 
-  // The terminal and fleet-dashboard figures are invented sample values. In
-  // HTML they sit inside a captioned <figure>; plain text strips that framing
-  // entirely, so mirroring them would be worse than omitting them.
-  it.each([
-    "15.1 GB/s",
-    "$0.151 /s",
-    "$0.1309",
-    "$0.0055",
-    "$0.0411",
-    "550 MB",
-    "probing 18 peers",
-  ])("omits the demo figure %s", (figure) => {
-    expect(body).not.toContain(figure);
+  // The settlement feed and fleet panel are live readings; a mirror built at
+  // deploy time would freeze them, so it points at their source instead.
+  it("points at the live stats file rather than mirroring the panels", () => {
+    expect(body).toContain(STATS_URL);
   });
 });
 

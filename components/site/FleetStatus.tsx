@@ -1,83 +1,128 @@
-import { DemoFigure } from "@/components/ui/DemoFigure";
-import { DEMO_CAPTIONS } from "@/lib/copy";
+"use client";
 
-type Node = {
-  id: string;
-  active: boolean;
-  rate: string;
-};
+import { PanelFigure } from "@/components/ui/PanelFigure";
+import { PANEL_CAPTIONS } from "@/lib/copy";
+import { FLEET_WINDOW_HOURS, fleetView, type StatsResult } from "@/lib/stats";
+import { useStats } from "@/lib/use-stats";
 
-const NODES: readonly Node[] = [
-  { id: "ber-14", active: true, rate: "2.4 GB/s" },
-  { id: "icn-03", active: true, rate: "1.8 GB/s" },
-  { id: "sfo-22", active: true, rate: "3.1 GB/s" },
-  { id: "tyo-05", active: true, rate: "4.2 GB/s" },
-  { id: "fra-11", active: true, rate: "2.1 GB/s" },
-  { id: "sgp-02", active: true, rate: "1.5 GB/s" },
-  { id: "nyc-07", active: false, rate: "idle" },
-  { id: "lax-17", active: false, rate: "idle" },
-] as const;
+const EMPTY_LABEL = {
+  loading: "loading",
+  error: "stats unavailable",
+} as const;
 
-// Every node id, per-node rate and Σ total below is invented; DemoFigure
-// carries the caption that says so, outside the aria-hidden subtree.
-export function FleetStatus({ className }: { className?: string }) {
-  const active = NODES.filter((n) => n.active).length;
+// Flat strips until the stats load.
+const FLAT = Array<number>(FLEET_WINDOW_HOURS).fill(0);
+
+/** One hourly spark strip: a cell per hour, its height the hour's share of
+ *  the window's busiest hour. */
+function Spark({ levels }: { levels: number[] }) {
   return (
-    <DemoFigure
+    <div className="fleet-spark">
+      {levels.map((level, i) => (
+        <span
+          key={i}
+          className="fleet-spark-cell"
+          style={{ "--level": level }}
+        />
+      ))}
+    </div>
+  );
+}
+
+/**
+ * The panel itself, from a stats result. Split from `FleetStatus` so the
+ * rendering is a plain function a test can walk without a React renderer;
+ * `FleetStatus` only adds the fetch.
+ */
+export function FleetPanel({
+  result,
+  className,
+}: {
+  result: StatsResult;
+  className?: string;
+}) {
+  const view = result.status === "ok" ? fleetView(result.stats) : null;
+  return (
+    <PanelFigure
       className={className}
       panelClassName="fleet"
-      caption={DEMO_CAPTIONS.fleet}
+      caption={PANEL_CAPTIONS.fleet}
     >
       <div className="fleet-head">
         <span className="fleet-dot" />
         <span className="fleet-dot" />
         <span className="fleet-dot" />
-        <span className="fleet-head-label">decdn · fleet · test</span>
+        <span className="fleet-head-label">
+          decdn · fleet · arbitrum sepolia
+          {view && !view.caughtUp ? " · catching up" : ""}
+        </span>
       </div>
 
       <div className="fleet-body">
         <div className="fleet-summary">
-          <span className="fleet-value">
-            {active}
-            <span className="fleet-dim"> / {NODES.length}</span>
-          </span>
-          <span className="fleet-dim">nodes serving</span>
+          <span className="fleet-value">{view ? view.registered : "—"}</span>
+          <span className="fleet-dim">nodes registered</span>
         </div>
 
-        {NODES.map((n, i) => (
-          <div key={n.id} className="fleet-row">
-            <span className="fleet-code">{n.id}</span>
-            <span
-              className={
-                n.active
-                  ? `fleet-pulse fleet-pulse-active pulse-${i % 6}`
-                  : "fleet-pulse"
-              }
-            />
-            <span className={n.active ? "fleet-rate" : "fleet-rate fleet-dim"}>
-              {n.rate}
-            </span>
+        {view ? (
+          view.regions.length > 0 ? (
+            view.regions.map((r, i) => (
+              <div key={r.code} className="fleet-row">
+                <span className="fleet-code">{r.code}</span>
+                <span
+                  className={
+                    r.nodes > 0
+                      ? `fleet-pulse fleet-pulse-active pulse-${i % 6}`
+                      : "fleet-pulse"
+                  }
+                />
+                <span
+                  className={
+                    r.nodes > 0 ? "fleet-rate" : "fleet-rate fleet-dim"
+                  }
+                >
+                  <span className="fleet-dim">
+                    {r.nodes} {r.nodes === 1 ? "node" : "nodes"} ·{" "}
+                  </span>
+                  {r.served}
+                </span>
+              </div>
+            ))
+          ) : (
+            <div className="fleet-note">no nodes registered yet</div>
+          )
+        ) : (
+          <div className="fleet-note">
+            {EMPTY_LABEL[result.status as keyof typeof EMPTY_LABEL]}
           </div>
-        ))}
+        )}
+        {view && view.moreRegions > 0 && (
+          <div className="fleet-note">
+            + {view.moreRegions} more{" "}
+            {view.moreRegions === 1 ? "region" : "regions"}
+          </div>
+        )}
 
         <div className="fleet-divider" />
 
         <div className="fleet-agg">
-          <span className="fleet-dim">Σ throughput</span>
-          <span className="fleet-value">15.1 GB/s</span>
+          <span className="fleet-dim">Σ served · 24h</span>
+          <span className="fleet-value">{view ? view.served24h : "—"}</span>
         </div>
-        <div className="fleet-bar">
-          <span className="fleet-bar-fill fb-throughput" />
-        </div>
+        <Spark levels={view ? view.servedSpark : FLAT} />
 
         <div className="fleet-agg">
-          <span className="fleet-dim">Σ revenue</span>
-          <span className="fleet-value">$0.151 /s</span>
+          <span className="fleet-dim">Σ settled · 24h</span>
+          <span className="fleet-value">{view ? view.settled24h : "—"}</span>
         </div>
-        <div className="fleet-bar">
-          <span className="fleet-bar-fill fb-revenue" />
-        </div>
+        <Spark levels={view ? view.settledSpark : FLAT} />
       </div>
-    </DemoFigure>
+    </PanelFigure>
   );
+}
+
+// Every figure is read from the live stats file (lib/stats.ts) after mount;
+// the static HTML carries the loading state.
+export function FleetStatus({ className }: { className?: string }) {
+  return <FleetPanel result={useStats()} className={className} />;
 }

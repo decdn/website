@@ -94,17 +94,18 @@ for (const surface of ["llms.txt", "llms-full.txt"]) {
   for (const url of unique) assertResolves(url, surface);
 }
 
-// 3. Both demo captions survive into the rendered homepage. FleetStatus is
-//    covered by a unit test; HeroTerminal is only observable here.
+// 3. Both panel captions survive into the rendered homepage. They are the
+//    only text-extractor-visible statement of what the aria-hidden live
+//    figures are.
 const home = read("index.html");
 if (home) {
   const captions = {
-    "HeroTerminal (fetch session)": "Illustrative deCDN fetch session.",
-    "FleetStatus (fleet dashboard)": "Illustrative deCDN fleet dashboard.",
+    "HeroTerminal (settlement feed)": "Live deCDN settlement feed.",
+    "FleetStatus (fleet panel)": "Live deCDN fleet panel.",
   };
   for (const [name, caption] of Object.entries(captions)) {
     if (!home.includes(caption)) {
-      fail(`index.html: ${name} caption missing — invented figures ship bare`);
+      fail(`index.html: ${name} caption missing — live figures ship bare`);
     }
   }
 

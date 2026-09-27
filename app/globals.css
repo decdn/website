@@ -303,10 +303,11 @@ a.cta-primary:focus-visible {
 }
 
 /* --- hero terminal -----------------------------------------------------
-   Mocks a single decdn CLI session: probe → stream → verify → settle.
+   Replays recent on-chain settlements from the live stats file
+   (lib/stats.ts), one per cycle: tx → block → operator → bytes → paid.
    All lines share one 4.5s loop; each line fades in at its own delay.
-   Progress bar fills during the "streaming" phase. Cursor blinks
-   independently. One terminal session restarts every cycle. */
+   Progress bar fills during the "delivered" line. Cursor blinks
+   independently. The cascade restarts every cycle. */
 
 .terminal {
   font-family:
@@ -498,9 +499,10 @@ a.cta-primary:focus-visible {
 /* --- fleet status panel (§05) -----------------------------------------
    Sits on the paper Contact section as an inverted panel. Same "tool
    panel" vocabulary as .terminal — square corners, dashed border, hard
-   offset shadow — with an ops-dashboard layout instead of a CLI log: a
-   list of nodes with pulsing serving indicators plus two aggregate stat
-   bars that breathe. Not interactive, so no hover transform. */
+   offset shadow — with an ops-dashboard layout instead of a CLI log:
+   registered nodes by region with pulsing indicators, plus two 24h
+   aggregates over hourly spark strips. Filled from the live stats file
+   (lib/stats.ts). Not interactive, so no hover transform. */
 
 .fleet {
   font-family:
@@ -663,68 +665,42 @@ a.cta-primary:focus-visible {
   font-variant-numeric: tabular-nums;
 }
 
-.fleet-bar {
+/* Full-width line for a status or overflow note in place of node rows. */
+.fleet-note {
+  padding: 2px 0;
+  opacity: 0.5;
+}
+
+/* Hourly spark strip under each aggregate: one cell per hour of the 24h
+   window, oldest left, each cell's height its share of the busiest hour
+   (--level, 0–1). A zero hour keeps a hairline so the strip reads as a
+   timeline rather than a gap. */
+.fleet-spark {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
   width: 100%;
-  height: 5px;
-  border: 1px solid color-mix(in srgb, var(--paper) 22%, transparent);
-  position: relative;
-  overflow: hidden;
+  height: 14px;
   margin: 4px 0 4px;
+  border-bottom: 1px solid color-mix(in srgb, var(--paper) 22%, transparent);
 }
 
-.fleet-bar-fill {
-  position: absolute;
-  inset: 0;
-  width: 70%;
+.fleet-spark-cell {
+  flex: 1;
+  height: max(1px, calc(var(--level, 0) * 100%));
   background: var(--whisper);
-}
-
-.fb-throughput {
-  animation: fleet-wave 7s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-.fb-revenue {
-  animation: fleet-wave 8.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  animation-delay: 2.3s;
-}
-
-/* subtle live-data jitter around a steady-state value — not a dramatic
-   breathe. Bar stays in a 72–82% band; the two bars run on different
-   durations + a phase offset so they never sync. */
-@keyframes fleet-wave {
-  0%,
-  100% {
-    width: 74%;
-  }
-  15% {
-    width: 79%;
-  }
-  32% {
-    width: 73%;
-  }
-  48% {
-    width: 81%;
-  }
-  63% {
-    width: 76%;
-  }
-  80% {
-    width: 78%;
-  }
+  transition: height 0.6s cubic-bezier(0.3, 0, 0.2, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fleet-pulse-active,
-  .fleet-bar-fill {
-    animation: none;
-  }
   .fleet-pulse-active {
+    animation: none;
     opacity: 1;
     transform: none;
     box-shadow: none;
   }
-  .fleet-bar-fill {
-    width: 80%;
+  .fleet-spark-cell {
+    transition: none;
   }
 }
 

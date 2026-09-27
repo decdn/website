@@ -17,6 +17,7 @@ import {
 import { FAQ_ITEMS } from "@/lib/faq";
 import { getLegalDoc, LEGAL_SLUGS, legalUrl } from "@/lib/legal";
 import { DOCS_ORIGIN, EMAIL, links, SITE_URL } from "@/lib/links";
+import { STATS_URL } from "@/lib/stats";
 
 // The whole origin as one plain-text document, so an agent grounding on deCDN
 // fetches this instead of stripping HTML from the homepage, the blog index,
@@ -32,9 +33,9 @@ import { DOCS_ORIGIN, EMAIL, links, SITE_URL } from "@/lib/links";
 // Post and legal bodies come from the same loaders the routes use.
 //
 // Deliberately excluded: the HeroTerminal and FleetStatus figures. They are
-// invented sample values, and a plain-text mirror strips exactly the visual
-// framing that marks them as a demo, so quoting them here would be worse than
-// not mirroring them at all. The tests assert their absence.
+// live testnet readings fetched in the browser, and a mirror built once at
+// deploy time would freeze a stale copy of them. The mirror points at the
+// stats file instead.
 
 // Required by Next 16 under `output: "export"` for route handlers that emit
 // static files at build time. GET-only is the only verb supported in export.
@@ -193,7 +194,7 @@ This is every page on decdn.org as one document: the homepage copy, the traditio
 
 ${statusBlock("throughout")}
 
-Two notes on reading this file. Field notes and legal documents are reproduced verbatim except that their headings are demoted to nest under the \`###\` each is given here, so the outline of this document is its own. And the homepage's terminal and fleet-dashboard widgets are not mirrored at all: their figures are invented sample values for demonstration, and plain text strips the framing that marks them as a demo.
+Two notes on reading this file. Field notes and legal documents are reproduced verbatim except that their headings are demoted to nest under the \`###\` each is given here, so the outline of this document is its own. And the homepage's settlement feed and fleet panel are not mirrored: they show live Arbitrum Sepolia testnet readings, fetched in the browser from ${STATS_URL}, which the deCDN indexer rewrites every five minutes. Read that file for current figures.
 
 ## Homepage
 

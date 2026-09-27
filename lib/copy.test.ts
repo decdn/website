@@ -6,11 +6,11 @@ import {
   CONTACT_HEADLINE,
   CONTACT_LEAD,
   type CompareRow,
-  DEMO_CAPTIONS,
   HERO_FIGURES,
   HERO_HEADLINE,
   HERO_LEAD,
   METHOD_STEPS,
+  PANEL_CAPTIONS,
   SITE_DESCRIPTION,
   SITE_TITLE,
   STACK,
@@ -58,8 +58,8 @@ const ALL_STRINGS: readonly [string, string][] = [
     [`STACK.${s.name}.name`, s.name],
     [`STACK.${s.name}.role`, s.role],
   ]),
-  ["DEMO_CAPTIONS.terminal", DEMO_CAPTIONS.terminal],
-  ["DEMO_CAPTIONS.fleet", DEMO_CAPTIONS.fleet],
+  ["PANEL_CAPTIONS.terminal", PANEL_CAPTIONS.terminal],
+  ["PANEL_CAPTIONS.fleet", PANEL_CAPTIONS.fleet],
   ...CONTACT_HEADLINE.map((s, i): [string, string] => [
     `CONTACT_HEADLINE[${i}]`,
     s,
@@ -160,16 +160,16 @@ describe("statusBlock", () => {
   });
 });
 
-describe("DEMO_CAPTIONS", () => {
-  // Both captions hedge invented figures, so both have to say so and point at
-  // the disclaimer. HeroTerminal is a client component the tree walker can't
-  // invoke, which is why its caption is asserted here and its *rendering* is
-  // asserted by scripts/check-out.mjs against the built HTML.
-  it.each(Object.entries(DEMO_CAPTIONS))(
-    "%s names the figures as illustrative and links the disclaimer",
+describe("PANEL_CAPTIONS", () => {
+  // Both captions describe live testnet figures, so both have to say they are
+  // testnet readings and point at the disclaimer. scripts/check-out.mjs
+  // asserts each one reaches the built HTML.
+  it.each(Object.entries(PANEL_CAPTIONS))(
+    "%s names the figures as live testnet readings and links the disclaimer",
     (_name, caption) => {
-      expect(caption).toMatch(/^Illustrative deCDN /);
-      expect(caption).toContain("not live network telemetry");
+      expect(caption).toMatch(/^Live deCDN /);
+      expect(caption).toContain("Arbitrum Sepolia testnet");
+      expect(caption).toContain("not mainnet revenue");
       expect(caption).toContain("/legal/disclaimer/");
     },
   );
