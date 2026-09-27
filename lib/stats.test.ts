@@ -66,6 +66,10 @@ describe("asStats", () => {
       "a malformed settlement",
       { ...base, settlements: [{ ...settlement(0), amount: 5 }] },
     ],
+    [
+      "a settlement without a logIndex",
+      { ...base, settlements: [{ ...settlement(0), logIndex: undefined }] },
+    ],
   ])("rejects %s", (_name, value) => {
     expect(asStats(value)).toBeNull();
   });

@@ -96,6 +96,7 @@ export function asStats(value: unknown): Stats | null {
       (r) =>
         isRecord(r) &&
         typeof r.txHash === "string" &&
+        typeof r.logIndex === "number" &&
         typeof r.operator === "string" &&
         typeof r.blockNumber === "number" &&
         typeof r.timestamp === "number" &&
