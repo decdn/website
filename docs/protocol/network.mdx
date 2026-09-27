@@ -21,7 +21,10 @@ When a lookup returns no providers for a request that names a namespace, the nam
 
 ## Selection
 
-Clients and nodes both rank candidates by a unified score combining advertised price, observed latency, and reputation, with a quadratic reputation penalty. Lower is better.
+Clients and nodes rank candidates differently.
+
+- **Clients** take candidates from their own peer store or the registry, not the DHT, and rank them by measured round-trip time alone. Price is not a rank key: the client pays the rate the node signs and can refuse a quote above a ceiling of its own. A client keeps no reputation score; it only sets aside, for a few minutes, a node that just failed it.
+- **Nodes** pulling on a cache miss rank holders by a unified score combining advertised price, observed latency, and their local reputation score, with a quadratic reputation penalty. Lower is better.
 
 ## On-chain registration
 
@@ -29,9 +32,9 @@ Nodes register through an on-chain staking registry that binds a network identit
 
 ## Regions
 
-A node declares its region — an ISO 3166-1 alpha-2 country code — on-chain at registration, and the registry watcher resolves the active set into a region map. The claim is self-attested and accepted at face value; a requester applies a reputation penalty when observed latency contradicts it, and region-scoped takedown obligations follow it ([takedown](/protocol/takedown)). A stability window after a region change stops a node shedding blacklist scope by flipping regions reactively.
+A node declares its region — an ISO 3166-1 alpha-2 country code — on-chain at registration, and the registry watcher resolves the active set into a region map. The claim is self-attested and accepted at face value; a pulling node applies a reputation penalty when observed latency contradicts it, and region-scoped takedown obligations follow it ([takedown](/protocol/takedown)). A stability window after a region change stops a node shedding blacklist scope by flipping regions reactively.
 
-Regions inform selection rather than partition the mesh: a client in Frankfurt prefers nearby candidates because they score better on latency, not because it sees a different peer set.
+Regions inform selection rather than partition the mesh: a client in Frankfurt uses its region only to shortlist which candidates to probe, and prefers nearby ones because they answer faster, not because it sees a different peer set.
 
 ## NAT traversal
 

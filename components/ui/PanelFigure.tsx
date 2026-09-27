@@ -1,26 +1,25 @@
 import type { ReactNode } from "react";
 
 /**
- * A decorative demo panel, captioned as illustrative.
+ * A decorative data panel with a plain-language caption.
  *
- * The panel is `aria-hidden` because its animated figures are noise for a
- * screen reader. Text extractors ignore `aria-hidden` entirely, though, and
- * every value in both panels is invented — so the caption has to sit *outside*
- * the hidden subtree, where a crawler reads it next to the figures it
- * qualifies.
+ * The panel is `aria-hidden` because its cycling, animated figures are noise
+ * for a screen reader. Text extractors ignore `aria-hidden` entirely, though,
+ * so the caption — which says where the figures come from and that they are
+ * testnet readings — has to sit *outside* the hidden subtree, where a crawler
+ * reads it next to the figures it qualifies.
  *
  * That placement is the whole reason this component exists rather than each
- * widget writing its own `<figure>`: it is a one-line mistake to make in
- * either of them, HeroTerminal is a client component that unit tests can't
- * walk, and components/ui/DemoFigure.test.ts asserts the structure once for
- * both. The captions themselves live in `DEMO_CAPTIONS` (lib/copy.ts), and
- * scripts/check-out.mjs greps the built HTML for them.
+ * panel writing its own `<figure>`: it is a one-line mistake to make in
+ * either of them, and components/ui/PanelFigure.test.ts asserts the structure
+ * once for both. The captions themselves live in `PANEL_CAPTIONS`
+ * (lib/copy.ts), and scripts/check-out.mjs greps the built HTML for them.
  *
  * `className` lands on the `<figure>` rather than the panel; both call sites
  * pass "block w-full", which behaves identically there (preflight zeroes
  * figure margin).
  */
-export function DemoFigure({
+export function PanelFigure({
   panelClassName,
   caption,
   className,

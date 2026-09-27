@@ -21,7 +21,7 @@ sequenceDiagram
     N->>P: Redeem (voucher + preimage)
 ```
 
-The client picks the candidate with the best combination of price, latency, and reputation. It pays from a pool it opened once and reuses for every node, so nothing on this path touches the chain until the node chooses to redeem. Vouchers cover every byte delivered.
+The client picks the holder with the lowest measured round-trip time. It pays the rate the node signs, and can refuse a quote above a ceiling of its own; it keeps no reputation score. It pays from a pool it opened once and reuses for every node, so nothing on this path touches the chain until the node chooses to redeem. Vouchers cover every byte delivered.
 
 ## Cache miss with pull-through
 
@@ -51,9 +51,9 @@ A node may also simply decline. Refusing is not a protocol violation and is not 
 
 ## Multi-source parallel fetch
 
-For a large blob, the client doesn't pull from a single node. A client-side scheduler admits a set of holders — **full and partial holders alike**, ranked by the same selection score, at most one node per operator — and fans out to all of them at once, up to `max_sources` (default 4, above a 64 MiB size floor).
+For a large blob, the client doesn't pull from a single node. A client-side scheduler admits a set of holders — **full and partial holders alike**, ranked by measured round-trip time, at most one node per operator — and fans out to all of them at once, up to `max_sources` (default 4, above a 64 MiB size floor).
 
-Assignment follows **coverage**: discovery and probes carry a bitmap of which 64 MiB blocks each holder will serve, so each block goes to a holder that already has it. A block no admitted holder covers is a genuine gap, warmed once from origin — and that warmer's new coverage becomes discoverable supply for the next fetch.
+Assignment follows **coverage**: probes carry a bitmap of which 64 MiB blocks each holder will serve, so each block goes to a holder that already has it. A block no admitted holder covers is a genuine gap, warmed once from origin — and that warmer's new coverage becomes discoverable supply for the next fetch.
 
 Assignment is dynamic. When a source finishes its **segment**, it steals the largest remaining one from a peer, splitting it on a verifiable boundary; every segment is verified as it lands, and a stalled or failed source's _unfinished remainder_ is reassigned without restarting the download. There is deliberately no hedging — racing a segment against idle sources would mean paying for the copies that lose, so the tail is bounded by deadline-based reassignment instead. Aggregate throughput therefore scales with the number of admitted sources rather than any one holder's uplink.
 

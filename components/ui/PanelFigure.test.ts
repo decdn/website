@@ -1,6 +1,6 @@
 import { createElement } from "react";
 import { describe, expect, it } from "vitest";
-import { DemoFigure } from "./DemoFigure";
+import { PanelFigure } from "./PanelFigure";
 import {
   asElement,
   attrs,
@@ -9,16 +9,16 @@ import {
   textOf,
 } from "@/test-utils/react-tree";
 
-const CAPTION = "Illustrative deCDN thing. Sample values, not telemetry.";
+const CAPTION = "Live deCDN thing. Testnet readings.";
 
-const tree = DemoFigure({
+const tree = PanelFigure({
   panelClassName: "fleet",
   caption: CAPTION,
   className: "block w-full",
   children: createElement("div", { className: "inner" }, "15.1 GB/s"),
 });
 
-describe("DemoFigure", () => {
+describe("PanelFigure", () => {
   it("wraps the panel in a figure carrying the caller's className", () => {
     const figure = asElement(tree);
     expect(figure.type).toBe("figure");
@@ -33,9 +33,9 @@ describe("DemoFigure", () => {
     expect(attrs(panel[0]).className).toBe("fleet");
   });
 
-  // The entire reason this component exists. aria-hidden hides the invented
-  // numbers from assistive tech but not from text extractors, so the hedge has
-  // to sit outside the hidden subtree to travel with them. Getting this wrong
+  // The entire reason this component exists. aria-hidden hides the figures
+  // from assistive tech but not from text extractors, so the caption has to
+  // sit outside the hidden subtree to travel with them. Getting this wrong
   // is a one-line mistake in either widget and invisible in review.
   it("captions the panel from outside the aria-hidden subtree", () => {
     const caption = findOne(tree, "figcaption");

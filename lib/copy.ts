@@ -33,7 +33,7 @@ export const HERO_HEADLINE = [
 ] as const;
 
 export const HERO_LEAD =
-  "The first bytes of a 14-gigabyte file posted in Berlin reach a client in Tokyo in under a second — streamed from three peers at once, every chunk verified with BLAKE3, paid for per megabyte in USDC. The code is open. The network is open. The price is posted.";
+  "A 14-gigabyte file posted in Berlin streams to a client in Tokyo from several nodes at once, every chunk verified with BLAKE3, paid for per megabyte in USDC. The code is open. The network is open. The price is posted.";
 
 /** A label/value pair rendered by `components/ui/Figure`. Named `FigureCopy`
  *  rather than `Figure` so a call site can import both the copy and the
@@ -123,7 +123,7 @@ export const COMPARE_ROWS = [
   {
     axis: "failure",
     traditional: "PoP dies, region 503s",
-    decdn: "peer drops, stream continues",
+    decdn: "node drops, stream continues",
   },
   {
     axis: "scaling",
@@ -147,12 +147,12 @@ export const METHOD_STEPS: readonly MethodStep[] = [
   {
     n: "01",
     word: "probe",
-    body: "In a single handshake, the client asks nearby peers who has the file. Peers answer with what they've cached, their rate per megabyte, and how fast they can serve — the round trip averages under 100 milliseconds. The client ranks the answers by price, latency, and reputation; the best-priced, fastest, most-reputable peer wins, or several win in parallel for a large file.",
+    body: "The client draws candidate nodes from the on-chain CapacityBond registry, or from its own peer store of nodes it has measured before — if that store is fresh, it skips the probe entirely. Otherwise it probes a shortlist of candidates in parallel for who holds the file and how fast they answer. It ranks holders by measured round-trip time alone. Price is not a rank key: the client pays the rate the node signs, and can cap it with a ceiling of its own. No reputation score is kept.",
   },
   {
     n: "02",
     word: "swarm",
-    body: "Bytes flow directly from the chosen node; for files over ten gigabytes the client opens parallel streams to several peers at once and aggregates their throughput — a 1 Gbps origin turns into multi-gigabit delivery to the client. Every chunk is verified against the BLAKE3 tree hash the instant it lands; tampered bytes trigger immediate disconnect and a fraud proof against the node's stake. Trust no node — verify every byte.",
+    body: "Bytes stream directly from the chosen node. For files over 64 MiB with at least two holders, the client splits the fetch across several nodes — one per operator — and fills its downlink from all of them at once. Every chunk is verified against the BLAKE3 tree hash as it lands. Bytes that fail verification never get a voucher, so the node that sent them is paid nothing for that range, and the client refetches it from another node. Trust no node — verify every byte.",
   },
   {
     n: "03",
@@ -161,10 +161,27 @@ export const METHOD_STEPS: readonly MethodStep[] = [
   },
 ];
 
-/** The stack chips under the method steps, rendered with an aria-hidden `·`
- *  between each. Order is the render order. This is the section's only stack
- *  summary — a figure strip beside it used to restate QUIC, iroh and USDC. */
-export const STACK = ["Rust", "BLAKE3", "QUIC", "iroh", "USDC", "EVM"] as const;
+export type StackItem = {
+  name: string;
+  /** What the piece does in the protocol — the small label under the name. */
+  role: string;
+};
+
+/** The stack under the method steps, in render order. Rendered by `Method`;
+ *  serialised by `stackLine()`. This is the section's only stack summary: put
+ *  per-piece detail in `role`, not in a separate strip beside it. */
+export const STACK: readonly StackItem[] = [
+  { name: "Rust", role: "node & client" },
+  { name: "BLAKE3", role: "verification" },
+  { name: "QUIC", role: "transport" },
+  { name: "iroh", role: "connectivity" },
+  { name: "USDC", role: "payment" },
+  { name: "EVM", role: "settlement" },
+];
+
+/** The stack as one line of text, for the machine mirror. */
+export const stackLine = (): string =>
+  STACK.map(({ name, role }) => `${name} (${role})`).join(" · ");
 
 /** The target price, as the page and both machine surfaces quote it. */
 export const TARGET_RATE = "$0.01/GB";
@@ -183,22 +200,23 @@ export const statusBlock = (scope: string): string =>
   `Status: testnet v0. The protocol runs end-to-end in a test environment; a public testnet and the open-source release are targeted for Q3 2026. The ${TARGET_RATE} figure quoted ${scope} is a public target rate, not a protocol-enforced price.`;
 
 /**
- * The hedges on the two homepage demo widgets.
+ * The captions on the two homepage data panels.
  *
- * `aria-hidden` hides the invented figures from assistive tech but does
- * nothing to text extractors, so each panel's caption has to sit outside the
- * hidden subtree and say the numbers are samples. They live here rather than
- * inline so components/ui/DemoFigure.tsx's structural test covers the text
- * too, and so a build-output check can grep for them.
+ * Both panels read the live stats file (lib/stats.ts) in the browser. They are
+ * `aria-hidden` because they cycle and animate, and that does nothing to text
+ * extractors, so each caption sits outside the hidden subtree and says what
+ * the figures are: testnet readings, not mainnet revenue. They live here
+ * rather than inline so components/ui/PanelFigure.tsx's structural test covers
+ * the text too, and so a build-output check can grep for them.
  *
- * Deliberately absent from the llms-full.txt mirror: it excludes the widgets
- * entirely, so there is nothing there for these to caption.
+ * Deliberately absent from the llms-full.txt mirror: it points at the stats
+ * file instead of freezing a reading of it into a static document.
  */
-export const DEMO_CAPTIONS = {
+export const PANEL_CAPTIONS = {
   terminal:
-    "Illustrative deCDN fetch session. The BLAKE3 hash, peer identifiers, peer count, latency, payload size, chunk count, settled amount, and duration shown are sample values for demonstration, not live network telemetry. See the disclaimer at /legal/disclaimer/ for forward-looking statements.",
+    "Live deCDN settlement feed. The most recent Settled events from the FeeRouter contract on the Arbitrum Sepolia testnet: transaction, block, epoch, operator, bytes delivered and USDC paid, read in the browser from the public stats file the deCDN indexer publishes every five minutes. Testnet figures, not mainnet revenue. See the disclaimer at /legal/disclaimer/ for forward-looking statements.",
   fleet:
-    "Illustrative deCDN fleet dashboard. The node identifiers, per-node rates, and aggregate throughput and revenue figures shown are sample values for demonstration, not live network telemetry. See the disclaimer at /legal/disclaimer/ for forward-looking statements.",
+    "Live deCDN fleet panel. Nodes registered in the CapacityBond contract on the Arbitrum Sepolia testnet, each with its self-declared region, operator address and most recent settlement, and the bytes served and USDC settled over the last 24 hours, read in the browser from the public stats file the deCDN indexer publishes every five minutes. Testnet figures, not mainnet revenue. See the disclaimer at /legal/disclaimer/ for forward-looking statements.",
 } as const;
 
 /** Blog index identity. Read by app/blog/page.tsx for its metadata, by

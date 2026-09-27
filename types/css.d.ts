@@ -5,5 +5,6 @@ declare module "react" {
     "--reveal-delay"?: `${number}ms`;
     "--mm-i"?: number;
     "--faq-n"?: number;
+    "--level"?: number;
   }
 }
