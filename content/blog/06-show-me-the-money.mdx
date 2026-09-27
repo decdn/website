@@ -15,7 +15,7 @@ That is the reference month for a healthy decdn node at the launch-fleet target:
 
 The reference node serves 100 TB in a month. It runs on a low-cost 1 Gbps-class setup: a Hetzner CPX22 with bandwidth overage, or an equivalent unmetered dedicated tier once traffic makes metered bandwidth a bad trade. Around 100 TB/month, those curves converge. Below that, a cheap VPS can work. Above that, a flat bandwidth port starts to matter.
 
-The rate is **$0.01/GB**. That is the public target rate, not a protocol-enforced price. Nodes advertise their own rates; clients choose among price, latency, and reputation. The model uses $0.01/GB because it is the launch reference price: cheap enough to be a real CDN alternative, high enough for efficient operators to clear costs.
+The rate is **$0.01/GB**. That is the public target rate, not a protocol-enforced price. Nodes set their own rates; clients rank nodes by measured latency and can refuse any rate above a ceiling they set. The model uses $0.01/GB because it is the launch reference price: cheap enough to be a real CDN alternative, high enough for efficient operators to clear costs.
 
 The traffic mix is:
 

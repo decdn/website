@@ -7,7 +7,7 @@ description: Each node scores its peers 0.0–1.0 from its own delivery outcomes
 
 Reputation is **local-only**. Each node scores its peers from its own direct delivery observations and nothing else: no propagation, no cross-node aggregation, no network-wide score, no on-chain reputation state. A node's ranking of a peer reflects only interactions it witnessed itself — the same tit-for-tat principle BitTorrent uses for peer selection, which needs no global reputation to work at scale.
 
-Reputation is **not** the Sybil or corruption defense — stake, the capacity bond, mandatory progressive BLAKE3 verification and no-payment-on-failed-delivery are. It is not an eligibility gate, a governance input, or a component of settlement or vote weight. It only tunes each requester's selection probability among otherwise-eligible nodes.
+Reputation is **not** the Sybil or corruption defense — stake, the capacity bond, mandatory progressive BLAKE3 verification and no-payment-on-failed-delivery are. It is not an eligibility gate, a governance input, or a component of settlement or vote weight. It only tunes a pulling node's choice among otherwise-eligible upstream holders on a cache miss. Clients keep no reputation score; they rank nodes by measured round-trip time alone ([network](/protocol/network#selection)).
 
 ## Scoring
 
