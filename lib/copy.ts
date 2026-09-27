@@ -188,22 +188,23 @@ export const statusBlock = (scope: string): string =>
   `Status: testnet v0. The protocol runs end-to-end in a test environment; a public testnet and the open-source release are targeted for Q3 2026. The ${TARGET_RATE} figure quoted ${scope} is a public target rate, not a protocol-enforced price.`;
 
 /**
- * The hedges on the two homepage demo widgets.
+ * The captions on the two homepage data panels.
  *
- * `aria-hidden` hides the invented figures from assistive tech but does
- * nothing to text extractors, so each panel's caption has to sit outside the
- * hidden subtree and say the numbers are samples. They live here rather than
- * inline so components/ui/DemoFigure.tsx's structural test covers the text
- * too, and so a build-output check can grep for them.
+ * Both panels read the live stats file (lib/stats.ts) in the browser. They are
+ * `aria-hidden` because they cycle and animate, and that does nothing to text
+ * extractors, so each caption sits outside the hidden subtree and says what
+ * the figures are: testnet readings, not mainnet revenue. They live here
+ * rather than inline so components/ui/PanelFigure.tsx's structural test covers
+ * the text too, and so a build-output check can grep for them.
  *
- * Deliberately absent from the llms-full.txt mirror: it excludes the widgets
- * entirely, so there is nothing there for these to caption.
+ * Deliberately absent from the llms-full.txt mirror: it points at the stats
+ * file instead of freezing a reading of it into a static document.
  */
-export const DEMO_CAPTIONS = {
+export const PANEL_CAPTIONS = {
   terminal:
-    "Illustrative deCDN fetch session. The BLAKE3 hash, peer identifiers, peer count, latency, payload size, chunk count, settled amount, and duration shown are sample values for demonstration, not live network telemetry. See the disclaimer at /legal/disclaimer/ for forward-looking statements.",
+    "Live deCDN settlement feed. The most recent Settled events from the FeeRouter contract on the Arbitrum Sepolia testnet: transaction, block, epoch, operator, bytes delivered and USDC paid, read in the browser from the public stats file the deCDN indexer publishes every five minutes. Testnet figures, not mainnet revenue. See the disclaimer at /legal/disclaimer/ for forward-looking statements.",
   fleet:
-    "Illustrative deCDN fleet dashboard. The node identifiers, per-node rates, and aggregate throughput and revenue figures shown are sample values for demonstration, not live network telemetry. See the disclaimer at /legal/disclaimer/ for forward-looking statements.",
+    "Live deCDN fleet panel. Nodes registered in the CapacityBond contract on the Arbitrum Sepolia testnet, each with its self-declared region, operator address and most recent settlement, and the bytes served and USDC settled over the last 24 hours, read in the browser from the public stats file the deCDN indexer publishes every five minutes. Testnet figures, not mainnet revenue. See the disclaimer at /legal/disclaimer/ for forward-looking statements.",
 } as const;
 
 /** Blog index identity. Read by app/blog/page.tsx for its metadata, by

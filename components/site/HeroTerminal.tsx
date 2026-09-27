@@ -1,132 +1,127 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { DemoFigure } from "@/components/ui/DemoFigure";
-import { DEMO_CAPTIONS } from "@/lib/copy";
-
-type Session = {
-  hash: string;
-  peerCount: string;
-  probeMs: string;
-  peers: string;
-  size: string;
-  chunks: string;
-  price: string;
-  duration: string;
-};
-
-const SESSIONS: readonly Session[] = [
-  {
-    hash: "c4a8f93142e1…9b37",
-    peerCount: "18",
-    probeMs: "41",
-    peers: "fra-11, ams-04, lhr-06",
-    size: "13.4 GB",
-    chunks: "1712",
-    price: "$0.1309",
-    duration: "1.27s",
-  },
-  {
-    hash: "3f8c1ab4e92d…d55a",
-    peerCount: "12",
-    probeMs: "34",
-    peers: "nyc-07, iad-03, ord-12",
-    size: "550 MB",
-    chunks: "86",
-    price: "$0.0055",
-    duration: "0.48s",
-  },
-  {
-    hash: "9c21f088a774…3bde",
-    peerCount: "14",
-    probeMs: "28",
-    peers: "sgp-02, kul-05, cgk-09",
-    size: "4.2 GB",
-    chunks: "672",
-    price: "$0.0411",
-    duration: "0.89s",
-  },
-];
+import { PanelFigure } from "@/components/ui/PanelFigure";
+import { PANEL_CAPTIONS } from "@/lib/copy";
+import { STATS_URL, terminalSessions, timeAgo } from "@/lib/stats";
+import { useStats } from "@/lib/use-stats";
 
 const CYCLE_MS = 4500;
 
 export function HeroTerminal({ className }: { className?: string }) {
+  const result = useStats();
+  const sessions = result.status === "ok" ? terminalSessions(result.stats) : [];
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
+    if (sessions.length < 2) return;
     const id = window.setInterval(() => {
-      setIndex((i) => (i + 1) % SESSIONS.length);
+      setIndex((i) => (i + 1) % sessions.length);
     }, CYCLE_MS);
     return () => window.clearInterval(id);
-  }, []);
+  }, [sessions.length]);
 
-  // Defensive: if SESSIONS length shrinks across an HMR reload while
-  // index is stale, modulo keeps it within bounds.
-  const s = SESSIONS[index % SESSIONS.length];
+  const s = sessions.length > 0 ? sessions[index % sessions.length] : null;
+  const catchingUp = result.status === "ok" && !result.stats.caughtUp;
 
   return (
-    // Every hash, peer id, latency and settled amount below is invented;
-    // DemoFigure carries the caption that says so, outside the aria-hidden
-    // subtree.
-    <DemoFigure
+    // Every figure below is a real FeeRouter `Settled` log from the stats
+    // file; PanelFigure carries the caption that says so, outside the
+    // aria-hidden subtree.
+    <PanelFigure
       className={className}
       panelClassName="terminal"
-      caption={DEMO_CAPTIONS.terminal}
+      caption={PANEL_CAPTIONS.terminal}
     >
       <div className="terminal-head">
         <span className="terminal-dot" />
         <span className="terminal-dot" />
         <span className="terminal-dot" />
-        <span className="terminal-label">decdn@node-001 ~ fetch</span>
+        <span className="terminal-label">
+          arbitrum sepolia ~ settled{catchingUp ? " · catching up" : ""}
+        </span>
       </div>
 
       {/* key forces a remount every cycle so the CSS line cascade
             and progress bar restart cleanly when the session flips. */}
-      <div className="terminal-body" key={index}>
-        <div className="tl tl-0">
-          <span className="prompt">$</span>
-          <span> decdn fetch </span>
-          <span className="hash">blake3:{s.hash}</span>
-        </div>
+      {s ? (
+        <div className="terminal-body" key={s.key}>
+          <div className="tl tl-0">
+            <span className="prompt">$</span>
+            <span> settled </span>
+            <span className="hash">tx {s.tx}</span>
+          </div>
 
-        <div className="tl tl-1">
-          <span className="arrow">→</span>
-          <span> probing {s.peerCount} peers</span>
-          <span className="dim"> · {s.probeMs} ms</span>
-        </div>
+          <div className="tl tl-1">
+            <span className="arrow">→</span>
+            <span> block {s.block}</span>
+            <span className="dim"> · epoch {s.epoch}</span>
+          </div>
 
-        <div className="tl tl-2">
-          <span className="arrow">→</span>
-          <span> selected: {s.peers}</span>
-        </div>
+          <div className="tl tl-2">
+            <span className="arrow">→</span>
+            <span> operator {s.operator}</span>
+            {s.region && <span className="dim"> · {s.region}</span>}
+          </div>
 
-        <div className="tl tl-3">
-          <span className="arrow">→</span>
-          <span> streaming {s.size} </span>
-          <span className="progress" aria-hidden>
-            <span className="progress-fill" />
-          </span>
-        </div>
+          <div className="tl tl-3">
+            <span className="arrow">→</span>
+            <span> delivered {s.size} </span>
+            <span className="progress" aria-hidden>
+              <span className="progress-fill" />
+            </span>
+          </div>
 
-        <div className="tl tl-4">
-          <span className="ok">✓</span>
-          <span> verified {s.chunks} chunks </span>
-          <span className="dim">blake3</span>
-        </div>
+          <div className="tl tl-4">
+            <span className="ok">✓</span>
+            <span> paid </span>
+            <span className="amount">{s.amount}</span>
+            <span className="dim"> usdc</span>
+          </div>
 
-        <div className="tl tl-5">
-          <span className="ok">✓</span>
-          <span> settled </span>
-          <span className="amount">{s.price}</span>
-          <span> in </span>
-          <span className="amount">{s.duration}</span>
-        </div>
+          <div className="tl tl-5">
+            <span className="ok">✓</span>
+            <span> on-chain </span>
+            <span className="dim">
+              {result.status === "ok" && timeAgo(s.timestamp, result.fetchedAt)}
+            </span>
+          </div>
 
-        <div className="tl tl-6">
-          <span className="prompt">$</span>
-          <span className="cursor" aria-hidden />
+          <div className="tl tl-6">
+            <span className="prompt">$</span>
+            <span className="cursor" aria-hidden />
+          </div>
         </div>
-      </div>
-    </DemoFigure>
+      ) : (
+        <div className="terminal-body">
+          <div className="tl tl-0">
+            <span className="prompt">$</span>
+            <span> read </span>
+            <span className="hash">{STATS_URL.replace("https://", "")}</span>
+          </div>
+          <div className="tl tl-1">
+            <span className="arrow">→</span>
+            <span className="dim">
+              {result.status === "loading"
+                ? " loading"
+                : result.status === "error"
+                  ? " stats unavailable"
+                  : " no settlements indexed yet"}
+            </span>
+          </div>
+          {/* Blank lines hold the panel at its seven-line height, so the
+              hero doesn't shift when the first settlement lands. */}
+          {[2, 3, 4, 5].map((n) => (
+            <div key={n} className={`tl tl-${n}`}>
+              {"\u00a0"}
+            </div>
+          ))}
+          <div className="tl tl-6">
+            <span className="prompt">$</span>
+            <span className="cursor" aria-hidden />
+          </div>
+        </div>
+      )}
+    </PanelFigure>
   );
 }
