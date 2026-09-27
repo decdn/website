@@ -47,8 +47,8 @@ See [Participants](/overview/participants) for a deeper breakdown per role.
 ## Life of a paid delivery
 
 1. **Client bootstrap** — client generates a keypair, queries the on-chain registry for the active node set, and caches it.
-2. **Discovery** — a DHT lookup locates holders of the blob hash, and a parallel probe confirms which of them will actually serve the wanted range, at what rate and latency.
-3. **Selection** — returned candidates are scored by price, latency, and reputation into one selection score; the lowest score wins, so a cheap or nearby node can outrank a better-reputed one.
+2. **Discovery** — the client takes candidate nodes from its own peer store or the registry; it runs no DHT lookup. A parallel probe confirms which of them will actually serve the wanted range, and how fast they answer. A fresh peer store lets the client skip the probe entirely.
+3. **Selection** — the client ranks holders by measured round-trip time alone. Price is not a rank key: the client pays the rate the node signs and can refuse a quote above a ceiling of its own. The client keeps no reputation score.
 4. **Payment** — the client pays from a USDC pool it opened once, off the fetch path, and reuses for every node ([payments](/protocol/payments)).
 5. **Streaming + vouchers** — node streams to the client; client signs a cumulative voucher and, on an optional hash chain, releases one preimage per 1 MiB chunk as bytes flow.
 6. **Cache-miss fan-out** — if the node doesn't have the blob, it pulls from other holders (paid). Every byte delivered in the network is paid.
