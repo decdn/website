@@ -61,8 +61,6 @@ export type Stats = {
   /** The CapacityBond registered set, keyed by nodeId. `region` is an
    *  upper-case ISO 3166-1 alpha-2 code, or `UNKNOWN_REGION`. */
   nodes: Record<Hex, { operator: Hex; region: string }>;
-  /** All-time bytes by the serving operator's region. */
-  regions: Record<string, { bytesServed: string; bytesPulled: string }>;
 };
 
 /** Where the indexer counts a node with no valid region hint. */
@@ -105,8 +103,7 @@ export function asStats(value: unknown): Stats | null {
         isUint(r.bytesDelivered) &&
         isUint(r.amount),
     ) &&
-    isRecord(s.nodes) &&
-    isRecord(s.regions);
+    isRecord(s.nodes);
   return ok ? (s as Stats) : null;
 }
 
@@ -201,23 +198,26 @@ export function terminalSessions(stats: Stats): TerminalSession[] {
   }));
 }
 
-/** How many region rows the fleet panel lists. */
+/** How many node rows the fleet panel lists. */
 export const FLEET_ROWS = 8;
 /** The fleet panel's aggregate window, in hourly buckets. */
 export const FLEET_WINDOW_HOURS = 24;
 
-export type FleetRegion = {
-  /** Lower-case alpha-2 code, or "n/a" for nodes with no valid region. */
-  code: string;
-  nodes: number;
-  served: string;
+export type FleetNode = {
+  key: string;
+  /** Lower-case alpha-2 code, or "n/a" for a node with no valid region. */
+  region: string;
+  operator: string;
+  /** Unix seconds of the operator's newest settlement in the file's recent
+   *  window, or null when it has none there. */
+  lastSettled: number | null;
 };
 
 export type FleetView = {
   registered: number;
-  regions: FleetRegion[];
-  /** Regions beyond FLEET_ROWS, folded into one count. */
-  moreRegions: number;
+  nodes: FleetNode[];
+  /** Nodes beyond FLEET_ROWS, folded into one count. */
+  moreNodes: number;
   served24h: string;
   settled24h: string;
   /** Per-hour levels in [0, 1] for the two spark strips, oldest first. */
@@ -234,26 +234,35 @@ function levels(values: string[]): number[] {
   return big.map((v) => Number((v * BigInt(1000)) / max) / 1000);
 }
 
-/** Registered nodes by region plus the last 24 hours of bytes and USDC. */
+/** The registered nodes, most recently settled first, plus the last 24
+ *  hours of bytes and USDC. */
 export function fleetView(stats: Stats): FleetView {
-  const nodes = new Map<string, number>();
-  for (const node of Object.values(stats.nodes)) {
-    nodes.set(node.region, (nodes.get(node.region) ?? 0) + 1);
+  // `settlements` is newest first, so the first row seen per operator is its
+  // newest. It holds only the indexer's recent window, so a node absent from
+  // it has not settled recently — not necessarily never.
+  const lastSettled = new Map<string, number>();
+  for (const row of stats.settlements) {
+    const operator = row.operator.toLowerCase();
+    if (!lastSettled.has(operator)) lastSettled.set(operator, row.timestamp);
   }
-  const codes = new Set([...nodes.keys(), ...Object.keys(stats.regions)]);
-  const all = [...codes]
-    .map((code) => ({
-      code,
-      nodes: nodes.get(code) ?? 0,
-      served: BigInt(stats.regions[code]?.bytesServed ?? "0"),
+  const all: FleetNode[] = Object.entries(stats.nodes)
+    .map(([nodeId, node]) => ({
+      key: nodeId,
+      region:
+        node.region === UNKNOWN_REGION ? "n/a" : node.region.toLowerCase(),
+      operator: truncateHex(node.operator),
+      lastSettled: lastSettled.get(node.operator.toLowerCase()) ?? null,
     }))
-    // Most nodes first, then most bytes; the unknown bucket always last.
     .sort((a, b) => {
-      if (a.code === UNKNOWN_REGION) return 1;
-      if (b.code === UNKNOWN_REGION) return -1;
-      if (a.nodes !== b.nodes) return b.nodes - a.nodes;
-      if (a.served !== b.served) return a.served > b.served ? -1 : 1;
-      return a.code.localeCompare(b.code);
+      if (a.lastSettled !== b.lastSettled) {
+        return (b.lastSettled ?? -1) - (a.lastSettled ?? -1);
+      }
+      if (a.region !== b.region) {
+        if (a.region === "n/a") return 1;
+        if (b.region === "n/a") return -1;
+        return a.region.localeCompare(b.region);
+      }
+      return a.operator.localeCompare(b.operator);
     });
 
   // Left-padded with empty hours, so the strips always span the full window
@@ -265,12 +274,8 @@ export function fleetView(stats: Stats): FleetView {
 
   return {
     registered: Object.keys(stats.nodes).length,
-    regions: all.slice(0, FLEET_ROWS).map((r) => ({
-      code: r.code === UNKNOWN_REGION ? "n/a" : r.code.toLowerCase(),
-      nodes: r.nodes,
-      served: formatBytes(r.served.toString()),
-    })),
-    moreRegions: Math.max(0, all.length - FLEET_ROWS),
+    nodes: all.slice(0, FLEET_ROWS),
+    moreNodes: Math.max(0, all.length - FLEET_ROWS),
     served24h: formatBytes(sum(served)),
     settled24h: formatUsdc(sum(settled)),
     servedSpark: levels(served),

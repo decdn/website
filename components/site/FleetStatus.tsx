@@ -2,7 +2,12 @@
 
 import { PanelFigure } from "@/components/ui/PanelFigure";
 import { PANEL_CAPTIONS } from "@/lib/copy";
-import { FLEET_WINDOW_HOURS, fleetView, type StatsResult } from "@/lib/stats";
+import {
+  FLEET_WINDOW_HOURS,
+  fleetView,
+  type StatsResult,
+  timeAgo,
+} from "@/lib/stats";
 import { useStats } from "@/lib/use-stats";
 
 const EMPTY_LABEL = {
@@ -65,26 +70,25 @@ export function FleetPanel({
         </div>
 
         {view ? (
-          view.regions.length > 0 ? (
-            view.regions.map((r, i) => (
-              <div key={r.code} className="fleet-row">
-                <span className="fleet-code">{r.code}</span>
+          view.nodes.length > 0 ? (
+            view.nodes.map((n, i) => (
+              <div key={n.key} className="fleet-row">
+                <span className="fleet-code">{n.region}</span>
                 <span
                   className={
-                    r.nodes > 0
+                    n.lastSettled !== null
                       ? `fleet-pulse fleet-pulse-active pulse-${i % 6}`
                       : "fleet-pulse"
                   }
                 />
-                <span
-                  className={
-                    r.nodes > 0 ? "fleet-rate" : "fleet-rate fleet-dim"
-                  }
-                >
+                <span className="fleet-rate">
+                  {n.operator}
                   <span className="fleet-dim">
-                    {r.nodes} {r.nodes === 1 ? "node" : "nodes"} ·{" "}
+                    {" · "}
+                    {n.lastSettled !== null && result.status === "ok"
+                      ? `settled ${timeAgo(n.lastSettled, result.fetchedAt)}`
+                      : "idle"}
                   </span>
-                  {r.served}
                 </span>
               </div>
             ))
@@ -96,10 +100,9 @@ export function FleetPanel({
             {EMPTY_LABEL[result.status as keyof typeof EMPTY_LABEL]}
           </div>
         )}
-        {view && view.moreRegions > 0 && (
+        {view && view.moreNodes > 0 && (
           <div className="fleet-note">
-            + {view.moreRegions} more{" "}
-            {view.moreRegions === 1 ? "region" : "regions"}
+            + {view.moreNodes} more {view.moreNodes === 1 ? "node" : "nodes"}
           </div>
         )}
 

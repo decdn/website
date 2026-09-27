@@ -204,7 +204,7 @@ export const PANEL_CAPTIONS = {
   terminal:
     "Live deCDN settlement feed. The most recent Settled events from the FeeRouter contract on the Arbitrum Sepolia testnet: transaction, block, epoch, operator, bytes delivered and USDC paid, read in the browser from the public stats file the deCDN indexer publishes every five minutes. Testnet figures, not mainnet revenue. See the disclaimer at /legal/disclaimer/ for forward-looking statements.",
   fleet:
-    "Live deCDN fleet panel. Nodes registered in the CapacityBond contract on the Arbitrum Sepolia testnet, grouped by their self-declared region with all-time bytes served, and the bytes served and USDC settled over the last 24 hours, read in the browser from the public stats file the deCDN indexer publishes every five minutes. Testnet figures, not mainnet revenue. See the disclaimer at /legal/disclaimer/ for forward-looking statements.",
+    "Live deCDN fleet panel. Nodes registered in the CapacityBond contract on the Arbitrum Sepolia testnet, each with its self-declared region, operator address and most recent settlement, and the bytes served and USDC settled over the last 24 hours, read in the browser from the public stats file the deCDN indexer publishes every five minutes. Testnet figures, not mainnet revenue. See the disclaimer at /legal/disclaimer/ for forward-looking statements.",
 } as const;
 
 /** Blog index identity. Read by app/blog/page.tsx for its metadata, by

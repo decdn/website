@@ -40,16 +40,35 @@ const stats: Stats = {
       registeredNodes: 3,
     },
   ],
-  settlements: [],
+  settlements: [
+    {
+      txHash: "0xabc",
+      logIndex: 0,
+      blockNumber: 100,
+      timestamp: 1_790_000_000 - 4 * 60,
+      operator: "0x00000000000000000000000000000000000000a1",
+      bytesDelivered: "1000000000",
+      amount: "500000",
+      epoch: 7,
+    },
+  ],
   nodes: {
-    "0x01": { operator: "0xa1", region: "DE" },
-    "0x02": { operator: "0xa2", region: "DE" },
-    "0x03": { operator: "0xa3", region: "unknown" },
-  },
-  regions: {
-    DE: { bytesServed: "3000000000", bytesPulled: "0" },
+    "0x01": {
+      operator: "0x00000000000000000000000000000000000000a1",
+      region: "DE",
+    },
+    "0x02": {
+      operator: "0x00000000000000000000000000000000000000a2",
+      region: "DE",
+    },
+    "0x03": {
+      operator: "0x00000000000000000000000000000000000000a3",
+      region: "unknown",
+    },
   },
 };
+
+const fetchedAt = 1_790_000_000_000;
 
 const panel = (result: StatsResult) => {
   const tree = FleetPanel({ result, className: "block w-full" });
@@ -87,13 +106,12 @@ describe("FleetPanel", () => {
     expect(panel({ status: "error" }).text).toContain("stats unavailable");
   });
 
-  it("renders the registered set and the 24h aggregates", () => {
-    const { text } = panel({ status: "ok", stats, fetchedAt: 0 });
+  it("renders one row per registered node and the 24h aggregates", () => {
+    const { text } = panel({ status: "ok", stats, fetchedAt });
     expect(text).toContain("3nodes registered");
-    expect(text).toContain("de");
-    expect(text).toContain("2 nodes · 3.0 GB");
-    expect(text).toContain("n/a");
-    expect(text).toContain("1 node · 0 B");
+    expect(text).toContain("de0x0000…00a1 · settled 4 min ago");
+    expect(text).toContain("de0x0000…00a2 · idle");
+    expect(text).toContain("n/a0x0000…00a3 · idle");
     expect(text).toContain("$1.50");
     expect(text).not.toContain("catching up");
   });
@@ -102,7 +120,7 @@ describe("FleetPanel", () => {
     const { text } = panel({
       status: "ok",
       stats: { ...stats, caughtUp: false },
-      fetchedAt: 0,
+      fetchedAt,
     });
     expect(text).toContain("catching up");
   });

@@ -500,7 +500,8 @@ a.cta-primary:focus-visible {
    Sits on the paper Contact section as an inverted panel. Same "tool
    panel" vocabulary as .terminal — square corners, dashed border, hard
    offset shadow — with an ops-dashboard layout instead of a CLI log:
-   registered nodes by region with pulsing indicators, plus two 24h
+   registered nodes (region, operator, last settlement) with a pulse for
+   each one that settled recently, plus two 24h
    aggregates over hourly spark strips. Filled from the live stats file
    (lib/stats.ts). Not interactive, so no hover transform. */
 

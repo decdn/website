@@ -34,7 +34,6 @@ const base: Stats = {
   hourly: [],
   settlements: [],
   nodes: {},
-  regions: {},
 };
 
 describe("STATS_URL", () => {
@@ -156,41 +155,45 @@ describe("terminalSessions", () => {
 });
 
 describe("fleetView", () => {
-  it("counts registered nodes by region, unknown last", () => {
+  it("lists registered nodes, most recently settled first", () => {
+    const op = (n: number) =>
+      `0x${String(n).padStart(40, "0")}` as `0x${string}`;
     const view = fleetView({
       ...base,
+      settlements: [
+        { ...settlement(0), operator: op(2), timestamp: 300 },
+        { ...settlement(1), operator: op(3), timestamp: 200 },
+        // An older row for the same operator doesn't move its last settlement.
+        { ...settlement(2), operator: op(2), timestamp: 100 },
+      ],
       nodes: {
-        "0x01": { operator: "0xa1", region: "unknown" },
-        "0x02": { operator: "0xa2", region: "US" },
-        "0x03": { operator: "0xa3", region: "DE" },
-        "0x04": { operator: "0xa4", region: "DE" },
-      },
-      regions: {
-        US: { bytesServed: "1000", bytesPulled: "0" },
-        // A region whose operators have since deregistered still served.
-        JP: { bytesServed: "5000", bytesPulled: "0" },
+        "0x01": { operator: op(1), region: "unknown" },
+        "0x02": { operator: op(2), region: "US" },
+        "0x03": { operator: op(3), region: "DE" },
+        "0x04": { operator: op(4), region: "SG" },
       },
     });
     expect(view.registered).toBe(4);
-    expect(view.regions.map((r) => [r.code, r.nodes])).toEqual([
-      ["de", 2],
-      ["us", 1],
-      ["jp", 0],
-      ["n/a", 1],
+    expect(
+      view.nodes.map((n) => [n.region, n.operator, n.lastSettled]),
+    ).toEqual([
+      ["us", "0x0000…0002", 300],
+      ["de", "0x0000…0003", 200],
+      ["sg", "0x0000…0004", null],
+      ["n/a", "0x0000…0001", null],
     ]);
-    expect(view.regions[1].served).toBe("1.0 KB");
   });
 
-  it("folds regions past the row limit into a count", () => {
+  it("folds nodes past the row limit into a count", () => {
     const nodes = Object.fromEntries(
       Array.from({ length: FLEET_ROWS + 3 }, (_, i) => [
         `0x${i}`,
-        { operator: `0xa${i}`, region: `A${String.fromCharCode(65 + i)}` },
+        { operator: `0xa${i}`, region: "DE" },
       ]),
     ) as Stats["nodes"];
     const view = fleetView({ ...base, nodes });
-    expect(view.regions).toHaveLength(FLEET_ROWS);
-    expect(view.moreRegions).toBe(3);
+    expect(view.nodes).toHaveLength(FLEET_ROWS);
+    expect(view.moreNodes).toBe(3);
   });
 
   it("sums the last 24 hourly buckets and scales the sparks", () => {
