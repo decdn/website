@@ -32,7 +32,7 @@ export function Hero() {
 
         {/* Stats and the status link share the grid's second row so they
             baseline-align on desktop; on mobile the DOM order stacks the
-            link under the stats and the terminal last. */}
+            terminal under the stats and the link last. */}
         <div className="grid gap-y-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-start @4xl:gap-x-12 @4xl:gap-y-14">
           <div className="flex flex-col gap-10 @4xl:col-start-1 @4xl:row-start-1 @4xl:gap-16">
             <p className="rise rise-3 max-w-[64ch] text-body leading-[1.65]">
@@ -82,6 +82,8 @@ export function Hero() {
             ))}
           </div>
 
+          <HeroTerminal className="block w-full @4xl:col-start-2 @4xl:row-start-1" />
+
           {/* Mirrors Figure's label/value lines so it baseline-aligns with
               the stat strip beside it. */}
           <a
@@ -101,8 +103,6 @@ export function Hero() {
               </span>
             </span>
           </a>
-
-          <HeroTerminal className="block w-full @4xl:col-start-2 @4xl:row-start-1" />
         </div>
       </div>
     </Frame>
