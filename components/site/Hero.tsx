@@ -30,9 +30,9 @@ export function Hero() {
           </span>
         </h1>
 
-        {/* Stats and the status link share the grid's second row so they
-            baseline-align on desktop; on mobile the DOM order stacks the
-            terminal under the stats and the link last. */}
+        {/* At @4xl the stats and the status link share row 2 so they
+            baseline-align; below it, DOM order stacks lead/CTAs, stats,
+            terminal, then the link. */}
         <div className="grid gap-y-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-start @4xl:gap-x-12 @4xl:gap-y-14">
           <div className="flex flex-col gap-10 @4xl:col-start-1 @4xl:row-start-1 @4xl:gap-16">
             <p className="rise rise-3 max-w-[64ch] text-body leading-[1.65]">
@@ -92,7 +92,9 @@ export function Hero() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <span className="meta opacity-60">{HERO_STATUS.label}</span>
+            <span className="meta text-ink opacity-60">
+              {HERO_STATUS.label}
+            </span>
             <span className="flex items-center gap-3 text-body font-medium tracking-[-0.01em]">
               <span aria-hidden className="status-live" />
               <span className="hero-status-text">

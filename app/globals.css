@@ -298,9 +298,10 @@ a.cta-primary:focus-visible {
   outline-offset: 9px;
 }
 
-/* The status link under the hero terminal. Text is a deepened whisper —
-   raw --whisper is ~3.4:1 on paper, short of AA at body size — while the
-   dot and arrow keep the full accent. */
+/* The status link under the hero terminal. Raw --whisper is ~3.5:1 on
+   paper, short of AA at body size, so the value text uses whisper mixed
+   68% with ink (~6.6:1). The label is ink like the stat labels; the dot
+   and the arrow keep the full accent. */
 a.hero-status {
   color: color-mix(in srgb, var(--whisper) 68%, var(--ink));
 }
