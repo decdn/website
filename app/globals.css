@@ -300,8 +300,7 @@ a.cta-primary:focus-visible {
 
 /* The status link under the hero terminal. Text is a deepened whisper —
    raw --whisper is ~3.4:1 on paper, short of AA at body size — while the
-   dot, arrow and strip keep the full accent. The strip is the last 24h of
-   settlement per hour (lib/stats.ts fleetView), styled like .fleet-spark. */
+   dot and arrow keep the full accent. */
 a.hero-status {
   color: color-mix(in srgb, var(--whisper) 68%, var(--ink));
   text-decoration: none;
@@ -347,27 +346,11 @@ a.hero-status:focus-visible {
   animation: fleet-pulse 2.4s ease-in-out infinite;
 }
 
-.status-strip {
-  display: inline-flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 12px;
-  border-bottom: 1px solid color-mix(in srgb, var(--whisper) 35%, transparent);
-}
-
-.status-strip > span {
-  width: 3px;
-  height: max(1px, calc(var(--level, 0) * 100%));
-  background: var(--whisper);
-  transition: height 0.6s cubic-bezier(0.3, 0, 0.2, 1);
-}
-
 @media (prefers-reduced-motion: reduce) {
   .status-live-active {
     animation: none;
     opacity: 1;
   }
-  .status-strip > span,
   .hero-status-text,
   a.hero-status .arrow {
     transition: none;

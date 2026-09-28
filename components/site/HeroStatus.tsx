@@ -2,11 +2,8 @@
 
 import { HERO_STATUS } from "@/lib/copy";
 import { STATUS_URL } from "@/lib/links";
-import { FLEET_WINDOW_HOURS, fleetView, type StatsResult } from "@/lib/stats";
+import type { StatsResult } from "@/lib/stats";
 import { useStats } from "@/lib/use-stats";
-
-// Flat strip until the stats load.
-const FLAT = Array<number>(FLEET_WINDOW_HOURS).fill(0);
 
 /**
  * The link itself, from a stats result. Split from `HeroStatus` so the
@@ -21,12 +18,8 @@ export function HeroStatusLink({
   result: StatsResult;
   className?: string;
 }) {
-  const ok = result.status === "ok";
-  // The last 24h of USDC settled, per hour — the same series as the fleet
-  // panel's settled strip.
-  const levels = ok ? fleetView(result.stats).settledSpark : FLAT;
   // Only claim "live" when the indexer is current.
-  const live = ok && result.stats.caughtUp;
+  const live = result.status === "ok" && result.stats.caughtUp;
 
   return (
     <a
@@ -46,11 +39,6 @@ export function HeroStatusLink({
           <span className="arrow" aria-hidden>
             →
           </span>
-        </span>
-        <span aria-hidden className="status-strip">
-          {levels.map((level, i) => (
-            <span key={i} style={{ "--level": level }} />
-          ))}
         </span>
       </span>
     </a>
