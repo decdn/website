@@ -1,10 +1,14 @@
-import { links } from "@/lib/links";
-import { HERO_FIGURES, HERO_HEADLINE, HERO_LEAD } from "@/lib/copy";
+import { links, STATUS_URL } from "@/lib/links";
+import {
+  HERO_FIGURES,
+  HERO_HEADLINE,
+  HERO_LEAD,
+  HERO_STATUS,
+} from "@/lib/copy";
 import { highlightBrand } from "@/components/ui/brand";
 import { Figure } from "@/components/ui/Figure";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { HeroStatus } from "@/components/site/HeroStatus";
 import { HeroTerminal } from "@/components/site/HeroTerminal";
 
 export function Hero() {
@@ -78,7 +82,25 @@ export function Hero() {
             ))}
           </div>
 
-          <HeroStatus className="rise rise-5 justify-self-start @4xl:col-start-2 @4xl:row-start-2 @4xl:self-baseline" />
+          {/* Mirrors Figure's label/value lines so it baseline-aligns with
+              the stat strip beside it. */}
+          <a
+            className="hero-status rise rise-5 flex flex-col gap-1 justify-self-start @4xl:col-start-2 @4xl:row-start-2 @4xl:self-baseline"
+            href={STATUS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="meta opacity-60">{HERO_STATUS.label}</span>
+            <span className="flex items-center gap-3 text-body font-medium tracking-[-0.01em]">
+              <span aria-hidden className="status-live" />
+              <span className="hero-status-text">
+                {HERO_STATUS.value}
+                <span className="arrow" aria-hidden>
+                  →
+                </span>
+              </span>
+            </span>
+          </a>
 
           <HeroTerminal className="block w-full @4xl:col-start-2 @4xl:row-start-1" />
         </div>

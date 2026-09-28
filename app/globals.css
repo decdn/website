@@ -338,16 +338,12 @@ a.hero-status:focus-visible {
   height: 7px;
   flex: none;
   border-radius: 50%;
-  border: 1px solid var(--whisper);
-}
-
-.status-live-active {
   background: var(--whisper);
   animation: fleet-pulse 2.4s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .status-live-active {
+  .status-live {
     animation: none;
     opacity: 1;
   }
