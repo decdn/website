@@ -31,8 +31,7 @@ export function Method() {
             right/bottom edge, so the grid stays single-ruled at any column
             count — and closed while STACK.length divides evenly by it. In one
             row of six the longest name (currently "BLAKE3") overflows
-            --text-h3, so names size off the frame's container width instead.
-            The role label is `.meta` a size up (12px). */}
+            --text-h3, so names size off the frame's container width instead. */}
         <ul
           aria-labelledby="method-stack"
           className="grid grid-cols-2 border-t border-l border-current/20 @xl:grid-cols-3 @6xl:grid-cols-6"

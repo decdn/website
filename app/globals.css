@@ -29,16 +29,16 @@
   --font-sans:
     var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
     "Helvetica Neue", Arial, sans-serif;
-  /* The tool panels (.terminal, .fleet), prose code, and the drawer's
-     external-link arrow. */
+  /* The terminal and fleet panels, prose code and pre blocks, and the
+     drawer's external-link arrow. */
   --font-mono:
     ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
     "Courier New", monospace;
 
-  /* Motion curves. --ease-expo: hover nudges and entrances (fast out, long
-     settle). --ease-soft: colour/opacity/underline transitions and scroll
+  /* Motion curves. --ease-expo: hover nudges, entrances and the hamburger
+     morph (fast out, long settle). --ease-soft: colour/opacity/underline transitions and scroll
      reveals. --ease-term: the terminal line cascade and spark cells. The
-     drawer slide uses Tailwind's built-in --ease-in-out. */
+     drawer slide and overlay fade use Tailwind's built-in --ease-in-out. */
   --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-term: cubic-bezier(0.3, 0, 0.2, 1);
@@ -104,8 +104,8 @@ body {
   }
 }
 
-/* --- utilities ---------------------------------------------------------
-   Layered so a Tailwind utility beside one of these can refine it (e.g.
+/* --- shared classes (components layer) -------------------------------
+   In @layer components so a Tailwind utility beside one of these can refine it (e.g.
    `meta text-[12px]`, or `hug tracking-[-0.05em]`). */
 
 @layer components {
@@ -266,7 +266,10 @@ a.underline-brutal:hover {
   border-bottom-color: var(--whisper);
 }
 
+/* The right margin is the room the hover nudge below slides into, so the
+   arrow never runs past the underline. */
 a.underline-brutal .arrow {
+  margin-right: 6px;
   transition:
     transform 260ms var(--ease-expo),
     color 260ms var(--ease-expo);
@@ -427,8 +430,9 @@ a.cta-primary:focus-visible {
   }
 }
 
-/* Scoped: .arrow is also the hover glyph on a.underline-brutal and
-   a.cta-primary, which must not pick up the terminal's colour and gap. */
+/* Scoped to .terminal because these are generic names: .arrow is also the
+   hover glyph on a.underline-brutal and a.cta-primary, which must not pick
+   up the terminal's colour, weight and gap. */
 .terminal .prompt,
 .terminal .arrow,
 .terminal .ok {
@@ -734,9 +738,8 @@ a.cta-primary:focus-visible {
    fades in a tone-matched frosted backdrop once the user scrolls past
    the threshold. The active section's nav item shows a full-width
    whisper-green underline (scales in from the left) and a brighter
-   label opacity; hover shows a short underline preview. Focus paints
-   a dashed outline, kept dashed so focus reads as distinct from the
-   solid panel borders. No mix-blend-mode is used — the parent nav toggles
+   label opacity; hover shows a short underline preview. Focus uses the
+   site-wide dashed ring (base layer, top of file). No mix-blend-mode is used — the parent nav toggles
    `data-tone` per-section to work around Safari's bug with
    `mix-blend-mode: difference` on `position: fixed` elements
    (see components/site/Chrome.tsx). */
