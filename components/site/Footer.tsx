@@ -39,11 +39,7 @@ export function Footer() {
               href={links.presskit}
               download
               aria-label="Download presskit"
-              className="mt-1 inline-flex items-baseline gap-2 no-underline hover:opacity-100"
-              style={{
-                borderBottom: "1px solid currentColor",
-                paddingBottom: 2,
-              }}
+              className="mt-1 inline-flex items-baseline gap-2 border-b border-current pb-[2px] no-underline hover:opacity-100"
             >
               <span>presskit</span>
               <span aria-hidden>↓</span>

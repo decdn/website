@@ -86,7 +86,7 @@ export function Contact() {
           <h2
             data-reveal
             id="contact-h"
-            className="hug flex flex-col text-h2 leading-[0.92] font-semibold tracking-[-0.04em]"
+            className="hug flex flex-col text-h2 leading-[0.92] font-semibold"
           >
             <span>{CONTACT_HEADLINE[0]}</span>
             <span className="pl-[3vw] opacity-60">{CONTACT_HEADLINE[1]}</span>

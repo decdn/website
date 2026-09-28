@@ -14,9 +14,8 @@ export const BLOG_GRID_COLS =
 
 // Lowercase meta text — same size as `.meta` (the shared `text-micro`
 // token) but without its forced uppercase (`02 · 08 min` reads lowercase)
-// and at a tighter tracking. `.meta` is an unlayered rule we can't
-// override per-call. Bakes in `tabular-nums` so figures align down the
-// column. Shared with the post page.
+// and at a tighter tracking. Bakes in `tabular-nums` so figures align down
+// the column. Shared with the post page.
 export const META =
   "text-micro leading-[1.3] font-medium tracking-[0.16em] tabular-nums";
 

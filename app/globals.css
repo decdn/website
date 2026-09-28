@@ -26,6 +26,23 @@
   --color-paper: var(--paper);
   --color-whisper: var(--whisper);
 
+  --font-sans:
+    var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    "Helvetica Neue", Arial, sans-serif;
+  /* The tool panels (.terminal, .fleet), prose code, and the drawer's
+     external-link arrow. */
+  --font-mono:
+    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
+    "Courier New", monospace;
+
+  /* Motion curves. --ease-expo: hover nudges and entrances (fast out, long
+     settle). --ease-soft: colour/opacity/underline transitions and scroll
+     reveals. --ease-term: the terminal line cascade and spark cells. The
+     drawer slide uses Tailwind's built-in --ease-in-out. */
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-soft: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --ease-term: cubic-bezier(0.3, 0, 0.2, 1);
+
   /* Shared content rail: every Frame centers within --container-frame. */
   --container-frame: 1280px;
   --spacing-frame-gutter: clamp(1.5rem, 4vw, 4rem);
@@ -61,14 +78,7 @@ html,
 body {
   background: var(--ink);
   color: var(--paper);
-  font-family:
-    var(--font-geist-sans),
-    ui-sans-serif,
-    system-ui,
-    -apple-system,
-    "Helvetica Neue",
-    Arial,
-    sans-serif;
+  font-family: var(--font-sans);
   font-feature-settings:
     "ss01" on,
     "ss02" on,
@@ -83,40 +93,49 @@ body {
   color: var(--ink);
 }
 
-/* --- utilities --------------------------------------------------------- */
-
-.rule {
-  display: block;
-  width: 100%;
-  height: 1px;
-  background: currentColor;
+/* Every focusable link and button gets the dashed ring, kept dashed so focus
+   reads as distinct from the solid panel borders. In the base layer so the
+   CTA and prose links can override it with their own rings below. */
+@layer base {
+  :where(a, button):focus-visible {
+    outline: 1px dashed currentColor;
+    outline-offset: 4px;
+    border-radius: 1px;
+  }
 }
 
-.rule-2 {
-  height: 2px;
-}
+/* --- utilities ---------------------------------------------------------
+   Layered so a Tailwind utility beside one of these can refine it (e.g.
+   `meta text-[12px]`, or `hug tracking-[-0.05em]`). */
 
-.meta {
-  font-family: inherit;
-  font-size: 11px;
-  line-height: 1.2;
-  font-weight: 500;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-}
+@layer components {
+  .rule {
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: currentColor;
+  }
 
-.blend {
-  color: #ffffff;
-  mix-blend-mode: difference;
-  pointer-events: auto;
-}
+  .rule-2 {
+    height: 2px;
+  }
 
-.hug {
-  font-feature-settings:
-    "ss01" on,
-    "zero" on;
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.04em;
+  .meta {
+    font-family: inherit;
+    font-size: var(--text-micro);
+    line-height: 1.2;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+
+  .hug {
+    font-feature-settings:
+      "ss01" on,
+      "zero" on;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.04em;
+  }
 }
 
 /* --- page-load cascade ------------------------------------------------- */
@@ -134,7 +153,7 @@ body {
 
 .rise {
   opacity: 0;
-  animation: brutal-rise 850ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: brutal-rise 850ms var(--ease-expo) forwards;
 }
 
 .rise-0 {
@@ -182,8 +201,8 @@ body {
   opacity: 0;
   transform: translateY(16px);
   transition:
-    opacity 800ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    transform 800ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    opacity 800ms var(--ease-soft),
+    transform 800ms var(--ease-soft);
   transition-delay: var(--reveal-delay, 0ms);
   will-change: opacity, transform;
 }
@@ -240,7 +259,7 @@ a.underline-brutal {
   text-decoration: none;
   padding-bottom: 2px;
   border-bottom: 1px solid currentColor;
-  transition: border-bottom-color 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: border-bottom-color 260ms var(--ease-soft);
 }
 
 a.underline-brutal:hover {
@@ -249,8 +268,8 @@ a.underline-brutal:hover {
 
 a.underline-brutal .arrow {
   transition:
-    transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
-    color 260ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform 260ms var(--ease-expo),
+    color 260ms var(--ease-expo);
 }
 
 a.underline-brutal:hover .arrow {
@@ -275,13 +294,13 @@ a.cta-primary {
   text-decoration: none;
   box-shadow: 5px 5px 0 0 var(--whisper);
   transition:
-    transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
-    box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform 260ms var(--ease-expo),
+    box-shadow 260ms var(--ease-expo);
 }
 
 a.cta-primary .arrow {
   color: var(--whisper);
-  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 260ms var(--ease-expo);
 }
 
 a.cta-primary:hover {
@@ -315,9 +334,7 @@ a.cta-primary:focus-visible {
    1px rule, a hard offset shadow. */
 
 .terminal {
-  font-family:
-    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
-    "Courier New", monospace;
+  font-family: var(--font-mono);
   font-size: clamp(11px, 1.2vw, 13px);
   line-height: 1.65;
   color: var(--ink);
@@ -364,7 +381,7 @@ a.cta-primary:focus-visible {
 .tl {
   opacity: 0;
   transform: translateY(2px);
-  animation: term-line 4.5s cubic-bezier(0.3, 0, 0.2, 1) infinite;
+  animation: term-line 4.5s var(--ease-term) infinite;
 }
 
 .tl-0 {
@@ -410,27 +427,29 @@ a.cta-primary:focus-visible {
   }
 }
 
-.prompt,
-.arrow,
-.ok {
+/* Scoped: .arrow is also the hover glyph on a.underline-brutal and
+   a.cta-primary, which must not pick up the terminal's colour and gap. */
+.terminal .prompt,
+.terminal .arrow,
+.terminal .ok {
   color: var(--whisper);
   margin-right: 6px;
   font-weight: 600;
 }
 
-.hash {
+.terminal .hash {
   opacity: 0.72;
 }
 
-.dim {
+.terminal .dim {
   opacity: 0.45;
 }
 
-.amount {
+.terminal .amount {
   font-weight: 600;
 }
 
-.progress {
+.terminal .progress {
   display: inline-block;
   width: 140px;
   height: 8px;
@@ -441,7 +460,7 @@ a.cta-primary:focus-visible {
   overflow: hidden;
 }
 
-.progress-fill {
+.terminal .progress-fill {
   position: absolute;
   inset: 0;
   width: 0%;
@@ -471,7 +490,7 @@ a.cta-primary:focus-visible {
   }
 }
 
-.cursor {
+.terminal .cursor {
   display: inline-block;
   width: 7px;
   height: 13px;
@@ -489,15 +508,15 @@ a.cta-primary:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .tl,
-  .progress-fill,
-  .cursor {
+  .terminal .progress-fill,
+  .terminal .cursor {
     animation: none;
     opacity: 1;
   }
   .tl {
     transform: none;
   }
-  .progress-fill {
+  .terminal .progress-fill {
     width: 100%;
   }
 }
@@ -512,9 +531,7 @@ a.cta-primary:focus-visible {
    (lib/stats.ts). Not interactive, so no hover transform. */
 
 .fleet {
-  font-family:
-    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
-    "Courier New", monospace;
+  font-family: var(--font-mono);
   font-size: clamp(11px, 1.1vw, 12px);
   line-height: 1.55;
   color: var(--paper);
@@ -697,7 +714,7 @@ a.cta-primary:focus-visible {
   flex: 1;
   height: max(1px, calc(var(--level, 0) * 100%));
   background: var(--whisper);
-  transition: height 0.6s cubic-bezier(0.3, 0, 0.2, 1);
+  transition: height 0.6s var(--ease-term);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -730,12 +747,12 @@ a.cta-primary:focus-visible {
   -webkit-backdrop-filter: blur(0) saturate(1);
   border-bottom: 1px solid transparent;
   transition:
-    background-color 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    backdrop-filter 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    -webkit-backdrop-filter 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    border-bottom-color 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 360ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    color 300ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    background-color 260ms var(--ease-soft),
+    backdrop-filter 260ms var(--ease-soft),
+    -webkit-backdrop-filter 260ms var(--ease-soft),
+    border-bottom-color 260ms var(--ease-soft),
+    box-shadow 360ms var(--ease-soft),
+    color 300ms var(--ease-soft);
 }
 
 /* Scoped to .chrome-nav so the bump doesn't ripple to every section header / stat label. */
@@ -810,7 +827,7 @@ a.cta-primary:focus-visible {
   text-transform: uppercase;
   line-height: 1;
   opacity: 0.65;
-  transition: opacity 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: opacity 220ms var(--ease-soft);
 }
 
 .nav-item .nav-underline {
@@ -823,8 +840,8 @@ a.cta-primary:focus-visible {
   transform: scaleX(var(--u));
   transform-origin: left center;
   transition:
-    transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    background-color 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform 260ms var(--ease-soft),
+    background-color 220ms var(--ease-soft);
   pointer-events: none;
 }
 
@@ -845,18 +862,12 @@ a.cta-primary:focus-visible {
   opacity: 1;
 }
 
-.chrome-nav a:focus-visible {
-  outline: 1px dashed currentColor;
-  outline-offset: 4px;
-  border-radius: 1px;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .chrome-nav {
     transition:
-      background-color 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
-      border-bottom-color 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
-      box-shadow 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+      background-color 260ms var(--ease-soft),
+      border-bottom-color 260ms var(--ease-soft),
+      box-shadow 360ms var(--ease-soft);
   }
   .nav-item .nav-label,
   .nav-item .nav-underline {
@@ -959,7 +970,7 @@ a.cta-primary:focus-visible {
   color: inherit;
   text-decoration: none;
   border-bottom: 1px solid currentColor;
-  transition: border-bottom-color 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: border-bottom-color 160ms var(--ease-soft);
 }
 
 .prose a:hover {
@@ -973,9 +984,7 @@ a.cta-primary:focus-visible {
 }
 
 .prose code {
-  font-family:
-    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
-    "Courier New", monospace;
+  font-family: var(--font-mono);
   font-size: 0.92em;
   padding: 0.05em 0.3em;
   background: color-mix(in srgb, var(--ink) 6%, transparent);
@@ -983,9 +992,7 @@ a.cta-primary:focus-visible {
 }
 
 .prose pre {
-  font-family:
-    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
-    "Courier New", monospace;
+  font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.65;
   padding: 1em 1.2em;
@@ -1048,7 +1055,7 @@ a.cta-primary:focus-visible {
   border: 0;
   padding: 0;
   cursor: pointer;
-  transition: color 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: color 400ms var(--ease-soft);
 }
 .mm-toggle[data-tone="ink"] {
   color: var(--paper);
@@ -1063,8 +1070,8 @@ a.cta-primary:focus-visible {
   height: 1px;
   background: currentColor;
   transition:
-    transform 460ms cubic-bezier(0.16, 1, 0.3, 1),
-    top 460ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform 460ms var(--ease-expo),
+    top 460ms var(--ease-expo);
 }
 
 .mm-toggle::before {
@@ -1083,12 +1090,6 @@ a.cta-primary:focus-visible {
   transform: rotate(-45deg);
 }
 
-.mm-toggle:focus-visible {
-  outline: 1px dashed currentColor;
-  outline-offset: 4px;
-  border-radius: 1px;
-}
-
 .mm-overlay {
   position: fixed;
   inset: 0;
@@ -1098,7 +1099,7 @@ a.cta-primary:focus-visible {
   -webkit-backdrop-filter: blur(6px) saturate(1.05);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 500ms var(--ease-in-out);
 }
 .mm-overlay[data-open="true"] {
   opacity: 1;
@@ -1113,7 +1114,7 @@ a.cta-primary:focus-visible {
   color: var(--ink);
   pointer-events: none;
   transform: translate3d(100%, 0, 0);
-  transition: transform 500ms cubic-bezier(0.4, 0, 0.2, 1);
+  transition: transform 500ms var(--ease-in-out);
   padding: clamp(4.25rem, 16vw, 5.5rem) clamp(1.5rem, 6vw, 2rem)
     clamp(1.5rem, 6vw, 2rem);
   overflow-y: auto;
@@ -1143,16 +1144,11 @@ a.cta-primary:focus-visible {
 .mm-head-link {
   color: inherit;
   text-decoration: none;
-  transition: color 220ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: color 220ms var(--ease-soft);
 }
 .mm-head-link:hover,
 .mm-head-link:active {
   color: var(--whisper);
-}
-.mm-head-link:focus-visible {
-  outline: 1px dashed currentColor;
-  outline-offset: 4px;
-  border-radius: 1px;
 }
 
 .mm-list {
@@ -1188,8 +1184,8 @@ a.cta-primary:focus-visible {
   opacity: 0;
   transform: translateX(-6px);
   transition:
-    opacity 540ms cubic-bezier(0.16, 1, 0.3, 1),
-    transform 540ms cubic-bezier(0.16, 1, 0.3, 1);
+    opacity 540ms var(--ease-expo),
+    transform 540ms var(--ease-expo);
 }
 .mm-row[data-active="true"] .mm-mark {
   opacity: 1;
@@ -1197,15 +1193,13 @@ a.cta-primary:focus-visible {
 }
 
 .mm-row-external .mm-arrow {
-  font-family:
-    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
-    "Courier New", monospace;
+  font-family: var(--font-mono);
   font-size: 16px;
   line-height: 1;
   color: color-mix(in srgb, var(--ink) 55%, transparent);
   transition:
-    transform 260ms cubic-bezier(0.16, 1, 0.3, 1),
-    color 260ms cubic-bezier(0.16, 1, 0.3, 1);
+    transform 260ms var(--ease-expo),
+    color 260ms var(--ease-expo);
 }
 .mm-row-external:hover .mm-arrow,
 .mm-row-external:active .mm-arrow {
@@ -1230,12 +1224,12 @@ a.cta-primary:focus-visible {
   }
   /* Reduced-motion: cross-fade instead of slide. */
   .mm-overlay {
-    transition: opacity 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: opacity 240ms var(--ease-soft);
   }
   .mm-panel {
     transform: none;
     opacity: 0;
-    transition: opacity 240ms cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: opacity 240ms var(--ease-soft);
   }
   .mm-panel[data-open="true"] {
     transform: none;
@@ -1311,25 +1305,20 @@ a.cta-primary:focus-visible {
   text-align: left;
   color: color-mix(in srgb, currentColor 55%, transparent);
   cursor: pointer;
-  transition: color 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: color 200ms var(--ease-soft);
 }
 .faq-q:hover,
 .faq-row[data-selected="true"] .faq-q {
   color: inherit;
 }
 .faq-ordinal {
-  transition: color 200ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: color 200ms var(--ease-soft);
 }
 .faq-row[data-selected="true"] .faq-ordinal {
   color: var(--whisper);
 }
 .faq-q[aria-disabled="true"] {
   cursor: default;
-}
-.faq-q:focus-visible {
-  outline: 1px dashed currentColor;
-  outline-offset: 4px;
-  border-radius: 1px;
 }
 
 .faq-card {
@@ -1349,7 +1338,7 @@ a.cta-primary:focus-visible {
 /* Restarts each time a card becomes the selected one: the animation-name
    flips from none to brutal-rise, which is what kicks it off. */
 .faq-card[data-selected="true"] .faq-answer {
-  animation: brutal-rise 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: brutal-rise 420ms var(--ease-expo) both;
 }
 
 .faq-ghost {
