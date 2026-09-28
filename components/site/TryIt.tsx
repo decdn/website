@@ -49,7 +49,7 @@ export function TryIt() {
   const model = MODELS.find((m) => m.id === id) ?? MODELS[0];
   const shell = PLATFORMS.find((p) => p.id === platform) ?? PLATFORMS[0];
   if (!model || !shell) return null;
-  const command = pullCommand(model.hash, platform);
+  const command = pullCommand(model.hash, platform, model.namespace);
 
   function flashCopied() {
     setCopied(true);

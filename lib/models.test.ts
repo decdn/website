@@ -18,6 +18,13 @@ describe("launch catalogue", () => {
     }
   });
 
+  it("publishes every model under a namespace >= 1", () => {
+    for (const model of MODELS) {
+      expect(Number.isInteger(model.namespace), model.id).toBe(true);
+      expect(model.namespace, model.id).toBeGreaterThanOrEqual(1);
+    }
+  });
+
   it("has unique ids and hashes", () => {
     expect(new Set(MODELS.map((m) => m.id)).size).toBe(MODELS.length);
     expect(new Set(MODELS.map((m) => m.hash)).size).toBe(MODELS.length);
@@ -29,6 +36,16 @@ describe("pullCommand", () => {
     const hash = `b3:${"ab".repeat(32)}`;
     expect(pullCommand(hash)).toBe(
       `curl -fsSL https://up.decdn.org/decdn.sh | sh -s -- pull ${hash}`,
+    );
+  });
+
+  it("passes the namespace through when the model has one", () => {
+    const hash = `b3:${"ab".repeat(32)}`;
+    expect(pullCommand(hash, "unix", 1)).toBe(
+      `curl -fsSL https://up.decdn.org/decdn.sh | sh -s -- pull ${hash} --namespace 1`,
+    );
+    expect(pullCommand(hash, "windows", 1)).toBe(
+      `irm https://up.decdn.org/decdn.ps1 | iex; decdn-sponsored pull ${hash} --namespace 1`,
     );
   });
 

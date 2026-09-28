@@ -19,6 +19,11 @@ export type Model = {
   license: string;
   /** `b3:` + 64 lowercase hex characters. */
   hash: string;
+  /** The namespace the model is published under (ADR 002). Passed to
+   *  `decdn-sponsored pull --namespace` so a node that has not cached the
+   *  model pulls it from that namespace's origins. A routing hint only: the
+   *  bytes are verified against `hash` either way. */
+  namespace?: number;
   bytes: number;
 };
 
@@ -40,12 +45,21 @@ export const PLATFORMS: readonly {
 ];
 
 /** The one line that installs `decdn` + `decdn-sponsored` and pulls `hash`
- *  into the current directory: a POSIX shell pipe on macOS and Linux, a
- *  PowerShell one on Windows. */
-export function pullCommand(hash: string, platform: Platform = "unix"): string {
+ *  (published under `namespace`, when it has one) into the current
+ *  directory: a POSIX shell pipe on macOS and Linux, a PowerShell one on
+ *  Windows. `namespace` also takes a placeholder string for prose examples. */
+export function pullCommand(
+  hash: string,
+  platform: Platform = "unix",
+  namespace?: number | string,
+): string {
+  const pull =
+    namespace === undefined
+      ? `pull ${hash}`
+      : `pull ${hash} --namespace ${namespace}`;
   return platform === "windows"
-    ? `irm ${links.installerPs1} | iex; decdn-sponsored pull ${hash}`
-    : `curl -fsSL ${links.installer} | sh -s -- pull ${hash}`;
+    ? `irm ${links.installerPs1} | iex; decdn-sponsored ${pull}`
+    : `curl -fsSL ${links.installer} | sh -s -- ${pull}`;
 }
 
 /** Windows visitors get the PowerShell line; everyone else the POSIX one. */

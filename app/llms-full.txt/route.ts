@@ -154,11 +154,11 @@ const compareTable = [
   }),
 ].join("\n");
 
-const tryWindows = `On Windows, in PowerShell: \`${pullCommand("b3:<hash>", "windows")}\``;
+const tryWindows = `On Windows, in PowerShell: \`${pullCommand("b3:<hash>", "windows", "<namespace>")}\``;
 
 const tryModels = MODELS.map(
   (m) =>
-    `- ${m.name} (${formatSize(m.bytes)}, ${m.license}): \`${pullCommand(m.hash)}\``,
+    `- ${m.name} (${formatSize(m.bytes)}, ${m.license}): \`${pullCommand(m.hash, "unix", m.namespace)}\``,
 ).join("\n");
 
 const methodSteps = METHOD_STEPS.map(
