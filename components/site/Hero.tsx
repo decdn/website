@@ -1,5 +1,10 @@
 import { links } from "@/lib/links";
-import { HERO_FIGURES, HERO_HEADLINE, HERO_LEAD } from "@/lib/copy";
+import {
+  HERO_FIGURES,
+  HERO_HEADLINE,
+  HERO_LEAD,
+  HERO_STATUS,
+} from "@/lib/copy";
 import { highlightBrand } from "@/components/ui/brand";
 import { Figure } from "@/components/ui/Figure";
 import { Frame } from "@/components/ui/Frame";
@@ -25,8 +30,11 @@ export function Hero() {
           </span>
         </h1>
 
-        <div className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-start @4xl:gap-12">
-          <div className="flex flex-col gap-8 @4xl:gap-12">
+        {/* At @4xl the stats and the status link share row 2 so they
+            baseline-align; below it, DOM order stacks lead/CTAs, stats,
+            terminal, then the link. */}
+        <div className="grid gap-y-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-start @4xl:gap-x-12 @4xl:gap-y-14">
+          <div className="flex flex-col gap-10 @4xl:col-start-1 @4xl:row-start-1 @4xl:gap-16">
             <p className="rise rise-3 max-w-[64ch] text-body leading-[1.65]">
               {highlightBrand(HERO_LEAD)}
             </p>
@@ -66,15 +74,37 @@ export function Hero() {
                 </a>
               </div>
             </div>
-
-            <div className="rise rise-5 grid grid-cols-2 gap-y-4 @xl:grid-cols-4">
-              {HERO_FIGURES.map((figure) => (
-                <Figure key={figure.label} {...figure} />
-              ))}
-            </div>
           </div>
 
-          <HeroTerminal className="block w-full" />
+          <div className="rise rise-5 grid grid-cols-2 gap-y-4 @xl:grid-cols-4 @4xl:col-start-1 @4xl:row-start-2 @4xl:self-baseline">
+            {HERO_FIGURES.map((figure) => (
+              <Figure key={figure.label} {...figure} />
+            ))}
+          </div>
+
+          <HeroTerminal className="block w-full @4xl:col-start-2 @4xl:row-start-1" />
+
+          {/* Mirrors Figure's label/value lines so it baseline-aligns with
+              the stat strip beside it. */}
+          <a
+            className="hero-status rise rise-5 flex flex-col gap-1 justify-self-start @4xl:col-start-2 @4xl:row-start-2 @4xl:self-baseline"
+            href={links.stats}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="meta text-ink opacity-60">
+              {HERO_STATUS.label}
+            </span>
+            <span className="flex items-center gap-3 text-body font-medium tracking-[-0.01em]">
+              <span aria-hidden className="status-live" />
+              <span className="hero-status-text inline-flex items-center gap-2">
+                {HERO_STATUS.value}
+                <span className="arrow" aria-hidden>
+                  →
+                </span>
+              </span>
+            </span>
+          </a>
         </div>
       </div>
     </Frame>

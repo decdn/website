@@ -8,6 +8,7 @@ export const links = {
   litepaper: "/decdn_litepaper.pdf",
   presskit: "/presskit/decdn-presskit.zip",
   docs: "https://docs.decdn.org/overview/introduction",
+  stats: "https://stats.decdn.org/",
   blog: "/blog/",
   contact: `mailto:${EMAIL}`,
   privacy: "/legal/privacy/",
