@@ -11,6 +11,7 @@ export const links = {
   // Served by sponsord; each installs decdn + decdn-sponsored.
   installer: "https://up.decdn.org/decdn.sh",
   installerPs1: "https://up.decdn.org/decdn.ps1",
+  stats: "https://stats.decdn.org/",
   blog: "/blog/",
   contact: `mailto:${EMAIL}`,
   privacy: "/legal/privacy/",

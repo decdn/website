@@ -16,6 +16,9 @@
      clamp's 9vw term already exceeds 5rem, so a bigger floor does
      nothing on desktop.) */
   --nav-h: 0;
+  /* Corner radius shared by the tool panels (.terminal, .fleet,
+     .faq-card) and their offset shadows. */
+  --panel-radius: 6px;
 }
 
 @theme inline {
@@ -295,10 +298,49 @@ a.cta-primary:focus-visible {
   outline-offset: 9px;
 }
 
+/* The status link under the hero terminal. Raw --whisper is ~3.5:1 on
+   paper, short of AA at body size, so the value text uses whisper mixed
+   68% with ink (~6.6:1). The label is ink like the stat labels; the dot
+   and the arrow keep the full accent. */
+a.hero-status {
+  color: color-mix(in srgb, var(--whisper) 68%, var(--ink));
+}
+
+.hero-status-text {
+  padding-bottom: 1px;
+  border-bottom: 1px solid transparent;
+  transition: border-bottom-color 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+a.hero-status:hover .hero-status-text {
+  border-bottom-color: currentColor;
+}
+
+a.hero-status .arrow {
+  margin-right: 0;
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+a.hero-status:hover .arrow {
+  transform: translateX(6px);
+}
+
+.status-live {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--whisper);
+  animation: fleet-pulse 2.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   a.cta-primary,
-  a.cta-primary .arrow {
+  a.cta-primary .arrow,
+  a.hero-status .arrow {
     transition: none;
+  }
+  .status-live {
+    animation: none;
   }
 }
 
@@ -307,7 +349,9 @@ a.cta-primary:focus-visible {
    (lib/stats.ts), one per cycle: tx → block → operator → bytes → paid.
    All lines share one 4.5s loop; each line fades in at its own delay.
    Progress bar fills during the "delivered" line. Cursor blinks
-   independently. The cascade restarts every cycle. */
+   independently. The cascade restarts every cycle. Shares the "tool
+   panel" vocabulary with .fleet and .faq-card: soft corners, a solid
+   1px rule, a hard offset shadow. */
 
 .terminal {
   font-family:
@@ -317,7 +361,8 @@ a.cta-primary:focus-visible {
   line-height: 1.65;
   color: var(--ink);
   background: var(--paper);
-  border: 1px dashed color-mix(in srgb, var(--ink) 30%, transparent);
+  border: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
+  border-radius: var(--panel-radius);
   box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--ink) 12%, transparent);
 }
 
@@ -326,7 +371,7 @@ a.cta-primary:focus-visible {
   align-items: center;
   gap: 6px;
   padding: 10px 14px;
-  border-bottom: 1px dashed color-mix(in srgb, var(--ink) 30%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--ink) 30%, transparent);
 }
 
 .terminal-dot {
@@ -498,7 +543,7 @@ a.cta-primary:focus-visible {
 
 /* --- fleet status panel (§06) -----------------------------------------
    Sits on the paper Contact section as an inverted panel. Same "tool
-   panel" vocabulary as .terminal — square corners, dashed border, hard
+   panel" vocabulary as .terminal — soft corners, solid rule, hard
    offset shadow — with an ops-dashboard layout instead of a CLI log:
    registered nodes (region, operator, last settlement) with a pulse for
    each one that settled recently, plus two 24h
@@ -513,7 +558,8 @@ a.cta-primary:focus-visible {
   line-height: 1.55;
   color: var(--paper);
   background: color-mix(in srgb, var(--paper) 12%, var(--ink));
-  border: 1px dashed color-mix(in srgb, var(--paper) 26%, transparent);
+  border: 1px solid color-mix(in srgb, var(--paper) 26%, transparent);
+  border-radius: var(--panel-radius);
   overflow: hidden;
   box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--ink) 12%, transparent);
 }
@@ -523,7 +569,7 @@ a.cta-primary:focus-visible {
   align-items: center;
   gap: 6px;
   padding: 10px 14px;
-  border-bottom: 1px dashed color-mix(in srgb, var(--paper) 30%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--paper) 30%, transparent);
 }
 
 .fleet-dot {
@@ -711,8 +757,8 @@ a.cta-primary:focus-visible {
    the threshold. The active section's nav item shows a full-width
    whisper-green underline (scales in from the left) and a brighter
    label opacity; hover shows a short underline preview. Focus paints
-   a dashed outline that matches the terminal / fleet border
-   vocabulary. No mix-blend-mode is used — the parent nav toggles
+   a dashed outline, kept dashed so focus reads as distinct from the
+   solid panel borders. No mix-blend-mode is used — the parent nav toggles
    `data-tone` per-section to work around Safari's bug with
    `mix-blend-mode: difference` on `position: fixed` elements
    (see components/site/Chrome.tsx). */
@@ -1330,8 +1376,9 @@ a.cta-primary:focus-visible {
   display: none;
   margin: 0 0 1.5rem;
   padding: var(--faq-pad);
-  /* Square and dashed, matching .terminal and .fleet. */
-  border: 1px dashed var(--faq-edge);
+  /* Soft-cornered and solid, matching .terminal and .fleet. */
+  border: 1px solid var(--faq-edge);
+  border-radius: var(--panel-radius);
   box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--paper) 12%, transparent);
 }
 .faq-card[data-selected="true"] {
