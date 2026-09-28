@@ -53,12 +53,12 @@ export const HERO_FIGURES = [
   { label: "gas overhead", value: "<1%" },
 ] as const satisfies readonly FigureCopy[];
 
-/** The status link under the hero terminal. Shaped like FigureCopy so it
+/** The live-stats link under the hero terminal. Shaped like FigureCopy so it
  *  shares the stat strip's label/value type (rendered inline in Hero, not
  *  through Figure). */
 export const HERO_STATUS = {
   label: "see also",
-  value: "Status website",
+  value: "Network stats",
 } as const satisfies FigureCopy;
 
 export const COMPARE_HEADLINE = [
