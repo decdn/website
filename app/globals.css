@@ -303,7 +303,6 @@ a.cta-primary:focus-visible {
    dot and arrow keep the full accent. */
 a.hero-status {
   color: color-mix(in srgb, var(--whisper) 68%, var(--ink));
-  text-decoration: none;
 }
 
 .hero-status-text {
@@ -343,20 +342,13 @@ a.hero-status:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .status-live {
-    animation: none;
-    opacity: 1;
-  }
-  .hero-status-text,
+  a.cta-primary,
+  a.cta-primary .arrow,
   a.hero-status .arrow {
     transition: none;
   }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  a.cta-primary,
-  a.cta-primary .arrow {
-    transition: none;
+  .status-live {
+    animation: none;
   }
 }
 

@@ -8,6 +8,7 @@ export const links = {
   litepaper: "/decdn_litepaper.pdf",
   presskit: "/presskit/decdn-presskit.zip",
   docs: "https://docs.decdn.org/overview/introduction",
+  stats: "https://stats.decdn.org/",
   blog: "/blog/",
   contact: `mailto:${EMAIL}`,
   privacy: "/legal/privacy/",
@@ -44,9 +45,6 @@ export const BLOG_URL = `${SITE_URL}blog/`;
 // wants the host has to strip the path. Three did it independently
 // (app/sitemap.xml, app/llms.txt, app/llms-full.txt); derive it once.
 export const DOCS_ORIGIN = new URL(links.docs).origin;
-
-// The network status site, linked from under the hero terminal.
-export const STATUS_URL = "https://stats.decdn.org/";
 
 // Twitter expects an `@handle`; derive from the X profile URL so the X
 // account is the single source of truth.

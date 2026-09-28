@@ -1,4 +1,4 @@
-import { links, STATUS_URL } from "@/lib/links";
+import { links } from "@/lib/links";
 import {
   HERO_FIGURES,
   HERO_HEADLINE,
@@ -86,7 +86,7 @@ export function Hero() {
               the stat strip beside it. */}
           <a
             className="hero-status rise rise-5 flex flex-col gap-1 justify-self-start @4xl:col-start-2 @4xl:row-start-2 @4xl:self-baseline"
-            href={STATUS_URL}
+            href={links.stats}
             target="_blank"
             rel="noopener noreferrer"
           >
