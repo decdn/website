@@ -33,7 +33,7 @@ export function Hero() {
         {/* Stats and the status link share the grid's second row so they
             baseline-align on desktop; on mobile the DOM order stacks the
             link under the stats and the terminal last. */}
-        <div className="grid gap-y-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-start @4xl:gap-x-12 @4xl:gap-y-16">
+        <div className="grid gap-y-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-start @4xl:gap-x-12 @4xl:gap-y-14">
           <div className="flex flex-col gap-10 @4xl:col-start-1 @4xl:row-start-1 @4xl:gap-16">
             <p className="rise rise-3 max-w-[64ch] text-body leading-[1.65]">
               {highlightBrand(HERO_LEAD)}
