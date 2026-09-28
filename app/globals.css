@@ -307,9 +307,6 @@ a.hero-status {
 }
 
 .hero-status-text {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
   padding-bottom: 1px;
   border-bottom: 1px solid transparent;
   transition: border-bottom-color 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -328,15 +325,9 @@ a.hero-status:hover .arrow {
   transform: translateX(6px);
 }
 
-a.hero-status:focus-visible {
-  outline: 1px dashed var(--ink);
-  outline-offset: 6px;
-}
-
 .status-live {
   width: 7px;
   height: 7px;
-  flex: none;
   border-radius: 50%;
   background: var(--whisper);
   animation: fleet-pulse 2.4s ease-in-out infinite;

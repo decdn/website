@@ -97,7 +97,7 @@ export function Hero() {
             </span>
             <span className="flex items-center gap-3 text-body font-medium tracking-[-0.01em]">
               <span aria-hidden className="status-live" />
-              <span className="hero-status-text">
+              <span className="hero-status-text inline-flex items-center gap-2">
                 {HERO_STATUS.value}
                 <span className="arrow" aria-hidden>
                   →
