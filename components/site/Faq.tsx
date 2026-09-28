@@ -21,7 +21,7 @@ export function Faq() {
         <h2
           data-reveal
           id="faq-h"
-          className="hug text-h2 leading-[0.92] font-semibold tracking-[-0.04em]"
+          className="hug text-h2 leading-[0.92] font-semibold"
         >
           frequently asked.
         </h2>

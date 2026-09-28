@@ -20,7 +20,7 @@ export function MethodRow({
           div, leaving the homepage with no h3 at all and the three steps
           undifferentiated from body text in a crawler's outline. Tailwind's
           preflight resets heading font-size and font-weight to inherit, so
-          these classes keep the appearance byte-for-byte. */}
+          these classes set the display type explicitly. */}
       <h3 className="hug text-method-row leading-[0.9] font-semibold tracking-[-0.05em] @xl:col-span-5">
         {word}
       </h3>
