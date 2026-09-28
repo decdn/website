@@ -46,7 +46,7 @@ export const BLOG_URL = `${SITE_URL}blog/`;
 export const DOCS_ORIGIN = new URL(links.docs).origin;
 
 // The network status site, linked from under the hero terminal.
-export const STATUS_URL = "https://status.decdn.org";
+export const STATUS_URL = "https://stats.decdn.org/";
 
 // Twitter expects an `@handle`; derive from the X profile URL so the X
 // account is the single source of truth.
