@@ -4,6 +4,7 @@ import { highlightBrand } from "@/components/ui/brand";
 import { Figure } from "@/components/ui/Figure";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
+import { HeroStatus } from "@/components/site/HeroStatus";
 import { HeroTerminal } from "@/components/site/HeroTerminal";
 
 export function Hero() {
@@ -25,8 +26,11 @@ export function Hero() {
           </span>
         </h1>
 
-        <div className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-start @4xl:gap-12">
-          <div className="flex flex-col gap-8 @4xl:gap-12">
+        {/* Stats and the status link share the grid's second row so they
+            baseline-align on desktop; on mobile the DOM order stacks the
+            link under the stats and the terminal last. */}
+        <div className="grid gap-y-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,440px)] @4xl:items-start @4xl:gap-x-12 @4xl:gap-y-16">
+          <div className="flex flex-col gap-10 @4xl:col-start-1 @4xl:row-start-1 @4xl:gap-16">
             <p className="rise rise-3 max-w-[64ch] text-body leading-[1.65]">
               {highlightBrand(HERO_LEAD)}
             </p>
@@ -66,15 +70,17 @@ export function Hero() {
                 </a>
               </div>
             </div>
-
-            <div className="rise rise-5 grid grid-cols-2 gap-y-4 @xl:grid-cols-4">
-              {HERO_FIGURES.map((figure) => (
-                <Figure key={figure.label} {...figure} />
-              ))}
-            </div>
           </div>
 
-          <HeroTerminal className="block w-full" />
+          <div className="rise rise-5 grid grid-cols-2 gap-y-4 @xl:grid-cols-4 @4xl:col-start-1 @4xl:row-start-2 @4xl:self-baseline">
+            {HERO_FIGURES.map((figure) => (
+              <Figure key={figure.label} {...figure} />
+            ))}
+          </div>
+
+          <HeroStatus className="rise rise-5 justify-self-start @4xl:col-start-2 @4xl:row-start-2 @4xl:self-baseline" />
+
+          <HeroTerminal className="block w-full @4xl:col-start-2 @4xl:row-start-1" />
         </div>
       </div>
     </Frame>

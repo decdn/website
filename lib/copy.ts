@@ -53,6 +53,13 @@ export const HERO_FIGURES = [
   { label: "gas overhead", value: "<1%" },
 ] as const satisfies readonly FigureCopy[];
 
+/** The status link under the hero terminal, set in the stat strip's
+ *  label/value type so it lines up with it. */
+export const HERO_STATUS = {
+  label: "see also",
+  value: "Status website",
+} as const satisfies FigureCopy;
+
 export const COMPARE_HEADLINE = [
   "information scaled.",
   "supply didn't.",

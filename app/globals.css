@@ -298,6 +298,82 @@ a.cta-primary:focus-visible {
   outline-offset: 9px;
 }
 
+/* The status link under the hero terminal. Text is a deepened whisper —
+   raw --whisper is ~3.4:1 on paper, short of AA at body size — while the
+   dot, arrow and strip keep the full accent. The strip is the last 24h of
+   settlement per hour (lib/stats.ts fleetView), styled like .fleet-spark. */
+a.hero-status {
+  color: color-mix(in srgb, var(--whisper) 68%, var(--ink));
+  text-decoration: none;
+}
+
+.hero-status-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-bottom: 1px;
+  border-bottom: 1px solid transparent;
+  transition: border-bottom-color 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+a.hero-status:hover .hero-status-text {
+  border-bottom-color: currentColor;
+}
+
+a.hero-status .arrow {
+  margin-right: 0;
+  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+a.hero-status:hover .arrow {
+  transform: translateX(6px);
+}
+
+a.hero-status:focus-visible {
+  outline: 1px dashed var(--ink);
+  outline-offset: 6px;
+}
+
+.status-live {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  border: 1px solid var(--whisper);
+}
+
+.status-live-active {
+  background: var(--whisper);
+  animation: fleet-pulse 2.4s ease-in-out infinite;
+}
+
+.status-strip {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--whisper) 35%, transparent);
+}
+
+.status-strip > span {
+  width: 3px;
+  height: max(1px, calc(var(--level, 0) * 100%));
+  background: var(--whisper);
+  transition: height 0.6s cubic-bezier(0.3, 0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-live-active {
+    animation: none;
+    opacity: 1;
+  }
+  .status-strip > span,
+  .hero-status-text,
+  a.hero-status .arrow {
+    transition: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   a.cta-primary,
   a.cta-primary .arrow {
