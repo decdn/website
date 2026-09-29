@@ -6,6 +6,7 @@ import {
   formatBytes,
   formatUsdc,
   loadStats,
+  settledInWindow,
   type Stats,
   STATS_URL,
   TERMINAL_SESSIONS,
@@ -119,6 +120,19 @@ describe("timeAgo", () => {
     [1_790_000_000 - 3 * 86_400, "3 d ago"],
   ])("%i → %s", (timestamp, text) => {
     expect(timeAgo(timestamp, now)).toBe(text);
+  });
+});
+
+describe("settledInWindow", () => {
+  const now = 1_790_000_000_000;
+  it.each([
+    [1_790_000_000 - 4 * 60, true],
+    [1_790_000_000 - 24 * 3600 + 1, true],
+    [1_790_000_000 - 24 * 3600, false],
+    [1_790_000_000 - 3 * 86_400, false],
+    [null, false],
+  ])("%s → %s", (lastSettled, inWindow) => {
+    expect(settledInWindow(lastSettled, now)).toBe(inWindow);
   });
 });
 

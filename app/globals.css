@@ -668,6 +668,11 @@ a.hero-status:hover .arrow {
   animation: fleet-pulse 2.4s ease-in-out infinite;
 }
 
+.fleet-pulse-stale {
+  background: color-mix(in srgb, var(--paper) 45%, transparent);
+  border: none;
+}
+
 @keyframes fleet-pulse {
   0%,
   100% {
