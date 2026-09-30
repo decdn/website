@@ -36,6 +36,7 @@ const EXTERNAL: readonly DrawerLink[] = [
   { kind: "internal", href: links.docs, label: "docs" },
   { kind: "internal", href: links.blog, label: "blog" },
   { kind: "external", href: links.litepaper, label: "litepaper" },
+  { kind: "external", href: links.stats, label: "network stats" },
 ] as const;
 
 const FOCUSABLE_SELECTOR =
