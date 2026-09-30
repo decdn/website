@@ -15,8 +15,7 @@ export function HeroTerminal({ className }: { className?: string }) {
   // The next session is cued by the cascade itself: each time the first
   // line's 4.5s animation completes an iteration, advance one (the key below
   // then remounts the body, restarting the cascade). Anything that stops the
-  // CSS stops the rotation with it — reduced motion (no animation), hovering
-  // the panel on a pointer device (holds the lines, see globals.css), a
+  // CSS stops the rotation with it — reduced motion (no animation), a
   // background tab (no frames render, so no iteration events; at most one
   // fires on return) and scrolling out of view (the observer below sets
   // data-offscreen; globals.css pauses the lines). A timer would keep

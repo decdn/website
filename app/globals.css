@@ -381,8 +381,8 @@ a.hero-status:hover .arrow {
    All lines share one 4.5s loop; each line fades in at its own delay.
    Progress bar fills during the "delivered" line. HeroTerminal advances to
    the next settlement on .tl-0's animationiteration, so anything that stops
-   the cascade stops the rotation: reduced motion, the hover hold and the
-   offscreen pause below. The cursor blinks independently except offscreen.
+   the cascade stops the rotation: reduced motion and the offscreen pause
+   below. The cursor blinks independently except offscreen.
    The cascade restarts every cycle. Shares the "tool
    panel" vocabulary with .fleet and .faq-card: soft corners, a solid
    1px rule, a hard offset shadow. */
@@ -573,19 +573,6 @@ a.hero-status:hover .arrow {
     transform: none;
   }
   .terminal .progress-fill {
-    transform: none;
-  }
-}
-
-/* Hovering the terminal holds the current settlement fully drawn: the
-   cascade stops, so no animationiteration fires and HeroTerminal doesn't
-   advance. Leaving re-applies the animation, which replays the cascade
-   from the top. The cursor keeps blinking. */
-@media (hover: hover) {
-  .terminal:hover .tl,
-  .terminal:hover .progress-fill {
-    animation: none;
-    opacity: 1;
     transform: none;
   }
 }
