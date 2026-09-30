@@ -15,7 +15,13 @@ function Rate({ value, strike }: { value: string; strike?: true }) {
     <>
       {figure}
       {unit && (
-        <span className="meta ml-1 align-baseline opacity-70">{unit}</span>
+        // Struck, the unit already sits inside the <s>'s 55%; dimming it
+        // again would take 11px text under AA on ink.
+        <span
+          className={`meta ml-1 align-baseline ${strike ? "" : "opacity-70"}`}
+        >
+          {unit}
+        </span>
       )}
     </>
   );

@@ -4,6 +4,13 @@
   --ink: #000000;
   --paper: #ffffff;
   --whisper: #0f9d6a;
+  /* Raw --whisper is ~3.5:1 on paper, short of AA for text, so text on paper
+     uses it mixed 68% with ink (~6.5:1). On ink the raw accent already clears
+     AA (~6:1). --whisper-text is what brand-coloured text reads: raw by
+     default (the page ground is ink), swapped to --whisper-deep by
+     Frame tone="paper". */
+  --whisper-deep: color-mix(in srgb, var(--whisper) 68%, var(--ink));
+  --whisper-text: var(--whisper);
   /* Intentionally 0: anchor jumps land flush at viewport top (under
      the fixed nav). Section headers don't get clipped because every
      Frame's --spacing-frame-pad-y floor (5rem = 80px) sits comfortably
@@ -25,6 +32,7 @@
   --color-ink: var(--ink);
   --color-paper: var(--paper);
   --color-whisper: var(--whisper);
+  --color-whisper-text: var(--whisper-text);
 
   --font-sans:
     var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
@@ -204,7 +212,6 @@ body {
     opacity 800ms var(--ease-soft),
     transform 800ms var(--ease-soft);
   transition-delay: var(--reveal-delay, 0ms);
-  will-change: opacity, transform;
 }
 
 [data-reveal][data-revealed="true"] {
@@ -320,18 +327,17 @@ a.cta-primary:focus-visible {
   outline-offset: 9px;
 }
 
-/* The status link under the hero terminal. Raw --whisper is ~3.5:1 on
-   paper, short of AA at body size, so the value text uses whisper mixed
-   68% with ink (~6.6:1). The label is ink like the stat labels; the dot
-   and the arrow keep the full accent. */
+/* The status link under the hero terminal. The value text takes
+   --whisper-deep (see :root) for AA on paper. The label is ink like the
+   stat labels; the dot and the arrow keep the full accent. */
 a.hero-status {
-  color: color-mix(in srgb, var(--whisper) 68%, var(--ink));
+  color: var(--whisper-deep);
 }
 
 .hero-status-text {
   padding-bottom: 1px;
   border-bottom: 1px solid transparent;
-  transition: border-bottom-color 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  transition: border-bottom-color 260ms var(--ease-soft);
 }
 
 a.hero-status:hover .hero-status-text {
@@ -340,7 +346,7 @@ a.hero-status:hover .hero-status-text {
 
 a.hero-status .arrow {
   margin-right: 0;
-  transition: transform 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  transition: transform 260ms var(--ease-expo);
 }
 
 a.hero-status:hover .arrow {
@@ -485,7 +491,7 @@ a.hero-status:hover .arrow {
 }
 
 .terminal .dim {
-  opacity: 0.45;
+  opacity: 0.6;
 }
 
 .terminal .amount {
@@ -506,8 +512,9 @@ a.hero-status:hover .arrow {
 .terminal .progress-fill {
   position: absolute;
   inset: 0;
-  width: 0%;
   background: var(--whisper);
+  transform: scaleX(0);
+  transform-origin: left center;
   animation: term-progress 4.5s linear infinite;
   animation-delay: 1.1s;
 }
@@ -515,20 +522,20 @@ a.hero-status:hover .arrow {
 @keyframes term-progress {
   0%,
   24% {
-    width: 0%;
+    transform: scaleX(0);
   }
   44% {
-    width: 100%;
+    transform: scaleX(1);
   }
   80% {
-    width: 100%;
+    transform: scaleX(1);
   }
   88% {
-    width: 100%;
+    transform: scaleX(1);
     opacity: 0;
   }
   100% {
-    width: 0%;
+    transform: scaleX(0);
     opacity: 0;
   }
 }
@@ -560,8 +567,26 @@ a.hero-status:hover .arrow {
     transform: none;
   }
   .terminal .progress-fill {
-    width: 100%;
+    transform: none;
   }
+}
+
+/* Hovering the terminal holds the current settlement fully drawn: the
+   cascade stops, so no animationiteration fires and HeroTerminal doesn't
+   advance. Leaving re-applies the animation, which replays the cascade
+   from the top. The cursor keeps blinking. */
+@media (hover: hover) {
+  .terminal:hover .tl,
+  .terminal:hover .progress-fill {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Set by HeroTerminal while the panel is scrolled out of view. */
+[data-offscreen] .terminal :is(.tl, .progress-fill, .cursor) {
+  animation-play-state: paused;
 }
 
 /* --- fleet status panel (§05) -----------------------------------------
@@ -760,9 +785,12 @@ a.hero-status:hover .arrow {
 
 .fleet-spark-cell {
   flex: 1;
-  height: max(1px, calc(var(--level, 0) * 100%));
+  height: 100%;
   background: var(--whisper);
-  transition: height 0.6s var(--ease-term);
+  /* 0.08 of the 13px strip is the ~1px hairline a zero hour keeps. */
+  transform: scaleY(max(0.08, var(--level, 0)));
+  transform-origin: bottom;
+  transition: transform 0.6s var(--ease-term);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1090,19 +1118,25 @@ a.hero-status:hover .arrow {
    Phone-only (<md) slide-out drawer. See MobileMenu.tsx for the
    portal/focus model. */
 
+/* A 44px hit area around an 18px glyph. The box overhangs the gutter by
+   11px so the glyph sits where the old 22px button drew it, centred on the
+   nav's ~70px bar. */
 .mm-toggle {
   position: fixed;
-  top: 24px;
-  right: var(--spacing-frame-gutter);
+  top: 13px;
+  right: calc(var(--spacing-frame-gutter) - 11px);
   z-index: 65;
-  width: 22px;
-  height: 22px;
+  width: 44px;
+  height: 44px;
   color: var(--ink);
   background: transparent;
   border: 0;
   padding: 0;
   cursor: pointer;
   transition: color 400ms var(--ease-soft);
+}
+.mm-toggle:focus-visible {
+  outline-offset: -6px;
 }
 .mm-toggle[data-tone="ink"] {
   color: var(--paper);
@@ -1112,8 +1146,8 @@ a.hero-status:hover .arrow {
 .mm-toggle::after {
   content: "";
   position: absolute;
-  left: 2px;
-  right: 2px;
+  left: 13px;
+  right: 13px;
   height: 1px;
   background: currentColor;
   transition:
@@ -1122,18 +1156,18 @@ a.hero-status:hover .arrow {
 }
 
 .mm-toggle::before {
-  top: 8px;
+  top: 19px;
 }
 .mm-toggle::after {
-  top: 14px;
+  top: 25px;
 }
 
 .mm-toggle[data-open="true"]::before {
-  top: 11px;
+  top: 22px;
   transform: rotate(45deg);
 }
 .mm-toggle[data-open="true"]::after {
-  top: 11px;
+  top: 22px;
   transform: rotate(-45deg);
 }
 
@@ -1195,7 +1229,7 @@ a.hero-status:hover .arrow {
 }
 .mm-head-link:hover,
 .mm-head-link:active {
-  color: var(--whisper);
+  color: var(--whisper-deep);
 }
 
 .mm-list {

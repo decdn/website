@@ -20,7 +20,7 @@ export function LegalDoc({ slug }: { slug: LegalSlug }) {
             >
               {doc.title}
             </h1>
-            <p className="meta opacity-50">
+            <p className="meta opacity-60">
               effective{" "}
               <time dateTime={doc.effective}>{doc.effectiveLabel}</time>
             </p>

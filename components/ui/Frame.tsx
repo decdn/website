@@ -10,9 +10,11 @@ type FrameProps = {
   children: ReactNode;
 };
 
+// Paper also swaps brand-coloured text to the deeper whisper, which is what
+// clears AA on white (see --whisper-text in globals.css).
 const TONE_CLASS: Record<Tone, string> = {
   ink: "bg-ink text-paper",
-  paper: "bg-paper text-ink",
+  paper: "bg-paper text-ink [--whisper-text:var(--whisper-deep)]",
 };
 
 export function Frame({ id, tone, className = "", children }: FrameProps) {

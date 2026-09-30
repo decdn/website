@@ -33,7 +33,7 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
       >
         {/* mobile-only meta line */}
         <div
-          className={`${META} flex items-baseline justify-between gap-4 opacity-50 @xl:hidden`}
+          className={`${META} flex items-baseline justify-between gap-4 opacity-60 @xl:hidden`}
         >
           <span>
             {num} <span aria-hidden>·</span>{" "}
@@ -44,7 +44,7 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
 
         {/* # */}
         <span
-          className={`${META} hidden self-start opacity-35 @xl:mt-1.5 @xl:block`}
+          className={`${META} hidden self-start opacity-60 @xl:mt-1.5 @xl:block`}
         >
           {num}
         </span>
@@ -52,7 +52,7 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
         {/* date */}
         <time
           dateTime={post.date}
-          className={`${META} hidden self-start opacity-55 @xl:mt-1.5 @xl:block`}
+          className={`${META} hidden self-start opacity-75 @xl:mt-1.5 @xl:block`}
         >
           {date}
         </time>
@@ -116,7 +116,7 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
         {/* arrow */}
         <span
           aria-hidden
-          className="hidden self-start text-lg leading-none opacity-30 transition-all duration-300 ease-out group-hover:translate-x-1.5 group-hover:text-whisper group-hover:opacity-100 @xl:mt-2 @xl:block @xl:text-right"
+          className="hidden self-start text-lg leading-none opacity-30 transition-[translate,color,opacity] duration-300 ease-out group-hover:translate-x-1.5 group-hover:text-whisper group-hover:opacity-100 @xl:mt-2 @xl:block @xl:text-right"
         >
           →
         </span>
