@@ -25,6 +25,19 @@ describe("PanelFigure", () => {
     expect(attrs(figure).className).toBe("block w-full");
   });
 
+  // HeroTerminal pauses offscreen through an IntersectionObserver on this
+  // ref; typecheck wouldn't notice the prop being accepted but not forwarded.
+  it("forwards the caller's ref to the figure", () => {
+    const ref = { current: null };
+    const withRef = PanelFigure({
+      panelClassName: "fleet",
+      caption: CAPTION,
+      ref,
+      children: null,
+    });
+    expect(attrs(asElement(withRef)).ref).toBe(ref);
+  });
+
   it("puts the caller's panel class on the hidden panel, not the figure", () => {
     const panel = findAll(tree, "div").filter(
       (el) => attrs(el)["aria-hidden"] === true,

@@ -14,9 +14,8 @@ export const BLOG_GRID_COLS =
 
 // Lowercase meta text — same size as `.meta` (the shared `text-micro`
 // token) but without its forced uppercase (`02 · 08 min` reads lowercase)
-// and at a tighter tracking. `.meta` is an unlayered rule we can't
-// override per-call. Bakes in `tabular-nums` so figures align down the
-// column. Shared with the post page.
+// and at a tighter tracking. Bakes in `tabular-nums` so figures align down
+// the column. Shared with the post page.
 export const META =
   "text-micro leading-[1.3] font-medium tracking-[0.16em] tabular-nums";
 
@@ -34,7 +33,7 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
       >
         {/* mobile-only meta line */}
         <div
-          className={`${META} flex items-baseline justify-between gap-4 opacity-50 @xl:hidden`}
+          className={`${META} flex items-baseline justify-between gap-4 opacity-60 @xl:hidden`}
         >
           <span>
             {num} <span aria-hidden>·</span>{" "}
@@ -45,7 +44,7 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
 
         {/* # */}
         <span
-          className={`${META} hidden self-start opacity-35 @xl:mt-1.5 @xl:block`}
+          className={`${META} hidden self-start opacity-60 @xl:mt-1.5 @xl:block`}
         >
           {num}
         </span>
@@ -53,7 +52,7 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
         {/* date */}
         <time
           dateTime={post.date}
-          className={`${META} hidden self-start opacity-55 @xl:mt-1.5 @xl:block`}
+          className={`${META} hidden self-start opacity-75 @xl:mt-1.5 @xl:block`}
         >
           {date}
         </time>
@@ -117,7 +116,7 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
         {/* arrow */}
         <span
           aria-hidden
-          className="hidden self-start text-lg leading-none opacity-30 transition-all duration-300 ease-out group-hover:translate-x-1.5 group-hover:text-whisper group-hover:opacity-100 @xl:mt-2 @xl:block @xl:text-right"
+          className="hidden self-start text-lg leading-none opacity-30 transition-[translate,color,opacity] duration-300 ease-out group-hover:translate-x-1.5 group-hover:text-whisper group-hover:opacity-100 @xl:mt-2 @xl:block @xl:text-right"
         >
           →
         </span>

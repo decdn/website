@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, Ref } from "react";
 
 /**
  * A decorative data panel with a plain-language caption.
@@ -17,21 +17,24 @@ import type { ReactNode } from "react";
  *
  * `className` lands on the `<figure>` rather than the panel; both call sites
  * pass "block w-full", which behaves identically there (preflight zeroes
- * figure margin).
+ * figure margin). `ref` is forwarded to the `<figure>` too (e.g. for an
+ * IntersectionObserver).
  */
 export function PanelFigure({
   panelClassName,
   caption,
   className,
+  ref,
   children,
 }: {
   panelClassName: string;
   caption: string;
   className?: string;
+  ref?: Ref<HTMLElement>;
   children: ReactNode;
 }) {
   return (
-    <figure className={className}>
+    <figure ref={ref} className={className}>
       <div aria-hidden className={panelClassName}>
         {children}
       </div>

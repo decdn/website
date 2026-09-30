@@ -51,6 +51,16 @@ const stats: Stats = {
       amount: "500000",
       epoch: 7,
     },
+    {
+      txHash: "0xdef",
+      logIndex: 0,
+      blockNumber: 90,
+      timestamp: 1_790_000_000 - 24 * 60 * 60,
+      operator: "0x00000000000000000000000000000000000000a4",
+      bytesDelivered: "1000000000",
+      amount: "500000",
+      epoch: 6,
+    },
   ],
   nodes: {
     "0x01": {
@@ -64,6 +74,10 @@ const stats: Stats = {
     "0x03": {
       operator: "0x00000000000000000000000000000000000000a3",
       region: "unknown",
+    },
+    "0x04": {
+      operator: "0x00000000000000000000000000000000000000a4",
+      region: "US",
     },
   },
 };
@@ -108,12 +122,29 @@ describe("FleetPanel", () => {
 
   it("renders one row per registered node and the 24h aggregates", () => {
     const { text } = panel({ status: "ok", stats, fetchedAt });
-    expect(text).toContain("3nodes registered");
+    expect(text).toContain("4nodes registered");
     expect(text).toContain("de0x0000…00a1 · settled 4 min ago");
-    expect(text).toContain("de0x0000…00a2 · idle");
-    expect(text).toContain("n/a0x0000…00a3 · idle");
+    expect(text).toContain("us0x0000…00a4 · settled 24 h ago");
+    expect(text).toContain("de0x0000…00a2n/a0x0000…00a3Σ served");
+    expect(text).not.toContain("idle");
     expect(text).toContain("$1.50");
     expect(text).not.toContain("catching up");
+  });
+
+  // A node pulses while its newest settlement is inside the 24h window, greys
+  // out once it falls outside, and stays an empty ring with none on file.
+  it("pulses recent nodes and greys out stale ones", () => {
+    const { tree } = panel({ status: "ok", stats, fetchedAt });
+    const pulses = findAll(tree, "span")
+      .map((el) => attrs(el).className)
+      .filter((c): c is string => typeof c === "string")
+      .filter((c) => c.startsWith("fleet-pulse"));
+    expect(pulses).toEqual([
+      "fleet-pulse fleet-pulse-active pulse-0",
+      "fleet-pulse fleet-pulse-stale",
+      "fleet-pulse",
+      "fleet-pulse",
+    ]);
   });
 
   it("flags a backfilling index", () => {

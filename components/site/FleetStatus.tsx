@@ -5,6 +5,7 @@ import { PANEL_CAPTIONS } from "@/lib/copy";
 import {
   FLEET_WINDOW_HOURS,
   fleetView,
+  settledInWindow,
   type StatsResult,
   timeAgo,
 } from "@/lib/stats";
@@ -19,7 +20,7 @@ const EMPTY_LABEL = {
 const FLAT = Array<number>(FLEET_WINDOW_HOURS).fill(0);
 
 /** One hourly spark strip: a cell per hour, its height the hour's share of
- *  the window's busiest hour. */
+ *  the window's busiest hour (drawn as a scaleY in globals.css). */
 function Spark({ levels }: { levels: number[] }) {
   return (
     <div className="fleet-spark">
@@ -76,19 +77,21 @@ export function FleetPanel({
                 <span className="fleet-code">{n.region}</span>
                 <span
                   className={
-                    n.lastSettled !== null
-                      ? `fleet-pulse fleet-pulse-active pulse-${i % 6}`
-                      : "fleet-pulse"
+                    result.status !== "ok" || n.lastSettled === null
+                      ? "fleet-pulse"
+                      : settledInWindow(n.lastSettled, result.fetchedAt)
+                        ? `fleet-pulse fleet-pulse-active pulse-${i % 6}`
+                        : "fleet-pulse fleet-pulse-stale"
                   }
                 />
                 <span className="fleet-rate">
                   {n.operator}
-                  <span className="fleet-dim">
-                    {" · "}
-                    {n.lastSettled !== null && result.status === "ok"
-                      ? `settled ${timeAgo(n.lastSettled, result.fetchedAt)}`
-                      : "idle"}
-                  </span>
+                  {n.lastSettled !== null && result.status === "ok" && (
+                    <span className="fleet-dim">
+                      {" · settled "}
+                      {timeAgo(n.lastSettled, result.fetchedAt)}
+                    </span>
+                  )}
                 </span>
               </div>
             ))

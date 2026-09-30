@@ -25,7 +25,7 @@ export function Compare() {
         <h2
           data-reveal
           id="compare-h"
-          className="hug flex flex-col text-h2 leading-[0.92] font-semibold tracking-[-0.04em]"
+          className="hug flex flex-col text-h2 leading-[0.92] font-semibold"
         >
           <span>{COMPARE_HEADLINE[0]}</span>
           <span className="pl-[3vw] opacity-60">{COMPARE_HEADLINE[1]}</span>
@@ -63,21 +63,21 @@ export function Compare() {
             <th
               role="columnheader"
               scope="col"
-              className="meta col-span-2 text-left font-normal opacity-0 @xl:col-span-2"
+              className="meta col-span-2 text-left opacity-0 @xl:col-span-2"
             >
               axis
             </th>
             <th
               role="columnheader"
               scope="col"
-              className="meta text-left font-normal opacity-55 @xl:col-span-5"
+              className="meta text-left opacity-55 @xl:col-span-5"
             >
               traditional cdn
             </th>
             <th
               role="columnheader"
               scope="col"
-              className="meta text-left font-normal @xl:col-span-5"
+              className="meta text-left @xl:col-span-5"
             >
               decdn
               <span className="ml-2 opacity-60">/ decentralized</span>

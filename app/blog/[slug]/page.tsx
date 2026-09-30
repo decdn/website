@@ -111,7 +111,7 @@ export default async function BlogPost({
           <Link
             href="/blog/"
             aria-label="Back to field notes"
-            className="meta inline-flex items-center gap-2 self-start opacity-50 no-underline transition-opacity hover:opacity-100"
+            className="meta inline-flex items-center gap-2 self-start opacity-60 no-underline transition-opacity hover:opacity-100"
           >
             <span aria-hidden>←</span> field notes
           </Link>
@@ -121,7 +121,7 @@ export default async function BlogPost({
               notes" back-link above stays flush-left as nav chrome. */}
           <header className="flex flex-col items-center gap-6 text-center">
             <div
-              className={`${META} flex flex-wrap items-center justify-center gap-x-3 gap-y-1 tabular-nums opacity-50`}
+              className={`${META} flex flex-wrap items-center justify-center gap-x-3 gap-y-1 tabular-nums opacity-60`}
             >
               <span>§ {num}</span>
               <span aria-hidden>·</span>
@@ -168,10 +168,10 @@ export default async function BlogPost({
                   {/* The title holds steady on hover — the glyph slides +
                       greens and the label lifts, mirroring the index row's
                       `→`. */}
-                  <span className="meta opacity-50 transition-opacity duration-300 ease-out group-hover:opacity-90">
+                  <span className="meta opacity-60 transition-opacity duration-300 ease-out group-hover:opacity-90">
                     <span
                       aria-hidden
-                      className="inline-block transition-all duration-300 ease-out group-hover:-translate-x-1 group-hover:text-whisper"
+                      className="inline-block transition-[translate,color] duration-300 ease-out group-hover:-translate-x-1 group-hover:text-whisper"
                     >
                       ←
                     </span>{" "}
@@ -189,11 +189,11 @@ export default async function BlogPost({
                   href={`/blog/${newer.slug}/`}
                   className="group flex flex-col gap-2 no-underline @xl:items-end @xl:text-right"
                 >
-                  <span className="meta opacity-50 transition-opacity duration-300 ease-out group-hover:opacity-90">
+                  <span className="meta opacity-60 transition-opacity duration-300 ease-out group-hover:opacity-90">
                     later{" "}
                     <span
                       aria-hidden
-                      className="inline-block transition-all duration-300 ease-out group-hover:translate-x-1 group-hover:text-whisper"
+                      className="inline-block transition-[translate,color] duration-300 ease-out group-hover:translate-x-1 group-hover:text-whisper"
                     >
                       →
                     </span>

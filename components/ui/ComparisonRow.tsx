@@ -15,21 +15,26 @@ function Rate({ value, strike }: { value: string; strike?: true }) {
     <>
       {figure}
       {unit && (
-        <span className="meta ml-1 align-baseline opacity-70">{unit}</span>
+        // Struck, the unit already inherits the <s>'s 55%. Stacking
+        // opacity-70 on top (≈38% effective, ~3.4:1) would put 11px text
+        // under AA on the ink Compare section.
+        <span
+          className={`meta ml-1 align-baseline ${strike ? "" : "opacity-70"}`}
+        >
+          {unit}
+        </span>
       )}
     </>
   );
 
   if (!strike) {
     return (
-      <div className="hug text-price leading-[0.96] font-semibold tracking-[-0.04em]">
-        {body}
-      </div>
+      <div className="hug text-price leading-[0.96] font-semibold">{body}</div>
     );
   }
 
   return (
-    <div className="hug relative inline-flex text-price leading-[0.96] font-semibold tracking-[-0.04em]">
+    <div className="hug relative inline-flex text-price leading-[0.96] font-semibold">
       {/* <s> is the semantics — it is what marks this as the *legacy* rate in
           extracted text, where the bar below is invisible. Native line-through
           would render hairline-thin and at the text's own 55% opacity, so
@@ -59,18 +64,18 @@ function Rate({ value, strike }: { value: string; strike?: true }) {
  */
 // The two visual variants, side by side rather than as four separate ternaries
 // down the JSX. `axis` spans both columns of the mobile grid and two of the
-// twelve at @xl — one utility, both jobs; `text-left font-normal` stops the
-// UA's bold, centred <th> defaults leaking through the .meta type.
+// twelve at @xl — one utility, both jobs; `text-left` stops the UA's centred
+// <th> default leaking through the .meta type (.meta already sets the weight).
 const EMPHASIS_STYLES = {
   row: "grid grid-cols-2 gap-x-4 gap-y-3 border-t border-current/25 py-5 @xl:grid-cols-12 @xl:gap-8 @xl:py-8",
-  axis: "meta col-span-2 text-left font-normal opacity-60 @xl:col-span-2 @xl:pt-2",
+  axis: "meta col-span-2 text-left opacity-60 @xl:col-span-2 @xl:pt-2",
   traditional: "@xl:col-span-5",
   decdn: "@xl:col-span-5",
 } as const;
 
 const PLAIN_STYLES = {
   row: "grid grid-cols-2 gap-x-4 gap-y-2 border-t border-current/20 py-4 text-body @xl:grid-cols-12 @xl:gap-8 @xl:py-5",
-  axis: "meta col-span-2 text-left font-normal opacity-60 @xl:col-span-2",
+  axis: "meta col-span-2 text-left opacity-60 @xl:col-span-2",
   traditional: "opacity-55 @xl:col-span-5",
   decdn: "font-semibold tracking-[-0.01em] @xl:col-span-5",
 } as const;

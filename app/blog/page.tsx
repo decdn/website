@@ -92,7 +92,7 @@ export default function BlogIndex() {
           <div className="mt-16 flex flex-col">
             <div
               aria-hidden
-              className={`meta hidden pb-3 opacity-50 @xl:grid ${BLOG_GRID_COLS}`}
+              className={`meta hidden pb-3 opacity-60 @xl:grid ${BLOG_GRID_COLS}`}
             >
               <span>#</span>
               <span>date</span>

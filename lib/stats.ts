@@ -227,6 +227,18 @@ export type FleetView = {
   caughtUp: boolean;
 };
 
+/** Whether a node's newest settlement falls inside the fleet window as of
+ *  `now` (ms): its row pulses while this holds and greys out after. */
+export function settledInWindow(
+  lastSettled: number | null,
+  now: number,
+): boolean {
+  return (
+    lastSettled !== null &&
+    now / 1000 - lastSettled < FLEET_WINDOW_HOURS * 60 * 60
+  );
+}
+
 /** Each value as a fraction of the series max; all zeros stay zeros. */
 function levels(values: string[]): number[] {
   const big = values.map((v) => BigInt(v));

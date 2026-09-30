@@ -37,6 +37,7 @@ const EXTERNAL: readonly DrawerLink[] = [
   { kind: "internal", href: links.docs, label: "docs" },
   { kind: "internal", href: links.blog, label: "blog" },
   { kind: "external", href: links.litepaper, label: "litepaper" },
+  { kind: "external", href: links.stats, label: "network stats" },
 ] as const;
 
 const FOCUSABLE_SELECTOR =
@@ -310,7 +311,7 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         </header>
 
         <ul className="mm-list">
-          {SECTIONS.map((s, i) => {
+          {SECTIONS.map((s) => {
             const isActive = activeSection === s.id;
             return (
               <li key={s.id}>
@@ -319,7 +320,6 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
                   className="mm-row"
                   data-active={isActive ? "true" : undefined}
                   aria-current={isActive ? "true" : undefined}
-                  style={{ "--mm-i": i }}
                   onClick={handleClick}
                 >
                   <span className="mm-label">{s.label}</span>
@@ -331,7 +331,7 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         </ul>
 
         <ul className="mm-list mm-list-external">
-          {EXTERNAL.map((e, i) => (
+          {EXTERNAL.map((e) => (
             <li key={e.label}>
               <a
                 href={e.href}
@@ -339,7 +339,6 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
                   ? { target: "_blank", rel: "noopener noreferrer" }
                   : {})}
                 className="mm-row mm-row-external"
-                style={{ "--mm-i": SECTIONS.length + i }}
                 onClick={handleClick}
               >
                 <span className="mm-label">{e.label}</span>

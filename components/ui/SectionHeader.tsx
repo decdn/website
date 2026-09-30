@@ -10,7 +10,7 @@ export function SectionHeader({
   return (
     <header className="flex flex-col gap-3">
       <span aria-hidden className="rule opacity-50" />
-      <div className="flex items-baseline justify-between gap-6 text-[11px] font-medium tracking-[0.22em] uppercase">
+      <div className="flex items-baseline justify-between gap-6 text-micro font-medium tracking-[0.22em] uppercase">
         <span>
           § {index} / {label}
         </span>
