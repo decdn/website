@@ -20,7 +20,7 @@ const EMPTY_LABEL = {
 const FLAT = Array<number>(FLEET_WINDOW_HOURS).fill(0);
 
 /** One hourly spark strip: a cell per hour, its height the hour's share of
- *  the window's busiest hour. */
+ *  the window's busiest hour (drawn as a scaleY in globals.css). */
 function Spark({ levels }: { levels: number[] }) {
   return (
     <div className="fleet-spark">

@@ -12,11 +12,14 @@ export function HeroTerminal({ className }: { className?: string }) {
   const [index, setIndex] = useState(0);
   const figureRef = useRef<HTMLElement>(null);
 
-  // The next session is cued by the cascade itself: each loop of the first
-  // line's 4.5s animation advances one. Anything that stops the CSS stops
-  // the cycle with it — reduced motion (no animation), hovering the panel
-  // (holds the lines, see globals.css), a background tab (animations don't
-  // run) and scrolling out of view (paused below). A timer would keep
+  // The next session is cued by the cascade itself: each time the first
+  // line's 4.5s animation completes an iteration, advance one (the key below
+  // then remounts the body, restarting the cascade). Anything that stops the
+  // CSS stops the rotation with it — reduced motion (no animation), hovering
+  // the panel on a pointer device (holds the lines, see globals.css), a
+  // background tab (no frames render, so no iteration events; at most one
+  // fires on return) and scrolling out of view (the observer below sets
+  // data-offscreen; globals.css pauses the lines). A timer would keep
   // swapping content through all of those.
   const advance = (e: AnimationEvent<HTMLDivElement>) => {
     if (e.target !== e.currentTarget || sessions.length < 2) return;

@@ -10,8 +10,9 @@ type FrameProps = {
   children: ReactNode;
 };
 
-// Paper also swaps brand-coloured text to the deeper whisper, which is what
-// clears AA on white (see --whisper-text in globals.css).
+// Paper also points --whisper-text (read by highlightBrand's span) at
+// --whisper-deep, which clears AA on white. Plain `text-whisper` is not
+// swapped; see globals.css :root.
 const TONE_CLASS: Record<Tone, string> = {
   ink: "bg-ink text-paper",
   paper: "bg-paper text-ink [--whisper-text:var(--whisper-deep)]",

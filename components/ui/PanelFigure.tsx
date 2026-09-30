@@ -17,8 +17,8 @@ import type { ReactNode, Ref } from "react";
  *
  * `className` lands on the `<figure>` rather than the panel; both call sites
  * pass "block w-full", which behaves identically there (preflight zeroes
- * figure margin). `ref` lands there too (HeroTerminal observes it to pause
- * offscreen).
+ * figure margin). `ref` is forwarded to the `<figure>` too (e.g. for an
+ * IntersectionObserver).
  */
 export function PanelFigure({
   panelClassName,
