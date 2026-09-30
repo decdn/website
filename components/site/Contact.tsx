@@ -89,7 +89,12 @@ export function Contact() {
             className="hug flex flex-col text-h2 leading-[0.92] font-semibold"
           >
             <span>{CONTACT_HEADLINE[0]}</span>
-            <span className="pl-[3vw] opacity-60">{CONTACT_HEADLINE[1]}</span>
+            {/* Whisper, not the dimmed second voice Compare uses: the fleet
+                panel beside this greys out offline nodes and pulses live
+                ones green, so a grey "open" line read as offline. */}
+            <span className="pl-[3vw] text-whisper-text">
+              {CONTACT_HEADLINE[1]}
+            </span>
           </h2>
 
           <p
