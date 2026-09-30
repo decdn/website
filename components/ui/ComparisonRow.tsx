@@ -15,7 +15,14 @@ function Rate({ value, strike }: { value: string; strike?: true }) {
     <>
       {figure}
       {unit && (
-        <span className="meta ml-1 align-baseline opacity-70">{unit}</span>
+        // Struck, the unit already inherits the <s>'s 55%. Stacking
+        // opacity-70 on top (≈38% effective, ~3.4:1) would put 11px text
+        // under AA on the ink Compare section.
+        <span
+          className={`meta ml-1 align-baseline ${strike ? "" : "opacity-70"}`}
+        >
+          {unit}
+        </span>
       )}
     </>
   );

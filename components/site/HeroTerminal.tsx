@@ -1,25 +1,40 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { type AnimationEvent, useEffect, useRef, useState } from "react";
 import { PanelFigure } from "@/components/ui/PanelFigure";
 import { PANEL_CAPTIONS } from "@/lib/copy";
 import { STATS_URL, terminalSessions, timeAgo } from "@/lib/stats";
 import { useStats } from "@/lib/use-stats";
 
-const CYCLE_MS = 4500;
-
 export function HeroTerminal({ className }: { className?: string }) {
   const result = useStats();
   const sessions = result.status === "ok" ? terminalSessions(result.stats) : [];
   const [index, setIndex] = useState(0);
+  const figureRef = useRef<HTMLElement>(null);
 
+  // The next session is cued by the cascade itself: each time the first
+  // line's 4.5s animation completes an iteration, advance one (the key below
+  // then remounts the body, restarting the cascade). Anything that stops the
+  // CSS stops the rotation with it — reduced motion (no animation), a
+  // background tab (no frames render, so no iteration events; at most one
+  // fires on return) and scrolling out of view (the observer below sets
+  // data-offscreen; globals.css pauses the lines). A timer would keep
+  // swapping content through all of those.
+  const advance = (e: AnimationEvent<HTMLDivElement>) => {
+    if (e.target !== e.currentTarget || sessions.length < 2) return;
+    setIndex((i) => (i + 1) % sessions.length);
+  };
+
+  // An attribute rather than state: pausing needs no re-render.
   useEffect(() => {
-    if (sessions.length < 2) return;
-    const id = window.setInterval(() => {
-      setIndex((i) => (i + 1) % sessions.length);
-    }, CYCLE_MS);
-    return () => window.clearInterval(id);
-  }, [sessions.length]);
+    const el = figureRef.current;
+    if (el === null) return;
+    const io = new IntersectionObserver(([entry]) => {
+      el.toggleAttribute("data-offscreen", !entry.isIntersecting);
+    });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   const s = sessions.length > 0 ? sessions[index % sessions.length] : null;
   const catchingUp = result.status === "ok" && !result.stats.caughtUp;
@@ -29,6 +44,7 @@ export function HeroTerminal({ className }: { className?: string }) {
     // file; PanelFigure carries the caption that says so, outside the
     // aria-hidden subtree.
     <PanelFigure
+      ref={figureRef}
       className={className}
       panelClassName="terminal"
       caption={PANEL_CAPTIONS.terminal}
@@ -46,7 +62,7 @@ export function HeroTerminal({ className }: { className?: string }) {
             and progress bar restart cleanly when the session flips. */}
       {s ? (
         <div className="terminal-body" key={s.key}>
-          <div className="tl tl-0">
+          <div className="tl tl-0" onAnimationIteration={advance}>
             <span className="prompt">$</span>
             <span> settled </span>
             <span className="hash">tx {s.tx}</span>
