@@ -13,10 +13,14 @@ import {
   SITE_DESCRIPTION,
   stackLine,
   statusBlock,
+  TRY_HEADLINE,
+  TRY_LEAD,
+  TRY_NOTES,
 } from "@/lib/copy";
 import { FAQ_ITEMS } from "@/lib/faq";
 import { getLegalDoc, LEGAL_SLUGS, legalUrl } from "@/lib/legal";
 import { DOCS_ORIGIN, EMAIL, links, SITE_URL } from "@/lib/links";
+import { MODELS, formatSize, pullCommand } from "@/lib/models";
 import { STATS_URL } from "@/lib/stats";
 
 // The whole origin as one plain-text document, so an agent grounding on deCDN
@@ -150,6 +154,13 @@ const compareTable = [
   }),
 ].join("\n");
 
+const tryWindows = `On Windows, in PowerShell: \`${pullCommand("b3:<hash>", "windows", "<namespace>")}\``;
+
+const tryModels = MODELS.map(
+  (m) =>
+    `- ${m.name} (${formatSize(m.bytes)}, ${m.license}): \`${pullCommand(m.hash, "unix", m.namespace)}\``,
+).join("\n");
+
 const methodSteps = METHOD_STEPS.map(
   (step) =>
     `#### ${step.n} ${assertHeadingText(step.word, `method ${step.n} word`)}\n\n${step.body}`,
@@ -219,6 +230,18 @@ ${compareTable}
 Stack: ${stackLine()}
 
 ${methodSteps}
+
+### Try it
+
+${TRY_HEADLINE}
+
+${TRY_LEAD}
+
+${tryModels}
+
+${tryWindows}
+
+${TRY_NOTES.join(" ")}
 
 ### FAQ
 
