@@ -29,10 +29,10 @@
      .faq-card) and their offset shadows. */
   --panel-radius: 6px;
   /* The system monospace stack: --font-mono's tail, and on its own the face
-     for glyphs Geist Mono's Google subsets leave out (the terminal's → and ✓,
-     the drawer's →). Under --font-mono those would land in next/font's
-     size-adjusted Arial fallback instead: proportional, and twice a cell
-     wide. */
+     for glyphs no Geist Mono Google subset carries (the terminal's → and ✓,
+     the fleet panel's Σ, the drawer's →). Under --font-mono, → and Σ would
+     land in next/font's size-adjusted Arial fallback instead: proportional,
+     and → more than twice a cell wide. */
   --font-mono-system:
     ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
     "Courier New", monospace;
@@ -497,8 +497,9 @@ a.hero-status:hover .arrow {
   font-weight: 600;
 }
 
-/* A second face in the line would stretch its box by a pixel; line-height 1
-   keeps these glyphs inside the line box Geist Mono sets. */
+/* → and ✓ aren't in Geist Mono, so they take --font-mono-system. That
+   face's ascent and descent would grow the line box (about 1px at these
+   sizes); line-height 1 keeps the glyphs inside the strut the panel sets. */
 .terminal .arrow,
 .terminal .ok {
   font-family: var(--font-mono-system);
@@ -668,6 +669,12 @@ a.hero-status:hover .arrow {
 
 .fleet-dim {
   opacity: 0.5;
+}
+
+/* Σ isn't in Geist Mono; see --font-mono-system. */
+.fleet-sigma {
+  font-family: var(--font-mono-system);
+  line-height: 1;
 }
 
 .fleet-row {
@@ -1282,6 +1289,7 @@ a.hero-status:hover .arrow {
   transform: translateX(0);
 }
 
+/* → isn't in Geist Mono; see --font-mono-system. */
 .mm-row-external .mm-arrow {
   font-family: var(--font-mono-system);
   font-size: 16px;

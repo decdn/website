@@ -112,13 +112,17 @@ export function FleetPanel({
         <div className="fleet-divider" />
 
         <div className="fleet-agg">
-          <span className="fleet-dim">Σ served · 24h</span>
+          <span className="fleet-dim">
+            <span className="fleet-sigma">Σ</span> served · 24h
+          </span>
           <span className="fleet-value">{view ? view.served24h : "—"}</span>
         </div>
         <Spark levels={view ? view.servedSpark : FLAT} />
 
         <div className="fleet-agg">
-          <span className="fleet-dim">Σ settled · 24h</span>
+          <span className="fleet-dim">
+            <span className="fleet-sigma">Σ</span> settled · 24h
+          </span>
           <span className="fleet-value">{view ? view.settled24h : "—"}</span>
         </div>
         <Spark levels={view ? view.settledSpark : FLAT} />
