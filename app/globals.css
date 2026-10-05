@@ -28,6 +28,14 @@
   /* Corner radius shared by the tool panels (.terminal, .fleet,
      .faq-card) and their offset shadows. */
   --panel-radius: 6px;
+  /* The system monospace stack: --font-mono's tail, and on its own the face
+     for glyphs Geist Mono's Google subsets leave out (the terminal's → and ✓,
+     the drawer's →). Under --font-mono those would land in next/font's
+     size-adjusted Arial fallback instead: proportional, and twice a cell
+     wide. */
+  --font-mono-system:
+    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
+    "Courier New", monospace;
 }
 
 @theme inline {
@@ -39,11 +47,8 @@
   --font-sans:
     var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
     "Helvetica Neue", Arial, sans-serif;
-  /* The terminal and fleet panels, prose code and pre blocks, and the
-     drawer's external-link arrow. */
-  --font-mono:
-    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
-    "Courier New", monospace;
+  /* The terminal and fleet panels, and prose code and pre blocks. */
+  --font-mono: var(--font-geist-mono), var(--font-mono-system);
 
   /* Motion curves. --ease-expo: hover nudges, entrances and the hamburger
      morph (fast out, long settle). --ease-soft: colour/opacity/underline transitions and scroll
@@ -490,6 +495,14 @@ a.hero-status:hover .arrow {
   color: var(--whisper);
   margin-right: 6px;
   font-weight: 600;
+}
+
+/* A second face in the line would stretch its box by a pixel; line-height 1
+   keeps these glyphs inside the line box Geist Mono sets. */
+.terminal .arrow,
+.terminal .ok {
+  font-family: var(--font-mono-system);
+  line-height: 1;
 }
 
 .terminal .hash {
@@ -1270,7 +1283,7 @@ a.hero-status:hover .arrow {
 }
 
 .mm-row-external .mm-arrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono-system);
   font-size: 16px;
   line-height: 1;
   color: color-mix(in srgb, var(--ink) 55%, transparent);
