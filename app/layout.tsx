@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import { links, INDEXABLE, SITE_URL } from "@/lib/links";
 import { SITE_TITLE, SITE_DESCRIPTION } from "@/lib/copy";
 import { organizationNode, serviceNode, websiteNode } from "@/lib/schema";
@@ -12,6 +12,12 @@ import "./globals.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
 });
@@ -63,7 +69,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} h-full motion-safe:scroll-smooth`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full motion-safe:scroll-smooth`}
     >
       <head>
         {[organizationNode, websiteNode, serviceNode].map((schema) => (

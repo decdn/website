@@ -28,6 +28,14 @@
   /* Corner radius shared by the tool panels (.terminal, .fleet,
      .faq-card) and their offset shadows. */
   --panel-radius: 6px;
+  /* The system monospace stack: --font-mono's tail, and on its own the face
+     for glyphs no Geist Mono Google subset carries (the terminal's → and ✓,
+     the fleet panel's Σ, the drawer's →). Under --font-mono, → and Σ would
+     land in next/font's size-adjusted Arial fallback instead: proportional,
+     and → more than twice a cell wide. */
+  --font-mono-system:
+    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
+    "Courier New", monospace;
 }
 
 @theme inline {
@@ -39,11 +47,8 @@
   --font-sans:
     var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
     "Helvetica Neue", Arial, sans-serif;
-  /* The terminal and fleet panels, prose code and pre blocks, and the
-     drawer's external-link arrow. */
-  --font-mono:
-    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Monaco, "Cascadia Mono",
-    "Courier New", monospace;
+  /* The terminal and fleet panels, and prose code and pre blocks. */
+  --font-mono: var(--font-geist-mono), var(--font-mono-system);
 
   /* Motion curves. --ease-expo: hover nudges, entrances and the hamburger
      morph (fast out, long settle). --ease-soft: colour/opacity/underline transitions and scroll
@@ -492,6 +497,15 @@ a.hero-status:hover .arrow {
   font-weight: 600;
 }
 
+/* → and ✓ aren't in Geist Mono, so they take --font-mono-system. That
+   face's ascent and descent would grow the line box (about 1px at these
+   sizes); line-height 1 keeps the glyphs inside the strut the panel sets. */
+.terminal .arrow,
+.terminal .ok {
+  font-family: var(--font-mono-system);
+  line-height: 1;
+}
+
 .terminal .hash {
   opacity: 0.72;
 }
@@ -655,6 +669,12 @@ a.hero-status:hover .arrow {
 
 .fleet-dim {
   opacity: 0.5;
+}
+
+/* Σ isn't in Geist Mono; see --font-mono-system. */
+.fleet-sigma {
+  font-family: var(--font-mono-system);
+  line-height: 1;
 }
 
 .fleet-row {
@@ -1269,8 +1289,9 @@ a.hero-status:hover .arrow {
   transform: translateX(0);
 }
 
+/* → isn't in Geist Mono; see --font-mono-system. */
 .mm-row-external .mm-arrow {
-  font-family: var(--font-mono);
+  font-family: var(--font-mono-system);
   font-size: 16px;
   line-height: 1;
   color: color-mix(in srgb, var(--ink) 55%, transparent);
