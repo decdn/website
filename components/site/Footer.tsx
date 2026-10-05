@@ -11,35 +11,38 @@ export function Footer() {
           <span className="opacity-80 @md:text-center">
             built in rust · probably over-engineered
           </span>
-          {/* Right-aligned vertical list: legal pages stacked above the
-              presskit download. */}
+          {/* Phones: legal pages stacked bottom-left, presskit bottom-right,
+              one rule under both. @md: a right-aligned column with the
+              presskit underlined on its own. */}
           <nav
             aria-label="Legal and resources"
-            className="-mt-1 flex flex-col @md:items-end @md:justify-self-end"
+            className="-mt-1 flex items-end justify-between border-b border-current/80 pb-[2px] @md:flex-col @md:justify-start @md:justify-self-end @md:border-0 @md:pb-0"
           >
-            <Link
-              href={links.privacy}
-              className="py-1 underline-offset-4 opacity-80 transition-opacity hover:underline hover:opacity-100"
-            >
-              privacy
-            </Link>
-            <Link
-              href={links.terms}
-              className="py-1 underline-offset-4 opacity-80 transition-opacity hover:underline hover:opacity-100"
-            >
-              terms
-            </Link>
-            <Link
-              href={links.disclaimer}
-              className="py-1 underline-offset-4 opacity-80 transition-opacity hover:underline hover:opacity-100"
-            >
-              disclaimer
-            </Link>
+            <div className="flex flex-col @md:items-end">
+              <Link
+                href={links.privacy}
+                className="py-1 underline-offset-4 opacity-80 transition-opacity hover:underline hover:opacity-100"
+              >
+                privacy
+              </Link>
+              <Link
+                href={links.terms}
+                className="py-1 underline-offset-4 opacity-80 transition-opacity hover:underline hover:opacity-100"
+              >
+                terms
+              </Link>
+              <Link
+                href={links.disclaimer}
+                className="py-1 underline-offset-4 opacity-80 transition-opacity hover:underline hover:opacity-100"
+              >
+                disclaimer
+              </Link>
+            </div>
             <a
               href={links.presskit}
               download
               aria-label="Download presskit"
-              className="mt-2 inline-flex items-baseline gap-2 border-b border-current pb-[2px] no-underline opacity-80 transition-opacity hover:opacity-100"
+              className="inline-flex items-baseline gap-2 py-1 no-underline opacity-80 transition-opacity hover:opacity-100 @md:mt-2 @md:border-b @md:border-current @md:py-0 @md:pb-[2px]"
             >
               <span>presskit</span>
               <span aria-hidden>↓</span>
