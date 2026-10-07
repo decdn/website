@@ -5,6 +5,7 @@ export const links = {
   github: "https://github.com/decdn",
   x: "https://x.com/decdn_",
   linkedin: "https://www.linkedin.com/company/decdn",
+  discord: "https://discord.gg/vVbNswKVGX",
   litepaper: "/decdn_litepaper.pdf",
   presskit: "/presskit/decdn-presskit.zip",
   docs: "https://docs.decdn.org/overview/introduction",
