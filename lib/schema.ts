@@ -37,7 +37,7 @@ export const organizationNode: Schema<"Organization"> = {
   description:
     "Organization developing deCDN, a decentralized content delivery network with per-megabyte settlement in USDC.",
   email: EMAIL,
-  sameAs: [links.github, links.x, links.linkedin],
+  sameAs: [links.github, links.x, links.linkedin, links.discord],
 };
 
 export const websiteNode: Schema<"WebSite"> = {

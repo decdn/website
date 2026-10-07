@@ -230,7 +230,7 @@ ${CONTACT_HEADLINE.join(" ")}
 
 ${CONTACT_LEAD}
 
-Email ${EMAIL} · GitHub ${links.github} · X ${links.x} · LinkedIn ${links.linkedin}
+Email ${EMAIL} · GitHub ${links.github} · X ${links.x} · LinkedIn ${links.linkedin} · Discord ${links.discord}
 
 ## Field notes
 

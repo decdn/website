@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { blogPostingNode, listPosts, postImageUrl } from "./blog";
 import { FAQ_ITEMS } from "./faq";
 import { getLegalDoc, LEGAL_SLUGS } from "./legal";
-import { EMAIL, ORG_ID, SERVICE_ID, SITE_ID } from "./links";
+import { EMAIL, links, ORG_ID, SERVICE_ID, SITE_ID } from "./links";
 import {
   blogNode,
   breadcrumbNode,
@@ -23,6 +23,15 @@ describe("site-level @ids", () => {
     expect(websiteNode["@id"]).toBe("https://decdn.org/#website");
     expect(serviceNode["@id"]).toBe("https://decdn.org/#service");
     expect(faqPageNode["@id"]).toBe("https://decdn.org/#faq");
+  });
+
+  it("lists every social profile as sameAs", () => {
+    expect(organizationNode.sameAs).toEqual([
+      links.github,
+      links.x,
+      links.linkedin,
+      links.discord,
+    ]);
   });
 
   it("builds each node from the shared constant", () => {
