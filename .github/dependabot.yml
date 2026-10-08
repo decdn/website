@@ -10,8 +10,23 @@ updates:
     schedule:
       interval: "monthly"
     groups:
+      # react and react-dom must ship the exact same version — bumped apart,
+      # the test suite fails React's version-mismatch check.
+      react:
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      next:
+        patterns:
+          - "next"
+          - "eslint-config-next"
+      # Majors stay out of the group so one breaking bump can't hold the
+      # patch/minor batch hostage; they arrive as their own PRs.
       dev-dependencies:
         dependency-type: "development"
+        update-types: ["minor", "patch"]
     ignore:
       # eslint-config-next@16 pulls in eslint-plugin-react@7.37, which only
       # peers eslint ^9 and crashes on v10 (context.getFilename() removed).
