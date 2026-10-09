@@ -8,6 +8,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { links } from "@/lib/links";
 import { HOME_SECTION_ID, scrollToAnchor } from "@/lib/scroll";
 
@@ -51,6 +52,7 @@ const getServerSnapshot = () => false;
 
 export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   // Static export: document.body isn't available during prerender. Gate
   // the portal until after hydration so the first client render matches
   // the prerendered HTML.
@@ -169,12 +171,14 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
       const targetEl = anchor ? document.getElementById(anchor) : null;
 
       if (anchor && !targetEl) {
-        // Drawer opened from a different route (e.g. /blog/*); a full
-        // reload lets the new page resolve the destination deterministically
-        // (Next 16 App Router's soft-nav hash behaviour under output:
-        // "export" isn't documented). Home -> "/", section -> "/#anchor".
-        // Skip the local restore — the page is about to unload.
-        window.location.assign(isHome ? "/" : `/#${anchor}`);
+        // Drawer opened from a different route (e.g. /blog/*), so the
+        // section isn't in this DOM: soft-nav home and let the router
+        // scroll to the hash. Home -> "/", section -> "/#anchor". Runs
+        // after the body unlock above, so the pinned body is released
+        // before the navigation. Historically a full reload, to dodge the
+        // `/#id#id` hash-append bug (#116) that Next 16.3.8 fixed
+        // upstream. Skip the local restore — the destination owns scroll.
+        router.push(isHome ? "/" : `/#${anchor}`);
         return;
       }
 
@@ -217,7 +221,7 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         focusMovedToSectionRef.current = true;
       }
     };
-  }, [open]);
+  }, [open, router]);
 
   // Skipped on the initial render (when `open` is already false) via
   // the wasOpenRef guard.
