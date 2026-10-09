@@ -1,33 +1,86 @@
 import { describe, expect, it } from "vitest";
 import {
   HASH_RE,
-  MODELS,
+  ITEMS,
+  type Item,
+  KINDS,
   detectPlatform,
   formatSize,
+  groupByKind,
   pullCommand,
+  sourceLabel,
 } from "@/lib/models";
 
 describe("launch catalogue", () => {
-  it("offers at least one model", () => {
-    expect(MODELS.length).toBeGreaterThan(0);
+  it("offers at least one item", () => {
+    expect(ITEMS.length).toBeGreaterThan(0);
   });
 
-  it("carries a well-formed b3 hash for every model", () => {
-    for (const model of MODELS) {
-      expect(model.hash, model.id).toMatch(HASH_RE);
+  it("carries a well-formed b3 hash for every item", () => {
+    for (const item of ITEMS) {
+      expect(item.hash, item.id).toMatch(HASH_RE);
     }
   });
 
-  it("publishes every model under a namespace >= 1", () => {
-    for (const model of MODELS) {
-      expect(Number.isInteger(model.namespace), model.id).toBe(true);
-      expect(model.namespace, model.id).toBeGreaterThanOrEqual(1);
+  it("publishes every item under a namespace >= 1", () => {
+    for (const item of ITEMS) {
+      expect(Number.isInteger(item.namespace), item.id).toBe(true);
+      expect(item.namespace, item.id).toBeGreaterThanOrEqual(1);
+    }
+  });
+
+  it("gives every item a known kind and an https source", () => {
+    const kinds: readonly string[] = KINDS.map((k) => k.id);
+    for (const item of ITEMS) {
+      expect(kinds, item.id).toContain(item.kind);
+      expect(new URL(item.source).protocol, item.id).toBe("https:");
     }
   });
 
   it("has unique ids and hashes", () => {
-    expect(new Set(MODELS.map((m) => m.id)).size).toBe(MODELS.length);
-    expect(new Set(MODELS.map((m) => m.hash)).size).toBe(MODELS.length);
+    expect(new Set(ITEMS.map((i) => i.id)).size).toBe(ITEMS.length);
+    expect(new Set(ITEMS.map((i) => i.hash)).size).toBe(ITEMS.length);
+  });
+});
+
+describe("groupByKind", () => {
+  const item = (id: string, kind: Item["kind"]): Item => ({
+    id,
+    kind,
+    name: id,
+    license: "CC-BY-4.0",
+    source: "https://example.org/",
+    hash: `b3:${"ab".repeat(32)}`,
+    namespace: 1,
+    bytes: 1,
+  });
+
+  it("orders groups by KINDS and drops empty kinds", () => {
+    const groups = groupByKind([
+      item("film", "video"),
+      item("llm", "model"),
+      item("distro", "iso"),
+      item("llm-2", "model"),
+    ]);
+    expect(groups.map((g) => g.kind)).toEqual(["model", "iso", "video"]);
+    expect(groups[0]?.items.map((i) => i.id)).toEqual(["llm", "llm-2"]);
+  });
+});
+
+describe("sourceLabel", () => {
+  it("shows the repo path for Hugging Face", () => {
+    expect(
+      sourceLabel("https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3"),
+    ).toBe("mistralai/Mistral-7B-Instruct-v0.3");
+  });
+
+  it("shows host and path elsewhere, without a trailing slash", () => {
+    expect(sourceLabel("https://www.openslr.org/resources/12/")).toBe(
+      "www.openslr.org/resources/12",
+    );
+    expect(sourceLabel("https://releases.ubuntu.com/")).toBe(
+      "releases.ubuntu.com",
+    );
   });
 });
 

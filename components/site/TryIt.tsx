@@ -4,13 +4,26 @@ import { useRef, useState, useSyncExternalStore } from "react";
 import { Figure } from "@/components/ui/Figure";
 import { TRY_NOTES } from "@/lib/copy";
 import {
-  MODELS,
+  ITEMS,
   PLATFORMS,
+  type Item,
   type Platform,
   detectPlatform,
   formatSize,
+  groupByKind,
   pullCommand,
+  sourceLabel,
 } from "@/lib/models";
+
+const GROUPS = groupByKind(ITEMS);
+
+function itemOptions(items: readonly Item[]) {
+  return items.map((item) => (
+    <option key={item.id} value={item.id}>
+      {item.name}
+    </option>
+  ));
+}
 
 const COPIED_MS = 2000;
 
@@ -30,12 +43,12 @@ function clientPlatform(): Platform {
 const serverPlatform = (): Platform => "unix";
 
 /**
- * The interactive half of the #try section: pick a seeded model, copy the one
+ * The interactive half of the #try section: pick a seeded item, copy the one
  * line that pulls it. Unlike HeroTerminal, this panel is real and not
  * aria-hidden: the command is the product's actual install-and-download line.
  */
 export function TryIt() {
-  const [id, setId] = useState(MODELS[0]?.id ?? "");
+  const [id, setId] = useState(ITEMS[0]?.id ?? "");
   const detected = useSyncExternalStore(
     subscribeNever,
     clientPlatform,
@@ -46,10 +59,10 @@ export function TryIt() {
   const [copied, setCopied] = useState(false);
   const codeRef = useRef<HTMLElement>(null);
 
-  const model = MODELS.find((m) => m.id === id) ?? MODELS[0];
+  const item = ITEMS.find((i) => i.id === id) ?? ITEMS[0];
   const shell = PLATFORMS.find((p) => p.id === platform) ?? PLATFORMS[0];
-  if (!model || !shell) return null;
-  const command = pullCommand(model.hash, platform, model.namespace);
+  if (!item || !shell) return null;
+  const command = pullCommand(item.hash, platform, item.namespace);
 
   function flashCopied() {
     setCopied(true);
@@ -86,21 +99,24 @@ export function TryIt() {
     >
       <div className="flex flex-col gap-8">
         <label className="flex flex-col gap-3">
-          <span className="meta opacity-60">model</span>
+          <span className="meta opacity-60">pull</span>
           <span className="relative">
             <select
-              value={model.id}
+              value={item.id}
               onChange={(e) => {
                 setId(e.target.value);
                 setCopied(false);
               }}
               className="w-full cursor-pointer appearance-none truncate border-b border-current bg-transparent pr-8 pb-2 text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold tracking-[-0.02em] focus-visible:outline-2 focus-visible:outline-offset-4"
             >
-              {MODELS.map((m) => (
-                <option key={m.id} value={m.id}>
-                  {m.name}
-                </option>
-              ))}
+              {/* One kind needs no group headings; several get one each. */}
+              {GROUPS.length > 1
+                ? GROUPS.map((group) => (
+                    <optgroup key={group.kind} label={group.label}>
+                      {itemOptions(group.items)}
+                    </optgroup>
+                  ))
+                : itemOptions(ITEMS)}
             </select>
             <span
               aria-hidden
@@ -112,17 +128,17 @@ export function TryIt() {
         </label>
 
         <div className="grid grid-cols-2 gap-y-4">
-          <Figure label="size" value={formatSize(model.bytes)} />
-          <Figure label="license" value={model.license} />
+          <Figure label="size" value={formatSize(item.bytes)} />
+          <Figure label="license" value={item.license} />
           <div className="col-span-2 flex flex-col gap-1">
             <span className="meta opacity-60">source</span>
             <a
               className="self-start text-body font-medium tracking-[-0.01em] break-all underline decoration-1 underline-offset-4 hover:decoration-whisper"
-              href={`https://huggingface.co/${model.repo}`}
+              href={item.source}
               target="_blank"
               rel="noopener noreferrer"
             >
-              {model.repo}
+              {sourceLabel(item.source)}
             </a>
           </div>
         </div>
