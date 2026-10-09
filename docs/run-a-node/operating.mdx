@@ -1,0 +1,73 @@
+---
+title: Operating a node
+description: Day-to-day operation of a deCDN node: status commands, cache sizing and hit rate, pull-through, disk, keystore, and changing region or capacity.
+---
+
+## Status commands
+
+`decdn node` talks to the running daemon over its localhost admin port.
+
+| Command                   | Shows                                                          |
+| ------------------------- | -------------------------------------------------------------- |
+| `decdn node health`       | Node identity and uptime                                       |
+| `decdn node status`       | DHT participation                                              |
+| `decdn node top`          | Live metrics                                                   |
+| `decdn node lanes`        | USDC accrued per payment lane, against the redeem threshold    |
+| `decdn node pools`        | The node's buyer pool for cache-miss pulls                     |
+| `decdn node slashes`      | Any slash against this operator, with its appeal deadline      |
+| `decdn node doctor`       | Readiness checks across config, chain and network              |
+| `decdn node reload`       | Re-reads the hot-reloadable config sections (same as `SIGHUP`) |
+| `decdn node drain --wait` | Graceful shutdown that finishes in-flight deliveries           |
+
+The daemon also exposes Prometheus metrics at `http://127.0.0.1:9090/metrics`.
+
+## Cache hit rate
+
+The hit rate is the share of requests your node serves from its own disk. Read it from the serving-path counters:
+
+```text
+hit rate = decdn_serve_cache_hit_total
+         / (decdn_serve_cache_hit_total + decdn_serve_cache_partial_hit_total + decdn_serve_cache_miss_total)
+```
+
+Use the `decdn_serve_cache_*` counters. The `decdn_cache_hits_total` family counts a different path and reads 0% on a serving node.
+
+**If the hit rate is low, increase the cache first.** Raise `cache.cache_size_mb` toward the free disk you can spare and restart the node. `decdn_cache_bytes` against `decdn_cache_size_limit_bytes` shows how full the cache is, and a high `decdn_cache_evictions_total` means the cache is too small for the demand it sees. Every miss you avoid is a paid upstream pull you do not make.
+
+## Pull-through
+
+With pull-through off, a cache miss is served as not-found and the client goes elsewhere. With pull-through on, the node buys the missing blob from another node, streams it to the client and caches it. This is what lets a node fill its cache from demand and take part in [regional warming](/run-a-node/traffic#regional-warming).
+
+```toml ~/.decdn/node.toml
+[cache]
+node_to_node_pull_through_enabled = true
+```
+
+Pull-through spends USDC from the node's buyer pool, 10 USDC by default. Fund the operator address with testnet USDC from [Circle's faucet](https://developers.circle.com/stablecoins/docs/usdc-on-testnet). The node opens the pool on its own. If pulls never succeed, check `decdn_buyer_wallet_usdc` and `decdn node pools`. To cap what the node pays per MB upstream, set `cache.max_rate_per_mb`.
+
+## Disk
+
+The cache limit is an upper bound. The node evicts least-recently-used blobs above 90% of the limit, and always keeps `cache.disk_headroom_mb` (8 GB by default) free on the volume. If the disk fills anyway, **lower** `cache_size_mb` or add disk. Never delete or truncate blob files by hand: use `decdn node evict <hash>` to remove one blob.
+
+## Keystore password
+
+The daemon reads the keystore password from `DECDN_KEYSTORE_PASSWORD`, then from the file named by `--keystore-password-file`, then from an interactive prompt. A headless host needs one of the first two. Keep the password file at mode `0600`, owned by the node's user.
+
+## Config changes
+
+`decdn node reload` or `SIGHUP` applies the log level, pinned hashes, and the `[security]`, `[content]` and `[load_shed]` sections without a restart. Every other change, including `rate_per_mb` and `cache_size_mb`, needs a restart. A restart drains in-flight deliveries first.
+
+## Changing capacity, region or address
+
+| Change                      | Command                                           |
+| --------------------------- | ------------------------------------------------- |
+| Raise declared capacity     | `decdn node bond --mbps <N>`                      |
+| Lower declared capacity     | `decdn node unbond --to-mbps <N>`                 |
+| New public IP or port       | `decdn node update-multiaddrs --multiaddr <addr>` |
+| Move to a different country | `decdn node update-region --region <CC>`          |
+
+A region change is allowed once per 7-day stability window, which starts at registration. During the window, the node stays bound by the previous region's blacklist entries.
+
+## Upgrading
+
+Install the latest release over the old binaries, then restart the daemon. The restart drains in-flight work, so upgrades do not cut paid deliveries short. The full operator runbook, covering RPC outages, keystore problems and blacklist incidents, is in the [decdn repo](https://github.com/decdn/decdn/blob/main/docs/runbook.md).

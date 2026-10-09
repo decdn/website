@@ -1,0 +1,139 @@
+---
+title: Operator FAQ
+description: Short answers to the questions prospective node operators ask most, each linking to the page with the details.
+---
+
+## Getting started
+
+<AccordionGroup>
+  <Accordion title="Is onboarding open?">
+    Yes. The public testnet on Arbitrum Sepolia is permissionless: anyone can
+    bond, register and serve. See [Run a node](/run-a-node/overview).
+  </Accordion>
+  <Accordion title="What is the setup procedure?">
+    Install `decdn` and `decdn-node`, run `decdn config init`, then `decdn setup
+    --dry-run` to preview and `decdn setup` to bond and register, then start
+    `decdn-node run`. See [Quickstart](/run-a-node/quickstart).
+  </Accordion>
+  <Accordion title="Which OS should I use? Is there a Docker image?">
+    Linux under systemd is what we run ourselves. A Docker image is published at
+    `ghcr.io/decdn/decdn-node`. macOS and Windows builds work for testing. See
+    [Requirements](/run-a-node/requirements#operating-system).
+  </Accordion>
+  <Accordion title="How do I get testnet tokens?">
+    We send testnet TOKEN directly. Send your EVM operator address through any
+    channel on our [contact section](https://decdn.org/#contact). Gas is
+    Arbitrum Sepolia ETH from any faucet; USDC comes from Circle's faucet. See
+    [Get testnet funds](/run-a-node/testnet-funds).
+  </Accordion>
+  <Accordion title="Where do I ask questions?">
+    The [Discord](https://discord.gg/vVbNswKVGX),
+    [info@decdn.org](mailto:info@decdn.org), or [GitHub
+    issues](https://github.com/decdn/decdn/issues).
+  </Accordion>
+</AccordionGroup>
+
+## Hardware and network
+
+<AccordionGroup>
+  <Accordion title="Which ports do I open?">
+    UDP 4433, for QUIC. Keep metrics (9090) and admin (9191) on localhost. See
+    [Requirements](/run-a-node/requirements#network).
+  </Accordion>
+  <Accordion title="Do I need a static IP?">
+    No. The transport hole-punches through NAT and falls back to a relay. A
+    stable public address with UDP 4433 forwarded gives the fastest direct path.
+    When your address changes, the node updates its registration.
+  </Accordion>
+  <Accordion title="What hardware do I need?">
+    There is no protocol minimum. The recommended start is 4 vCPU, 8 GB RAM, an
+    SSD and 5 TB/month of egress. See
+    [Requirements](/run-a-node/requirements#hardware).
+  </Accordion>
+  <Accordion title="How much storage should I give it?">
+    Your choice, and larger is better for hit rate. Our test nodes run 250 GB to
+    1 TB. If your hit rate is low on testnet, increase the cache first. See
+    [Disk and cache size](/run-a-node/requirements#disk-and-cache-size).
+  </Accordion>
+  <Accordion title="Can I run a node at home?">
+    Yes. Residential and homelab nodes are fully supported, and an unmetered
+    home connection is the cheapest way to run one.
+  </Accordion>
+</AccordionGroup>
+
+## Bond and earnings
+
+<AccordionGroup>
+  <Accordion title="How much do I need to bond?">
+    The bond scales with the capacity you declare. On testnet it is 50,000 TOKEN
+    for any declaration up to about 1 Gbps. `decdn setup --dry-run` prints the
+    exact figure. See [Bond and
+    earnings](/run-a-node/bond-and-earnings#the-capacity-bond).
+  </Accordion>
+  <Accordion title="What can get my bond slashed?">
+    Only rate manipulation and serving blacklisted content after its compliance
+    window. Bad delivery is unpaid, not slashed. See [Compliance and
+    risk](/run-a-node/compliance#what-can-cost-you-bond).
+  </Accordion>
+  <Accordion title="How long does unbonding take?">
+    14 days, during which the bond stays slashable. See
+    [Unbonding](/run-a-node/bond-and-earnings#unbonding).
+  </Accordion>
+  <Accordion title="How am I paid?">
+    Per byte delivered, in USDC. The node redeems its vouchers on-chain
+    automatically and the operator share goes straight to your address. See [How
+    you earn](/run-a-node/bond-and-earnings#how-you-earn).
+  </Accordion>
+  <Accordion title="What is the price, and what share do operators get?">
+    The target client price is about $0.01/GB, and each operator sets its own
+    per-MB rate. Mainnet launches at 90% operator, 0% buyback, 10% treasury, and
+    moves to 60/30/10 once governance confirms the activation criteria. The
+    testnet already runs 60/30/10. See [Operator
+    share](/run-a-node/bond-and-earnings#operator-share).
+  </Accordion>
+</AccordionGroup>
+
+## Traffic
+
+<AccordionGroup>
+  <Accordion title="Will my node receive test traffic?">
+    Yes, from real clients. There is no synthetic traffic, so volume reflects
+    demand near you. See [What to expect on
+    testnet](/run-a-node/traffic#what-to-expect-on-testnet).
+  </Accordion>
+  <Accordion title="How does the network choose my node?">
+    Clients pick the responsive node with the lowest round-trip time. Nodes
+    filling a cache miss weigh price, latency and reputation. See [How a request
+    reaches you](/run-a-node/traffic#how-a-request-reaches-you).
+  </Accordion>
+  <Accordion title="Does being the first node in a region help?">
+    Yes. Clients in your region reach you fastest, and regional warming routes
+    their requests through your node so it caches what they pull. Turn on
+    pull-through to take part. See [Regional
+    warming](/run-a-node/traffic#regional-warming).
+  </Accordion>
+</AccordionGroup>
+
+## Compliance
+
+<AccordionGroup>
+  <Accordion title="Am I responsible for the content my node serves?">
+    You follow the law where you operate and accept the operator terms at registration. The node follows the on-chain blacklist on its own, and you can refuse any content locally. See [Compliance and risk](/run-a-node/compliance).
+  </Accordion>
+  <Accordion title="Can I stop serving something immediately?">
+    Yes. Evict it with `decdn node evict <hash>`, deny it in the `[content]` config section, or stop the daemon. See [Refusing content yourself](/run-a-node/compliance#refusing-content-yourself).
+  </Accordion>
+</AccordionGroup>
+
+## Mainnet
+
+<AccordionGroup>
+  <Accordion title="Will requirements change for mainnet?">
+    No hardware minimum is planned. The bond keeps scaling with declared
+    capacity, and selection keeps rewarding fast, reliable nodes.
+  </Accordion>
+  <Accordion title="When is mainnet?">
+    The target is Q1 2027. The date is fixed once the testnet has earned it. See
+    [the road to testnet](https://decdn.org/blog/road-to-testnet/).
+  </Accordion>
+</AccordionGroup>

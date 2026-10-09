@@ -1,0 +1,43 @@
+---
+title: Get testnet funds
+description: How to get Arbitrum Sepolia ETH for gas, TOKEN for the capacity bond, and USDC for cache-miss pulls on the deCDN testnet.
+---
+
+A testnet node needs up to three assets on Arbitrum Sepolia, all held by the node's operator address.
+
+| Asset     | Used for                                | How to get it                                                                             |
+| --------- | --------------------------------------- | ----------------------------------------------------------------------------------------- |
+| **TOKEN** | The capacity bond                       | The deCDN team sends it. See below.                                                       |
+| **ETH**   | Gas for bonding, registering, redeeming | Any Arbitrum Sepolia faucet                                                               |
+| **USDC**  | Paying peers for cache-miss pulls       | [Circle's testnet faucet](https://developers.circle.com/stablecoins/docs/usdc-on-testnet) |
+
+## Your operator address
+
+Your operator address is the Ethereum address of the node's keystore. Create the keys, then print the address:
+
+```bash
+decdn key-gen     # writes the node key and an encrypted Ethereum keystore to ~/.decdn
+decdn whoami      # prints the node ID and the operator address
+```
+
+`key-gen` asks for a keystore password. Keep it: the daemon needs it to start. `decdn setup` reuses these keys.
+
+## TOKEN
+
+The team sends testnet TOKEN to operators directly. Send your **EVM operator address** through any channel on the [contact section](https://decdn.org/#contact):
+
+- email [info@decdn.org](mailto:info@decdn.org)
+- the [Discord](https://discord.gg/vVbNswKVGX)
+- [X](https://x.com/decdn_) or [GitHub](https://github.com/decdn/decdn/issues)
+
+Say which capacity you plan to declare. The testnet bond is **50,000 TOKEN** for any capacity up to about 1 Gbps. See [Bond and earnings](/run-a-node/bond-and-earnings).
+
+## ETH for gas
+
+Bonding and registering together take about 600,000 gas, and `decdn setup` checks the balance before it submits anything. After that, the node spends gas to redeem its earnings on-chain. A small amount of Arbitrum Sepolia ETH covers a long time.
+
+## USDC for cache-miss pulls
+
+USDC is optional at first. A node only spends it when **node-to-node pull-through** is on. With pull-through on, the node fills a cache miss by buying the blob from another node, then serves and caches it. The node keeps a buyer pool of 10 USDC for this by default (`blockchain.buyer_working_deposit_micro_usdc`).
+
+Pull-through is off by default. Turn it on once the node is running, so that your node can fill misses and take part in [regional warming](/run-a-node/traffic#regional-warming). See [Operating a node](/run-a-node/operating#pull-through).

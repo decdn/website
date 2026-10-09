@@ -1,0 +1,55 @@
+---
+title: Compliance and risk
+description: The operator terms, how the node follows the on-chain blacklist, regional obligations, your own refusal controls, and what can cost you bond.
+---
+
+Your node serves content from your own IP address. The node software is built to keep you compliant by default: it follows the on-chain blacklist automatically, scopes regional rules to the region you declare, and gives you local controls to refuse anything you choose. Your own obligations come from the law where you operate, and they apply on top of everything the software does.
+
+## The operator terms
+
+You accept the [operator terms](https://github.com/decdn/decdn/blob/main/crates/cli/TERMS.md) at registration. `decdn setup` shows them, and your acceptance is recorded on-chain as a hash of the exact text. In short, you agree to:
+
+- **follow the law that applies to you**, including any duty to report illegal content such as CSAM in your jurisdiction;
+- **declare your region truthfully** and accept that region's takedown scope;
+- **act on actual knowledge**: if you learn that specific content your node serves is illegal, stop serving it promptly and report it where your law requires.
+
+The terms do not, by themselves, require any particular automated scanning. What screening you must do, if any, is set by your law and your region. Read the full text before you register; it is short.
+
+## The blacklist
+
+The `ContentBlacklist` contract lists hashes no node may serve, and operators that sourced blacklisted content. Your node follows it on its own: it tails new entries live and re-reads the full list every 10 minutes, and it stops serving when its view of the chain is more than 30 minutes stale.
+
+| Entry type | Who adds it                   | Applies to                     | Compliance window |
+| ---------- | ----------------------------- | ------------------------------ | ----------------- |
+| Global     | Governance                    | Every node                     | 24 h              |
+| Regional   | That region's governance body | Nodes that declared the region | 24 h              |
+| Emergency  | 3-of-5 emergency multisig     | Every node                     | 2 h               |
+
+The window is the time between an entry taking effect and it becoming slashable, so normal polling lag never costs you bond. A node running current software stays compliant without any action from you. See [Content takedown](/protocol/takedown).
+
+If you find a blacklisted hash in your cache, remove it at once with `decdn node evict <hash>`.
+
+## Your region
+
+The region you declare at registration decides which regional entries and which regional body apply to your node. Regional rules follow the region you declare, never the region of the client. Keep it truthful: a claim that measured latency contradicts costs reputation, and a region change only takes effect after a 7-day stability window, during which the old region's entries still bind you.
+
+## Refusing content yourself
+
+You can refuse any content locally, beyond what the blacklist requires. List hashes or origin operators in the `[content]` section of `node.toml`:
+
+```toml ~/.decdn/node.toml
+[content]
+denied_hashes = ["<blake3-hash>"]
+denied_origins = ["0x<operator-address>"]
+```
+
+`decdn node reload` applies the change without a restart. To stop serving entirely, stop the daemon: `decdn node drain --wait`, or `systemctl stop decdn-node`.
+
+## What can cost you bond
+
+Only two offenses are slashable:
+
+- **Rate manipulation.** Charging more than the rate your node signed in a probe response.
+- **Blacklist violation.** Serving a blacklisted hash after its compliance window.
+
+The penalty is 5% of bond for the first offense, 15% for the second and 50% for the third and later, counted over the operator's lifetime. Unmodified node software commits neither offense. A slashed operator can appeal within 30 days with `decdn appeal slash`. Corrupt delivery, refusing a request, downtime and slow service are not slashable: they cost you payment and reputation, not bond. See [Slashing](/protocol/slashing).

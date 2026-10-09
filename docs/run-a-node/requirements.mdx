@@ -1,0 +1,48 @@
+---
+title: Requirements
+description: Hardware, disk, network and operating-system requirements for a deCDN node, including the one UDP port to open.
+---
+
+## Hardware
+
+The protocol enforces no hardware minimum. The recommended starting spec from the [onboarding design](https://github.com/decdn/decdn/blob/main/adr/019-node-onboarding.md) is:
+
+| Resource | Recommended         |
+| -------- | ------------------- |
+| CPU      | 4 vCPU              |
+| Memory   | 8 GB RAM            |
+| Disk     | SSD, sized to cache |
+| Egress   | 5 TB/month          |
+
+Content is verified with BLAKE3 as it streams, which runs at several GB/s on modern CPUs, so a recent desktop CPU is not the bottleneck. The node also needs a clock synchronized with NTP: `decdn setup` refuses to bond when the local clock is more than 10 seconds off UTC.
+
+## Disk and cache size
+
+Cache size is your choice, and it is the setting that most affects how often your node can serve a request from local disk. A larger cache holds more of the catalogue, so more requests are cache hits. Testnet content is mostly model weights, from a few GB to more than 40 GB per model.
+
+Our own test nodes run caches of **250 GB to 1 TB**. The node's default cache limit is 100 GB (`cache.cache_size_mb = 102400`), so raise it to match the disk you give the node. The node keeps 8 GB of the volume free at all times (`cache.disk_headroom_mb`).
+
+The trade-off is economic. A cache miss either goes unserved or is filled by a paid pull from another node, and that pull costs USDC. A larger cache means fewer paid pulls. If your hit rate on testnet is low, increase the cache first. See [Operating a node](/run-a-node/operating#cache-hit-rate).
+
+## Network
+
+| Port     | Protocol | Exposure                  | Purpose                             |
+| -------- | -------- | ------------------------- | ----------------------------------- |
+| **4433** | UDP      | Public (IPv4 and IPv6)    | QUIC: probes, delivery, DHT         |
+| 9090     | TCP      | Localhost by default      | Prometheus `/metrics`               |
+| 9191     | TCP      | Localhost only (enforced) | Admin JSON-RPC used by `decdn node` |
+
+Open **UDP 4433** to the internet, and forward it on your router if you are behind NAT. Keep metrics and admin on localhost. The node makes outbound connections to the Arbitrum RPC endpoint and to relays.
+
+**A static IP is not required.** The transport hole-punches through NAT, falls back to a content-blind relay when a direct path fails, and updates the node's registered addresses when its public address changes. A direct UDP path is faster than a relayed one, so a stable public IPv4 or IPv6 address with 4433 forwarded gives the best results. See [NAT traversal](/protocol/network#nat-traversal).
+
+## Operating system
+
+| Platform                    | Status                                         |
+| --------------------------- | ---------------------------------------------- |
+| Linux (x86_64, aarch64)     | Recommended. Our own fleet runs under systemd. |
+| Docker (linux/amd64, arm64) | Supported. The repo ships a `Dockerfile`.      |
+| macOS (x86_64, aarch64)     | Builds and runs, suited to testing.            |
+| Windows (x86_64)            | Builds and runs, suited to testing.            |
+
+For a node that runs 24/7, use Linux with systemd or Docker. See [Quickstart](/run-a-node/quickstart).

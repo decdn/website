@@ -1,0 +1,41 @@
+---
+title: Run a node
+description: What a deCDN node does, who runs one, and what to expect from the public testnet on Arbitrum Sepolia.
+---
+
+A deCDN node caches content-addressed blobs and serves them to clients over QUIC. Clients pay the node per megabyte in USDC, and the node bonds TOKEN in proportion to the bandwidth it declares. Anyone can run one: onboarding is permissionless, and a single `decdn setup` command bonds and registers the node on-chain.
+
+## The public testnet
+
+The testnet runs on **Arbitrum Sepolia** (chain ID 421614). It carries real client demand, mostly AI model weights pulled through the walletless on-ramp. There is no synthetic traffic, so the volume a node sees reflects real demand near it.
+
+Bonding uses testnet TOKEN, which the team sends to operators on request. See [Get testnet funds](/run-a-node/testnet-funds).
+
+## Who runs a node
+
+- **Home and homelab operators.** A residential connection with unmetered bandwidth is the cheapest way to run a node, and it is fully supported. A static IP is not required.
+- **Server and datacenter operators.** The same binary runs on a VPS or bare metal. Bond size scales with the capacity you declare, so a larger link bonds more.
+- **Operators in under-served regions.** Clients pick the fastest node they can reach, so a node in a region with few holders gets local demand that distant nodes serve slowly.
+
+## The path
+
+<Steps>
+  <Step title="Check the requirements">
+    Hardware, disk, the one UDP port to open, and how NAT is handled. See
+    [Requirements](/run-a-node/requirements).
+  </Step>
+  <Step title="Get testnet funds">
+    Arbitrum Sepolia ETH for gas, TOKEN for the bond, and optionally USDC for
+    cache-miss pulls. See [Get testnet funds](/run-a-node/testnet-funds).
+  </Step>
+  <Step title="Install and register">
+    Install the binaries, write the config, preview with `--dry-run`, then bond
+    and register. See [Quickstart](/run-a-node/quickstart).
+  </Step>
+  <Step title="Operate">
+    Size the cache, watch the hit rate, and keep the node healthy. See
+    [Operating a node](/run-a-node/operating).
+  </Step>
+</Steps>
+
+Before you start, read [Compliance and risk](/run-a-node/compliance). Your node serves content from your own IP address, and you accept the operator terms at registration.

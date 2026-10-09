@@ -1,0 +1,29 @@
+---
+title: How you get traffic
+description: How clients and nodes find and select your node, how a first node in a new region warms its cache, and what volume to expect on testnet.
+---
+
+## How a request reaches you
+
+1. **Discovery.** Every node publishes a DHT record for each blob it caches. A client or node looking for a hash finds the holders through the DHT. The bonded set itself comes from the on-chain registry.
+2. **Probing.** The requester probes candidates in parallel. Each probe response confirms availability, measures round-trip time and carries your signed per-MB rate.
+3. **Selection.**
+   - **Clients** rank candidates by measured round-trip time only. The closest responsive node wins, as long as its rate is under the client's ceiling.
+   - **Nodes** filling a cache miss rank holders by a combined score of price, latency and their local reputation of each holder. They collect probe answers for up to 500 ms, and stop early once enough viable holders answer.
+
+The region you declare does not partition the network. A client uses regions only to shortlist which nodes to probe, then picks on measured latency. A region claim that latency contradicts costs the node reputation. See [Network topology](/protocol/network).
+
+## Regional warming
+
+A first node in a new region starts with an empty cache. Regional proxy warming fills it from real demand:
+
+1. A client finds that every holder of a blob is far away, and that a bonded node it can reach is much closer.
+2. The client sends its paid request through that nearby node, even though the node does not hold the blob.
+3. The nearby node pulls the blob from a distant holder, streams it to the client as it arrives, and keeps the copy.
+4. It announces the copy in the DHT. Later requests from the region go to it directly, because it answers fastest.
+
+Warming needs a cache-only node with [pull-through](/run-a-node/operating#pull-through) turned on and a funded buyer pool, because the node pays the distant holder for the pull. It is on by default in clients. See [ADR 037](https://github.com/decdn/decdn/blob/main/adr/037-regional-proxy-warming.md).
+
+## What to expect on testnet
+
+Testnet traffic is real client demand, mostly model downloads, and today most clients are in North America and Europe. There is no synthetic traffic. A node in a region with few clients sees modest volume at first, and that volume is an honest measure of local demand. Volume grows with the clients near you, and a node that is the first in its region is the one that warms up when they arrive.
