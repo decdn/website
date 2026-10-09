@@ -53,10 +53,11 @@ export function Chrome() {
   // when the URL already carries it (Next 16 App Router, output: "export"
   // + trailingSlash), growing `/#method#method…` across click → reload →
   // click cycles. Intercept same-page anchors and resolve locally. Off
-  // this route the section isn't in the DOM (e.g. /blog/*); force a full
-  // reload so the destination resolves the hash deterministically — the
-  // soft-nav hash codepath is the unreliable one. Modified clicks (new
-  // tab, middle-click) fall through to the native <Link>.
+  // this route the section isn't in the DOM (e.g. /blog/*), so the native
+  // <Link> soft-navs home and scrolls to the hash itself — the append bug
+  // no longer reproduces on Next 16.3.8, so no full reload is needed.
+  // Modified clicks (new tab, middle-click) fall through to the native
+  // <Link>.
   const handleNavClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (!shouldInterceptNavClick(e)) return;
@@ -86,12 +87,11 @@ export function Chrome() {
       }
 
       const { id } = target;
-      e.preventDefault();
+      // Off this route: return without preventDefault so the native
+      // <Link href="/#id"> soft-navs home, as the top branch does above.
       const el = document.getElementById(id);
-      if (el === null) {
-        window.location.assign(`/#${id}`);
-        return;
-      }
+      if (el === null) return;
+      e.preventDefault();
       // Write the exact single hash so it can never accumulate;
       // replaceState keeps a same-hash click a URL no-op.
       history.replaceState(null, "", `#${id}`);
