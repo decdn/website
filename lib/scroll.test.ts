@@ -1,9 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   HOME_SECTION_ID,
+  focusSection,
   homeNavTarget,
   parseScrollMarginTop,
+  queueSectionFocus,
   shouldInterceptNavClick,
+  takeSectionFocus,
 } from "./scroll";
 
 describe("homeNavTarget", () => {
@@ -132,5 +135,91 @@ describe("shouldInterceptNavClick", () => {
     expect(shouldInterceptNavClick({ ...plainLeftClick, altKey: true })).toBe(
       false,
     );
+  });
+});
+
+describe("focusSection", () => {
+  const fakeEl = (tabIndex: number) => ({
+    tabIndex,
+    setAttribute: vi.fn(),
+    focus: vi.fn(),
+  });
+
+  it("makes a non-focusable section programmatically focusable", () => {
+    const el = fakeEl(-1);
+    focusSection(el);
+    expect(el.setAttribute).toHaveBeenCalledWith("tabindex", "-1");
+  });
+
+  it("adds the tabindex before focusing (focus is a no-op without it)", () => {
+    const el = fakeEl(-1);
+    focusSection(el);
+    expect(el.setAttribute.mock.invocationCallOrder[0]).toBeLessThan(
+      el.focus.mock.invocationCallOrder[0]!,
+    );
+  });
+
+  it("leaves an already-focusable element in the tab order", () => {
+    const el = fakeEl(0);
+    focusSection(el);
+    expect(el.setAttribute).not.toHaveBeenCalled();
+  });
+
+  it("focuses without scrolling, so it can't race the nav's scroll", () => {
+    for (const el of [fakeEl(-1), fakeEl(0)]) {
+      focusSection(el);
+      expect(el.focus).toHaveBeenCalledWith({ preventScroll: true });
+    }
+  });
+});
+
+describe("queueSectionFocus / takeSectionFocus", () => {
+  // The queue is module state: drain it so no case depends on another
+  // having taken what it queued.
+  beforeEach(() => {
+    takeSectionFocus("");
+  });
+
+  it("returns nothing when no section is queued", () => {
+    expect(takeSectionFocus("#method")).toBeNull();
+  });
+
+  it("returns the queued id when the URL landed on its hash", () => {
+    queueSectionFocus("method");
+    expect(takeSectionFocus("#method")).toBe("method");
+  });
+
+  it("is single-use", () => {
+    queueSectionFocus("method");
+    takeSectionFocus("#method");
+    expect(takeSectionFocus("#method")).toBeNull();
+  });
+
+  it("ignores a stale id on an arrival with a different hash", () => {
+    // e.g. an aborted section nav followed by a home nav (no hash).
+    queueSectionFocus("method");
+    expect(takeSectionFocus("")).toBeNull();
+    queueSectionFocus("method");
+    expect(takeSectionFocus("#faq")).toBeNull();
+  });
+
+  it("keeps only the latest queued section", () => {
+    queueSectionFocus("method");
+    queueSectionFocus("faq");
+    expect(takeSectionFocus("#faq")).toBe("faq");
+    queueSectionFocus("method");
+    queueSectionFocus("faq");
+    expect(takeSectionFocus("#method")).toBeNull();
+  });
+
+  it("matches the hash exactly", () => {
+    queueSectionFocus("method");
+    expect(takeSectionFocus("#methodology")).toBeNull();
+  });
+
+  it("clears the queue even when the hash doesn't match", () => {
+    queueSectionFocus("method");
+    takeSectionFocus("");
+    expect(takeSectionFocus("#method")).toBeNull();
   });
 });

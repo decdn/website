@@ -10,7 +10,12 @@ import {
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { links } from "@/lib/links";
-import { HOME_SECTION_ID, scrollToAnchor } from "@/lib/scroll";
+import {
+  HOME_SECTION_ID,
+  focusSection,
+  queueSectionFocus,
+  scrollToAnchor,
+} from "@/lib/scroll";
 
 type SectionId = "intro" | "compare" | "method" | "faq" | "contact";
 
@@ -81,11 +86,13 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   // the prior scroll position — otherwise the body unlock would override
   // the anchor jump.
   const pendingAnchorRef = useRef<string | null>(null);
-  // An in-page anchor-select close (target in this DOM) moves focus into
-  // the target section from the scroll-lock effect's cleanup, which runs
-  // *before* the toggle-refocus effect's setup in the same commit. This
-  // flag — set there, consumed there — stops that effect from yanking
-  // focus back to the hamburger.
+  // A section-select close moves focus into the target section — at once
+  // from the scroll-lock effect's cleanup when the target is in this DOM,
+  // or after the route commits (Chrome's arrival effect) when it isn't.
+  // That cleanup runs *before* the toggle-refocus effect's setup in the
+  // same commit. This flag — set in that cleanup, consumed by the
+  // toggle-refocus effect — stops it from yanking focus back to the
+  // hamburger.
   const focusMovedToSectionRef = useRef(false);
 
   useEffect(() => {
@@ -180,8 +187,16 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         // no-op against a still-pinned body. Historically a full reload,
         // because soft-nav hash handling under output: "export" was
         // untrusted; its one concrete failure, `/#id#id` (#116), was fixed
-        // upstream in Next 16.3.8. Skip the local restore and focus move —
-        // the router owns scroll and the URL.
+        // upstream in Next 16.3.8. Skip the local restore — the router
+        // owns scroll and the URL. A section can't be focused until the
+        // route commits, so queue it for Chrome's arrival effect and set
+        // the flag so the toggle-refocus effect doesn't grab focus
+        // meanwhile; a home tap leaves the flag false, so focus returns
+        // to the toggle.
+        if (!isHome) {
+          queueSectionFocus(anchor);
+          focusMovedToSectionRef.current = true;
+        }
         router.push(isHome ? "/" : `/#${anchor}`);
         return;
       }
@@ -215,13 +230,9 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         history.replaceState(null, "", `#${anchor}`);
         scrollToAnchor(targetEl);
         // Move keyboard / SR focus into the section — scrollToAnchor
-        // only moves the viewport. Add tabindex only when the target
-        // isn't already focusable (don't pull a focusable el out of
-        // tab order); leaving the injected tabindex="-1" in place is
-        // the established programmatic-focus pattern. preventScroll so
-        // .focus() doesn't race the in-flight rAF scroll.
-        if (targetEl.tabIndex < 0) targetEl.setAttribute("tabindex", "-1");
-        targetEl.focus({ preventScroll: true });
+        // only moves the viewport. focusSection won't race the
+        // in-flight rAF scroll.
+        focusSection(targetEl);
         focusMovedToSectionRef.current = true;
       }
     };
@@ -232,10 +243,10 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   const wasOpenRef = useRef(false);
   useEffect(() => {
     if (wasOpenRef.current && !open) {
-      // An anchor-select close already moved focus into the section;
-      // leave it there. Normal closes (Escape, scrim, toggle, resize) and
-      // an off-route anchor close (soft-navs home) leave the flag false
-      // and still return focus to the toggle.
+      // A section-select close already moved focus into the section, or
+      // will once the route lands on its hash; leave it alone. Normal closes
+      // (Escape, scrim, toggle, resize) and a home-select close leave the
+      // flag false and still return focus to the toggle.
       if (focusMovedToSectionRef.current) {
         focusMovedToSectionRef.current = false;
       } else {

@@ -55,6 +55,45 @@ export function shouldInterceptNavClick(e: {
   );
 }
 
+// Moves keyboard / SR focus into a section after a nav tap — scrolling
+// alone only moves the viewport, so tab order and the reading cursor
+// would stay on the nav. Add tabindex only when the target isn't already
+// focusable (don't pull a focusable el out of tab order); leaving the
+// injected tabindex="-1" in place is the established programmatic-focus
+// pattern (focusable via script, not via Tab). preventScroll so .focus()
+// doesn't run its own scroll and race whichever scroll got us here.
+// Typed structurally so it's unit-testable without a DOM.
+export function focusSection(
+  el: Pick<HTMLElement, "tabIndex" | "setAttribute" | "focus">,
+) {
+  if (el.tabIndex < 0) el.setAttribute("tabindex", "-1");
+  el.focus({ preventScroll: true });
+}
+
+// A section tap from another route (e.g. /blog/*) soft-navs to `/#id`,
+// so the target isn't in the DOM yet when the nav is tapped. The tap
+// queues the id here; Chrome — mounted in the root layout, so it
+// survives the route change — takes it in a pathname effect once the
+// home page has committed and focuses the section with focusSection.
+// Next's hash scroll doesn't move focus — 16.3.8's default
+// appNewScrollHandler leaves it untouched — so without this, focus stays
+// on the tapped link (or the drawer).
+let pendingSectionFocus: string | null = null;
+
+export function queueSectionFocus(id: string) {
+  pendingSectionFocus = id;
+}
+
+// Single-use: always clears the queue. Returns the id only when the URL
+// actually landed on that hash, so a queued id that outlives an aborted
+// nav can't focus a section on a later, unrelated arrival (e.g. home,
+// which lands on `/` with no hash).
+export function takeSectionFocus(hash: string): string | null {
+  const id = pendingSectionFocus;
+  pendingSectionFocus = null;
+  return id !== null && hash === `#${id}` ? id : null;
+}
+
 // `<html>` scroll-behavior is forced to `auto` for the lifetime of
 // the rAF: without it, each per-frame `window.scrollTo` defers to
 // `motion-safe:scroll-smooth` and queues yet another browser
