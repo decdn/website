@@ -19,7 +19,7 @@ description: Day-to-day operation of a deCDN node: status commands, cache sizing
 | `decdn node reload`       | Re-reads the hot-reloadable config sections (same as `SIGHUP`) |
 | `decdn node drain --wait` | Graceful shutdown that finishes in-flight deliveries           |
 
-The daemon also exposes Prometheus metrics at `http://127.0.0.1:9090/metrics`.
+The daemon also exposes Prometheus metrics at `http://127.0.0.1:9090/metrics`. Network-wide figures, including registered nodes and settlements, are public at [stats.decdn.org](https://stats.decdn.org).
 
 ## Cache hit rate
 
