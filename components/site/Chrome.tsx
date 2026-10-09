@@ -251,17 +251,17 @@ export function Chrome() {
           <img
             src="/wordmark-light.svg"
             alt="decdn"
-            width={112}
-            height={30}
-            className={onDark ? "hidden" : "block"}
+            width={120}
+            height={32}
+            className={`h-8 w-auto ${onDark ? "hidden" : "block"}`}
           />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/wordmark-dark.svg"
             alt=""
-            width={112}
-            height={30}
-            className={onDark ? "block" : "hidden"}
+            width={120}
+            height={32}
+            className={`h-8 w-auto ${onDark ? "block" : "hidden"}`}
           />
           <span className="meta hidden opacity-70 sm:inline">labs</span>
         </Link>

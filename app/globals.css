@@ -16,8 +16,8 @@
   /* Intentionally 0: anchor jumps land flush at viewport top (under
      the fixed nav). Section headers don't get clipped because every
      Frame's --spacing-frame-pad-y floor (5rem = 80px) sits comfortably
-     above the current fixed-nav height (py-5 + 30px wordmark ≈ 70px),
-     leaving ~10px of breathing room below the nav. If the nav grows
+     above the current fixed-nav height (py-5 + 32px wordmark ≈ 72px),
+     leaving ~8px of breathing room below the nav. If the nav grows
      past 5rem, set --nav-h to the measured nav height — Frame already
      applies scroll-mt-[var(--nav-h)] on every section, so anchor
      offsets pick it up automatically. (Bumping the 5rem floor on
@@ -1135,11 +1135,11 @@ a.hero-status:hover .arrow {
 
 /* A 44px hit area around an 18px glyph. The box overhangs the gutter by
    11px and insets the bars 13px, so the glyph sits 2px inside the gutter;
-   top: 13px centres it on the nav's ~70px bar (py-5 + 30px wordmark, see
+   top: 14px centres it on the nav's ~72px bar (py-5 + 32px wordmark, see
    :root). Retune if the nav height changes. */
 .mm-toggle {
   position: fixed;
-  top: 13px;
+  top: 14px;
   right: calc(var(--spacing-frame-gutter) - 11px);
   z-index: 65;
   width: 44px;
