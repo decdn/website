@@ -10,20 +10,29 @@ updates:
     schedule:
       interval: "monthly"
     groups:
+      # Dependabot assigns a dependency to the first group it matches, so
+      # react and next must stay above dev-dependencies — otherwise their
+      # dev-side packages (@types/react*, eslint-config-next) get pulled
+      # into that batch and drift from the runtime package.
+      #
       # react and react-dom must ship the exact same version — bumped apart,
-      # the test suite fails React's version-mismatch check.
+      # the test suite fails React's version-mismatch check. @types/react*
+      # ride along so type and runtime majors land together.
       react:
         patterns:
           - "react"
           - "react-dom"
           - "@types/react"
           - "@types/react-dom"
+      # next and eslint-config-next are pinned to the same exact version and
+      # move together.
       next:
         patterns:
           - "next"
           - "eslint-config-next"
-      # Majors stay out of the group so one breaking bump can't hold the
-      # patch/minor batch hostage; they arrive as their own PRs.
+      # Majors stay out of the dev batch so one breaking bump can't hold its
+      # patch/minor updates hostage; they arrive as their own PRs (unless
+      # ignored below).
       dev-dependencies:
         dependency-type: "development"
         update-types: ["minor", "patch"]
