@@ -15,18 +15,19 @@ This is the source for the deCDN marketing site and blog.
 
 ## Stack
 
-Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · TypeScript · pnpm. Static export, deployed to Cloudflare Pages.
+Next.js 16 (App Router) · React 19 · Tailwind CSS v4 · TypeScript · pnpm · Node ≥24 (`.nvmrc`). Static export, deployed to Cloudflare Pages.
 
 ## Getting started
 
 ```bash
-pnpm install   # required (not npm/yarn) — husky hooks shell out to `pnpm exec`
-pnpm dev       # dev server on :3000
-pnpm build     # static export → ./out
-pnpm test      # vitest run
-pnpm typecheck # tsc --noEmit
-pnpm lint      # eslint (flat config)
-pnpm format    # prettier --write .
+pnpm install      # required (not npm/yarn) — husky hooks shell out to `pnpm exec`
+pnpm dev          # dev server on :3000
+pnpm build        # static export → ./out, then the check:out + check:og-image guards
+pnpm test         # vitest run
+pnpm typecheck    # tsc --noEmit
+pnpm lint         # eslint (flat config)
+pnpm format       # prettier --write .
+pnpm format:check # prettier --check . (CI)
 ```
 
 ## Project layout
@@ -34,9 +35,9 @@ pnpm format    # prettier --write .
 - `app/` — App Router entry (`layout.tsx`, `page.tsx`, `globals.css`) plus the blog routes (`blog/`, `blog/[slug]/`), the `legal/[doc]` route, the sitemap/robots handlers, the `llms.txt` / `llms-full.txt` handlers, and file-convention metadata assets.
 - `components/site/` — page sections composed by `app/page.tsx` (Hero, Compare, Method, Faq, Contact, …) plus chrome (`Chrome`, `Footer`, `ScrollReveal`, …).
 - `components/ui/` — low-level primitives (Frame, SectionHeader, Prose, Figure, …).
-- `lib/` — shared helpers (`links.ts`, `copy.ts`, `blog.ts`, `faq.ts`, `legal.ts`, `jsonld.tsx`, `schema.ts`, …). The site's prose _and_ its displayed values live in `lib/copy.ts` as plain data — the comparison table maps over it and the `llms-full.txt` mirror serialises it, so anything inlined in a component drifts from the mirror.
+- `lib/` — shared helpers (`links.ts`, `copy.ts`, `stats.ts`, `blog.ts`, `faq.ts`, `legal.ts`, `jsonld.tsx`, `schema.ts`, …). The site's prose _and_ its displayed values live in `lib/copy.ts` as plain data — the comparison table maps over it and the `llms-full.txt` mirror serialises it, so anything inlined in a component drifts from the mirror. Prose that names the product renders through `highlightBrand` (`components/ui/brand.tsx`).
 - `test-utils/` — test-only helpers for walking the element tree a server component returns.
-- `scripts/` — `check-out.mjs`, postbuild assertions run against `./out` by `pnpm build`.
+- `scripts/` — postbuild guards run against `./out` by `pnpm build`: `check-out.mjs` (advertised URLs, dotted routes, panel captions) and `check-og-image.mjs` (social cards).
 - `content/blog/` — MDX posts loaded by `lib/blog.ts` and rendered by `app/blog/[slug]/page.tsx`.
 - `content/legal/` — MDX for the legal pages (`privacy`, `terms`, `disclaimer`), loaded by `lib/legal.ts` and rendered by `app/legal/[doc]/page.tsx`.
 - `docs/` — Mintlify source for `docs.decdn.org`. Built and deployed independently of `pnpm build`; not part of the static export and not imported from the website code.
@@ -50,6 +51,7 @@ pnpm format    # prettier --write .
 - **Conventional commits enforced.** `commitlint` runs in the `commit-msg` husky hook; non-conforming messages are rejected.
 - **`metadataBase` is live.** `lib/links.ts` `site` is the real origin and `INDEXABLE` is `true`. Anything anchored on this origin — OG and canonical (via `metadataBase`); JSON-LD and the sitemap/robots emitters (via `SITE_URL`) — ships to production. Adding a non-blog page means appending an entry to `app/sitemap-pages.xml/route.ts`; blog posts are auto-derived from `content/blog/`, while legal pages are driven by the closed `LEGAL_SLUGS` list in `lib/legal.ts` (add both the MDX file under `content/legal/` and a slug there). Flipping `INDEXABLE` flips `<meta name="robots">` only; `robots.txt` and the sitemap stay unconditional by design (rationale in `lib/links.ts`).
 - **Machine-readable surfaces.** `/llms.txt` is a curated index of this origin and `/llms-full.txt` is every page as one plain-text document; both derive their page entries from `listPosts()`, `LEGAL_SLUGS`, `lib/faq.ts` and `lib/copy.ts`, are listed in `app/sitemap-pages.xml/route.ts`, and are advertised through `alternates.types` in `app/layout.tsx` and a `Link:` header in `public/_headers`. `scripts/check-out.mjs` resolves every advertised same-origin URL against `out/` after a build. The protocol documentation has its own pair on `docs.decdn.org`, served by Mintlify.
+- **Live testnet stats.** The hero terminal and the Contact fleet panel render a loading state into the static HTML and fill in after mount from `https://data.decdn.org/stats-421614.json` (rewritten every five minutes by the `decdn/stats` indexer). The fetch lives in `lib/stats.ts` / `lib/use-stats.ts`; the CSP in `public/_headers` allowlists the origin under `connect-src`, so change `STATS_ORIGIN` and the CSP together.
 
 ## Deploy
 
