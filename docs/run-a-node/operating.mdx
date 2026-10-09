@@ -51,7 +51,7 @@ The cache limit is an upper bound. The node evicts least-recently-used blobs abo
 
 ## Keystore password
 
-The daemon reads the keystore password from `DECDN_KEYSTORE_PASSWORD`, then from the file named by `--keystore-password-file`, then from an interactive prompt. A headless host needs one of the first two. Keep the password file at mode `0600`, owned by the node's user.
+The daemon reads the keystore password from `DECDN_KEYSTORE_PASSWORD`, then from the file named by `--keystore-password-file` (or its environment form, `DECDN_KEYSTORE_PASSWORD_FILE`), then from an interactive prompt. A headless host needs one of the first two. Keep the password file at mode `0600`, owned by the node's user.
 
 ## Config changes
 
