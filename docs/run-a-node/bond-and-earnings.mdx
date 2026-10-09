@@ -1,0 +1,55 @@
+---
+title: Bond and earnings
+description: How the TOKEN capacity bond is sized, what can be slashed, how unbonding works, and how a node earns USDC per byte delivered.
+---
+
+## The capacity bond
+
+A node bonds TOKEN in proportion to the bandwidth it declares. The curve is super-linear, so declaring more capacity than you can serve costs more than it is worth:
+
+```text
+bond = max(minBond, 12.6 × Mbps^1.2)  TOKEN
+```
+
+| Declared capacity | Curve value     |
+| ----------------- | --------------- |
+| 10 Mbps           | ≈ 200 TOKEN     |
+| 100 Mbps          | ≈ 3,165 TOKEN   |
+| 250 Mbps          | ≈ 9,500 TOKEN   |
+| 1 Gbps            | ≈ 50,000 TOKEN  |
+| 10 Gbps           | ≈ 795,000 TOKEN |
+
+`minBond` is a network-wide floor. **On the testnet it is 50,000 TOKEN**, so every declaration up to about 1 Gbps bonds 50,000 TOKEN. `decdn setup --dry-run` and `decdn node bond --mbps <N> --dry-run` print the exact live figure. The team sends testnet TOKEN on request; see [Get testnet funds](/run-a-node/testnet-funds).
+
+To raise your declared capacity later, run `decdn node bond --mbps <N>`. It tops the bond up to the new requirement. The full curve and its rationale are in [ADR 026 § Capacity-bond curve](https://github.com/decdn/decdn/blob/main/adr/026-tokenomics.md#capacity-bond-curve).
+
+## What can be slashed
+
+Only two offenses are slashable, and each needs signed, on-chain evidence:
+
+- **Rate manipulation.** Charging more than the rate your node signed in its probe response.
+- **Blacklist violation.** Serving a blacklisted hash after its compliance window has passed.
+
+Corrupt or failed delivery is **not** slashable. The client verifies every chunk against its BLAKE3 hash, pays nothing for a bad range and fetches it from another node, and your node loses local reputation with that peer. See [Slashing](/protocol/slashing) and [Compliance and risk](/run-a-node/compliance).
+
+## Unbonding
+
+Unbonding takes **14 days**. The node goes inactive when the unbond starts, and the bond stays slashable for the whole window. To lower your capacity, run `decdn node unbond --to-mbps <N>`. To exit fully, run `decdn node deregister`, then `decdn node unbond --all`, then run the unbond command again after the window to withdraw.
+
+## How you earn
+
+- **Per byte delivered.** Clients pay per megabyte in USDC through off-chain vouchers. A voucher pays only for bytes the client has verified.
+- **Your rate.** You set your own per-MB rate with `payment.rate_per_mb` in USDC base units. The default, `10`, is $0.00001/MB, which is about **$0.01/GB**, the network's target client price. Clients choose the fastest node they can reach, so price within reason and compete on speed. A rate change takes effect after a restart.
+- **Settlement.** The node redeems its vouchers on-chain automatically, by default every 5 minutes once a payment lane holds at least 1 USDC. `decdn node lanes` shows what has accrued. There is no claim step: the operator share goes to your address in the same transaction.
+
+## Operator share
+
+Each settlement passes through the on-chain `FeeRouter`, which splits it three ways: operator, buyback-and-burn, and treasury.
+
+| Network                  | Operator | Buyback-and-burn | Treasury |
+| ------------------------ | -------- | ---------------- | -------- |
+| Testnet (today)          | 60%      | 30%              | 10%      |
+| Mainnet at launch        | 90%      | 0%               | 10%      |
+| Mainnet after activation | 60%      | 30%              | 10%      |
+
+Mainnet launches with the buyback bucket dormant, so operators keep 90%. Governance moves it to 60/30/10 only after the network meets set [activation criteria](https://github.com/decdn/decdn/blob/main/adr/018-liquidity-strategy.md). The testnet already runs the target split. See [Governance](/protocol/governance) for the bounds on each share.

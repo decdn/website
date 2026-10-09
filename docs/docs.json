@@ -89,9 +89,39 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "Run a node",
+        "groups": [
+          {
+            "group": "Get started",
+            "pages": [
+              "run-a-node/overview",
+              "run-a-node/requirements",
+              "run-a-node/testnet-funds",
+              "run-a-node/quickstart"
+            ]
+          },
+          {
+            "group": "Run it",
+            "pages": [
+              "run-a-node/bond-and-earnings",
+              "run-a-node/traffic",
+              "run-a-node/operating",
+              "run-a-node/compliance"
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": ["run-a-node/faq"]
+          }
+        ]
       }
     ]
   },
+  "redirects": [
+    { "source": "/node-setup", "destination": "/run-a-node/quickstart" }
+  ],
   "footer": {
     "socials": {
       "website": "https://decdn.org",

@@ -1,0 +1,128 @@
+---
+title: Quickstart
+description: Install the deCDN node, write its config, bond and register on Arbitrum Sepolia, and run it under systemd or Docker.
+---
+
+deCDN ships two binaries. `decdn` is the CLI you type commands into: setup, bonding, status. `decdn-node` is the daemon that serves traffic. You need both on the host.
+
+## 1. Install
+
+Pick one of three ways.
+
+**Release archive.** Download the `decdn` and `decdn-node` archives for your platform from the [latest release](https://github.com/decdn/decdn/releases/latest), then put both binaries on your `PATH`. A maintainer signs the `SHA256SUMS` manifest that covers the archives; [SECURITY.md](https://github.com/decdn/decdn/blob/main/SECURITY.md) explains how to verify it.
+
+**Cargo.**
+
+```bash
+cargo install --locked decdn-cli decdn-node
+```
+
+**Docker.** The image holds the `decdn-node` daemon only, so install the `decdn` CLI from the release archive or with Cargo as well. You use it for keys, setup and status.
+
+```bash
+docker pull ghcr.io/decdn/decdn-node:latest
+```
+
+## 2. Write the config
+
+```bash
+decdn config init
+```
+
+This writes `~/.decdn/node.toml` with the testnet RPC endpoint and the deployed contract addresses filled in. Open it and set the cache size to match the disk you give the node:
+
+```toml ~/.decdn/node.toml
+[cache]
+cache_size_mb = 512000   # 500 GB
+```
+
+See [Requirements](/run-a-node/requirements#disk-and-cache-size) for how to size it. The default RPC endpoint is the public, rate-limited Arbitrum Sepolia endpoint. For a node that runs 24/7, use an RPC provider of your own.
+
+## 3. Create keys and get funds
+
+```bash
+decdn key-gen
+decdn whoami
+```
+
+Send the operator address that `whoami` prints to the team to receive testnet TOKEN, and fund it with a little Arbitrum Sepolia ETH. See [Get testnet funds](/run-a-node/testnet-funds).
+
+## 4. Bond and register
+
+Preview first. `--dry-run` checks the RPC, your clock, your TOKEN and ETH balances and the exact bond, and submits nothing:
+
+```bash
+decdn setup --mbps 250 --region BR \
+  --multiaddr /ip4/<your-public-ip>/udp/4433/quic-v1 \
+  --dry-run
+```
+
+When every check passes, run it for real:
+
+```bash
+decdn setup --mbps 250 --region BR \
+  --multiaddr /ip4/<your-public-ip>/udp/4433/quic-v1
+```
+
+`setup` shows the [operator terms](https://github.com/decdn/decdn/blob/main/crates/cli/TERMS.md) and asks you to accept them, confirms the bond, then bonds, declares your capacity and registers the node on-chain. It ends with a go/no-go summary.
+
+- `--mbps` is the bandwidth you commit to serve. It sets your bond. Declare what your uplink sustains.
+- `--region` is your ISO 3166-1 alpha-2 country code, such as `BR` or `DE`. It sets which regional takedown rules apply to you. See [Compliance and risk](/run-a-node/compliance).
+- `--multiaddr` is the public address peers dial. A dual-stack host passes a second one: `/ip6/<addr>/udp/4433/quic-v1`. Omit the flag to register the host's detected public address. A host behind NAT with no forwarded port registers none and relies on hole-punching and relays.
+
+## 5. Run the node
+
+The daemon needs the keystore password to start. On a headless host, put it in a file readable only by the node's user and pass `--keystore-password-file` (or set `DECDN_KEYSTORE_PASSWORD_FILE`, as the Docker example does), or set `DECDN_KEYSTORE_PASSWORD`.
+
+### Under systemd
+
+```ini /etc/systemd/system/decdn-node.service
+[Unit]
+Description=deCDN node
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=decdn
+ExecStart=/usr/local/bin/decdn-node run \
+    --config /home/decdn/.decdn/node.toml \
+    --keystore-password-file /etc/decdn/keystore-password
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGTERM
+TimeoutStopSec=300
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable --now decdn-node
+```
+
+`SIGTERM` drains in-flight deliveries and flushes settlement before the process exits. Keep `TimeoutStopSec` generous so a stop never cuts a paid delivery short.
+
+### Under Docker
+
+```bash
+docker run -d --name decdn-node --restart unless-stopped \
+  -p 4433:4433/udp \
+  -v ~/.decdn:/home/decdn/.decdn \
+  -e DECDN_KEYSTORE_PASSWORD_FILE=/home/decdn/.decdn/keystore-password \
+  ghcr.io/decdn/decdn-node:latest
+```
+
+Publish 4433 as **UDP**: QUIC does not use TCP. The volume holds the config, keys and cache, so mount it on the disk you sized the cache for. The container runs as uid 1000, so that user must own the mounted directory.
+
+## 6. Check it
+
+```bash
+decdn node health    # identity and uptime
+decdn node status    # DHT participation
+decdn node doctor    # end-to-end readiness checks
+decdn node top       # live metrics
+```
+
+Your node earns from the first paid delivery onward. Next, turn on [pull-through](/run-a-node/operating#pull-through) so it can fill cache misses, and read [How you get traffic](/run-a-node/traffic) to know what volume to expect.
