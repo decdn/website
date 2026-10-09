@@ -2,7 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "maple",
   "name": "deCDN",
-  "description": "Decentralized CDN — staked nodes cache and serve content over QUIC, paid per-MB via off-chain USDC channels.",
+  "description": "Decentralized CDN — staked nodes cache and serve content over QUIC, paid per-MB with off-chain vouchers against a shared on-chain USDC pool.",
   "colors": {
     "primary": "#0f9d6a",
     "light": "#1dc889",

@@ -11,19 +11,19 @@ All staked nodes form a **flat mesh** with no routing hierarchy. Node discovery 
 
 The on-chain registry's active set is the sole membership source. A node reads it at startup and keeps it fresh by subscribing to registration, address-update, deregistration and auto-ejection events; sub-second L2 block times keep the staleness window small. Clients do the same and re-read periodically, falling back to a cached peer list — with its age surfaced — when the RPC endpoint is unreachable.
 
-The same active set seeds the DHT routing table, so a freshly started node participates in lookups immediately. A node dials any peer by its network identity, which resolves to reachable transport addresses on its own — there is no separate address-exchange layer, and no metadata broadcast.
+The same active set seeds the DHT routing table, so a freshly started node participates in lookups immediately. A node dials any peer by its network identity, which resolves to reachable transport addresses from two sources: the registry's `multiaddrs` as direct-address hints, and each node's signed pkarr record carrying its relay URL and public IPs. There is no separate address-exchange layer, and no metadata broadcast.
 
 ## Content discovery
 
 A cache miss issues a DHT lookup for the hash, which returns candidate holders along with a coarse **coverage bitmap** per holder — so a requester can prune candidates that do not hold the range it wants. Candidates are then probed in parallel to confirm live availability, fresh coverage, latency and price. Collection stops as soon as enough blob-holding candidates answer to fill the failover budget, and otherwise at a 500 ms ceiling that accommodates inter-continental round trips.
 
-When a lookup returns no providers for a request that names a namespace, the namespace's on-chain origin set is the deterministic fallback. A request naming no namespace has no directory to fall back to — it has no authorized origins — so a miss there simply fails. Either way, if nothing answers, the blob is not available in the network.
+When a lookup returns no providers — or only providers that do not cover every block — for a request that names a namespace, the namespace's on-chain origin set is the deterministic fallback. A node checks that its candidates cover every block of the range before it commits to its own client; if any block has none, it refuses with a signed miss so the client fails over, rather than starting a stream that ends short. A request naming no namespace has no directory to fall back to — it has no authorized origins — so a miss there simply fails. Either way, if nothing answers, the blob is not available in the network.
 
 ## Selection
 
 Clients and nodes rank candidates differently.
 
-- **Clients** take candidates from their own peer store or the registry, not the DHT, and rank them by measured round-trip time alone. Price is not a rank key: the client pays the rate the node signs and can refuse a quote above a ceiling of its own. A client keeps no reputation score; it only sets aside, for a few minutes, a node that just failed it.
+- **Clients** take candidates from their own peer store or the registry, not the DHT, and rank them by measured round-trip time alone. Price is not a rank key: the client pays the rate the node signs and can refuse a quote above a ceiling of its own. A client keeps no reputation score. Within a fetch, a node that fails it cools for 2 s, doubling to 60 s and reset by a verified byte; across runs, a failure stamp keeps it out of the peer-store candidate set for a fixed window.
 - **Nodes** pulling on a cache miss rank holders by a unified score combining advertised price, observed latency, and their local reputation score, with a quadratic reputation penalty. Lower is better.
 
 ## On-chain registration
@@ -38,4 +38,4 @@ Regions inform selection rather than partition the mesh: a client in Frankfurt u
 
 ## NAT traversal
 
-The transport handles hole-punching automatically; nodes update their registered addresses when their public-facing address changes. When direct P2P fails, traffic routes through a stateless, content-blind QUIC relay. Relays are not protocol participants — they cannot inspect, cache, or modify content — and they are not an incentivized network role: paying relays per byte would create a perverse incentive to prevent direct connections. Deployments self-host them as operational infrastructure, funded from the protocol treasury or from node staking fees.
+The transport handles hole-punching automatically. Registration defaults to the host's public address, and a node behind NAT registers none. When the public address changes, the operator runs `decdn node update-multiaddrs` — the node does not submit the update itself — and the node's pkarr record carries the new address in the meantime. When direct P2P fails, traffic routes through a stateless, content-blind QUIC relay. Relays are not protocol participants — they cannot inspect, cache, or modify content — and they are not an incentivized network role: paying relays per byte would create a perverse incentive to prevent direct connections. Deployments self-host them as operational infrastructure, funded from the protocol treasury or from node staking fees.
