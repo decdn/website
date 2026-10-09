@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   HOME_SECTION_ID,
   focusSection,
@@ -151,6 +151,14 @@ describe("focusSection", () => {
     expect(el.setAttribute).toHaveBeenCalledWith("tabindex", "-1");
   });
 
+  it("adds the tabindex before focusing (focus is a no-op without it)", () => {
+    const el = fakeEl(-1);
+    focusSection(el);
+    expect(el.setAttribute.mock.invocationCallOrder[0]).toBeLessThan(
+      el.focus.mock.invocationCallOrder[0]!,
+    );
+  });
+
   it("leaves an already-focusable element in the tab order", () => {
     const el = fakeEl(0);
     focusSection(el);
@@ -166,6 +174,12 @@ describe("focusSection", () => {
 });
 
 describe("queueSectionFocus / takeSectionFocus", () => {
+  // The queue is module state: drain it so no case depends on another
+  // having taken what it queued.
+  beforeEach(() => {
+    takeSectionFocus("");
+  });
+
   it("returns nothing when no section is queued", () => {
     expect(takeSectionFocus("#method")).toBeNull();
   });
@@ -187,6 +201,20 @@ describe("queueSectionFocus / takeSectionFocus", () => {
     expect(takeSectionFocus("")).toBeNull();
     queueSectionFocus("method");
     expect(takeSectionFocus("#faq")).toBeNull();
+  });
+
+  it("keeps only the latest queued section", () => {
+    queueSectionFocus("method");
+    queueSectionFocus("faq");
+    expect(takeSectionFocus("#faq")).toBe("faq");
+    queueSectionFocus("method");
+    queueSectionFocus("faq");
+    expect(takeSectionFocus("#method")).toBeNull();
+  });
+
+  it("matches the hash exactly", () => {
+    queueSectionFocus("method");
+    expect(takeSectionFocus("#methodology")).toBeNull();
   });
 
   it("clears the queue even when the hash doesn't match", () => {

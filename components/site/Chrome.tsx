@@ -204,7 +204,7 @@ export function Chrome() {
   // the drawer) queued its id before soft-navving to `/#id`. Router
   // navigations commit the new page together with the new pathname, and
   // this passive effect runs after Next's layout-phase hash scroll, so
-  // the section is in the DOM and already at the viewport top. Same-page
+  // the section is in the DOM and already scrolled into place. Same-page
   // taps focus directly and never queue.
   useEffect(() => {
     const id = takeSectionFocus(window.location.hash);

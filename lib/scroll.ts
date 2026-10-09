@@ -75,8 +75,9 @@ export function focusSection(
 // queues the id here; Chrome — mounted in the root layout, so it
 // survives the route change — takes it in a pathname effect once the
 // home page has committed and focuses the section with focusSection.
-// Next's own hash scroll also calls .focus() on the target, but that's a
-// no-op on a section without tabindex.
+// Next's hash scroll doesn't move focus — 16.3.8's default
+// appNewScrollHandler leaves it untouched — so without this, focus stays
+// on the tapped link (or the drawer).
 let pendingSectionFocus: string | null = null;
 
 export function queueSectionFocus(id: string) {

@@ -90,8 +90,9 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   // from the scroll-lock effect's cleanup when the target is in this DOM,
   // or after the route commits (Chrome's arrival effect) when it isn't.
   // That cleanup runs *before* the toggle-refocus effect's setup in the
-  // same commit. This flag — set there, consumed there — stops that
-  // effect from yanking focus back to the hamburger.
+  // same commit. This flag — set in that cleanup, consumed by the
+  // toggle-refocus effect — stops it from yanking focus back to the
+  // hamburger.
   const focusMovedToSectionRef = useRef(false);
 
   useEffect(() => {
@@ -188,9 +189,10 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         // untrusted; its one concrete failure, `/#id#id` (#116), was fixed
         // upstream in Next 16.3.8. Skip the local restore — the router
         // owns scroll and the URL. A section can't be focused until the
-        // route commits, so queue it for Chrome's arrival effect and keep
-        // the toggle-refocus effect off it; home leaves focus on the
-        // toggle.
+        // route commits, so queue it for Chrome's arrival effect and set
+        // the flag so the toggle-refocus effect doesn't grab focus
+        // meanwhile; a home tap leaves the flag false, so focus returns
+        // to the toggle.
         if (!isHome) {
           queueSectionFocus(anchor);
           focusMovedToSectionRef.current = true;
@@ -242,7 +244,7 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   useEffect(() => {
     if (wasOpenRef.current && !open) {
       // A section-select close already moved focus into the section, or
-      // will once the route commits; leave it alone. Normal closes
+      // will once the route lands on its hash; leave it alone. Normal closes
       // (Escape, scrim, toggle, resize) and a home-select close leave the
       // flag false and still return focus to the toggle.
       if (focusMovedToSectionRef.current) {
