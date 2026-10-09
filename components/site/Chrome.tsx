@@ -6,8 +6,11 @@ import { usePathname } from "next/navigation";
 import { links } from "@/lib/links";
 import {
   HOME_SECTION_ID,
+  focusSection,
   homeNavTarget,
+  queueSectionFocus,
   shouldInterceptNavClick,
+  takeSectionFocus,
 } from "@/lib/scroll";
 import { MobileMenu } from "@/components/site/MobileMenu";
 import { resolveActiveSection } from "@/components/site/chrome-active";
@@ -56,8 +59,10 @@ export function Chrome() {
   // hash (`/#method#method…`, #116) under output: "export" +
   // trailingSlash; Next 16.3.8 fixed that upstream. Off this route the
   // section isn't in the DOM (e.g. /blog/*), so the native <Link>
-  // soft-navs home and scrolls to the hash itself. Modified clicks (new
-  // tab, middle-click) also fall through to the native <Link>.
+  // soft-navs home and scrolls to the hash itself; the id is queued so
+  // the arrival effect below moves focus into the section once home has
+  // committed. Modified clicks (new tab, middle-click) also fall through
+  // to the native <Link>.
   const handleNavClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
       if (!shouldInterceptNavClick(e)) return;
@@ -89,8 +94,11 @@ export function Chrome() {
       const { id } = target;
       const el = document.getElementById(id);
       // Off this route: fall through to the native <Link>, as the top
-      // branch does.
-      if (el === null) return;
+      // branch does, and focus the section on arrival.
+      if (el === null) {
+        queueSectionFocus(id);
+        return;
+      }
       e.preventDefault();
       // Write the exact single hash so it can never accumulate;
       // replaceState keeps a same-hash click a URL no-op.
@@ -101,15 +109,9 @@ export function Chrome() {
       // desktop, so the drawer's custom rAF isn't needed.
       el.scrollIntoView({ block: "start" });
       // Unlike a real anchor nav, the intercepted scroll doesn't move
-      // keyboard / SR focus — without this, tab order and the reading
-      // cursor stay stuck on the nav. Add tabindex only when the target
-      // isn't already focusable (don't pull a focusable el out of tab
-      // order); leaving the injected tabindex="-1" in place is the
-      // established programmatic-focus pattern (focusable via script,
-      // not via Tab). preventScroll so .focus() doesn't run its own
-      // scroll and race the scrollIntoView above.
-      if (el.tabIndex < 0) el.setAttribute("tabindex", "-1");
-      el.focus({ preventScroll: true });
+      // keyboard / SR focus; focusSection does, without racing the
+      // scrollIntoView above.
+      focusSection(el);
     },
     [],
   );
@@ -196,6 +198,19 @@ export function Chrome() {
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, [pathname]);
+
+  // Cross-route arrival: a section tap from another route (this nav or
+  // the drawer) queued its id before soft-navving to `/#id`. Router
+  // navigations commit the new page together with the new pathname, and
+  // this passive effect runs after Next's layout-phase hash scroll, so
+  // the section is in the DOM and already at the viewport top. Same-page
+  // taps focus directly and never queue.
+  useEffect(() => {
+    const id = takeSectionFocus(window.location.hash);
+    if (id === null) return;
+    const el = document.getElementById(id);
+    if (el) focusSection(el);
   }, [pathname]);
 
   const effectiveActive = resolveActiveSection(
