@@ -1,45 +1,85 @@
 {
-  "version": 1,
-  "models": [
+  "version": 2,
+  "items": [
     {
       "id": "mistralai-mistral-7b-instruct-v0.3",
+      "kind": "model",
       "name": "Mistral 7B Instruct v0.3",
-      "repo": "mistralai/Mistral-7B-Instruct-v0.3",
       "license": "Apache-2.0",
+      "source": "https://huggingface.co/mistralai/Mistral-7B-Instruct-v0.3",
       "hash": "b3:9194000d7b356650e6924a7746ec4afb0b705838b65913c0e46cba6b15af69e5",
+      "namespace": 1,
       "bytes": 28995469846
     },
     {
-      "id": "openai-gpt-oss-20b",
-      "name": "gpt-oss-20b",
-      "repo": "openai/gpt-oss-20b",
-      "license": "Apache-2.0",
-      "hash": "b3:ea8ae18fbfaddfd7cda8995d5fc431b165c6984dfd8fccb3eda1e0e44c333a97",
-      "bytes": 41301463946
-    },
-    {
       "id": "qwen-qwen2.5-7b-instruct",
+      "kind": "model",
       "name": "Qwen2.5 7B Instruct",
-      "repo": "Qwen/Qwen2.5-7B-Instruct",
       "license": "Apache-2.0",
+      "source": "https://huggingface.co/Qwen/Qwen2.5-7B-Instruct",
       "hash": "b3:6e9b67de35340aed7b502fb8b2ed907ba70e10170d9cead869d9aafda194c6cd",
+      "namespace": 1,
       "bytes": 15242805751
     },
     {
       "id": "openai-whisper-large-v3",
+      "kind": "model",
       "name": "Whisper large-v3",
-      "repo": "openai/whisper-large-v3",
       "license": "Apache-2.0",
+      "source": "https://huggingface.co/openai/whisper-large-v3",
       "hash": "b3:b7df87129ebb6b1119b27432ff01fe234799a38c62bfffbba2b0b51206e36031",
+      "namespace": 1,
       "bytes": 24701693968
     },
     {
       "id": "stabilityai-stable-diffusion-xl-base-1.0",
+      "kind": "model",
       "name": "Stable Diffusion XL base 1.0",
-      "repo": "stabilityai/stable-diffusion-xl-base-1.0",
       "license": "OpenRAIL++-M",
+      "source": "https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0",
       "hash": "b3:4621f13ec126975bff9f4f7a90283569bc5f81fc902e8f3dfc1ac9acadf954ed",
+      "namespace": 1,
       "bytes": 76912763729
+    },
+    {
+      "id": "ubuntu-26.04-desktop-amd64",
+      "kind": "iso",
+      "name": "Ubuntu 26.04 LTS desktop (amd64)",
+      "license": "Canonical IP policy",
+      "source": "https://releases.ubuntu.com/26.04/",
+      "hash": "b3:60034bbdea274f48f86caef8bc100d4ae11fc337590f50ba82db84fa4ac2a7df",
+      "namespace": 1,
+      "bytes": 6482409472
+    },
+    {
+      "id": "debian-13-amd64-dvd-1",
+      "kind": "iso",
+      "name": "Debian 13 DVD-1 (amd64)",
+      "license": "DFSG + redistributable non-free firmware",
+      "source": "https://cdimage.debian.org/debian-cd/current/amd64/iso-dvd/",
+      "hash": "b3:4004df6119f58223616aa0cb9db220e59042e56b851915cb40ed86bd5dad9bb5",
+      "namespace": 1,
+      "bytes": 3992977408
+    },
+    {
+      "id": "tears-of-steel-4k",
+      "kind": "video",
+      "name": "Tears of Steel 4K (.mov)",
+      "license": "CC-BY-3.0",
+      "source": "https://download.blender.org/demo/movies/ToS/",
+      "hash": "b3:e571996d61dbc459fcc27b7da1ac799e266021ca0921b6cd75566c199ddf9a6d",
+      "namespace": 1,
+      "bytes": 6737592810
+    },
+    {
+      "id": "sintel-4k-mkv",
+      "kind": "video",
+      "name": "Sintel 4K (.mkv)",
+      "license": "CC-BY-3.0",
+      "source": "https://download.blender.org/durian/movies/",
+      "hash": "b3:87539fba0ee64b9f7814d50af89988b0e10f624340dd6e8477a0984c27eaab42",
+      "namespace": 1,
+      "bytes": 4506488235
     }
   ]
 }

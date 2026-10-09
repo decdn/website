@@ -3,6 +3,7 @@ import { Contact } from "@/components/site/Contact";
 import { Faq } from "@/components/site/Faq";
 import { Hero } from "@/components/site/Hero";
 import { Method } from "@/components/site/Method";
+import { Try } from "@/components/site/Try";
 import { JsonLd } from "@/lib/jsonld";
 import { faqPageNode } from "@/lib/schema";
 
@@ -16,6 +17,7 @@ export default function Home() {
       <Hero />
       <Compare />
       <Method />
+      <Try />
       <Faq />
       <Contact />
     </main>
