@@ -8,6 +8,7 @@ import {
   useSyncExternalStore,
 } from "react";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 import { links } from "@/lib/links";
 import { HOME_SECTION_ID, scrollToAnchor } from "@/lib/scroll";
 
@@ -51,6 +52,7 @@ const getServerSnapshot = () => false;
 
 export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   const [open, setOpen] = useState(false);
+  const router = useRouter();
   // Static export: document.body isn't available during prerender. Gate
   // the portal until after hydration so the first client render matches
   // the prerendered HTML.
@@ -75,13 +77,15 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   } | null>(null);
   const scrollYRef = useRef(0);
   // When the drawer closes via an in-page anchor tap, the cleanup must
-  // scroll to that target instead of restoring the prior scroll
-  // position — otherwise the body unlock would override the anchor jump.
+  // scroll (or, off-route, soft-nav) to that target instead of restoring
+  // the prior scroll position — otherwise the body unlock would override
+  // the anchor jump.
   const pendingAnchorRef = useRef<string | null>(null);
-  // An anchor-select close moves focus into the target section from the
-  // Effect-A cleanup, which runs *before* the toggle-refocus effect's
-  // setup in the same commit. This flag — set there, consumed there —
-  // stops that effect from yanking focus back to the hamburger.
+  // An in-page anchor-select close (target in this DOM) moves focus into
+  // the target section from the scroll-lock effect's cleanup, which runs
+  // *before* the toggle-refocus effect's setup in the same commit. This
+  // flag — set there, consumed there — stops that effect from yanking
+  // focus back to the hamburger.
   const focusMovedToSectionRef = useRef(false);
 
   useEffect(() => {
@@ -169,12 +173,16 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
       const targetEl = anchor ? document.getElementById(anchor) : null;
 
       if (anchor && !targetEl) {
-        // Drawer opened from a different route (e.g. /blog/*); a full
-        // reload lets the new page resolve the destination deterministically
-        // (Next 16 App Router's soft-nav hash behaviour under output:
-        // "export" isn't documented). Home -> "/", section -> "/#anchor".
-        // Skip the local restore — the page is about to unload.
-        window.location.assign(isHome ? "/" : `/#${anchor}`);
+        // Drawer opened from a different route (e.g. /blog/*), so the
+        // section isn't in this DOM: soft-nav home and let the router
+        // scroll to the hash. Home -> "/", section -> "/#anchor". Must
+        // run after the body unlock above — the router's hash scroll is a
+        // no-op against a still-pinned body. Historically a full reload,
+        // because soft-nav hash handling under output: "export" was
+        // untrusted; its one concrete failure, `/#id#id` (#116), was fixed
+        // upstream in Next 16.3.8. Skip the local restore and focus move —
+        // the router owns scroll and the URL.
+        router.push(isHome ? "/" : `/#${anchor}`);
         return;
       }
 
@@ -217,7 +225,7 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         focusMovedToSectionRef.current = true;
       }
     };
-  }, [open]);
+  }, [open, router]);
 
   // Skipped on the initial render (when `open` is already false) via
   // the wasOpenRef guard.
@@ -225,8 +233,9 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   useEffect(() => {
     if (wasOpenRef.current && !open) {
       // An anchor-select close already moved focus into the section;
-      // leave it there. Normal closes (Escape, scrim, toggle, resize)
-      // leave the flag false and still return focus to the toggle.
+      // leave it there. Normal closes (Escape, scrim, toggle, resize) and
+      // an off-route anchor close (soft-navs home) leave the flag false
+      // and still return focus to the toggle.
       if (focusMovedToSectionRef.current) {
         focusMovedToSectionRef.current = false;
       } else {
