@@ -99,7 +99,7 @@ export function TryIt() {
     >
       <div className="flex flex-col gap-8">
         <label className="flex flex-col gap-3">
-          <span className="meta opacity-60">pull</span>
+          <span className="meta opacity-60">download</span>
           <span className="relative">
             <select
               value={item.id}

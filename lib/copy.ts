@@ -62,10 +62,10 @@ export const HERO_STATUS = {
 } as const satisfies FigureCopy;
 
 /** The #try section between How it works and the FAQ. */
-export const TRY_HEADLINE = "try it: pull something real.";
+export const TRY_HEADLINE = "try it: download something real.";
 
 export const TRY_LEAD =
-  "pick something we seeded on the testnet and paste the line into a terminal on macos or linux, or into powershell on windows. it installs deCDN, opens one captcha in your browser, then pulls it from the network and checks every byte against its blake3 hash. the testnet sponsor pays for the transfer, so there is no wallet, no token, and no sign-up.";
+  "pick something we seeded on the testnet and paste the line into a terminal on macos or linux, or into powershell on windows. it installs deCDN, opens one captcha in your browser, then downloads it from the network and checks every byte against its blake3 hash. the testnet sponsor pays for the transfer, so there is no wallet, no token, and no sign-up.";
 
 /** The short notes under the command. */
 export const TRY_NOTES = [
