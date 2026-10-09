@@ -34,7 +34,7 @@ A **client** is a lightweight QUIC endpoint that consumes content and pays for i
 - **Payment.** Opens one on-chain USDC pool, reuses it for every node it buys from, and signs cumulative off-chain vouchers as bytes flow ([payments](/protocol/payments)).
 - **Trust model.** Verifies hashes on all bytes received. Trusts no node for content, and none for availability either — a node may decline to serve, and the client simply re-routes without paying for the attempt.
 
-Every client fetch runs a multi-source scheduler, pulling disjoint segments from up to four holders at once (or from one, when only one holds the blob), and resume crashed transfers from the last verified chunk-group boundary.
+Every client fetch runs a multi-source scheduler, pulling disjoint segments from up to four holders at once (or from one, when only one holds the blob), and resumes crashed transfers from the last verified chunk-group boundary.
 
 ## External components
 
