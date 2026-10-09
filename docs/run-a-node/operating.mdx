@@ -43,7 +43,7 @@ With pull-through off, a cache miss is served as not-found and the client goes e
 node_to_node_pull_through_enabled = true
 ```
 
-Pull-through spends USDC from the node's buyer pool, 10 USDC by default. Fund the operator address with testnet USDC from [Circle's faucet](https://developers.circle.com/stablecoins/docs/usdc-on-testnet). The node opens the pool on its own. If pulls never succeed, check `decdn_buyer_wallet_usdc` and `decdn node pools`. To cap what the node pays per MB upstream, set `cache.max_rate_per_mb`.
+Pull-through spends USDC from the node's buyer pool, 10 USDC by default. Fund the operator address with testnet USDC from [Circle's faucet](https://faucet.circle.com). The node opens the pool on its own. If pulls never succeed, check `decdn_buyer_wallet_usdc` and `decdn node pools`. To cap what the node pays per MB upstream, set `cache.max_rate_per_mb`.
 
 ## Disk
 
