@@ -31,7 +31,7 @@ describe("brand-text contrast wiring", () => {
   });
 
   it("colours the brand span through --whisper-text", () => {
-    const spans = highlightBrand("run decdn").filter(isValidElement);
+    const spans = highlightBrand("run deCDN").filter(isValidElement);
     expect(spans).toHaveLength(1);
     expect(attrs(asElement(spans[0])).className).toBe("text-whisper-text");
   });

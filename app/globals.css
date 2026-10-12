@@ -1364,14 +1364,14 @@ a.hero-status:hover .arrow {
    (inherited colour, 15% opacity) in the card's bottom-right corner to
    tether the card to its row.
 
-   Every dd shares one grid area — all question rows plus a trailing
-   minmax(0, 1fr) sink row — and stretches to fill it, so every card is the
-   same size: the height of the longest answer (or of the question list, if
-   that is taller), never the height of the answer currently showing. An
-   item that crosses a flexible track is excluded from the auto rows'
-   intrinsic sizing (css-grid §12.5), so the longest answer grows the sink,
-   not the question rows. At phone width the cards stack under their own
-   question and take their content height, so nothing can be clipped.
+   Every dd shares one grid area — grid lines 2 to n, the top rules of the
+   second and the last question — and stretches to fill it, so the card's
+   edges sit on those two dividers however the questions wrap, and every
+   card is the same size, never the height of the answer currently
+   showing. The rows are all auto tracks, so an answer taller than rows 2
+   to n-1 grows those rows rather than clipping. At phone width the cards
+   stack under their own question and take their content height, so
+   nothing can be clipped there either.
 
    Breakpoints are container queries against Frame's @container wrapper —
    these rules are unlayered and would beat @xl: utilities. */
@@ -1446,7 +1446,7 @@ a.hero-status:hover .arrow {
 @container (width >= 36rem) {
   .faq-grid {
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    grid-template-rows: repeat(var(--faq-n), auto) minmax(0, 1fr);
+    grid-template-rows: repeat(var(--faq-n), auto);
     column-gap: var(--faq-gap);
     border-bottom: 0;
   }
@@ -1468,7 +1468,7 @@ a.hero-status:hover .arrow {
     display: flex;
     flex-direction: column;
     grid-column: 2;
-    grid-row: 1 / -1;
+    grid-row: 2 / var(--faq-n);
     align-self: stretch;
     margin: 0;
     visibility: hidden;
