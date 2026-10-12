@@ -2,6 +2,7 @@ import { EMAIL, links } from "@/lib/links";
 import { CONTACT_HEADLINE, CONTACT_LEAD, CONTACT_RUN_NODE } from "@/lib/copy";
 import { highlightBrand } from "@/components/ui/brand";
 import { Frame } from "@/components/ui/Frame";
+import { SectionHeader } from "@/components/ui/SectionHeader";
 import { FleetStatus } from "@/components/site/FleetStatus";
 
 // Solid monochrome glyphs leading each contact link. Decorative — every link
@@ -84,10 +85,14 @@ function XIcon() {
 
 export function Contact() {
   return (
-    // The second half of §05: #faq above carries the chapter header, so this
-    // frame drops its own and its top padding to read as one chapter.
-    <Frame id="contact" tone="paper" className="overflow-hidden pt-0">
-      <div className="grid gap-12 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,460px)] @4xl:items-start @4xl:gap-14">
+    <Frame id="contact" tone="ink" className="overflow-hidden">
+      <SectionHeader
+        index="06"
+        label="Contact us"
+        timestamp="open source · open network"
+      />
+
+      <div className="mt-14 grid gap-12 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,460px)] @4xl:items-start @4xl:gap-14">
         <div className="flex flex-col gap-12">
           {/* A display line, not the wordmark: the nav already carries the
               logo, and repeating it at 11rem said nothing about the section. */}
