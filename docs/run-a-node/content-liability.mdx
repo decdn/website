@@ -1,0 +1,68 @@
+---
+title: Content liability
+description: What you are on the hook for as a node operator, in plain language. Knowledge-based duties, your own removal controls, your declared region, network-level removal, and why CSAM is different.
+---
+
+Your node serves content from your own IP address, so the first fair question is what you are responsible for. The short answer: you are expected to act on what you know, not to inspect everything that passes through. You have tools to act fast, you choose which region's rules apply to you, and the network removes severe content on its own path as well. One area works differently from the rest, and this page says so plainly: child sexual abuse material (CSAM).
+
+## Your duty is to act on knowledge
+
+The [operator terms](https://github.com/decdn/decdn/blob/main/crates/cli/TERMS.md) you accept at registration set a knowledge-based floor. If you learn that specific content your node serves is illegal, you stop serving it promptly and report it where your law requires. The terms do not require you to run any particular scanning system. What screening you must do, if any, comes from the law where you operate.
+
+The node caches content-addressed blobs and serves them unmodified. It does not inspect what they contain, and the network makes no claim that content is screened. Legal protections for caching intermediaries generally attach to that pattern: serve automatically, do not modify, and act when you are put on notice. How those protections apply to a decentralized, content-addressed cache has not been tested in court yet, so treat them as a reasonable expectation rather than a guarantee.
+
+In practice, the most common consequence for operators of open infrastructure is not a lawsuit. It is a hosting provider or ISP enforcing its own terms of service. Check your provider's acceptable-use policy before you start.
+
+## You can stop serving anything, immediately
+
+You have a per-node kill switch that needs no vote and no one's permission. Add a hash, or an origin operator's address, to the local denylist in `node.toml`:
+
+```toml ~/.decdn/node.toml
+[content]
+denied_hashes = ["<blake3-hash>"]
+denied_origins = ["0x<operator-address>"]
+```
+
+Run `decdn node reload` and the change applies without a restart. From then on your node refuses those requests, and the refusal looks the same to a client as an on-chain takedown, so nobody can tell from the outside which notices you have received. This is the path to use when a legal notice reaches you directly, including orders with very short deadlines. To drop a blob you already hold, run `decdn node evict <hash>`. To stop serving entirely, run `decdn node drain --wait` and stop the daemon.
+
+## You choose which region's rules apply
+
+You declare a region at registration. Your node then follows global blacklist entries plus your own region's entries, and ignores entries scoped to other regions. Regional rules follow the region you declare, not the location of the client. If you cannot meet a jurisdiction's content rules, do not declare it.
+
+Keep the declaration truthful. A claim that your measured latency contradicts costs reputation, and a region change with `decdn node update-region` only takes effect after a stability window, during which your old region's entries still apply. Your real legal exposure follows where you actually operate, whatever you declare.
+
+## The network removes content too
+
+You are not the only line of defense. The on-chain `ContentBlacklist` removes content network-wide, and your node follows it automatically:
+
+- **Emergency removals** come from a 3-of-5 emergency multisig with no vote and no timelock. They are meant for severe content such as CSAM and terrorist material. Nodes stop serving an entry as soon as they see it, and it becomes slashable 2 hours after it is added. Entries in those two categories stay in force for 90 days unless governance makes them permanent sooner.
+- **Regional removals** come from a governance body registered for one jurisdiction and bind only nodes that declared that region. No regional bodies are registered yet.
+- **Global removals** come from a governance vote and bind every node.
+
+Each entry carries a reason field and a public on-chain record, which documents when content was listed and when your node had to act. Origins that keep supplying blacklisted content can be blacklisted by address and ejected from the network.
+
+## What can cost you bond
+
+Following the blacklist is the one content duty the protocol enforces with your bond. Serving a blacklisted hash after its compliance window (24 hours for governance and regional entries, 2 hours for emergency entries) is slashable. Unmodified node software stops serving on its own well inside that window, and by default it pauses serving if it loses sight of the chain for more than 30 minutes. Your local denylist is yours alone and never exposes you to slashing. See [Compliance and risk](/run-a-node/compliance#what-can-cost-you-bond) for the penalty schedule and appeals.
+
+## CSAM is different
+
+Copyright safe harbors do not protect anyone from criminal CSAM law. The protections for caching intermediaries mentioned above apply to things like copyright claims. They do not apply here.
+
+What this means for you:
+
+- **Knowledge is what matters.** CSAM offenses generally turn on knowledge, and deliberately avoiding knowledge can count as knowing. Do not set your node up so that you cannot act on what you learn.
+- **Reporting is mandatory in many places.** In the US, a provider with actual knowledge of apparent CSAM must report it to NCMEC. In the UK, the Internet Watch Foundation handles reports. Find your country's hotline before you need it.
+- **Stop serving at once.** Add the hash to your local denylist and reload. Do not wait for an on-chain entry.
+- **The protocol does not scan for you.** Perceptual hash matching against industry lists is outside the protocol by design, because deCDN carries arbitrary binary data. Running it, where your law requires or allows it, is an operator-side choice.
+
+## Practical steps before you start
+
+- Read the [operator terms](https://github.com/decdn/decdn/blob/main/crates/cli/TERMS.md). They are short.
+- Consider operating through a limited-liability company rather than personally, and ask about insurance.
+- Know how you will receive notices, and keep a record of each one and what you did.
+- Check your hosting provider's or ISP's terms.
+
+This page explains how the network works and where your duties come from. It is not legal advice. Your obligations depend on where you operate, so talk to a lawyer there if you are unsure.
+
+See also: [Compliance and risk](/run-a-node/compliance), [Content takedown](/protocol/takedown), [Slashing](/protocol/slashing).
