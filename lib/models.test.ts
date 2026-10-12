@@ -98,14 +98,14 @@ describe("pullCommand", () => {
       `curl -fsSL https://up.decdn.org/decdn.sh | sh -s -- pull ${hash} --namespace 1`,
     );
     expect(pullCommand(hash, "windows", 1)).toBe(
-      `irm https://up.decdn.org/decdn.ps1 | iex; decdn-sponsored pull ${hash} --namespace 1`,
+      `& ([scriptblock]::Create((irm https://up.decdn.org/decdn.ps1))) pull ${hash} --namespace 1`,
     );
   });
 
   it("installs and pulls from PowerShell on Windows", () => {
     const hash = `b3:${"ab".repeat(32)}`;
     expect(pullCommand(hash, "windows")).toBe(
-      `irm https://up.decdn.org/decdn.ps1 | iex; decdn-sponsored pull ${hash}`,
+      `& ([scriptblock]::Create((irm https://up.decdn.org/decdn.ps1))) pull ${hash}`,
     );
   });
 });
