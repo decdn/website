@@ -4,10 +4,12 @@ import { Frame } from "@/components/ui/Frame";
 import { TryIt } from "@/components/site/TryIt";
 
 export function Try() {
-  // No chapter header: this continues "How it works", so it drops the
-  // frame's top padding and sits on Method's bottom padding alone.
+  // No chapter header: this continues "How it works". Method gives up its
+  // bottom padding instead of this frame its top, so the two read as one
+  // chapter while #try keeps its own top padding as anchor clearance under
+  // the fixed nav (--nav-h is 0).
   return (
-    <Frame id="try" tone="paper" className="pt-0">
+    <Frame id="try" tone="paper">
       <div className="flex flex-col gap-12">
         <div className="flex flex-col gap-6">
           <span data-reveal className="meta block opacity-60">

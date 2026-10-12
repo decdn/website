@@ -4,8 +4,9 @@ import { MethodRow } from "@/components/ui/MethodRow";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export function Method() {
+  // The try-it block continues this chapter and supplies the space below.
   return (
-    <Frame id="method" tone="paper">
+    <Frame id="method" tone="paper" className="pb-0">
       <SectionHeader
         index="03"
         label="How it works"
