@@ -80,6 +80,16 @@
       "hash": "b3:87539fba0ee64b9f7814d50af89988b0e10f624340dd6e8477a0984c27eaab42",
       "namespace": 1,
       "bytes": 4506488235
+    },
+    {
+      "id": "librispeech",
+      "kind": "dataset",
+      "name": "LibriSpeech ASR corpus",
+      "license": "CC-BY-4.0",
+      "source": "https://www.openslr.org/resources/12/",
+      "hash": "b3:4834e3d4d0e30348841ec99d935d8261f6933c086ff05d5c4adeed19b4ca2c73",
+      "namespace": 1,
+      "bytes": 61357943031
     }
   ]
 }

@@ -1,16 +1,16 @@
-// The seeded launch catalogue, read from public/models.json at build time.
+// The seeded launch catalogue, read from public/demo.json at build time.
 //
-// public/models.json is written by the seeding runbook and is the single
+// public/demo.json is written by the seeding runbook and is the single
 // source for which bundles the site offers (models, datasets, ISOs, videos):
 // an item appears here only once its verified BLAKE3 hash lands in that file.
-// The file also ships as a static asset at /models.json for anyone scripting
+// The file also ships as a static asset at /demo.json for anyone scripting
 // against the catalogue.
 //
 // The command carries the hash, never the item's name: the hash is what
 // `decdn-sponsored` fetches and what every byte is verified against, so the
 // line a visitor copies names exactly the bytes they get.
 
-import catalogue from "@/public/models.json";
+import catalogue from "@/public/demo.json";
 import { links } from "@/lib/links";
 
 /** The kinds of bundle the catalogue offers, in display order. */
@@ -49,7 +49,7 @@ function isKind(kind: string): kind is Kind {
 // here rather than rendering an item no group shows.
 export const ITEMS: readonly Item[] = catalogue.items.map((item) => {
   if (!isKind(item.kind)) {
-    throw new Error(`models.json: ${item.id} has unknown kind "${item.kind}"`);
+    throw new Error(`demo.json: ${item.id} has unknown kind "${item.kind}"`);
   }
   return { ...item, kind: item.kind };
 });
