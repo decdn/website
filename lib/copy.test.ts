@@ -150,7 +150,7 @@ describe("statusBlock", () => {
     expect(block).toContain(
       "public target rate, not a protocol-enforced price",
     );
-    expect(block).toContain("testnet v0");
+    expect(block).toContain("public testnet");
   });
 
   it("places the scope phrase in the sentence", () => {

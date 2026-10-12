@@ -74,7 +74,7 @@ describe("serviceNode pricing", () => {
           unitCode: "E34",
         },
         description:
-          "Public target rate, not a protocol-enforced price. deCDN is at testnet v0; a public testnet and the open-source release are targeted for Q3 2026.",
+          "Public target rate, not a protocol-enforced price. deCDN is a public testnet, live on Arbitrum Sepolia, and open source.",
       },
     });
   });
