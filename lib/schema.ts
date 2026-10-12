@@ -82,7 +82,7 @@ export const serviceNode: Schema<"Service"> = {
         unitCode: "E34",
       },
       description:
-        "Public target rate, not a protocol-enforced price. deCDN is at testnet v0: the public testnet is live on Arbitrum Sepolia and the code is open source.",
+        "Public target rate, not a protocol-enforced price. deCDN is at testnet v0; a public testnet and the open-source release are targeted for Q3 2026.",
     },
   },
   termsOfService: legalUrl("terms"),

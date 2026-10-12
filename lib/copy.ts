@@ -213,7 +213,7 @@ export const TARGET_RATE = "$0.01/GB";
  * in both.
  */
 export const statusBlock = (scope: string): string =>
-  `Status: testnet v0. The public testnet is live on Arbitrum Sepolia and the code is open source. The ${TARGET_RATE} figure quoted ${scope} is a public target rate, not a protocol-enforced price.`;
+  `Status: testnet v0. The protocol runs end-to-end in a test environment; a public testnet and the open-source release are targeted for Q3 2026. The ${TARGET_RATE} figure quoted ${scope} is a public target rate, not a protocol-enforced price.`;
 
 /**
  * The captions on the two homepage data panels.
