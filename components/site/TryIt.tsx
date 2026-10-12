@@ -99,7 +99,9 @@ export function TryIt() {
     >
       <div className="flex flex-col gap-8">
         <label className="flex flex-col gap-3">
-          <span className="meta opacity-60">download</span>
+          <span className="meta opacity-60">
+            select a bundle · {ITEMS.length} seeded
+          </span>
           <span className="relative">
             <select
               value={item.id}
@@ -118,12 +120,16 @@ export function TryIt() {
                   ))
                 : itemOptions(ITEMS)}
             </select>
-            <span
+            <svg
               aria-hidden
-              className="pointer-events-none absolute right-1 bottom-3 text-body opacity-60"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              className="pointer-events-none absolute right-0 bottom-3.5 size-5"
             >
-              ▾
-            </span>
+              <path d="M3 6l5 5 5-5" />
+            </svg>
           </span>
         </label>
 
