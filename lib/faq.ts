@@ -8,8 +8,8 @@ export const FAQ_ITEMS = [
     a: "The recommended starting server is 4 vCPU, 8 GB of RAM, a 1 TB SSD and 5 TB a month of egress. The protocol sets no hardware minimum. What it checks is the capacity you declare, from 10 Mbps up to 200 Gbps, which sets your bond. A 250 Mbps home or server node fits that profile comfortably. The disk is your cache, so more of it means more requests served from bytes you already hold.",
   },
   {
-    q: "What operating system and deployment method do you currently recommend — native Linux, Docker, etc.?",
-    a: "Linux. The node is a single program, decdn-node, and you can run it directly under systemd or in the official container image. The image carries the exact same binary, so pick whichever fits how you already run servers. Linux builds cover x86_64 and ARM64 and run on Debian 11, Ubuntu 20.04, RHEL 8 or anything newer. Release builds also exist for macOS and Windows. A separate decdn command-line tool handles setup, registration and day-to-day admin.",
+    q: "Which platforms and deployment methods are supported?",
+    a: "The node supports Linux, macOS and Windows. It is a single program, decdn-node. On Linux you can run it directly under systemd or in the official container image, which carries the exact same binary. Linux builds cover x86_64 and ARM64 and run on Debian 11, Ubuntu 20.04 or anything newer. A separate decdn command-line tool handles setup, registration and day-to-day admin.",
   },
   {
     q: "How does the capacity bond work?",
