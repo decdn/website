@@ -87,7 +87,7 @@ export function Contact() {
   return (
     <Frame id="contact" tone="paper" className="overflow-hidden">
       <SectionHeader
-        index="06"
+        index="05"
         label="Contact"
         timestamp="open source · open network"
       />

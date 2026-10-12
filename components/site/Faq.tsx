@@ -5,7 +5,7 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 
 // Shared with the row ordinals ("05.1" …) so the numbering can't drift from
 // the section header.
-const SECTION = "05";
+const SECTION = "04";
 
 export function Faq() {
   return (
