@@ -17,7 +17,7 @@ import {
   scrollToAnchor,
 } from "@/lib/scroll";
 
-type SectionId = "intro" | "compare" | "method" | "faq" | "contact";
+type SectionId = "intro" | "compare" | "method" | "try" | "faq" | "contact";
 
 type Props = {
   activeSection: SectionId;
@@ -28,6 +28,7 @@ type Props = {
 const SECTIONS: readonly { id: SectionId; label: string }[] = [
   { id: "compare", label: "compare" },
   { id: "method", label: "method" },
+  { id: "try", label: "try it" },
   { id: "faq", label: "faq" },
   { id: "contact", label: "contact" },
 ] as const;

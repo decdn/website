@@ -596,7 +596,7 @@ a.hero-status:hover .arrow {
   animation-play-state: paused;
 }
 
-/* --- fleet status panel (§05) -----------------------------------------
+/* --- fleet status panel (§06) -----------------------------------------
    Sits on the paper Contact section as an inverted panel. Same "tool
    panel" vocabulary as .terminal — soft corners, solid rule, hard
    offset shadow — with an ops-dashboard layout instead of a CLI log:
@@ -1357,7 +1357,7 @@ a.hero-status:hover .arrow {
   }
 }
 
-/* --- faq: question list + answer card (§04) ---------------------------
+/* --- faq: question list + answer card (§05) ---------------------------
    One <dl>, two columns. Questions (dt) stack on the left; every answer (dd)
    occupies the whole right column and only the selected one is visible.
    The selected row's ordinal turns whisper; the same number is ghosted
