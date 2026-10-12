@@ -9,6 +9,7 @@ import {
   HERO_FIGURES,
   HERO_HEADLINE,
   HERO_LEAD,
+  LAUNCH_BANNER,
   METHOD_STEPS,
   PANEL_CAPTIONS,
   SITE_DESCRIPTION,
@@ -33,6 +34,9 @@ const ROWS: readonly CompareRow[] = COMPARE_ROWS;
 const ALL_STRINGS: readonly [string, string][] = [
   ["SITE_TITLE", SITE_TITLE],
   ["SITE_DESCRIPTION", SITE_DESCRIPTION],
+  ["LAUNCH_BANNER.badge", LAUNCH_BANNER.badge],
+  ["LAUNCH_BANNER.text", LAUNCH_BANNER.text],
+  ["LAUNCH_BANNER.cta", LAUNCH_BANNER.cta],
   ...HERO_HEADLINE.map((s, i): [string, string] => [`HERO_HEADLINE[${i}]`, s]),
   ["HERO_LEAD", HERO_LEAD],
   ...HERO_FIGURES.flatMap((f): [string, string][] => [
@@ -157,6 +161,19 @@ describe("statusBlock", () => {
     expect(statusBlock("throughout")).toContain(
       "quoted throughout is a public",
     );
+  });
+});
+
+describe("LAUNCH_BANNER", () => {
+  // The banner is the homepage's lowercase voice, and it says "testnet" both
+  // in the badge and in the sentence so the status survives a screen reader
+  // or text extractor that skips the badge.
+  it("is lowercase and names the testnet", () => {
+    for (const s of Object.values(LAUNCH_BANNER)) {
+      expect(s).toBe(s.toLowerCase());
+    }
+    expect(LAUNCH_BANNER.badge).toBe("testnet");
+    expect(LAUNCH_BANNER.text).toContain("testnet is live");
   });
 });
 

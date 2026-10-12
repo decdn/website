@@ -35,6 +35,14 @@ export const HERO_HEADLINE = [
 export const HERO_LEAD =
   "A 14-gigabyte file posted in Berlin streams to a client in Tokyo from several nodes at once, every chunk verified with BLAKE3, paid for per megabyte in USDC. The code is open. The network is open. The price is posted.";
 
+/** The launch banner at the top of the hero: a testnet badge, one line, and a
+ *  CTA to the #try section. */
+export const LAUNCH_BANNER = {
+  badge: "testnet",
+  text: "the public testnet is live. pull a model, a dataset, an iso or a film with one command, no wallet.",
+  cta: "try it",
+} as const;
+
 /** A label/value pair rendered by `components/ui/Figure`. Named `FigureCopy`
  *  rather than `Figure` so a call site can import both the copy and the
  *  component without aliasing.
@@ -205,7 +213,7 @@ export const TARGET_RATE = "$0.01/GB";
  * in both.
  */
 export const statusBlock = (scope: string): string =>
-  `Status: testnet v0. The protocol runs end-to-end in a test environment; a public testnet and the open-source release are targeted for Q3 2026. The ${TARGET_RATE} figure quoted ${scope} is a public target rate, not a protocol-enforced price.`;
+  `Status: testnet v0. The public testnet is live on Arbitrum Sepolia and the code is open source. The ${TARGET_RATE} figure quoted ${scope} is a public target rate, not a protocol-enforced price.`;
 
 /**
  * The captions on the two homepage data panels.

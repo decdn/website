@@ -4,6 +4,7 @@ import {
   HERO_HEADLINE,
   HERO_LEAD,
   HERO_STATUS,
+  LAUNCH_BANNER,
 } from "@/lib/copy";
 import { highlightBrand } from "@/components/ui/brand";
 import { Figure } from "@/components/ui/Figure";
@@ -17,6 +18,24 @@ export function Hero() {
       <SectionHeader index="01" label="Hero" timestamp="testnet · v0" />
 
       <div className="mt-10 flex flex-col gap-8 @4xl:gap-12">
+        {/* Launch banner: badge, one line, and a CTA to #try. */}
+        <p className="rise rise-0 flex flex-wrap items-center gap-x-4 gap-y-3 text-body leading-[1.5] font-medium tracking-[-0.01em]">
+          <span className="meta inline-flex items-center gap-2 rounded border border-current px-2 py-1.5 text-whisper-text">
+            <span aria-hidden className="status-live" />
+            {LAUNCH_BANNER.badge}
+          </span>
+          <span>{LAUNCH_BANNER.text}</span>
+          <a
+            className="underline-brutal text-cta font-medium tracking-[0.14em] uppercase"
+            href="#try"
+          >
+            {LAUNCH_BANNER.cta}
+            <span className="arrow" aria-hidden>
+              →
+            </span>
+          </a>
+        </p>
+
         <h1
           id="intro-h"
           className="hug flex flex-col text-h1 leading-[0.9] font-semibold"
