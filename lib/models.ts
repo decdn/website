@@ -7,8 +7,8 @@
 // against the catalogue.
 //
 // The command carries the hash, never the item's name: the hash is what
-// `decdn-sponsored` fetches and what every byte is verified against, so the
-// line a visitor copies names exactly the bytes they get.
+// `decdn` fetches and what every byte is verified against, so the line a
+// visitor copies names exactly the bytes they get.
 
 import catalogue from "@/public/demo.json";
 import { links } from "@/lib/links";
@@ -33,8 +33,8 @@ export type Item = {
   source: string;
   /** `b3:` + 64 lowercase hex characters. */
   hash: string;
-  /** The namespace the item is published under (ADR 002). Passed to
-   *  `decdn-sponsored pull --namespace` so a node that has not cached the
+  /** The namespace the item is published under (ADR 002). Passed to the
+   *  installer's `pull --namespace` so a node that has not cached the
    *  item pulls it from that namespace's origins. A routing hint only: the
    *  bytes are verified against `hash` either way. */
   namespace?: number;
@@ -89,10 +89,11 @@ export const PLATFORMS: readonly {
   { id: "windows", label: "windows", shell: "powershell", prompt: "PS>" },
 ];
 
-/** The one line that installs `decdn` + `decdn-sponsored` and pulls `hash`
- *  (published under `namespace`, when it has one) into the current
- *  directory: a POSIX shell pipe on macOS and Linux, a PowerShell one on
- *  Windows. `namespace` also takes a placeholder string for prose examples. */
+/** The one line that installs `decdn` and pulls `hash` (published under
+ *  `namespace`, when it has one) into the current directory: a POSIX shell
+ *  pipe on macOS and Linux; on Windows, the PowerShell installer run as a
+ *  script block, so the pull arguments reach it. `namespace` also takes a
+ *  placeholder string for prose examples. */
 export function pullCommand(
   hash: string,
   platform: Platform = "unix",
@@ -103,7 +104,7 @@ export function pullCommand(
       ? `pull ${hash}`
       : `pull ${hash} --namespace ${namespace}`;
   return platform === "windows"
-    ? `irm ${links.installerPs1} | iex; decdn-sponsored ${pull}`
+    ? `& ([scriptblock]::Create((irm ${links.installerPs1}))) ${pull}`
     : `curl -fsSL ${links.installer} | sh -s -- ${pull}`;
 }
 
