@@ -2,7 +2,9 @@ import type { ReactNode } from "react";
 
 /**
  * Wraps every case-insensitive `decdn` in a copy string with the whisper-green
- * brand span, normalising the casing to `deCDN` on the way through. The span
+ * brand span, normalising the casing to `deCDN` on the way through. An
+ * all-lowercase `decdn` is left alone: it is the CLI (`decdn setup`,
+ * `decdn-node`), and rewriting it would print a command that doesn't exist. The span
  * reads `--whisper-text`, which Frame deepens on paper so the brand stays AA
  * there (see globals.css :root).
  *
@@ -13,7 +15,7 @@ import type { ReactNode } from "react";
  */
 export function highlightBrand(s: string): ReactNode[] {
   return s.split(/(decdn)/gi).map((part, i) =>
-    part.toLowerCase() === "decdn" ? (
+    part !== "decdn" && part.toLowerCase() === "decdn" ? (
       <span key={i} className="text-whisper-text">
         deCDN
       </span>
