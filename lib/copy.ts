@@ -69,7 +69,7 @@ export const TRY_LEAD =
 
 /** The short notes under the command. */
 export const TRY_NOTES = [
-  "files land in the current directory. add -o <dir> to change it.",
+  "files land in the current directory. add --select to preview.",
   "interrupted? run the same line again to resume.",
 ] as const;
 
