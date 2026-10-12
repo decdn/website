@@ -15,13 +15,15 @@ import { BLOG_URL, DOCS_ORIGIN, links, repoUrl, SITE_URL } from "@/lib/links";
 // a consumer short on context may skip everything under it, so nothing
 // load-bearing lives there.
 //
-// Page entries derive from the same loaders the HTML routes use (listPosts,
-// LEGAL_SLUGS), so this file cannot list an HTML route the build did not emit.
-// The rest are not routes and get no such guarantee: the litepaper and press
-// kit are files under public/, the two docs.decdn.org URLs are on a host
-// Mintlify builds independently of `pnpm build`, and the source repos are on
-// GitHub. scripts/check-out.mjs verifies the same-origin ones against out/
-// after a build; the off-origin ones are out of reach from here. Both llms surfaces are also listed in
+// Post and legal entries derive from the same loaders the HTML routes use
+// (listPosts, LEGAL_SLUGS), so this file cannot list an HTML route the build
+// did not emit. The rest get no such guarantee: the site, blog-index and
+// llms-full.txt entries are literals; the litepaper and press kit are files
+// under public/, not routes; the two docs.decdn.org URLs are on a host
+// Mintlify builds independently of `pnpm build`; and the source repos are on
+// GitHub. scripts/check-out.mjs resolves every same-origin entry against out/
+// after a build. The off-origin ones are beyond its reach, so route.test.ts
+// pins the repo URLs instead. Both llms surfaces are also listed in
 // app/sitemap-pages.xml/route.ts.
 
 // Required by Next 16 under `output: "export"` for route handlers that emit
@@ -72,7 +74,7 @@ ${STATUS}
 
 ${entry("deCDN", SITE_URL, SITE_DESCRIPTION, "site")}
 ${entry(BLOG_TITLE, BLOG_URL, BLOG_DESCRIPTION, "blog index")}
-${entry("llms-full.txt", `${SITE_URL}llms-full.txt`, "Every page on this origin as one plain-text document: homepage copy, the comparison matrix, the FAQ, all field notes, and the legal documents.", "llms-full")}
+${entry("llms-full.txt", `${SITE_URL}llms-full.txt`, "Every page on this origin as one plain-text document: homepage copy, the comparison matrix, the FAQ, all field notes, the legal documents, and a list of the public source repos.", "llms-full")}
 
 ## Protocol documentation
 

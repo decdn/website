@@ -41,6 +41,18 @@ describe("llms.txt shape", () => {
     expect(sections.at(-1)).toBe("## Optional");
   });
 
+  // Pinned in full so a load-bearing section — the source repos, say — cannot
+  // drift under `## Optional` or lose its heading without a test failing.
+  it("orders its sections", () => {
+    expect(headings.filter((h) => h.startsWith("## "))).toEqual([
+      "## Site",
+      "## Protocol documentation",
+      "## Source code",
+      "## Field notes",
+      "## Optional",
+    ]);
+  });
+
   it("formats every list line as a link entry", () => {
     const entries = lines.filter((line) => line.startsWith("- "));
     expect(entries.length).toBeGreaterThan(0);
@@ -85,6 +97,19 @@ describe("llms.txt contents", () => {
       expect(lines.filter((line) => line === entry)).toHaveLength(1);
     },
   );
+
+  it("lists exactly the source repos, in order, under Source code", () => {
+    const section = lines.slice(
+      lines.indexOf("## Source code"),
+      lines.indexOf("## Field notes"),
+    );
+    expect(section.filter((line) => line.startsWith("- "))).toEqual(
+      SOURCE_REPOS.map(
+        ({ name, note }) =>
+          `- [decdn/${name}](https://github.com/decdn/${name}): ${note}`,
+      ),
+    );
+  });
 
   it.each(LEGAL_SLUGS)("lists /legal/%s/", (slug) => {
     expect(body).toContain(`(https://decdn.org/legal/${slug}/)`);

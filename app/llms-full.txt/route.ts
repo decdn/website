@@ -35,7 +35,9 @@ import { STATS_URL } from "@/lib/stats";
 // attributes restated here by hand, and had already drifted. Anything new the
 // homepage renders belongs in lib/copy.ts for the same reason.
 //
-// Post and legal bodies come from the same loaders the routes use.
+// Post and legal bodies come from the same loaders the routes use. The Source
+// code section is the one part that mirrors nothing: it lists SOURCE_REPOS as
+// pointers to GitHub.
 //
 // Deliberately excluded: the HeroTerminal and FleetStatus figures. They are
 // live testnet readings fetched in the browser, and a mirror built once at

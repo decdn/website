@@ -51,7 +51,9 @@ export const BLOG_URL = `${SITE_URL}blog/`;
 export const DOCS_ORIGIN = new URL(links.docs).origin;
 
 // A public repo under the org, derived so `links.github` stays the one source
-// of truth for the org URL. Not a key in `links`: those entries feed `sameAs`.
+// of truth for the org URL. A function rather than per-repo keys in `links`:
+// the repo list is SOURCE_REPOS in lib/copy.ts, and repos are not social
+// profiles, so they stay out of `sameAs` in lib/schema.ts.
 export const repoUrl = (name: string): string => `${links.github}/${name}`;
 
 // Twitter expects an `@handle`; derive from the X profile URL so the X
