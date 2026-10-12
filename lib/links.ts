@@ -50,6 +50,10 @@ export const BLOG_URL = `${SITE_URL}blog/`;
 // (app/sitemap.xml, app/llms.txt, app/llms-full.txt); derive it once.
 export const DOCS_ORIGIN = new URL(links.docs).origin;
 
+// A public repo under the org, derived so `links.github` stays the one source
+// of truth for the org URL. Not a key in `links`: those entries feed `sameAs`.
+export const repoUrl = (name: string): string => `${links.github}/${name}`;
+
 // Twitter expects an `@handle`; derive from the X profile URL so the X
 // account is the single source of truth.
 export const X_HANDLE = `@${new URL(links.x).pathname.replace(/^\//, "")}`;

@@ -11,6 +11,7 @@ import {
   HERO_FIGURES,
   HERO_LEAD,
   METHOD_STEPS,
+  SOURCE_REPOS,
   STACK,
   statusBlock,
 } from "@/lib/copy";
@@ -65,13 +66,20 @@ describe("llms-full.txt shape", () => {
     expect(body).toContain("https://decdn.org/llms.txt");
   });
 
+  it.each(SOURCE_REPOS)("lists the $name repo", ({ name, note }) => {
+    expect(lines).toContain(
+      `- decdn/${name} — https://github.com/decdn/${name}: ${note}`,
+    );
+  });
+
   // The outline is the whole document's, not a mix of this route's headings
   // and every embedded document's — that is what demoteHeadings buys, and it is
   // asserted against the *raw* body rather than `owned`, because the point is
   // that no embedded heading reaches these levels.
-  it("has three sections and one entry per document, embedded bodies included", () => {
+  it("has four sections and one entry per document, embedded bodies included", () => {
     expect(lines.filter((line) => line.startsWith("## "))).toEqual([
       "## Homepage",
+      "## Source code",
       "## Field notes",
       "## Legal",
     ]);
@@ -80,7 +88,7 @@ describe("llms-full.txt shape", () => {
     // documents are counted from the loaders that generate them.
     const homepage = lines.slice(
       lines.indexOf("## Homepage"),
-      lines.indexOf("## Field notes"),
+      lines.indexOf("## Source code"),
     );
     expect(homepage.filter((line) => line.startsWith("### "))).toEqual(
       HOMEPAGE_SUBSECTIONS,

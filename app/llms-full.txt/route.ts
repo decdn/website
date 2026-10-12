@@ -11,6 +11,7 @@ import {
   HERO_LEAD,
   METHOD_STEPS,
   SITE_DESCRIPTION,
+  SOURCE_REPOS,
   stackLine,
   statusBlock,
   TRY_HEADLINE,
@@ -19,7 +20,7 @@ import {
 } from "@/lib/copy";
 import { FAQ_ITEMS } from "@/lib/faq";
 import { getLegalDoc, LEGAL_SLUGS, legalUrl } from "@/lib/legal";
-import { DOCS_ORIGIN, EMAIL, links, SITE_URL } from "@/lib/links";
+import { DOCS_ORIGIN, EMAIL, links, repoUrl, SITE_URL } from "@/lib/links";
 import { ITEMS, formatSize, pullCommand } from "@/lib/models";
 import { STATS_URL } from "@/lib/stats";
 
@@ -170,6 +171,10 @@ const faq = FAQ_ITEMS.map(
   ({ q, a }, i) => `#### ${assertHeadingText(q, `faq[${i}] question`)}\n\n${a}`,
 ).join("\n\n");
 
+const sourceRepos = SOURCE_REPOS.map(
+  ({ name, note }) => `- decdn/${name} — ${repoUrl(name)}: ${note}`,
+).join("\n");
+
 const fieldNotes = listPosts()
   .map((meta) => {
     const post = getPost(meta.slug);
@@ -201,7 +206,7 @@ const BODY = `# deCDN — full text
 
 > ${SITE_DESCRIPTION}
 
-This is every page on decdn.org as one document: the homepage copy, the traditional-vs-deCDN comparison, the FAQ, every field note, and the three legal documents. The curated index is at ${SITE_URL}llms.txt, and the protocol documentation lives on its own host at ${DOCS_ORIGIN}/llms-full.txt.
+This is every page on decdn.org as one document: the homepage copy, the traditional-vs-deCDN comparison, the FAQ, every field note, and the three legal documents. The curated index is at ${SITE_URL}llms.txt, the protocol documentation lives on its own host at ${DOCS_ORIGIN}/llms-full.txt, and the source code is listed under Source code below.
 
 ${statusBlock("throughout")}
 
@@ -254,6 +259,10 @@ ${CONTACT_HEADLINE.join(" ")}
 ${CONTACT_LEAD}
 
 Email ${EMAIL} · GitHub ${links.github} · X ${links.x} · LinkedIn ${links.linkedin} · Discord ${links.discord}
+
+## Source code
+
+${sourceRepos}
 
 ## Field notes
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { assertMarkdownSafe, GET } from "./route";
 import { listPosts } from "@/lib/blog";
+import { SOURCE_REPOS } from "@/lib/copy";
 import { LEGAL_SLUGS } from "@/lib/legal";
 
 const response = GET();
@@ -74,6 +75,16 @@ describe("llms.txt contents", () => {
   ])("points at %s", (url) => {
     expect(body).toContain(`(${url})`);
   });
+
+  // Off-origin, so scripts/check-out.mjs never resolves these; pin the URL
+  // shape here instead.
+  it.each(SOURCE_REPOS)(
+    "lists the $name repo exactly once",
+    ({ name, note }) => {
+      const entry = `- [decdn/${name}](https://github.com/decdn/${name}): ${note}`;
+      expect(lines.filter((line) => line === entry)).toHaveLength(1);
+    },
+  );
 
   it.each(LEGAL_SLUGS)("lists /legal/%s/", (slug) => {
     expect(body).toContain(`(https://decdn.org/legal/${slug}/)`);

@@ -3,10 +3,11 @@ import {
   BLOG_DESCRIPTION,
   BLOG_TITLE,
   SITE_DESCRIPTION,
+  SOURCE_REPOS,
   statusBlock,
 } from "@/lib/copy";
 import { getLegalDoc, LEGAL_SLUGS, legalUrl } from "@/lib/legal";
-import { BLOG_URL, DOCS_ORIGIN, links, SITE_URL } from "@/lib/links";
+import { BLOG_URL, DOCS_ORIGIN, links, repoUrl, SITE_URL } from "@/lib/links";
 
 // Curated machine-readable index of this origin, per https://llmstxt.org:
 // an H1, a blockquote summary, free-form prose, then H2-delimited file lists
@@ -16,11 +17,11 @@ import { BLOG_URL, DOCS_ORIGIN, links, SITE_URL } from "@/lib/links";
 //
 // Page entries derive from the same loaders the HTML routes use (listPosts,
 // LEGAL_SLUGS), so this file cannot list an HTML route the build did not emit.
-// Four entries are not routes and get no such guarantee: the litepaper and
-// press kit are files under public/, and the two docs.decdn.org URLs are on a
-// host Mintlify builds independently of `pnpm build`. scripts/check-out.mjs
-// verifies the same-origin ones against out/ after a build; the docs host is
-// out of reach from here. Both llms surfaces are also listed in
+// The rest are not routes and get no such guarantee: the litepaper and press
+// kit are files under public/, the two docs.decdn.org URLs are on a host
+// Mintlify builds independently of `pnpm build`, and the source repos are on
+// GitHub. scripts/check-out.mjs verifies the same-origin ones against out/
+// after a build; the off-origin ones are out of reach from here. Both llms surfaces are also listed in
 // app/sitemap-pages.xml/route.ts.
 
 // Required by Next 16 under `output: "export"` for route handlers that emit
@@ -77,6 +78,12 @@ ${entry("llms-full.txt", `${SITE_URL}llms-full.txt`, "Every page on this origin 
 
 ${entry("docs.decdn.org llms.txt", `${DOCS_ORIGIN}/llms.txt`, "Curated index of the protocol documentation, served by the docs host.", "docs index")}
 ${entry("docs.decdn.org llms-full.txt", `${DOCS_ORIGIN}/llms-full.txt`, "The full protocol documentation as one plain-text document.", "docs full")}
+
+## Source code
+
+${SOURCE_REPOS.map(({ name, note }) =>
+  entry(`decdn/${name}`, repoUrl(name), note, `repo ${name}`),
+).join("\n")}
 
 ## Field notes
 
