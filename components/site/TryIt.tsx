@@ -151,7 +151,7 @@ export function TryIt() {
         </div>
       </div>
 
-      <div className="terminal flex flex-col">
+      <div className="terminal terminal-light flex flex-col">
         <div className="terminal-head">
           <span className="terminal-dot" />
           <span className="terminal-dot" />
@@ -202,7 +202,7 @@ export function TryIt() {
           </button>
         </div>
 
-        <ul className="flex flex-col gap-1 border-t border-dashed border-current/30 px-[18px] py-4 text-[12px] opacity-70">
+        <ul className="terminal-foot flex flex-col gap-1 px-[18px] py-4 text-[12px] text-ink/70">
           {TRY_NOTES.map((note) => (
             <li key={note}>
               <span className="dim">#</span> {note}

@@ -489,6 +489,30 @@ a.hero-status:hover .arrow {
   }
 }
 
+/* The #try panel sits on ink, where the stark white panel and its ink
+   rules read as a hole punched in the page. This variant keeps the white
+   command body but steps the chrome down in greys: a pale head and foot
+   strip, hairlines in a light grey, and a grey offset slab in place of the
+   ink shadow that vanishes on black. */
+.terminal-light {
+  --term-grey: color-mix(in srgb, var(--ink) 5%, var(--paper));
+  --term-rule: color-mix(in srgb, var(--ink) 12%, var(--paper));
+  border-color: var(--term-rule);
+  box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--paper) 22%, var(--ink));
+}
+.terminal-light .terminal-head,
+.terminal-light .terminal-foot {
+  background: var(--term-grey);
+}
+.terminal-light .terminal-head {
+  border-bottom-color: var(--term-rule);
+  border-radius: var(--panel-radius) var(--panel-radius) 0 0;
+}
+.terminal-light .terminal-foot {
+  border-top: 1px solid var(--term-rule);
+  border-radius: 0 0 var(--panel-radius) var(--panel-radius);
+}
+
 /* Scoped to .terminal because these are generic names: .arrow is also the
    hover glyph on a.underline-brutal and a.cta-primary, which must not pick
    up the terminal's colour, weight and gap. */
@@ -599,7 +623,7 @@ a.hero-status:hover .arrow {
   animation-play-state: paused;
 }
 
-/* --- fleet status panel (§06) -----------------------------------------
+/* --- fleet status panel (§05) -----------------------------------------
    Sits on the paper Contact section as an inverted panel. Same "tool
    panel" vocabulary as .terminal — soft corners, solid rule, hard
    offset shadow — with an ops-dashboard layout instead of a CLI log:
@@ -1445,7 +1469,7 @@ a.hero-status:hover .arrow {
   transition: color 200ms var(--ease-soft);
 }
 .faq-row[data-selected="true"] .faq-ordinal {
-  color: var(--whisper);
+  color: var(--whisper-text);
 }
 .faq-q[aria-disabled="true"] {
   cursor: default;
@@ -1456,10 +1480,10 @@ a.hero-status:hover .arrow {
   display: none;
   margin: 0 0 1.5rem;
   padding: var(--faq-pad);
-  /* Solid like .terminal and .fleet, but rounder; filled with a
-     dark grey so the card reads as a panel, not a hole in the ink. A shade
-     under .fleet's 12%, which sits on paper: on ink, 12% reads too light. No
-     offset shadow: on ink it renders as a second grey slab beside the card. */
+  /* Solid like .terminal and .fleet, but rounder; a dark panel on the
+     paper chapter, like the fleet panel below it. Sets its
+     own colour so the ghost ordinal, which inherits, stays visible. */
+  color: var(--paper);
   background: color-mix(in srgb, var(--paper) 8%, var(--ink));
   border: 1px solid var(--faq-edge);
   border-radius: var(--card-radius);

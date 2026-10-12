@@ -40,7 +40,7 @@ const NAV = [
 // when applied to `position: fixed` elements (the nav would vanish).
 const DARK_SECTIONS: ReadonlySet<(typeof SECTION_IDS)[number]> = new Set([
   "compare",
-  "faq",
+  "try",
 ]);
 
 export function Chrome() {

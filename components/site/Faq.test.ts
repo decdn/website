@@ -10,10 +10,10 @@ import { asElement, attrs, childElements } from "@/test-utils/react-tree";
 describe("Faq", () => {
   const section = asElement(Faq());
 
-  it("stays the ink-toned #faq section the nav and schema point at", () => {
+  it("stays the paper-toned #faq section the nav and schema point at", () => {
     expect(section.type).toBe(Frame);
     expect(attrs(section).id).toBe("faq");
-    expect(attrs(section).tone).toBe("ink");
+    expect(attrs(section).tone).toBe("paper");
   });
 
   it("keeps the heading Frame labels the section by", () => {

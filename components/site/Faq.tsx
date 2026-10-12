@@ -9,11 +9,13 @@ const SECTION = "05";
 
 export function Faq() {
   return (
-    <Frame id="faq" tone="ink">
-      {/* Not "field notes": that is the blog's name, and this is not the blog. */}
+    <Frame id="faq" tone="paper">
+      {/* Not "field notes": that is the blog's name, and this is not the blog.
+          The header names the whole chapter: #contact follows on the same
+          paper with no header of its own. */}
       <SectionHeader
         index={SECTION}
-        label="FAQ"
+        label="FAQ and Contact"
         timestamp={`${FAQ_ITEMS.length} questions`}
       />
 
