@@ -1424,7 +1424,9 @@ a.hero-status:hover .arrow {
   display: none;
   margin: 0 0 1.5rem;
   padding: var(--faq-pad);
-  /* Soft-cornered and solid, matching .terminal and .fleet. */
+  /* Soft-cornered and solid, matching .terminal and .fleet; filled with
+     .fleet's grey so the card reads as a panel, not a hole in the ink. */
+  background: color-mix(in srgb, var(--paper) 12%, var(--ink));
   border: 1px solid var(--faq-edge);
   border-radius: var(--panel-radius);
   box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--paper) 12%, transparent);
