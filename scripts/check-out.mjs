@@ -81,7 +81,7 @@ if (sitemap) {
   }
 }
 
-// 2. Every same-origin URL the curated index advertises resolves. Off-origin
+// 2. Every same-origin URL either llms surface advertises resolves. Off-origin
 //    entries (docs.decdn.org, built by Mintlify; the GitHub source repos) are
 //    out of reach from here.
 for (const surface of ["llms.txt", "llms-full.txt"]) {

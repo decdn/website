@@ -66,9 +66,16 @@ describe("llms-full.txt shape", () => {
     expect(body).toContain("https://decdn.org/llms.txt");
   });
 
-  it.each(SOURCE_REPOS)("lists the $name repo", ({ name, note }) => {
-    expect(lines).toContain(
-      `- decdn/${name} — https://github.com/decdn/${name}: ${note}`,
+  it("lists exactly the source repos, in order, under Source code", () => {
+    const section = lines.slice(
+      lines.indexOf("## Source code"),
+      lines.indexOf("## Field notes"),
+    );
+    expect(section.filter((line) => line.startsWith("- "))).toEqual(
+      SOURCE_REPOS.map(
+        ({ name, note }) =>
+          `- decdn/${name} — https://github.com/decdn/${name}: ${note}`,
+      ),
     );
   });
 

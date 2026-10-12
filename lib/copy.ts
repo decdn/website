@@ -236,6 +236,7 @@ export const BLOG_DESCRIPTION = "long-form posts on the deCDN protocol.";
 export type SourceRepo = {
   /** Repo name under the GitHub org; the URL is `repoUrl(name)` in lib/links.ts. */
   name: string;
+  /** One line, no "]": llms.txt's assertMarkdownSafe rejects either at build. */
   note: string;
 };
 
