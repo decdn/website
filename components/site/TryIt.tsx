@@ -1,31 +1,23 @@
 "use client";
 
-import { useRef, useState, useSyncExternalStore } from "react";
-import { Figure } from "@/components/ui/Figure";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { flushSync } from "react-dom";
+import { TryPicker } from "@/components/site/TryPicker";
 import { TRY_NOTES } from "@/lib/copy";
 import {
   ITEMS,
   PLATFORMS,
-  type Item,
   type Platform,
   detectPlatform,
   formatSize,
-  groupByKind,
   pullCommand,
   sourceLabel,
 } from "@/lib/models";
 
-const GROUPS = groupByKind(ITEMS);
-
-function itemOptions(items: readonly Item[]) {
-  return items.map((item) => (
-    <option key={item.id} value={item.id}>
-      {item.name}
-    </option>
-  ));
-}
-
 const COPIED_MS = 2000;
+
+/** How long a picked item's command takes to type itself out. */
+const TYPE_MS = 350;
 
 // The visitor's OS never changes while the page is open, so there is nothing
 // to subscribe to.
@@ -42,10 +34,14 @@ function clientPlatform(): Platform {
 // gets PowerShell once the page hydrates.
 const serverPlatform = (): Platform => "unix";
 
+const prefersReducedMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 /**
- * The interactive half of the #try section: pick a seeded item, copy the one
- * line that pulls it. Unlike HeroTerminal, this panel is real and not
- * aria-hidden: the command is the product's actual install-and-download line.
+ * The interactive half of the #try section: pick a seeded item from the boxes,
+ * copy the one line that pulls it. Unlike HeroTerminal, this panel is real and
+ * not aria-hidden: the command is the product's actual install-and-download
+ * line.
  */
 export function TryIt() {
   const [id, setId] = useState(ITEMS[0]?.id ?? "");
@@ -57,12 +53,49 @@ export function TryIt() {
   const [chosen, setPlatform] = useState<Platform | null>(null);
   const platform = chosen ?? detected;
   const [copied, setCopied] = useState(false);
+  // Picking a box types its command out; null means the full line shows.
+  // Only a pick animates: first paint, the hydration swap to PowerShell and
+  // the OS toggle all render the whole line at once.
+  const [typingFrom, setTypingFrom] = useState<number | null>(null);
+  const [now, setNow] = useState(0);
   const codeRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (typingFrom === null) return;
+    let frame = requestAnimationFrame(function tick(t) {
+      if (t - typingFrom >= TYPE_MS) {
+        setTypingFrom(null);
+        return;
+      }
+      setNow(t);
+      frame = requestAnimationFrame(tick);
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [typingFrom]);
 
   const item = ITEMS.find((i) => i.id === id) ?? ITEMS[0];
   const shell = PLATFORMS.find((p) => p.id === platform) ?? PLATFORMS[0];
   if (!item || !shell) return null;
   const command = pullCommand(item.hash, platform, item.namespace);
+  const typed =
+    typingFrom === null
+      ? command
+      : command.slice(
+          0,
+          Math.ceil((command.length * Math.max(0, now - typingFrom)) / TYPE_MS),
+        );
+
+  function select(next: string) {
+    setId(next);
+    setCopied(false);
+    if (prefersReducedMotion()) {
+      setTypingFrom(null);
+      return;
+    }
+    const start = performance.now();
+    setNow(start);
+    setTypingFrom(start);
+  }
 
   function flashCopied() {
     setCopied(true);
@@ -83,6 +116,8 @@ export function TryIt() {
   }
 
   async function copy() {
+    // Finish any typing first, so a fallback selection takes the whole line.
+    flushSync(() => setTypingFrom(null));
     try {
       await navigator.clipboard.writeText(command);
       flashCopied();
@@ -95,56 +130,11 @@ export function TryIt() {
     <div
       data-reveal
       style={{ "--reveal-delay": "120ms" }}
-      className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] @4xl:items-start @4xl:gap-12"
+      className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] @4xl:items-start @4xl:gap-12"
     >
-      <div className="flex flex-col gap-8">
-        <label className="flex flex-col gap-3">
-          <span className="meta opacity-60">download</span>
-          <span className="relative">
-            <select
-              value={item.id}
-              onChange={(e) => {
-                setId(e.target.value);
-                setCopied(false);
-              }}
-              className="w-full cursor-pointer appearance-none truncate border-b border-current bg-transparent pr-8 pb-2 text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold tracking-[-0.02em] focus-visible:outline-2 focus-visible:outline-offset-4"
-            >
-              {/* One kind needs no group headings; several get one each. */}
-              {GROUPS.length > 1
-                ? GROUPS.map((group) => (
-                    <optgroup key={group.kind} label={group.label}>
-                      {itemOptions(group.items)}
-                    </optgroup>
-                  ))
-                : itemOptions(ITEMS)}
-            </select>
-            <span
-              aria-hidden
-              className="pointer-events-none absolute right-1 bottom-3 text-body opacity-60"
-            >
-              ▾
-            </span>
-          </span>
-        </label>
+      <TryPicker selectedId={item.id} onSelect={select} />
 
-        <div className="grid grid-cols-2 gap-y-4">
-          <Figure label="size" value={formatSize(item.bytes)} />
-          <Figure label="license" value={item.license} />
-          <div className="col-span-2 flex flex-col gap-1">
-            <span className="meta opacity-60">source</span>
-            <a
-              className="self-start text-body font-medium tracking-[-0.01em] break-all underline decoration-1 underline-offset-4 hover:decoration-whisper"
-              href={item.source}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {sourceLabel(item.source)}
-            </a>
-          </div>
-        </div>
-      </div>
-
-      <div className="terminal flex flex-col">
+      <div className="terminal flex flex-col @4xl:sticky @4xl:top-28">
         <div className="terminal-head">
           <span className="terminal-dot" />
           <span className="terminal-dot" />
@@ -163,6 +153,7 @@ export function TryIt() {
                 onClick={() => {
                   setPlatform(p.id);
                   setCopied(false);
+                  setTypingFrom(null);
                 }}
                 className={`cursor-pointer border-b pb-[1px] text-[10px] font-medium tracking-[0.14em] uppercase ${
                   p.id === platform
@@ -176,9 +167,26 @@ export function TryIt() {
           </span>
         </div>
 
-        <pre className="m-0 px-[18px] pt-[18px] pb-4 font-[inherit] break-all whitespace-pre-wrap">
-          <span className="prompt select-none">{shell.prompt} </span>
-          <code ref={codeRef}>{command}</code>
+        <pre className="m-0 flex flex-col gap-1 px-[18px] pt-[18px] pb-4 font-[inherit] break-all whitespace-pre-wrap">
+          <span className="dim">
+            # {item.name}, {formatSize(item.bytes)}, {item.license}
+          </span>
+          <span className="dim">
+            # source:{" "}
+            <a
+              className="underline decoration-1 underline-offset-4 hover:decoration-whisper"
+              href={item.source}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {sourceLabel(item.source)}
+            </a>
+          </span>
+          <span className="mt-2">
+            <span className="prompt select-none">{shell.prompt} </span>
+            <code ref={codeRef}>{typed}</code>
+            <span className="cursor" aria-hidden />
+          </span>
         </pre>
 
         <div className="flex items-center justify-between gap-6 px-[18px] pb-[18px]">

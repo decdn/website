@@ -599,6 +599,53 @@ a.hero-status:hover .arrow {
   animation-play-state: paused;
 }
 
+/* --- try-it picker (§04) -----------------------------------------------
+   One box per seeded item (components/site/TryPicker.tsx), a visually
+   hidden radio inside each. Unpicked boxes keep a quiet hairline; the
+   picked one takes the terminal's solid rule and hard offset shadow and
+   lifts by the shadow's half, so it reads as the item in the terminal.
+   No hover transform: hover only firms the rule. */
+
+.try-option {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  height: 100%;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, currentColor 25%, transparent);
+  border-radius: var(--panel-radius);
+  cursor: pointer;
+  transition:
+    border-color 200ms var(--ease-soft),
+    box-shadow 300ms var(--ease-expo),
+    transform 300ms var(--ease-expo);
+}
+
+.try-option:hover {
+  border-color: color-mix(in srgb, currentColor 60%, transparent);
+}
+
+.try-option:has(:checked) {
+  border-color: currentColor;
+  box-shadow: 4px 4px 0 0 color-mix(in srgb, var(--ink) 12%, transparent);
+  transform: translate(-2px, -2px);
+}
+
+.try-option:has(:focus-visible) {
+  outline: 1px dashed currentColor;
+  outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .try-option {
+    transition: none;
+  }
+  .try-option:has(:checked) {
+    transform: none;
+  }
+}
+
 /* --- fleet status panel (§06) -----------------------------------------
    Sits on the paper Contact section as an inverted panel. Same "tool
    panel" vocabulary as .terminal — soft corners, solid rule, hard
