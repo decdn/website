@@ -26,7 +26,7 @@
      nothing on desktop.) */
   --nav-h: 0;
   /* Corner radius shared by the tool panels (.terminal, .fleet,
-     .faq-card) and their offset shadows. */
+     .faq-card) and the offset shadows of the first two. */
   --panel-radius: 6px;
   /* The system monospace stack: --font-mono's tail, and on its own the face
      for glyphs no Geist Mono Google subset carries (the terminal's → and ✓,
@@ -389,8 +389,8 @@ a.hero-status:hover .arrow {
    the cascade stops the rotation: reduced motion and the offscreen pause
    below. The cursor blinks independently except offscreen.
    The cascade restarts every cycle. Shares the "tool
-   panel" vocabulary with .fleet and .faq-card: soft corners, a solid
-   1px rule, a hard offset shadow. */
+   panel" vocabulary with .fleet: soft corners, a solid 1px rule, a hard
+   offset shadow. .faq-card keeps the first two. */
 
 .terminal {
   font-family: var(--font-mono);
@@ -1424,10 +1424,13 @@ a.hero-status:hover .arrow {
   display: none;
   margin: 0 0 1.5rem;
   padding: var(--faq-pad);
-  /* Soft-cornered and solid, matching .terminal and .fleet. */
+  /* Soft-cornered and solid, matching .terminal and .fleet; filled with a
+     dark grey so the card reads as a panel, not a hole in the ink. A shade
+     under .fleet's 12%, which sits on paper: on ink, 12% reads too light. No
+     offset shadow: on ink it renders as a second grey slab beside the card. */
+  background: color-mix(in srgb, var(--paper) 8%, var(--ink));
   border: 1px solid var(--faq-edge);
   border-radius: var(--panel-radius);
-  box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--paper) 12%, transparent);
 }
 .faq-card[data-selected="true"] {
   display: block;
