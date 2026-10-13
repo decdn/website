@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
+import { CodeBlock } from "@/components/ui/CodeBlock";
 import { Frame } from "@/components/ui/Frame";
 import { Pill } from "@/components/ui/Pill";
 import { META } from "@/components/ui/PostRow";
@@ -151,6 +152,7 @@ export default async function BlogPost({
           <Prose>
             <MDXRemote
               source={post.body}
+              components={{ pre: CodeBlock }}
               options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
             />
           </Prose>
