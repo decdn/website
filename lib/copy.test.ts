@@ -36,7 +36,6 @@ const ALL_STRINGS: readonly [string, string][] = [
   ["SITE_DESCRIPTION", SITE_DESCRIPTION],
   ["LAUNCH_BANNER.badge", LAUNCH_BANNER.badge],
   ["LAUNCH_BANNER.text", LAUNCH_BANNER.text],
-  ["LAUNCH_BANNER.cta", LAUNCH_BANNER.cta],
   ...HERO_HEADLINE.map((s, i): [string, string] => [`HERO_HEADLINE[${i}]`, s]),
   ["HERO_LEAD", HERO_LEAD],
   ...HERO_FIGURES.flatMap((f): [string, string][] => [
