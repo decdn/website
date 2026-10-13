@@ -5,6 +5,7 @@ import {
   COMPARE_ROWS,
   CONTACT_HEADLINE,
   CONTACT_LEAD,
+  CONTACT_RUN_NODE,
   type CompareRow,
   HERO_FIGURES,
   HERO_HEADLINE,
@@ -70,6 +71,7 @@ const ALL_STRINGS: readonly [string, string][] = [
     s,
   ]),
   ["CONTACT_LEAD", CONTACT_LEAD],
+  ["CONTACT_RUN_NODE", CONTACT_RUN_NODE],
 ];
 
 describe("copy strings", () => {
@@ -175,7 +177,7 @@ describe("statusBlock", () => {
     expect(block).toContain(
       "public target rate, not a protocol-enforced price",
     );
-    expect(block).toContain("testnet v0");
+    expect(block).toContain("public testnet");
   });
 
   it("places the scope phrase in the sentence", () => {

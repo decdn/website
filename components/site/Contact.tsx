@@ -1,5 +1,5 @@
 import { EMAIL, links } from "@/lib/links";
-import { CONTACT_HEADLINE, CONTACT_LEAD } from "@/lib/copy";
+import { CONTACT_HEADLINE, CONTACT_LEAD, CONTACT_RUN_NODE } from "@/lib/copy";
 import { highlightBrand } from "@/components/ui/brand";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -187,7 +187,22 @@ export function Contact() {
           </div>
         </div>
 
-        <FleetStatus className="block w-full" />
+        <div className="flex flex-col items-start gap-6">
+          <FleetStatus className="block w-full" />
+          <a
+            data-reveal
+            style={{ "--reveal-delay": "320ms" }}
+            className="underline-brutal text-body font-semibold tracking-[0.02em]"
+            href={links.runNode}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {CONTACT_RUN_NODE}
+            <span className="arrow" aria-hidden>
+              →
+            </span>
+          </a>
+        </div>
       </div>
     </Frame>
   );
