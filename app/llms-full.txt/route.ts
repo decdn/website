@@ -170,7 +170,8 @@ const methodSteps = METHOD_STEPS.map(
 ).join("\n\n");
 
 const faq = FAQ_ITEMS.map(
-  ({ q, a }, i) => `#### ${assertHeadingText(q, `faq[${i}] question`)}\n\n${a}`,
+  ({ q, a }, i) =>
+    `#### ${assertHeadingText(q, `faq[${i}] question`)}\n\n${a.join("\n\n")}`,
 ).join("\n\n");
 
 const sourceRepos = SOURCE_REPOS.map(
@@ -261,6 +262,8 @@ ${CONTACT_HEADLINE.join(" ")}
 ${CONTACT_LEAD}
 
 Email ${EMAIL} · GitHub ${links.github} · X ${links.x} · LinkedIn ${links.linkedin} · Discord ${links.discord}
+
+Run a node on the testnet: ${links.runNode}
 
 ## Source code
 

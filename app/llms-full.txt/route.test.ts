@@ -144,7 +144,7 @@ describe("homepage mirror", () => {
 
   it.each(FAQ_ITEMS)("has the FAQ entry $q", ({ q, a }) => {
     expect(lines).toContain(`#### ${q}`);
-    expect(body).toContain(a);
+    expect(body).toContain(a.join("\n\n"));
   });
 
   // The scalar homepage strings: without these, deleting `${HERO_LEAD}` from

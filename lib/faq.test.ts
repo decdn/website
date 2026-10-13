@@ -10,7 +10,7 @@ import { FAQ_ITEMS } from "./faq";
 const FIELDS: readonly [string, string][] = FAQ_ITEMS.flatMap(
   ({ q, a }, i): [string, string][] => [
     [`FAQ_ITEMS[${i}].q`, q],
-    [`FAQ_ITEMS[${i}].a`, a],
+    ...a.map((p, j): [string, string] => [`FAQ_ITEMS[${i}].a[${j}]`, p]),
   ],
 );
 
@@ -33,5 +33,9 @@ describe("FAQ_ITEMS", () => {
   // prefixes it with, producing a heading a level shallower than intended.
   it.each(FAQ_ITEMS)("does not open $q with a hash", ({ q }) => {
     expect(q.startsWith("#")).toBe(false);
+  });
+
+  it.each(FAQ_ITEMS)("answers $q in at least one paragraph", ({ a }) => {
+    expect(a.length).toBeGreaterThan(0);
   });
 });

@@ -9,6 +9,7 @@ export const links = {
   litepaper: "/decdn_litepaper.pdf",
   presskit: "/presskit/decdn-presskit.zip",
   docs: "https://docs.decdn.org/overview/introduction",
+  runNode: "https://docs.decdn.org/run-a-node/overview",
   // Served by sponsord; each installs decdn and runs the sponsored pull.
   installer: "https://up.decdn.org/decdn.sh",
   installerPs1: "https://up.decdn.org/decdn.ps1",

@@ -1,22 +1,52 @@
+import { TARGET_RATE } from "./copy";
+import { EMAIL } from "./links";
+
+/** One question and its answer. The answer is a list of paragraphs: the
+ *  homepage renders each as its own <p>, llms-full.txt separates them with a
+ *  blank line, and the FAQPage JSON-LD joins them with a space. */
+export type FaqEntry = { q: string; a: readonly string[] };
+
 export const FAQ_ITEMS = [
   {
-    q: "What about free-egress storage like Cloudflare R2 or Backblaze B2?",
-    a: "It's real, and for a small project it's the right call. But \"free egress\" is a pricing model, not a zero bill: R2 and B2 still charge for storage and per operation, the zero-egress line is a loss-leader the vendor can reprice or pull at will, and it ties you to one provider. deCDN is a different model, not a worse one — you pay per delivered byte on an open market where operators compete for every request, the price falls as the network grows, and no single vendor can reprice or pull it.",
+    q: "How do I put my files on deCDN?",
+    a: [
+      "Set up origin nodes in front of your own storage, whether that is an S3-compatible bucket, an NFS mount or a local disk, and join the network. Your files stay where they are.",
+      `Once you get approved, the rest of the network accepts your nodes as origins and caches your content as your users ask for it. To get started, write to us at ${EMAIL}.`,
+    ],
   },
   {
-    q: "How is byte-level integrity enforced?",
-    a: "Every blob is BLAKE3-addressed, so the hash the client is asking for is the same hash they'll be checking on the way in. Verification happens chunk-by-chunk, in flight — mismatched bytes are dropped and the next node on the list is asked instead. Nodes that send garbage don't get paid for it: the client signs a voucher only for bytes that verify. On-chain misbehavior (rate manipulation, blacklist violations) is slashed against the operator's capacity bond at submit time, from an EIP-712 signed message rather than a central arbiter. The math is the arbiter.",
+    q: "I already have a bucket in S3, R2 or B2. Why add deCDN?",
+    a: [
+      "Keep the bucket. It becomes the origin behind deCDN, read only on a cache miss and never exposed to the network, so you stop paying its egress on every download.",
+      "Your files are served instead by many independent operators close to your users, large files from several of them at once, and when a node drops the download carries on from the next one. Operators compete on every request, so an open market sets your delivery price rather than one vendor's egress rates.",
+    ],
   },
   {
-    q: "Can content be gated or taken down?",
-    a: "Both. For gating: upload ciphertext instead of plaintext — nodes cache the encrypted blob without ever seeing inside, and your app holds the keys, handing them to clients over a separate authenticated channel. Subscription, paywall, whatever logic fits. For takedown: governance can flag specific BLAKE3 hashes as non-servable, and nodes that keep serving them past a short compliance window lose part of their capacity bond — slashing is on-chain, not a human call. Both the key gate and the flag list are auditable; compliance runs end-to-end, from origin onboarding to node-level slashing, governance-owned and auditable throughout.",
+    q: "How do my users download?",
+    a: [
+      "Through your own app. You build downloads into it with the deCDN client SDK, and your users never have to know deCDN is there.",
+      "The SDK pulls each file from several nodes at once, checks every piece as it arrives, and picks up where it left off if the connection drops. It runs on macOS, Linux and Windows today, and phone and browser support are on the way.",
+    ],
   },
   {
-    q: "Why does the network need a token?",
-    a: "TOKEN secures the network — operators post a slashable capacity bond to participate, and they lose it if they misbehave. Payments, though, happen in USDC, because operators want stable currency they can pay power bills with. Once governance switches it on, thirty percent of settled USDC flows into a Uniswap V3 50/50 TOKEN/USDC buyback-and-burn, tying token demand to network throughput.",
+    q: "Do my users need a wallet or crypto?",
+    a: [
+      "No. You fund a USDC pool and your users download from it, with no wallet, no token and no sign-up.",
+      "Each user gets their own allowance, so they can only spend as much as you allow them, and only you can top up or close the pool. The testnet download on this page works the same way.",
+    ],
   },
   {
-    q: "Can publishers pay on behalf of users?",
-    a: "Yes. A publisher funds a payment pool and hands each user a capped, expiring spending capability, so users pull content with no funded wallet and no subscription — same free-to-download experience as a public mirror, except the publisher pays nodes per megabyte instead of one cloud's egress bill. Default flow is client-pays; publisher-pays is the flag you flip when you want to ship widely without per-user payment friction.",
+    q: "Who sets the price, and what will I pay?",
+    a: [
+      "Each node sets its own per-megabyte rate in USDC and signs it into every quote, so you see the price before a byte moves. A node that charges more than it quoted loses part of its bond.",
+      `You never pay more than the ceiling you set, and you pay only for bytes that verify, as they arrive, with no minimums or contracts. The network's target is ${TARGET_RATE}.`,
+    ],
   },
-] as const;
+  {
+    q: "What stops illegal content, and what if a file is flagged by mistake?",
+    a: [
+      "Governance keeps a public, on-chain blacklist of content hashes, network-wide or for a single region. Nodes have 24 hours to stop serving a listed hash, and repeated offenses result in removal from the network.",
+      "Every entry is public, so a wrongful one is visible to anyone, and governance can lift it.",
+    ],
+  },
+] as const satisfies readonly FaqEntry[];

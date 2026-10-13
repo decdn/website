@@ -205,7 +205,7 @@ export const TARGET_RATE = "$0.01/GB";
  * in both.
  */
 export const statusBlock = (scope: string): string =>
-  `Status: testnet v0. The protocol runs end-to-end in a test environment; a public testnet and the open-source release are targeted for Q3 2026. The ${TARGET_RATE} figure quoted ${scope} is a public target rate, not a protocol-enforced price.`;
+  `Status: public testnet. The protocol runs end-to-end on a public testnet on Arbitrum Sepolia, and the source is open. The ${TARGET_RATE} figure quoted ${scope} is a public target rate, not a protocol-enforced price.`;
 
 /**
  * The captions on the two homepage data panels.
@@ -271,3 +271,7 @@ export const CONTACT_HEADLINE = [
 
 export const CONTACT_LEAD =
   "Write to us with questions, partnerships, or anything you'd run on a fleet of idle machines. We read everything.";
+
+/** The operator path under the fleet panel: the homepage FAQ answers
+ *  publishers, and node operators go to the run-a-node docs from here. */
+export const CONTACT_RUN_NODE = "run a node on the testnet";

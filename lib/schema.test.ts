@@ -74,7 +74,7 @@ describe("serviceNode pricing", () => {
           unitCode: "E34",
         },
         description:
-          "Public target rate, not a protocol-enforced price. deCDN is at testnet v0; a public testnet and the open-source release are targeted for Q3 2026.",
+          "Public target rate, not a protocol-enforced price. deCDN runs as a public testnet on Arbitrum Sepolia, and the source is open.",
       },
     });
   });
@@ -130,7 +130,7 @@ describe("faqPageNode", () => {
       FAQ_ITEMS.map(({ q, a }) => ({
         "@type": "Question",
         name: q,
-        acceptedAnswer: { "@type": "Answer", text: a },
+        acceptedAnswer: { "@type": "Answer", text: a.join(" ") },
       })),
     );
   });
