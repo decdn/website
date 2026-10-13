@@ -9,6 +9,7 @@ import {
   HERO_FIGURES,
   HERO_HEADLINE,
   HERO_LEAD,
+  LAUNCH_BANNER,
   METHOD_STEPS,
   SITE_DESCRIPTION,
   SOURCE_REPOS,
@@ -218,6 +219,8 @@ Two notes on reading this file. Field notes and legal documents are reproduced v
 ## Homepage
 
 ### Intro
+
+${LAUNCH_BANNER.badge}: ${LAUNCH_BANNER.text}
 
 ${HERO_HEADLINE.join(" ")}
 

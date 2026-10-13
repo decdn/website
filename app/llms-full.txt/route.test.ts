@@ -10,6 +10,7 @@ import {
   COMPARE_ROWS,
   HERO_FIGURES,
   HERO_LEAD,
+  LAUNCH_BANNER,
   METHOD_STEPS,
   SOURCE_REPOS,
   STACK,
@@ -150,6 +151,7 @@ describe("homepage mirror", () => {
   // The scalar homepage strings: without these, deleting `${HERO_LEAD}` from
   // the template leaves every other assertion in this file green.
   it.each([
+    ["launch banner", LAUNCH_BANNER.text],
     ["hero lead", HERO_LEAD],
     ["contact lead", "the network is open. so is our inbox."],
     ["status hedge", statusBlock("throughout")],
