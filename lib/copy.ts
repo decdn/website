@@ -54,7 +54,7 @@ export type FigureCopy = { label: string; value: string };
 /** The stat strip under the hero CTAs. */
 export const HERO_FIGURES = [
   { label: "target price", value: "$0.01/GB" },
-  { label: "p50 latency", value: "50–100 ms" },
+  { label: "p50 TTFB (hit)", value: "50–100 ms" },
   { label: "settlement", value: "per-MB · USDC" },
   { label: "gas overhead", value: "<1%" },
 ] as const satisfies readonly FigureCopy[];
