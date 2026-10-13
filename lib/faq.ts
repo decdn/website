@@ -25,7 +25,7 @@ export const FAQ_ITEMS = [
     q: "How do my users download?",
     a: [
       "Through your own app. You build downloads into it with the deCDN client SDK, and your users never have to know deCDN is there.",
-      "The SDK pulls each file from several nodes at once, checks every piece as it arrives, and picks up where it left off if the connection drops. It runs on macOS, Linux and Windows today, and phone and browser support are on the way.",
+      "The SDK pulls each file from several nodes at once, checks every piece as it arrives, and picks up where it left off if the connection drops. It runs on macOS, Linux and Windows today, and we are testing phone and browser support.",
     ],
   },
   {
