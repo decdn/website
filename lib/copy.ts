@@ -205,7 +205,7 @@ export const TARGET_RATE = "$0.01/GB";
  * in both.
  */
 export const statusBlock = (scope: string): string =>
-  `Status: public testnet, live on Arbitrum Sepolia, and open source. The ${TARGET_RATE} figure quoted ${scope} is a public target rate, not a protocol-enforced price.`;
+  `Status: public testnet. The protocol runs end-to-end on a public testnet on Arbitrum Sepolia, and the source is open. The ${TARGET_RATE} figure quoted ${scope} is a public target rate, not a protocol-enforced price.`;
 
 /**
  * The captions on the two homepage data panels.
@@ -233,6 +233,36 @@ export const PANEL_CAPTIONS = {
 export const BLOG_TITLE = "field notes";
 export const BLOG_DESCRIPTION = "long-form posts on the deCDN protocol.";
 
+export type SourceRepo = {
+  /** Repo name under the GitHub org; the URL is `repoUrl(name)` in lib/links.ts. */
+  name: string;
+  /** One line, no "]": llms.txt's assertMarkdownSafe rejects either at build. */
+  note: string;
+};
+
+/** The public source repos, in the order both llms surfaces list them. Not
+ *  rendered by the homepage — read by app/llms.txt and app/llms-full.txt, so
+ *  an agent grounding on either has a path to the code. */
+export const SOURCE_REPOS: readonly SourceRepo[] = [
+  {
+    name: "decdn",
+    note: "The protocol: nodes and clients that serve and fetch content-addressed blobs over iroh QUIC, paid per megabyte in USDC.",
+  },
+  {
+    name: "devops",
+    note: "Deploy and operate a deCDN node: Ansible, cloud-init, Docker Compose and a Helm chart.",
+  },
+  {
+    name: "sponsord",
+    note: "Sponsored downloads: publishers fund a USDC pool so their users can download without a wallet. Signing daemon, onramp and CLI.",
+  },
+  {
+    name: "stats",
+    note: "The indexer that publishes the testnet stats file the homepage panels read.",
+  },
+  { name: "website", note: "This site." },
+];
+
 /** The Contact section's display h2, one line per span. */
 export const CONTACT_HEADLINE = [
   "the network is open.",
@@ -241,3 +271,7 @@ export const CONTACT_HEADLINE = [
 
 export const CONTACT_LEAD =
   "Write to us with questions, partnerships, or anything you'd run on a fleet of idle machines. We read everything.";
+
+/** The operator path under the fleet panel: the homepage FAQ answers
+ *  publishers, and node operators go to the run-a-node docs from here. */
+export const CONTACT_RUN_NODE = "run a node on the testnet";

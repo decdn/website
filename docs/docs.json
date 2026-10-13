@@ -108,7 +108,8 @@
               "run-a-node/bond-and-earnings",
               "run-a-node/traffic",
               "run-a-node/operating",
-              "run-a-node/compliance"
+              "run-a-node/compliance",
+              "run-a-node/content-liability"
             ]
           },
           {

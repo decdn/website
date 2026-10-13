@@ -9,6 +9,7 @@ export const links = {
   litepaper: "/decdn_litepaper.pdf",
   presskit: "/presskit/decdn-presskit.zip",
   docs: "https://docs.decdn.org/overview/introduction",
+  runNode: "https://docs.decdn.org/run-a-node/overview",
   // Served by sponsord; each installs decdn and runs the sponsored pull.
   installer: "https://up.decdn.org/decdn.sh",
   installerPs1: "https://up.decdn.org/decdn.ps1",
@@ -49,6 +50,12 @@ export const BLOG_URL = `${SITE_URL}blog/`;
 // wants the host has to strip the path. Three did it independently
 // (app/sitemap.xml, app/llms.txt, app/llms-full.txt); derive it once.
 export const DOCS_ORIGIN = new URL(links.docs).origin;
+
+// A public repo under the org, derived so `links.github` stays the one source
+// of truth for the org URL. A function rather than per-repo keys in `links`:
+// the repo list is SOURCE_REPOS in lib/copy.ts, and repos are not social
+// profiles, so they stay out of `sameAs` in lib/schema.ts.
+export const repoUrl = (name: string): string => `${links.github}/${name}`;
 
 // Twitter expects an `@handle`; derive from the X profile URL so the X
 // account is the single source of truth.

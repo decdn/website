@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { assertMarkdownSafe, GET } from "./route";
 import { listPosts } from "@/lib/blog";
+import { SOURCE_REPOS } from "@/lib/copy";
 import { LEGAL_SLUGS } from "@/lib/legal";
 
 const response = GET();
@@ -40,6 +41,18 @@ describe("llms.txt shape", () => {
     expect(sections.at(-1)).toBe("## Optional");
   });
 
+  // Pinned in full so a load-bearing section — the source repos, say — cannot
+  // drift under `## Optional` or lose its heading without a test failing.
+  it("orders its sections", () => {
+    expect(headings.filter((h) => h.startsWith("## "))).toEqual([
+      "## Site",
+      "## Protocol documentation",
+      "## Source code",
+      "## Field notes",
+      "## Optional",
+    ]);
+  });
+
   it("formats every list line as a link entry", () => {
     const entries = lines.filter((line) => line.startsWith("- "));
     expect(entries.length).toBeGreaterThan(0);
@@ -73,6 +86,29 @@ describe("llms.txt contents", () => {
     "https://docs.decdn.org/llms-full.txt",
   ])("points at %s", (url) => {
     expect(body).toContain(`(${url})`);
+  });
+
+  // Off-origin, so scripts/check-out.mjs never resolves these; pin the URL
+  // shape here instead.
+  it.each(SOURCE_REPOS)(
+    "lists the $name repo exactly once",
+    ({ name, note }) => {
+      const entry = `- [decdn/${name}](https://github.com/decdn/${name}): ${note}`;
+      expect(lines.filter((line) => line === entry)).toHaveLength(1);
+    },
+  );
+
+  it("lists exactly the source repos, in order, under Source code", () => {
+    const section = lines.slice(
+      lines.indexOf("## Source code"),
+      lines.indexOf("## Field notes"),
+    );
+    expect(section.filter((line) => line.startsWith("- "))).toEqual(
+      SOURCE_REPOS.map(
+        ({ name, note }) =>
+          `- [decdn/${name}](https://github.com/decdn/${name}): ${note}`,
+      ),
+    );
   });
 
   it.each(LEGAL_SLUGS)("lists /legal/%s/", (slug) => {

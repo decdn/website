@@ -1,30 +1,52 @@
+import { TARGET_RATE } from "./copy";
+import { EMAIL } from "./links";
+
+/** One question and its answer. The answer is a list of paragraphs: the
+ *  homepage renders each as its own <p>, llms-full.txt separates them with a
+ *  blank line, and the FAQPage JSON-LD joins them with a space. */
+export type FaqEntry = { q: string; a: readonly string[] };
+
 export const FAQ_ITEMS = [
   {
-    q: "How do I join the testnet as a node operator?",
-    a: "Onboarding is permissionless: anyone can bond, register and serve on the Arbitrum Sepolia testnet. It runs in four steps. First, prepare a server and keep its clock within 10 seconds of UTC. Second, bond TOKEN and register the node on-chain with its declared capacity, region and addresses; the same signature records your acceptance of the operator terms. Third, start the node, which loads the content blacklist and the node registry before it accepts any connection. From then on it is discoverable and earns USDC for what it delivers. The decdn setup command signs and submits the on-chain steps for you.",
+    q: "How do I put my files on deCDN?",
+    a: [
+      "Set up origin nodes in front of your own storage, whether that is an S3-compatible bucket, an NFS mount or a local disk, and join the network. Your files stay where they are.",
+      `Once you get approved, the rest of the network accepts your nodes as origins and caches your content as your users ask for it. To get started, write to us at ${EMAIL}.`,
+    ],
   },
   {
-    q: "What hardware and storage does a node need?",
-    a: "The recommended starting server is 4 vCPU, 8 GB of RAM, a 1 TB SSD and 5 TB a month of egress. The protocol sets no hardware minimum. What it checks is the capacity you declare, from 10 Mbps up to 200 Gbps, which sets your bond. A 250 Mbps home or server node fits that profile comfortably. The disk is your cache, so more of it means more requests served from bytes you already hold.",
+    q: "I already have a bucket in S3, R2 or B2. Why add deCDN?",
+    a: [
+      "Keep the bucket. It becomes the origin behind deCDN, read only on a cache miss and never exposed to the network, so you stop paying its egress on every download.",
+      "Your files are served instead by many independent operators close to your users, large files from several of them at once, and when a node drops the download carries on from the next one. Operators compete on every request, so an open market sets your delivery price rather than one vendor's egress rates.",
+    ],
   },
   {
-    q: "Which platforms and deployment methods are supported?",
-    a: "The node supports Linux, macOS and Windows. It is a single program, decdn-node. On Linux you can run it directly under systemd or in the official container image, which carries the exact same binary. Linux builds cover x86_64 and ARM64 and run on Debian 11, Ubuntu 20.04 or anything newer. A separate decdn command-line tool handles setup, registration and day-to-day admin.",
+    q: "How do my users download?",
+    a: [
+      "Through your own app. You build downloads into it with the deCDN client SDK, and your users never have to know deCDN is there.",
+      "The SDK pulls each file from several nodes at once, checks every piece as it arrives, and picks up where it left off if the connection drops. It runs on macOS, Linux and Windows today, and we are testing phone and browser support.",
+    ],
   },
   {
-    q: "How does the capacity bond work?",
-    a: "Every node bonds TOKEN in proportion to the bandwidth it declares, following 12.6 × Mbps^1.2. There is also a network minimum that governance sets and never lowers below 10,000 TOKEN, and you bond whichever is larger. That is about 50,000 TOKEN at 1 Gbps. At 250 Mbps the curve gives about 9,500, below the minimum, so a 250 Mbps node bonds the minimum. The bond locks at registration and can be slashed for only two offenses: quoting a rate other than the one you signed, and serving blacklisted content after its compliance window. A bad delivery isn't slashed; it simply isn't paid. Withdrawing takes a 14-day unbonding period. Besides the bond, you hold a little ETH for gas. USDC is optional.",
+    q: "Do my users need a wallet or crypto?",
+    a: [
+      "No. You fund a USDC pool and your users download from it, with no wallet, no token and no sign-up.",
+      "Each user gets their own allowance, so they can only spend as much as you allow them, and only you can top up or close the pool. The testnet download on this page works the same way.",
+    ],
   },
   {
-    q: "How does the network choose my node, and will a new region get traffic?",
-    a: "Registering is enough to make a node discoverable. Clients shortlist nodes in their own region and then rank them by measured round-trip time alone; price and reputation are not part of their ranking. A node fetching a cache miss from another node weighs price, latency and reputation together, and a newcomer starts at a neutral reputation. A region with no copies yet is where a first node counts most. A client whose only holders are far away routes its request through the nearest bonded node. That node pulls the content, serves it and keeps a copy, so it becomes the region's first local source and later clients find it directly. This applies to cache-only nodes; a node set to serve only its own origin declines these requests.",
+    q: "Who sets the price, and what will I pay?",
+    a: [
+      "Each node sets its own per-megabyte rate in USDC and signs it into every quote, so you see the price before a byte moves. A node that charges more than it quoted loses part of its bond.",
+      `You never pay more than the ceiling you set, and you pay only for bytes that verify, as they arrive, with no minimums or contracts. The network's target is ${TARGET_RATE}.`,
+    ],
   },
   {
-    q: "How are operators paid, and what share do they keep?",
-    a: "Operators are paid per byte actually delivered, in USDC. Clients sign vouchers only for bytes that verify. Your node redeems those vouchers on-chain, and your share arrives in the same transaction. Each operator sets its own per-MB rate, and the target client price is about $0.01/GB. At mainnet launch the split is 90% operator, 0% buyback and 10% treasury. Once governance confirms the activation criteria, it moves to the long-term 60/30/10, with 30% going to a TOKEN buyback-and-burn. Governance can never set the operator share below 40% or above 90%.",
+    q: "What stops illegal content, and what if a file is flagged by mistake?",
+    a: [
+      "Governance keeps a public, on-chain blacklist of content hashes, network-wide or for a single region. Nodes have 24 hours to stop serving a listed hash, and repeated offenses result in removal from the network.",
+      "Every entry is public, so a wrongful one is visible to anyone, and governance can lift it.",
+    ],
   },
-  {
-    q: "Can I run a node from home?",
-    a: "Yes. You don't need a static IP or a datacenter connection. At home the node usually sits behind a router, and it reaches peers by punching through NAT, with a relay as fallback, so no port forwarding is required. If you forward the node's UDP port, 4433 by default, and register that address, peers get a direct path to you. If your public address changes, run decdn node update-multiaddrs to update the registry. As on any node, keep the machine's clock in sync.",
-  },
-] as const;
+] as const satisfies readonly FaqEntry[];

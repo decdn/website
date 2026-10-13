@@ -5,6 +5,7 @@ import {
   COMPARE_ROWS,
   CONTACT_HEADLINE,
   CONTACT_LEAD,
+  CONTACT_RUN_NODE,
   type CompareRow,
   HERO_FIGURES,
   HERO_HEADLINE,
@@ -13,6 +14,7 @@ import {
   PANEL_CAPTIONS,
   SITE_DESCRIPTION,
   SITE_TITLE,
+  SOURCE_REPOS,
   STACK,
   statusBlock,
   TARGET_RATE,
@@ -58,6 +60,10 @@ const ALL_STRINGS: readonly [string, string][] = [
     [`STACK.${s.name}.name`, s.name],
     [`STACK.${s.name}.role`, s.role],
   ]),
+  ...SOURCE_REPOS.flatMap((r): [string, string][] => [
+    [`SOURCE_REPOS.${r.name}.name`, r.name],
+    [`SOURCE_REPOS.${r.name}.note`, r.note],
+  ]),
   ["PANEL_CAPTIONS.terminal", PANEL_CAPTIONS.terminal],
   ["PANEL_CAPTIONS.fleet", PANEL_CAPTIONS.fleet],
   ...CONTACT_HEADLINE.map((s, i): [string, string] => [
@@ -65,6 +71,7 @@ const ALL_STRINGS: readonly [string, string][] = [
     s,
   ]),
   ["CONTACT_LEAD", CONTACT_LEAD],
+  ["CONTACT_RUN_NODE", CONTACT_RUN_NODE],
 ];
 
 describe("copy strings", () => {
@@ -91,6 +98,26 @@ describe("STACK", () => {
   it("names each item once", () => {
     const names = STACK.map((s) => s.name);
     expect(new Set(names).size).toBe(names.length);
+  });
+});
+
+describe("SOURCE_REPOS", () => {
+  // Both llms route tests iterate this list, so an empty one would leave them
+  // green over an empty `## Source code` section.
+  it("is not empty", () => {
+    expect(SOURCE_REPOS.length).toBeGreaterThan(0);
+  });
+
+  it("names each repo once", () => {
+    const names = SOURCE_REPOS.map((r) => r.name);
+    expect(new Set(names).size).toBe(names.length);
+  });
+
+  // The name is interpolated unescaped into a GitHub URL, and the route tests
+  // build their expected URL from the same name, so they cannot catch a `/`,
+  // `?` or `#` in it.
+  it.each(SOURCE_REPOS)("$name is a bare repo name", ({ name }) => {
+    expect(name).toMatch(/^[a-z0-9][a-z0-9._-]*$/);
   });
 });
 

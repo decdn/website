@@ -10,7 +10,8 @@ export function FaqItem({
   delay = 0,
 }: {
   q: string;
-  a: string;
+  /** The answer's paragraphs, each rendered as its own <p>. */
+  a: readonly string[];
   index: number;
   /** Document-style number shown on the row and ghosted on the card, e.g. "04.1". */
   ordinal: string;
@@ -67,9 +68,11 @@ export function FaqItem({
         data-selected={selected ? "true" : undefined}
         className="faq-card"
       >
-        <p className="faq-answer max-w-[60ch] text-body leading-[1.7] text-paper/85">
-          {highlightBrand(a)}
-        </p>
+        <div className="faq-answer flex max-w-[60ch] flex-col gap-[1em] text-body leading-[1.7] text-paper/85">
+          {a.map((paragraph) => (
+            <p key={paragraph}>{highlightBrand(paragraph)}</p>
+          ))}
+        </div>
         {/* Ties the card back to its row when the selected question sits far
             below the card's top edge. Hidden at phone width, where the card
             renders directly under its question. */}

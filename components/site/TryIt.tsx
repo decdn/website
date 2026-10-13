@@ -97,7 +97,7 @@ export function TryIt() {
       style={{ "--reveal-delay": "120ms" }}
       className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] @4xl:items-start @4xl:gap-12"
     >
-      <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-8 @4xl:self-stretch">
         <label className="flex flex-col gap-3">
           <span className="meta opacity-60">
             select a bundle · {ITEMS.length} seeded
@@ -133,7 +133,8 @@ export function TryIt() {
           </span>
         </label>
 
-        <div className="grid grid-cols-2 gap-y-4">
+        {/* Beside the terminal, the source row sinks to its bottom edge. */}
+        <div className="grid flex-1 grid-cols-2 content-between gap-y-4">
           <Figure label="size" value={formatSize(item.bytes)} />
           <Figure label="license" value={item.license} />
           <div className="col-span-2 flex flex-col gap-1">

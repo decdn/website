@@ -5,11 +5,12 @@ import {
   attrs,
   childElements,
   findOne,
+  findSome,
   textOf,
 } from "@/test-utils/react-tree";
 
 const Q = "Why does the network need a token?";
-const A = "TOKEN secures the network. deCDN settles in USDC.";
+const A = ["TOKEN secures the network.", "deCDN settles in USDC."] as const;
 
 const render = (selected: boolean) =>
   asElement(
@@ -30,7 +31,8 @@ describe("FaqItem", () => {
     const item = render(false);
     expect(childElements(item).map((c) => c.type)).toEqual(["dt", "dd"]);
     const [dt, dd] = childElements(item);
-    expect(textOf(findOne(dd, "p"))).toBe(A);
+    // One <p> per paragraph, in order.
+    expect(findSome(dd, "p").map(textOf)).toEqual(A);
     // The ordinal is hidden from assistive tech so the button's accessible
     // name is the question alone, not "zero four point four Why does…".
     const [ordinal, question] = childElements(findOne(dt, "button"));
@@ -105,7 +107,7 @@ describe("FaqItem", () => {
 
   it("styles the brand inside the answer", () => {
     const [, dd] = childElements(render(false));
-    const brand = childElements(findOne(dd, "p")).filter(
+    const brand = childElements(findSome(dd, "p")[1]).filter(
       (c) => c.type === "span",
     );
     expect(brand).toHaveLength(1);
