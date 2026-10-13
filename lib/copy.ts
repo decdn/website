@@ -39,7 +39,7 @@ export const HERO_LEAD =
  *  CTA to the #try section. */
 export const LAUNCH_BANNER = {
   badge: "testnet",
-  text: "the public testnet is live. pull a model, a dataset, an iso or a film with one command, no wallet.",
+  text: "the public testnet is live and open source. pull a model, a dataset, an iso or a film with one command.",
   cta: "try it",
 } as const;
 

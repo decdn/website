@@ -1,14 +1,14 @@
 ---
-title: "The Testnet Is Live, and You Don't Need a Wallet"
+title: "The Public Testnet Is Live, and It's Open Source"
 slug: testnet-is-live
 date: 2026-10-13
-summary: "The decdn public testnet is live and the code is open source. Pull an open model, a dataset, a Linux install image or a 4K film with one command: no wallet, no token, no sign-up."
+summary: "The decdn public testnet is live and the code is open source. Pull an open model, a dataset, a Linux install image or a 4K film with one command, or run a pilot on your own data."
 bucket: pillar
 tags: [testnet, open-source, launch]
 pinned: true
 ---
 
-Today the **decdn** public testnet is live on Arbitrum Sepolia, and the code is open source. You can download something real from the network right now with one command, and you don't need a wallet to do it.
+Today the **decdn** public testnet is live on Arbitrum Sepolia, and the code is open source. You can download something real from the network right now with one command, and if you have data of your own to distribute, you can run it through the testnet with us.
 
 ## The problem we kept hitting
 
@@ -19,10 +19,6 @@ Big files are awkward to move. Model weights, datasets and install images run to
 Independent nodes cache content and serve it, and every file is addressed by its BLAKE3 hash. The client checks each piece against that hash the moment it arrives. A piece that fails is thrown out and fetched again from another node, so you end up with exactly the bytes the publisher named, without trusting any machine in between. Large files are pulled from several nodes at once.
 
 Delivery is paid per megabyte, in USDC, as the bytes arrive. The target rate is $0.01/GB, 4 to 20 times cheaper than major traditional CDNs. It is a target, not a protocol-enforced price: nodes set their own rates, and every client can cap what it is willing to pay.
-
-## The part we're proudest of: no wallet
-
-The usual first step into a network that settles on-chain is "set up a wallet." Here it isn't. On the testnet a sponsor pays for your transfer. The installer opens one captcha in your browser, the sponsor grants a capped allowance for the download, and that's the whole setup. No seed phrase, no token, no sign-up.
 
 ## Try it
 
@@ -40,10 +36,14 @@ On Windows, in PowerShell:
 & ([scriptblock]::Create((irm https://up.decdn.org/decdn.ps1))) pull b3:9194000d7b356650e6924a7746ec4afb0b705838b65913c0e46cba6b15af69e5 --namespace 1
 ```
 
-The line installs decdn, runs the captcha, then downloads into the current directory and verifies every byte on the way in. If it gets interrupted, run the same line again and it resumes.
+The line installs decdn, opens one captcha in your browser, then downloads into the current directory and verifies every byte on the way in. If it gets interrupted, run the same line again and it resumes. On the testnet a sponsor covers the transfer with a capped allowance, so there is nothing to pay and no account to make.
 
 While it runs, you can watch the network work at [stats.decdn.org](https://stats.decdn.org): settlements and the node fleet, read straight off Arbitrum Sepolia. The whole thing is open source at [github.com/decdn/decdn](https://github.com/decdn/decdn): the node, the client, the contracts, and more than two dozen design records covering the payments, the slashing and the verification.
 
+## Bring your own data
+
+The catalogue is what we seeded. The more useful test is your data, so we're opening pilots on the testnet. If you distribute models, datasets, images or any other large files, we set up an origin node in front of your storage with you, publish a real catalogue from it, and wire the client into whatever does your downloading. You measure the result on your own files, and delivery during the pilot draws from a pool we fund, so there is nothing for you or your users to pay. Write to [info@decdn.org](mailto:info@decdn.org) to start one. [Who actually needs this](/blog/who-actually-needs-this/) covers the workloads where it helps most.
+
 ## What testnet means
 
-This is a testnet, so treat it as proof of life, not production. The money is testnet money, the catalogue is what we seeded, and things will break. When they do, tell us: open an issue on [GitHub](https://github.com/decdn/decdn), find us on [Discord](https://discord.gg/vVbNswKVGX), or write to [info@decdn.org](mailto:info@decdn.org).
+The money is testnet money, and things will break. When they do, tell us: open an issue on [GitHub](https://github.com/decdn/decdn), find us on [Discord](https://discord.gg/vVbNswKVGX), or write to [info@decdn.org](mailto:info@decdn.org).
