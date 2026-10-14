@@ -17,7 +17,7 @@ export function Hero() {
     <Frame id="intro" tone="paper" className="overflow-hidden">
       <SectionHeader index="01" label="Hero">
         {/* Launch banner: a testnet badge and one line. */}
-        <p className="rise rise-0 flex flex-wrap items-center gap-x-4 gap-y-2 text-[0.9375rem] leading-[1.5] font-medium tracking-[-0.01em]">
+        <p className="rise rise-0 flex flex-wrap items-center gap-x-4 gap-y-2 text-body leading-[1.5] font-medium tracking-[-0.01em]">
           <span className="meta inline-flex items-center gap-2 rounded border border-current px-2 py-1 text-whisper-text">
             <span aria-hidden className="status-live" />
             {LAUNCH_BANNER.badge}
