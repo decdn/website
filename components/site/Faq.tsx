@@ -5,11 +5,11 @@ import { SectionHeader } from "@/components/ui/SectionHeader";
 
 // Shared with the row ordinals ("05.1" …) so the numbering can't drift from
 // the section header.
-const SECTION = "04";
+const SECTION = "05";
 
 export function Faq() {
   return (
-    <Frame id="faq" tone="ink">
+    <Frame id="faq" tone="paper">
       {/* Not "field notes": that is the blog's name, and this is not the blog. */}
       <SectionHeader
         index={SECTION}

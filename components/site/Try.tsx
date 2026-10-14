@@ -6,9 +6,9 @@ import { TryIt } from "@/components/site/TryIt";
 
 export function Try() {
   return (
-    <Frame id="try" tone="paper">
+    <Frame id="try" tone="ink">
       <SectionHeader
-        index="05"
+        index="04"
         label="Try it"
         timestamp="testnet · no wallet"
       />

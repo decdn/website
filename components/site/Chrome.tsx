@@ -19,8 +19,8 @@ const SECTION_IDS = [
   "intro",
   "compare",
   "method",
-  "faq",
   "try",
+  "faq",
   "contact",
 ] as const;
 // Hash anchors are written `/#section`. Required because this nav also
@@ -29,8 +29,8 @@ const SECTION_IDS = [
 const NAV = [
   { id: "compare", label: "compare" },
   { id: "method", label: "method" },
-  { id: "faq", label: "faq" },
   { id: "try", label: "try it" },
+  { id: "faq", label: "faq" },
   { id: "contact", label: "contact" },
 ] as const;
 
@@ -40,7 +40,7 @@ const NAV = [
 // when applied to `position: fixed` elements (the nav would vanish).
 const DARK_SECTIONS: ReadonlySet<(typeof SECTION_IDS)[number]> = new Set([
   "compare",
-  "faq",
+  "try",
   "contact",
 ]);
 

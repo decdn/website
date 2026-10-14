@@ -489,13 +489,16 @@ a.hero-status:hover .arrow {
   }
 }
 
-/* The #try panel's softer variant: the white command body stays, but the
-   chrome steps down in greys — a pale head and foot strip and light-grey
-   hairlines in place of the 30% ink rules. */
+/* The #try panel sits on ink, where the stark white panel and its ink
+   rules read as a hole punched in the page. This variant keeps the white
+   command body but steps the chrome down in greys: a pale head and foot
+   strip, light-grey hairlines, and a grey offset slab in place of the ink
+   shadow that vanishes on black. */
 .terminal-light {
   --term-grey: color-mix(in srgb, var(--ink) 5%, var(--paper));
   --term-rule: color-mix(in srgb, var(--ink) 12%, var(--paper));
   border-color: var(--term-rule);
+  box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--paper) 22%, var(--ink));
 }
 .terminal-light .terminal-head,
 .terminal-light .terminal-foot {
@@ -1410,7 +1413,7 @@ a.hero-status:hover .arrow {
   }
 }
 
-/* --- faq: question list + answer card (§04) ---------------------------
+/* --- faq: question list + answer card (§05) ---------------------------
    One <dl>, two columns. Questions (dt) stack on the left; every answer (dd)
    occupies the whole right column and only the selected one is visible.
    The selected row's ordinal turns whisper; the same number is ghosted
@@ -1466,7 +1469,7 @@ a.hero-status:hover .arrow {
   transition: color 200ms var(--ease-soft);
 }
 .faq-row[data-selected="true"] .faq-ordinal {
-  color: var(--whisper);
+  color: var(--whisper-text);
 }
 .faq-q[aria-disabled="true"] {
   cursor: default;
@@ -1477,10 +1480,11 @@ a.hero-status:hover .arrow {
   display: none;
   margin: 0 0 1.5rem;
   padding: var(--faq-pad);
-  /* Solid like .terminal and .fleet, but rounder; filled with a
-     dark grey so the card reads as a panel, not a hole in the ink. A shade
-     under .fleet's 12%: at card size, 12% reads too light on ink. No
-     offset shadow: on ink it renders as a second grey slab beside the card. */
+  /* Solid like .terminal and .fleet, but rounder; a dark-grey panel on
+     the paper section. A shade under .fleet's 12%, which reads too light
+     at card size. Sets its own colour so the ghost ordinal, which
+     inherits, stays visible. No offset shadow. */
+  color: var(--paper);
   background: color-mix(in srgb, var(--paper) 8%, var(--ink));
   border: 1px solid var(--faq-edge);
   border-radius: var(--card-radius);
