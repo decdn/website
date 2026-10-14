@@ -27,13 +27,13 @@ The homepage has a [catalogue](/#try) of things we seeded on the testnet: open m
 For Mistral 7B Instruct, on macOS or Linux, in a terminal:
 
 ```text
-curl -fsSL https://up.decdn.org/decdn.sh | sh -s -- pull b3:9194000d7b356650e6924a7746ec4afb0b705838b65913c0e46cba6b15af69e5 --namespace 1
+curl -fsSL https://up.decdn.org/decdn.sh | sh -s -- get 'decdn:9194000d7b356650e6924a7746ec4afb0b705838b65913c0e46cba6b15af69e5/?ns=1'
 ```
 
 On Windows, in PowerShell:
 
 ```text
-& ([scriptblock]::Create((irm https://up.decdn.org/decdn.ps1))) pull b3:9194000d7b356650e6924a7746ec4afb0b705838b65913c0e46cba6b15af69e5 --namespace 1
+& ([scriptblock]::Create((irm https://up.decdn.org/decdn.ps1))) get 'decdn:9194000d7b356650e6924a7746ec4afb0b705838b65913c0e46cba6b15af69e5/?ns=1'
 ```
 
 The line installs decdn, opens one captcha in your browser, then downloads into the current directory and verifies every byte on the way in. If it gets interrupted, run the same line again and it resumes. On the testnet a sponsor covers the transfer with a capped allowance, so there is nothing to pay and no account to make.
