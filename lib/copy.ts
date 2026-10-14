@@ -35,7 +35,7 @@ export const HERO_HEADLINE = [
 export const HERO_LEAD =
   "A 14-gigabyte file posted in Berlin streams to a client in Tokyo from several nodes at once, every chunk verified with BLAKE3, paid for per megabyte in USDC. The code is open. The network is open. The price is posted.";
 
-/** The launch banner at the top of the hero: a testnet badge and one line. */
+/** The launch banner in the hero's section-header row: a testnet badge and one line. */
 export const LAUNCH_BANNER = {
   badge: "testnet",
   text: "the public testnet is live and open source. pull a model, a dataset, an iso or a film with one command.",
