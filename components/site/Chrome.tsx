@@ -13,16 +13,12 @@ import {
   takeSectionFocus,
 } from "@/lib/scroll";
 import { MobileMenu } from "@/components/site/MobileMenu";
-import { resolveActiveSection } from "@/components/site/chrome-active";
+import {
+  DARK_SECTIONS,
+  SECTION_IDS,
+  resolveActiveSection,
+} from "@/components/site/chrome-active";
 
-const SECTION_IDS = [
-  "intro",
-  "compare",
-  "method",
-  "try",
-  "faq",
-  "contact",
-] as const;
 // Hash anchors are written `/#section`. Required because this nav also
 // renders on /blog/*, where a bare `#section` resolves against the
 // current URL (e.g. /blog/foo/#section) instead of the home page.
@@ -33,16 +29,6 @@ const NAV = [
   { id: "faq", label: "faq" },
   { id: "contact", label: "contact" },
 ] as const;
-
-// Ids of sections that paint on a dark background — used to flip the
-// navbar text color per-section instead of relying on
-// `mix-blend-mode: difference`, which silently fails on Safari / iOS
-// when applied to `position: fixed` elements (the nav would vanish).
-const DARK_SECTIONS: ReadonlySet<(typeof SECTION_IDS)[number]> = new Set([
-  "compare",
-  "try",
-  "contact",
-]);
 
 export function Chrome() {
   const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
