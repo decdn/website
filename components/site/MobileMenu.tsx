@@ -28,8 +28,8 @@ type Props = {
 const SECTIONS: readonly { id: SectionId; label: string }[] = [
   { id: "compare", label: "compare" },
   { id: "method", label: "method" },
-  { id: "try", label: "try it" },
   { id: "faq", label: "faq" },
+  { id: "try", label: "try it" },
   { id: "contact", label: "contact" },
 ] as const;
 

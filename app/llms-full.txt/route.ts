@@ -242,6 +242,10 @@ Stack: ${stackLine()}
 
 ${methodSteps}
 
+### FAQ
+
+${faq}
+
 ### Try it
 
 ${TRY_HEADLINE}
@@ -254,11 +258,7 @@ ${tryWindows}
 
 ${TRY_NOTES.join(" ")}
 
-### FAQ
-
-${faq}
-
-### Contact
+### Contact us
 
 ${CONTACT_HEADLINE.join(" ")}
 

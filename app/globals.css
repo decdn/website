@@ -600,12 +600,12 @@ a.hero-status:hover .arrow {
 }
 
 /* --- fleet status panel (§06) -----------------------------------------
-   Sits on the paper Contact section as an inverted panel. Same "tool
-   panel" vocabulary as .terminal — soft corners, solid rule, hard
-   offset shadow — with an ops-dashboard layout instead of a CLI log:
-   registered nodes (region, operator, last settlement) with a pulse for
-   each one that settled recently, plus two 24h
-   aggregates over hourly spark strips. Filled from the live stats file
+   Sits on the ink Contact section as a grey panel. Same "tool panel"
+   vocabulary as .terminal — soft corners, solid rule, hard offset
+   shadow (invisible on ink) — with an ops-dashboard layout instead of
+   a CLI log: registered nodes (region, operator, last settlement) with
+   a pulse for each one that settled recently, plus two 24h aggregates
+   over hourly spark strips. Filled from the live stats file
    (lib/stats.ts). Not interactive, so no hover transform. */
 
 .fleet {
@@ -1389,7 +1389,7 @@ a.hero-status:hover .arrow {
   }
 }
 
-/* --- faq: question list + answer card (§05) ---------------------------
+/* --- faq: question list + answer card (§04) ---------------------------
    One <dl>, two columns. Questions (dt) stack on the left; every answer (dd)
    occupies the whole right column and only the selected one is visible.
    The selected row's ordinal turns whisper; the same number is ghosted

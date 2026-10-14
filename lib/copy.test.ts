@@ -191,14 +191,13 @@ describe("statusBlock", () => {
 });
 
 describe("LAUNCH_BANNER", () => {
-  // The banner is the homepage's lowercase voice, and it says "testnet" both
-  // in the badge and in the sentence so the status survives a screen reader
-  // or text extractor that skips the badge.
-  it("is lowercase and names the testnet", () => {
-    for (const s of Object.values(LAUNCH_BANNER)) {
-      expect(s).toBe(s.toLowerCase());
-    }
+  // The badge is a label, in the homepage's lowercase display voice; the text
+  // is prose, so it takes sentence case like the rest of the page's prose.
+  // Both say "testnet" so the status survives a screen reader or text
+  // extractor that skips the badge.
+  it("keeps the badge lowercase, sentence-cases the text, names the testnet", () => {
     expect(LAUNCH_BANNER.badge).toBe("testnet");
+    expect(LAUNCH_BANNER.text).toMatch(/^[A-Z]/);
     expect(LAUNCH_BANNER.text).toContain("testnet is live");
   });
 });
