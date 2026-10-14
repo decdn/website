@@ -3,7 +3,7 @@ import { links } from "@/lib/links";
 
 export function Footer() {
   return (
-    <footer className="bg-paper px-frame-gutter pb-10 text-ink">
+    <footer className="bg-ink px-frame-gutter py-10 text-paper">
       <div className="@container mx-auto flex max-w-frame flex-col gap-3">
         <span aria-hidden className="rule opacity-40" />
         <div className="grid grid-cols-1 gap-6 text-micro tracking-[0.2em] uppercase @md:grid-cols-3 @md:items-start @md:gap-2">

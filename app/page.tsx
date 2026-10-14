@@ -17,8 +17,8 @@ export default function Home() {
       <Hero />
       <Compare />
       <Method />
-      <Try />
       <Faq />
+      <Try />
       <Contact />
     </main>
   );

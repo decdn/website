@@ -44,9 +44,9 @@ const HOMEPAGE_SUBSECTIONS = [
   "### Intro",
   "### Side by side",
   "### How it works",
-  "### Try it",
   "### FAQ",
-  "### Contact",
+  "### Try it",
+  "### Contact us",
 ];
 
 describe("llms-full.txt shape", () => {

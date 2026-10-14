@@ -341,7 +341,7 @@ const readEntries = (): PostSource[] => {
   if (cache) return cache;
   // The directory's presence is part of the project's contract — every
   // statically wired blog route depends on it. Falling back to `[]`
-  // would silently regress to "nothing yet." in prod. If you really
+  // would silently regress to "Nothing yet." in prod. If you really
   // want zero posts, leave a `.gitkeep` in `content/blog/`.
   if (!fs.existsSync(POSTS_DIR)) {
     throw new Error(
