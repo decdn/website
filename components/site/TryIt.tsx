@@ -109,7 +109,7 @@ export function TryIt() {
                 setId(e.target.value);
                 setCopied(false);
               }}
-              className="w-full cursor-pointer appearance-none truncate [&_optgroup]:bg-paper [&_optgroup]:text-ink [&_option]:bg-paper [&_option]:text-ink border-b border-current bg-transparent pr-8 pb-2 text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold tracking-[-0.02em] focus-visible:outline-2 focus-visible:outline-offset-4"
+              className="w-full cursor-pointer appearance-none truncate border-b border-current bg-transparent pr-8 pb-2 text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold tracking-[-0.02em] focus-visible:outline-2 focus-visible:outline-offset-4"
             >
               {/* One kind needs no group headings; several get one each. */}
               {GROUPS.length > 1
@@ -151,7 +151,7 @@ export function TryIt() {
         </div>
       </div>
 
-      <div className="terminal terminal-light flex flex-col">
+      <div className="terminal flex flex-col">
         <div className="terminal-head">
           <span className="terminal-dot" />
           <span className="terminal-dot" />
@@ -202,7 +202,7 @@ export function TryIt() {
           </button>
         </div>
 
-        <ul className="terminal-foot flex flex-col gap-1 px-[18px] py-4 text-[12px] text-ink/70">
+        <ul className="flex flex-col gap-1 border-t border-dashed border-current/30 px-[18px] py-4 text-[12px] opacity-70">
           {TRY_NOTES.map((note) => (
             <li key={note}>
               <span className="dim">#</span> {note}

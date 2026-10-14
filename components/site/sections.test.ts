@@ -16,8 +16,8 @@ const SECTIONS = {
   intro: Hero,
   compare: Compare,
   method: Method,
-  try: Try,
   faq: Faq,
+  try: Try,
   contact: Contact,
 } satisfies Record<(typeof SECTION_IDS)[number], () => unknown>;
 

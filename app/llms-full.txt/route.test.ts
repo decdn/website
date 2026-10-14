@@ -45,8 +45,8 @@ const HOMEPAGE_SUBSECTIONS = [
   "### Intro",
   "### Side by side",
   "### How it works",
-  "### Try it",
   "### FAQ",
+  "### Try it",
   "### Contact us",
 ];
 

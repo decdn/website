@@ -4,8 +4,8 @@ export const SECTION_IDS = [
   "intro",
   "compare",
   "method",
-  "try",
   "faq",
+  "try",
   "contact",
 ] as const;
 
@@ -16,7 +16,7 @@ export const SECTION_IDS = [
 // A hand copy of each section's <Frame tone>; sections.test.ts keeps the
 // two in step.
 export const DARK_SECTIONS: ReadonlySet<(typeof SECTION_IDS)[number]> = new Set(
-  ["compare", "try", "contact"],
+  ["compare", "faq", "contact"],
 );
 
 // Both `pathname === "/"` and `scrolled` must hold for `observed` to win.

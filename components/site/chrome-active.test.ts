@@ -28,14 +28,14 @@ describe("resolveActiveSection", () => {
       name: "home + scrolled passes other DARK_SECTIONS members through",
       pathname: "/",
       scrolled: true,
-      observed: "contact",
-      expected: "contact",
+      observed: "faq",
+      expected: "faq",
     },
     {
       name: "off-home dominates regardless of scrolled state",
       pathname: "/blog/",
       scrolled: false,
-      observed: "contact",
+      observed: "faq",
       expected: "intro",
     },
     {

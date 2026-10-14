@@ -8,8 +8,7 @@
      ink. --whisper-deep mixes it 68% with ink for ~6.5:1 on paper.
      --whisper-text is what readable brand text uses (highlightBrand, via
      `text-whisper-text`): raw by default, matching the body's ink ground,
-     and swapped to --whisper-deep by every Frame tone="paper" (a dark card
-     inside one, like .faq-card, swaps it back). Decorative
+     and swapped to --whisper-deep by every Frame tone="paper". Decorative
      glyphs and icons (prompt and arrow marks, the pin, the hero's full stop)
      keep raw --whisper — ~3.5:1 clears the 3:1 non-text bar. */
   --whisper-deep: color-mix(in srgb, var(--whisper) 68%, var(--ink));
@@ -488,31 +487,6 @@ a.hero-status:hover .arrow {
   100% {
     opacity: 0;
   }
-}
-
-/* A .terminal placed on an ink section (#try). There the paper panel and
-   its ink rules read as a hole punched in the page, and the ink offset
-   shadow vanishes. This variant keeps the paper command body but steps the
-   chrome down in greys: a pale head and foot strip (.terminal-foot is only
-   styled here), light-grey hairlines, and a grey offset slab in place of
-   the shadow. */
-.terminal-light {
-  --term-grey: color-mix(in srgb, var(--ink) 5%, var(--paper));
-  --term-rule: color-mix(in srgb, var(--ink) 12%, var(--paper));
-  border-color: var(--term-rule);
-  box-shadow: 7px 7px 0 0 color-mix(in srgb, var(--paper) 22%, var(--ink));
-}
-.terminal-light .terminal-head,
-.terminal-light .terminal-foot {
-  background: var(--term-grey);
-}
-.terminal-light .terminal-head {
-  border-bottom-color: var(--term-rule);
-  border-radius: var(--panel-radius) var(--panel-radius) 0 0;
-}
-.terminal-light .terminal-foot {
-  border-top: 1px solid var(--term-rule);
-  border-radius: 0 0 var(--panel-radius) var(--panel-radius);
 }
 
 /* Scoped to .terminal because these are generic names: .arrow is also the
@@ -1415,13 +1389,12 @@ a.hero-status:hover .arrow {
   }
 }
 
-/* --- faq: question list + answer card (§05) ---------------------------
+/* --- faq: question list + answer card (§04) ---------------------------
    One <dl>, two columns. Questions (dt) stack on the left; every answer (dd)
    occupies the whole right column and only the selected one is visible.
-   The selected row's ordinal turns --whisper-text (the deep, AA-safe
-   whisper on this paper section); the same number is ghosted (the card's
-   paper colour, 15% opacity) in the card's bottom-right corner to tether
-   the card to its row.
+   The selected row's ordinal turns whisper; the same number is ghosted
+   (inherited colour, 15% opacity) in the card's bottom-right corner to
+   tether the card to its row.
 
    Every dd shares one grid area — grid lines 2 to n, the top rules of the
    second and the last question — and stretches to fill it, so the card's
@@ -1472,7 +1445,7 @@ a.hero-status:hover .arrow {
   transition: color 200ms var(--ease-soft);
 }
 .faq-row[data-selected="true"] .faq-ordinal {
-  color: var(--whisper-text);
+  color: var(--whisper);
 }
 .faq-q[aria-disabled="true"] {
   cursor: default;
@@ -1483,15 +1456,10 @@ a.hero-status:hover .arrow {
   display: none;
   margin: 0 0 1.5rem;
   padding: var(--faq-pad);
-  /* Solid like .terminal and .fleet, but rounder: a dark-grey card on
-     the paper section, a shade darker than .fleet's 12%. Sets paper as
-     its own colour so the ghost ordinal, which inherits, stays visible,
-     and points --whisper-text back at raw whisper: the paper Frame
-     deepens it for paper, but the card is dark. No offset shadow: the
-     card swaps in place as questions change, and a slab would read as a
-     second card. */
-  --whisper-text: var(--whisper);
-  color: var(--paper);
+  /* Solid like .terminal and .fleet, but rounder; filled with a
+     dark grey so the card reads as a panel, not a hole in the ink. A shade
+     under .fleet's 12%, which sits on paper: on ink, 12% reads too light. No
+     offset shadow: on ink it renders as a second grey slab beside the card. */
   background: color-mix(in srgb, var(--paper) 8%, var(--ink));
   border: 1px solid var(--faq-edge);
   border-radius: var(--card-radius);
