@@ -258,7 +258,7 @@ ${TRY_NOTES.join(" ")}
 
 ${faq}
 
-### Contact
+### Contact us
 
 ${CONTACT_HEADLINE.join(" ")}
 
