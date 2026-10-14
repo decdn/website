@@ -21,7 +21,7 @@ import {
 import { FAQ_ITEMS } from "@/lib/faq";
 import { getLegalDoc, LEGAL_SLUGS, legalUrl } from "@/lib/legal";
 import { DOCS_ORIGIN, EMAIL, links, repoUrl, SITE_URL } from "@/lib/links";
-import { ITEMS, formatSize, pullCommand } from "@/lib/models";
+import { ITEMS, formatSize, getCommand } from "@/lib/models";
 import { STATS_URL } from "@/lib/stats";
 
 // The whole origin as one plain-text document, so an agent grounding on deCDN
@@ -157,11 +157,11 @@ const compareTable = [
   }),
 ].join("\n");
 
-const tryWindows = `On Windows, in PowerShell: \`${pullCommand("b3:<hash>", "windows", "<namespace>")}\``;
+const tryWindows = `On Windows, in PowerShell: \`${getCommand("<hash>", "windows", "<namespace>")}\``;
 
 const tryItems = ITEMS.map(
   (item) =>
-    `- ${item.name} (${item.kind}, ${formatSize(item.bytes)}, ${item.license}): \`${pullCommand(item.hash, "unix", item.namespace)}\``,
+    `- ${item.name} (${item.kind}, ${formatSize(item.bytes)}, ${item.license}): \`${getCommand(item.hash, "unix", item.namespace)}\``,
 ).join("\n");
 
 const methodSteps = METHOD_STEPS.map(

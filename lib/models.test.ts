@@ -4,10 +4,11 @@ import {
   ITEMS,
   type Item,
   KINDS,
+  bundleUri,
   detectPlatform,
   formatSize,
+  getCommand,
   groupByKind,
-  pullCommand,
   sourceLabel,
 } from "@/lib/models";
 
@@ -84,28 +85,46 @@ describe("sourceLabel", () => {
   });
 });
 
-describe("pullCommand", () => {
-  it("installs and pulls by hash in one line", () => {
-    const hash = `b3:${"ab".repeat(32)}`;
-    expect(pullCommand(hash)).toBe(
-      `curl -fsSL https://up.decdn.org/decdn.sh | sh -s -- pull ${hash}`,
+describe("bundleUri", () => {
+  const hex = "ab".repeat(32);
+
+  it("names the bundle by its bare hash with a trailing slash", () => {
+    expect(bundleUri(`b3:${hex}`)).toBe(`decdn:${hex}/`);
+  });
+
+  it("carries the namespace as ?ns=", () => {
+    expect(bundleUri(`b3:${hex}`, 1)).toBe(`decdn:${hex}/?ns=1`);
+  });
+
+  it("takes placeholders for prose", () => {
+    expect(bundleUri("b3:<hash>", "<namespace>")).toBe(
+      "decdn:<hash>/?ns=<namespace>",
+    );
+  });
+});
+
+describe("getCommand", () => {
+  const hex = "ab".repeat(32);
+  const hash = `b3:${hex}`;
+
+  it("installs and gets the bundle URI in one line", () => {
+    expect(getCommand(hash)).toBe(
+      `curl -fsSL https://up.decdn.org/decdn.sh | sh -s -- get 'decdn:${hex}/'`,
     );
   });
 
-  it("passes the namespace through when the model has one", () => {
-    const hash = `b3:${"ab".repeat(32)}`;
-    expect(pullCommand(hash, "unix", 1)).toBe(
-      `curl -fsSL https://up.decdn.org/decdn.sh | sh -s -- pull ${hash} --namespace 1`,
+  it("passes the namespace in the URI when the item has one", () => {
+    expect(getCommand(hash, "unix", 1)).toBe(
+      `curl -fsSL https://up.decdn.org/decdn.sh | sh -s -- get 'decdn:${hex}/?ns=1'`,
     );
-    expect(pullCommand(hash, "windows", 1)).toBe(
-      `& ([scriptblock]::Create((irm https://up.decdn.org/decdn.ps1))) pull ${hash} --namespace 1`,
+    expect(getCommand(hash, "windows", 1)).toBe(
+      `& ([scriptblock]::Create((irm https://up.decdn.org/decdn.ps1))) get 'decdn:${hex}/?ns=1'`,
     );
   });
 
-  it("installs and pulls from PowerShell on Windows", () => {
-    const hash = `b3:${"ab".repeat(32)}`;
-    expect(pullCommand(hash, "windows")).toBe(
-      `& ([scriptblock]::Create((irm https://up.decdn.org/decdn.ps1))) pull ${hash}`,
+  it("installs and gets from PowerShell on Windows", () => {
+    expect(getCommand(hash, "windows")).toBe(
+      `& ([scriptblock]::Create((irm https://up.decdn.org/decdn.ps1))) get 'decdn:${hex}/'`,
     );
   });
 });

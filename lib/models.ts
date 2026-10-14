@@ -33,8 +33,8 @@ export type Item = {
   source: string;
   /** `b3:` + 64 lowercase hex characters. */
   hash: string;
-  /** The namespace the item is published under (ADR 002). Passed to the
-   *  installer's `pull --namespace` so a node that has not cached the
+  /** The namespace the item is published under (ADR 002). Carried as the
+   *  `?ns=` of the item's `decdn:` URI, so a node that has not cached the
    *  item pulls it from that namespace's origins. A routing hint only: the
    *  bytes are verified against `hash` either way. */
   namespace?: number;
@@ -89,23 +89,28 @@ export const PLATFORMS: readonly {
   { id: "windows", label: "windows", shell: "powershell", prompt: "PS>" },
 ];
 
-/** The one line that installs `decdn` and pulls `hash` (published under
- *  `namespace`, when it has one) into the current directory: a POSIX shell
- *  pipe on macOS and Linux; on Windows, the PowerShell installer run as a
- *  script block, so the pull arguments reach it. `namespace` also takes a
- *  placeholder string for prose examples. */
-export function pullCommand(
+/** The `decdn:` URI of the bundle whose manifest has `hash` (`b3:<hex>`),
+ *  with the `?ns=` routing hint when it has a `namespace`. `hash` and
+ *  `namespace` also take placeholder strings for prose examples. */
+export function bundleUri(hash: string, namespace?: number | string): string {
+  const uri = `decdn:${hash.replace(/^b3:/, "")}/`;
+  return namespace === undefined ? uri : `${uri}?ns=${namespace}`;
+}
+
+/** The one line that installs `decdn` and gets the bundle `hash` (published
+ *  under `namespace`, when it has one) into the current directory: a POSIX
+ *  shell pipe on macOS and Linux; on Windows, the PowerShell installer run as
+ *  a script block, so the `get` arguments reach it. The URI is single-quoted,
+ *  so neither shell reads its `?` as a pattern. */
+export function getCommand(
   hash: string,
   platform: Platform = "unix",
   namespace?: number | string,
 ): string {
-  const pull =
-    namespace === undefined
-      ? `pull ${hash}`
-      : `pull ${hash} --namespace ${namespace}`;
+  const get = `get '${bundleUri(hash, namespace)}'`;
   return platform === "windows"
-    ? `& ([scriptblock]::Create((irm ${links.installerPs1}))) ${pull}`
-    : `curl -fsSL ${links.installer} | sh -s -- ${pull}`;
+    ? `& ([scriptblock]::Create((irm ${links.installerPs1}))) ${get}`
+    : `curl -fsSL ${links.installer} | sh -s -- ${get}`;
 }
 
 /** Windows visitors get the PowerShell line; everyone else the POSIX one. */

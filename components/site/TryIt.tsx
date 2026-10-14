@@ -10,8 +10,8 @@ import {
   type Platform,
   detectPlatform,
   formatSize,
+  getCommand,
   groupByKind,
-  pullCommand,
   sourceLabel,
 } from "@/lib/models";
 
@@ -62,7 +62,7 @@ export function TryIt() {
   const item = ITEMS.find((i) => i.id === id) ?? ITEMS[0];
   const shell = PLATFORMS.find((p) => p.id === platform) ?? PLATFORMS[0];
   if (!item || !shell) return null;
-  const command = pullCommand(item.hash, platform, item.namespace);
+  const command = getCommand(item.hash, platform, item.namespace);
 
   function flashCopied() {
     setCopied(true);
