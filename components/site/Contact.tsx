@@ -187,20 +187,20 @@ export function Contact() {
           </div>
         </div>
 
-        <div className="flex flex-col items-start gap-6">
+        <div className="flex flex-col items-start gap-4">
           <FleetStatus className="block w-full" />
+          {/* A footnote to the panel in its label register, so it does not
+              compete with the contact links on the left. */}
           <a
             data-reveal
             style={{ "--reveal-delay": "320ms" }}
-            className="underline-brutal text-body font-semibold tracking-[0.02em]"
+            className="meta inline-flex items-center gap-2 text-paper/60 transition-colors duration-200 ease-(--ease-soft) hover:text-paper focus-visible:text-paper"
             href={links.runNode}
             target="_blank"
             rel="noopener noreferrer"
           >
             {CONTACT_RUN_NODE}
-            <span className="arrow" aria-hidden>
-              →
-            </span>
+            <span aria-hidden>→</span>
           </a>
         </div>
       </div>
