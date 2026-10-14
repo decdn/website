@@ -76,8 +76,8 @@ export default function BlogIndex() {
               the class itself. */}
           <div className="rise rise-1">
             <p className="max-w-[60ch] text-lead leading-[1.7] opacity-75">
-              long-form posts on the deCDN protocol — what it is, why now, and
-              how the pieces fit together. published when something&apos;s worth
+              Long-form posts on the deCDN protocol — what it is, why now, and
+              how the pieces fit together. Published when something&apos;s worth
               saying.
             </p>
           </div>
@@ -86,7 +86,7 @@ export default function BlogIndex() {
         {posts.length === 0 ? (
           <>
             <span aria-hidden className="rule mt-16 opacity-20" />
-            <p className="mt-16 text-body opacity-60">nothing yet.</p>
+            <p className="mt-16 text-body opacity-60">Nothing yet.</p>
           </>
         ) : (
           <div className="mt-16 flex flex-col">
