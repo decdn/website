@@ -64,7 +64,7 @@ export const HERO_STATUS = {
   value: "Network stats",
 } as const satisfies FigureCopy;
 
-/** The #try section between How it works and the FAQ. */
+/** The #try section between the FAQ and Contact. */
 export const TRY_HEADLINE = "try it: download something real.";
 
 export const TRY_LEAD =
