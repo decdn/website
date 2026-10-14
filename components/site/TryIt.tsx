@@ -102,14 +102,23 @@ export function TryIt() {
           <span className="meta opacity-60">
             select a bundle · {ITEMS.length} seeded
           </span>
-          <span className="relative">
+          {/* The native menu takes the select's font-size, so the select
+              stays at body size and sits invisibly over a headline-sized
+              face. The ring moves to the wrapper for the same reason. */}
+          <span className="relative has-[select:focus-visible]:outline-2 has-[select:focus-visible]:outline-offset-4">
+            <span
+              aria-hidden
+              className="block truncate border-b border-current pr-8 pb-2 text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold tracking-[-0.02em]"
+            >
+              {item.name}
+            </span>
             <select
               value={item.id}
               onChange={(e) => {
                 setId(e.target.value);
                 setCopied(false);
               }}
-              className="w-full cursor-pointer appearance-none truncate border-b border-current bg-transparent pr-8 pb-2 text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold tracking-[-0.02em] focus-visible:outline-2 focus-visible:outline-offset-4"
+              className="absolute inset-0 w-full cursor-pointer appearance-none text-body opacity-0"
             >
               {/* One kind needs no group headings; several get one each. */}
               {GROUPS.length > 1
