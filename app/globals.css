@@ -994,8 +994,7 @@ a.hero-status:hover .arrow {
   overflow-wrap: break-word; /* break long unbreakable inline tokens (long
                                 inline code, external links) so they wrap
                                 instead of overflowing the column. Fenced code
-                                blocks are unaffected — they scroll via
-                                .prose pre { overflow-x: auto }. */
+                                blocks wrap too, via .prose pre. */
 }
 
 .prose > * + * {
@@ -1092,13 +1091,43 @@ a.hero-status:hover .arrow {
   background: color-mix(in srgb, var(--ink) 5%, transparent);
   border: 1px dashed color-mix(in srgb, var(--ink) 25%, transparent);
   border-radius: 4px;
-  overflow-x: auto;
+  /* Wrap rather than scroll: a one-line shell command (a 64-hex hash and
+     all) stays fully visible on a phone, and the copy button copies the
+     unwrapped text. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .prose pre code {
   background: none;
   padding: 0;
   font-size: inherit;
+}
+
+/* CodeBlock: the copy button sits in the block's top-right corner; the
+   block's right padding keeps wrapped lines clear of it. */
+.prose .code-block {
+  position: relative;
+}
+
+.prose .code-block pre {
+  padding-inline-end: 4.5em;
+}
+
+.code-copy {
+  position: absolute;
+  top: 0.75em;
+  right: 0.9em;
+  cursor: pointer;
+  padding-bottom: 2px;
+  border-bottom: 1px solid currentColor;
+  opacity: 0.6;
+  transition: opacity 160ms var(--ease-soft);
+}
+
+.code-copy:hover,
+.code-copy:focus-visible {
+  opacity: 1;
 }
 
 .prose table {
