@@ -15,10 +15,10 @@ import { links } from "@/lib/links";
 
 /** The kinds of bundle the catalogue offers, in display order. */
 export const KINDS = [
-  { id: "model", label: "models" },
-  { id: "dataset", label: "datasets" },
-  { id: "iso", label: "isos" },
-  { id: "video", label: "videos" },
+  { id: "model", label: "model" },
+  { id: "dataset", label: "dataset" },
+  { id: "iso", label: "iso" },
+  { id: "video", label: "video" },
 ] as const;
 
 export type Kind = (typeof KINDS)[number]["id"];
