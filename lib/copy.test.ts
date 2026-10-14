@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  BLOG_DESCRIPTION,
   COMPARE_HEADLINE,
   COMPARE_LEAD,
   COMPARE_ROWS,
@@ -19,6 +20,8 @@ import {
   STACK,
   statusBlock,
   TARGET_RATE,
+  TRY_LEAD,
+  TRY_NOTES,
 } from "./copy";
 
 // COMPARE_ROWS is `as const`, so each element has its own literal type and the
@@ -192,6 +195,19 @@ describe("statusBlock", () => {
 describe("HERO_BADGE", () => {
   it("names the testnet", () => {
     expect(HERO_BADGE).toBe("testnet");
+  });
+});
+
+describe("prose", () => {
+  // Labels and headlines keep the homepage's lowercase display voice; prose
+  // takes sentence case. A merge once reverted these to lowercase unnoticed.
+  it.each([
+    ["HERO_LEAD", HERO_LEAD],
+    ["TRY_LEAD", TRY_LEAD],
+    ...TRY_NOTES.map((s, i): [string, string] => [`TRY_NOTES[${i}]`, s]),
+    ["BLOG_DESCRIPTION", BLOG_DESCRIPTION],
+  ])("%s is sentence-cased", (_name, s) => {
+    expect(s).toMatch(/^[A-Z]/);
   });
 });
 

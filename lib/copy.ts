@@ -68,12 +68,12 @@ export const HERO_STATUS = {
 export const TRY_HEADLINE = "try it: download something real.";
 
 export const TRY_LEAD =
-  "pick something we seeded on the testnet and paste the line into a terminal on macos or linux, or into powershell on windows. it installs deCDN, opens one captcha in your browser, then downloads it from the network and checks every byte against its blake3 hash. the testnet sponsor pays for the transfer, so there is no wallet, no token, and no sign-up.";
+  "Pick something we seeded on the testnet and paste the line into a terminal on macOS or Linux, or into PowerShell on Windows. It installs deCDN, opens one captcha in your browser, then downloads it from the network and checks every byte against its BLAKE3 hash. The testnet sponsor pays for the transfer, so there is no wallet, no token, and no sign-up.";
 
 /** The short notes under the command. */
 export const TRY_NOTES = [
-  "files land in the current directory. add --select to preview.",
-  "interrupted? run the same line again to resume.",
+  "Files land in the current directory. Add --select to preview.",
+  "Interrupted? Run the same line again to resume.",
 ] as const;
 
 export const COMPARE_HEADLINE = [
@@ -234,7 +234,7 @@ export const PANEL_CAPTIONS = {
  *  `blogNode` for the `Blog` schema node, and by the llms.txt index — one
  *  string so the three can't disagree about what the section is. */
 export const BLOG_TITLE = "field notes";
-export const BLOG_DESCRIPTION = "long-form posts on the deCDN protocol.";
+export const BLOG_DESCRIPTION = "Long-form posts on the deCDN protocol.";
 
 export type SourceRepo = {
   /** Repo name under the GitHub org; the URL is `repoUrl(name)` in lib/links.ts. */

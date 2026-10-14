@@ -1,8 +1,9 @@
-import type { ReactNode } from "react";
+import type { ReactElement } from "react";
 
 /** The row's right-hand end holds a timestamp or a badge, never both. */
 type SectionHeaderProps = { index: string; label: string } & (
-  { timestamp: string; badge?: never } | { badge: ReactNode; timestamp?: never }
+  | { timestamp: string; badge?: never }
+  | { badge: ReactElement; timestamp?: never }
 );
 
 export function SectionHeader({

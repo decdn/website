@@ -31,7 +31,19 @@ describe("SectionHeader", () => {
   it("rejects a timestamp and a badge together at the type level", () => {
     const both = () =>
       // @ts-expect-error — the right-hand end holds one or the other.
-      SectionHeader({ index: "01", label: "x", timestamp: "t", badge: "b" });
+      SectionHeader({
+        index: "01",
+        label: "x",
+        timestamp: "t",
+        badge: createElement("i"),
+      });
     expect(both).toBeTypeOf("function");
+  });
+
+  it("rejects an empty badge at the type level", () => {
+    const empty = () =>
+      // @ts-expect-error — a nullish badge would render an empty timestamp.
+      SectionHeader({ index: "01", label: "x", badge: null });
+    expect(empty).toBeTypeOf("function");
   });
 });
