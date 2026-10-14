@@ -1,10 +1,10 @@
 import { links } from "@/lib/links";
 import {
   HERO_FIGURES,
+  HERO_BADGE,
   HERO_HEADLINE,
   HERO_LEAD,
   HERO_STATUS,
-  LAUNCH_BANNER,
 } from "@/lib/copy";
 import { highlightBrand } from "@/components/ui/brand";
 import { Figure } from "@/components/ui/Figure";
@@ -15,16 +15,16 @@ import { HeroTerminal } from "@/components/site/HeroTerminal";
 export function Hero() {
   return (
     <Frame id="intro" tone="paper" className="overflow-hidden">
-      <SectionHeader index="01" label="Hero">
-        {/* Launch banner: a testnet badge and one line. */}
-        <p className="rise rise-0 flex flex-wrap items-center gap-x-4 gap-y-2 text-body leading-[1.5] font-medium tracking-[-0.01em]">
-          <span className="meta inline-flex items-center gap-2 rounded border border-current px-2 py-1 text-whisper-text">
+      <SectionHeader
+        index="01"
+        label="Hero"
+        badge={
+          <span className="meta rise rise-0 inline-flex items-center gap-2 rounded border border-current px-2 py-1 text-whisper-text">
             <span aria-hidden className="status-live" />
-            {LAUNCH_BANNER.badge}
+            {HERO_BADGE}
           </span>
-          <span>{LAUNCH_BANNER.text}</span>
-        </p>
-      </SectionHeader>
+        }
+      />
 
       <div className="mt-10 flex flex-col gap-8 @4xl:gap-12">
         <h1
