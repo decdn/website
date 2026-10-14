@@ -35,11 +35,8 @@ export const HERO_HEADLINE = [
 export const HERO_LEAD =
   "A 14-gigabyte file posted in Berlin streams to a client in Tokyo from several nodes at once, every chunk verified with BLAKE3, paid for per megabyte in USDC. The code is open. The network is open. The price is posted.";
 
-/** The launch banner in the hero's section-header row: a testnet badge and one line. */
-export const LAUNCH_BANNER = {
-  badge: "testnet",
-  text: "The public testnet is live and open source. Pull a model, a dataset, an ISO or a film with one command.",
-} as const;
+/** The badge at the right-hand end of the hero's section-header row. */
+export const HERO_BADGE = "testnet";
 
 /** A label/value pair rendered by `components/ui/Figure`. Named `FigureCopy`
  *  rather than `Figure` so a call site can import both the copy and the

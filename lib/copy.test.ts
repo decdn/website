@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  BLOG_DESCRIPTION,
   COMPARE_HEADLINE,
   COMPARE_LEAD,
   COMPARE_ROWS,
@@ -7,10 +8,10 @@ import {
   CONTACT_LEAD,
   CONTACT_RUN_NODE,
   type CompareRow,
+  HERO_BADGE,
   HERO_FIGURES,
   HERO_HEADLINE,
   HERO_LEAD,
-  LAUNCH_BANNER,
   METHOD_STEPS,
   PANEL_CAPTIONS,
   SITE_DESCRIPTION,
@@ -19,6 +20,8 @@ import {
   STACK,
   statusBlock,
   TARGET_RATE,
+  TRY_LEAD,
+  TRY_NOTES,
 } from "./copy";
 
 // COMPARE_ROWS is `as const`, so each element has its own literal type and the
@@ -36,8 +39,7 @@ const ROWS: readonly CompareRow[] = COMPARE_ROWS;
 const ALL_STRINGS: readonly [string, string][] = [
   ["SITE_TITLE", SITE_TITLE],
   ["SITE_DESCRIPTION", SITE_DESCRIPTION],
-  ["LAUNCH_BANNER.badge", LAUNCH_BANNER.badge],
-  ["LAUNCH_BANNER.text", LAUNCH_BANNER.text],
+  ["HERO_BADGE", HERO_BADGE],
   ...HERO_HEADLINE.map((s, i): [string, string] => [`HERO_HEADLINE[${i}]`, s]),
   ["HERO_LEAD", HERO_LEAD],
   ...HERO_FIGURES.flatMap((f): [string, string][] => [
@@ -190,15 +192,22 @@ describe("statusBlock", () => {
   });
 });
 
-describe("LAUNCH_BANNER", () => {
-  // The badge is a label, in the homepage's lowercase display voice; the text
-  // is prose, so it takes sentence case like the rest of the page's prose.
-  // Both say "testnet" so the status survives a screen reader or text
-  // extractor that skips the badge.
-  it("keeps the badge lowercase, sentence-cases the text, names the testnet", () => {
-    expect(LAUNCH_BANNER.badge).toBe("testnet");
-    expect(LAUNCH_BANNER.text).toMatch(/^[A-Z]/);
-    expect(LAUNCH_BANNER.text).toContain("testnet is live");
+describe("HERO_BADGE", () => {
+  it("names the testnet", () => {
+    expect(HERO_BADGE).toBe("testnet");
+  });
+});
+
+describe("prose", () => {
+  // Labels and headlines keep the homepage's lowercase display voice; prose
+  // takes sentence case. A merge once reverted these to lowercase unnoticed.
+  it.each([
+    ["HERO_LEAD", HERO_LEAD],
+    ["TRY_LEAD", TRY_LEAD],
+    ...TRY_NOTES.map((s, i): [string, string] => [`TRY_NOTES[${i}]`, s]),
+    ["BLOG_DESCRIPTION", BLOG_DESCRIPTION],
+  ])("%s is sentence-cased", (_name, s) => {
+    expect(s).toMatch(/^[A-Z]/);
   });
 });
 
