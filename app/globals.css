@@ -393,7 +393,7 @@ a.hero-status:hover .arrow {
    below. The cursor blinks independently except offscreen.
    The cascade restarts every cycle. Shares the "tool
    panel" vocabulary with .fleet: soft corners, a solid 1px rule, a hard
-   offset shadow. .faq-card keeps the solid rule. */
+   offset shadow. .faq-panel keeps the solid rule. */
 
 .terminal {
   font-family: var(--font-mono);
@@ -1527,8 +1527,9 @@ a.hero-status:hover .arrow {
   }
 
   /* Both selectors: the base `.faq-card[data-selected="true"]` rule above
-     is more specific than a bare .faq-card and would win inside this query
-     otherwise. The card swaps instantly here: nothing beside it moves. */
+     is more specific than a bare .faq-card and would otherwise keep its
+     margin-bottom here. No height slide at this width: nothing beside the
+     card moves. */
   .faq-card,
   .faq-card[data-selected="true"] {
     grid-column: 2;

@@ -9,10 +9,10 @@ import { FAQ_ITEMS } from "@/lib/faq";
 // Index 0 on both server and client, so the static HTML matches hydration.
 //
 // Toggling never scrolls the page. At phone width the closing answer shrinks
-// and the opening one grows over the same 250ms (globals.css, .faq-card), so
-// when the closing answer sits above the tapped question the question slides
-// up smoothly rather than jumping; `.faq-grid` sets `overflow-anchor: none`
-// so the browser doesn't scroll to compensate either.
+// while the opening one grows (globals.css, .faq-card), so when the closing
+// answer sits above the tapped question the question slides up smoothly
+// rather than jumping; `.faq-grid` sets `overflow-anchor: none` so the
+// browser doesn't scroll to compensate either.
 export function FaqList({ section }: { section: string }) {
   const [selected, setSelected] = useState(0);
 

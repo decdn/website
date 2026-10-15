@@ -63,9 +63,8 @@ export function FaqItem({
           the reader taps, and a view()-timeline reveal created mid-scroll
           would leave a freshly opened answer dim until the reader scrolls.
           The height slide and the .faq-answer rise are its entrance instead.
-          The dd is the part that grows and shrinks, .faq-clip cuts its
-          content off while it is short, and .faq-panel is the card the
-          reader sees. */}
+          See .faq-card in globals.css for what the dd, .faq-clip and
+          .faq-panel each do. */}
       <dd
         id={answerId}
         data-selected={selected ? "true" : undefined}
