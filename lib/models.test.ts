@@ -101,6 +101,18 @@ describe("bundleUri", () => {
       "decdn:<hash>/?ns=<namespace>",
     );
   });
+
+  it("names one entry by its manifest path", () => {
+    expect(bundleUri(`b3:${hex}`, 1, "sintel-4k-mkv/Sintel.2010.4k.mkv")).toBe(
+      `decdn:${hex}/sintel-4k-mkv/Sintel.2010.4k.mkv?ns=1`,
+    );
+  });
+
+  it("percent-encodes each entry segment, quotes included", () => {
+    expect(bundleUri(`b3:${hex}`, undefined, "a dir/it's?#.iso")).toBe(
+      `decdn:${hex}/a%20dir/it%27s%3F%23.iso`,
+    );
+  });
 });
 
 describe("getCommand", () => {
@@ -119,6 +131,12 @@ describe("getCommand", () => {
     );
     expect(getCommand(hash, "windows", 1)).toBe(
       `& ([scriptblock]::Create((irm https://up.decdn.org/decdn.ps1))) get 'decdn:${hex}/?ns=1'`,
+    );
+  });
+
+  it("gets a single-file bundle's entry by its path", () => {
+    expect(getCommand(hash, "unix", 1, "dir/file.iso")).toBe(
+      `curl -fsSL https://up.decdn.org/decdn.sh | sh -s -- get 'decdn:${hex}/dir/file.iso?ns=1'`,
     );
   });
 
