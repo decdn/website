@@ -64,11 +64,36 @@ describe("FaqItem", () => {
     }
   });
 
-  // One answer is always open, so the open button can't collapse anything:
-  // it says so with aria-disabled and its handler is a no-op.
-  it("disables the already-open button without removing it from the tab order", () => {
+  // The desktop card always shows one answer, so its button can't collapse
+  // it: it says so with aria-disabled. The tap still reports, because
+  // FaqList decides from the layout at tap time, not from this prop.
+  it("disables the locked button without removing it from the tab order", () => {
     const calls: number[] = [];
     const open = asElement(
+      FaqItem({
+        q: Q,
+        a: A,
+        index: 3,
+        ordinal: "04.4",
+        selected: true,
+        locked: true,
+        onSelect: (i) => calls.push(i),
+      }),
+    );
+    const button = findOne(open, "button");
+    expect(attrs(button)["aria-disabled"]).toBe(true);
+    expect(attrs(button).disabled).toBeUndefined();
+    (attrs(button).onClick as () => void)();
+    expect(calls).toEqual([3]);
+
+    const closed = findOne(render(false), "button");
+    expect(attrs(closed)["aria-disabled"]).toBeUndefined();
+  });
+
+  // At phone width an open answer closes again on a second tap.
+  it("lets an open, unlocked button report its index", () => {
+    const calls: number[] = [];
+    const item = asElement(
       FaqItem({
         q: Q,
         a: A,
@@ -78,14 +103,10 @@ describe("FaqItem", () => {
         onSelect: (i) => calls.push(i),
       }),
     );
-    const button = findOne(open, "button");
-    expect(attrs(button)["aria-disabled"]).toBe(true);
-    expect(attrs(button).disabled).toBeUndefined();
+    const button = findOne(item, "button");
+    expect(attrs(button)["aria-disabled"]).toBeUndefined();
     (attrs(button).onClick as () => void)();
-    expect(calls).toEqual([]);
-
-    const closed = findOne(render(false), "button");
-    expect(attrs(closed)["aria-disabled"]).toBeUndefined();
+    expect(calls).toEqual([3]);
   });
 
   it("reports its index when clicked", () => {
