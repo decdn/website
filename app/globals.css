@@ -350,9 +350,15 @@ a.social-pill:focus-visible .social-pill-label {
 }
 
 @media (hover: hover) and (pointer: fine) {
+  /* The outline seeps to green well after the pill has opened: the slow
+     timing lives on :hover, so it applies on the way in only and the border
+     settles back at the base rule's 250ms when the cursor leaves. */
   a.social-pill:hover {
-    border-color: color-mix(in oklab, var(--paper) 60%, transparent);
+    border-color: var(--whisper);
     padding-inline-end: 16px;
+    transition:
+      border-color 1400ms ease-out,
+      padding-inline-end 250ms ease-out;
   }
 
   a.social-pill:hover .social-pill-label {
@@ -364,6 +370,7 @@ a.social-pill:focus-visible .social-pill-label {
 
 @media (prefers-reduced-motion: reduce) {
   a.social-pill,
+  a.social-pill:hover,
   .social-pill-label {
     transition: none;
   }
