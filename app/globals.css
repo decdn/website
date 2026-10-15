@@ -297,6 +297,80 @@ a.underline-brutal:hover .arrow {
   color: var(--whisper);
 }
 
+/* Contact's social links: a 44px icon circle at rest (the minimum touch
+   target) that widens into a pill naming the platform. The width animates
+   through a 0fr→1fr grid track, so each pill grows to its label's real width
+   with no max-width guess and no JS, and the flex row reflows every frame,
+   sliding the neighbours along. Hover only expands on devices that can hover
+   with a fine pointer: otherwise iOS Safari spends the first tap on :hover
+   instead of following the link. */
+a.social-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  min-width: 44px;
+  padding-inline: 12px;
+  border: 1px solid color-mix(in oklab, var(--paper) 25%, transparent);
+  border-radius: 9999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: var(--text-body);
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  transition:
+    border-color 250ms var(--ease-soft),
+    padding-inline-end 250ms var(--ease-soft);
+}
+
+.social-pill-label {
+  display: grid;
+  grid-template-columns: 0fr;
+  opacity: 0;
+  transition:
+    grid-template-columns 250ms var(--ease-soft),
+    opacity 250ms var(--ease-soft),
+    margin-inline-start 250ms var(--ease-soft);
+}
+
+.social-pill-label > span {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+a.social-pill:focus-visible {
+  border-color: color-mix(in oklab, var(--paper) 60%, transparent);
+  padding-inline-end: 16px;
+}
+
+a.social-pill:focus-visible .social-pill-label {
+  grid-template-columns: 1fr;
+  opacity: 1;
+  margin-inline-start: 0.5rem;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a.social-pill:hover {
+    border-color: color-mix(in oklab, var(--paper) 60%, transparent);
+    padding-inline-end: 16px;
+  }
+
+  a.social-pill:hover .social-pill-label {
+    grid-template-columns: 1fr;
+    opacity: 1;
+    margin-inline-start: 0.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  a.social-pill,
+  .social-pill-label {
+    transition: none;
+  }
+}
+
 /* The hero's single primary action: a solid ink block with the same hard
    offset shadow as the tool panels, so it reads as the page's one button
    rather than a fourth underlined link. */

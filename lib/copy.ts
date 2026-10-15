@@ -20,6 +20,8 @@
 // (components/ui/brand.tsx) wrap it at render time; the mirror takes the same
 // string verbatim.
 
+import type { links } from "@/lib/links";
+
 export const SITE_TITLE = "deCDN — decentralized CDN for bytes at scale";
 export const SITE_DESCRIPTION =
   "A decentralized CDN. Anyone can serve bytes; clients pay per megabyte in USDC. An open market that gets cheaper as it grows, at ~$0.01/GB, up to 90% below legacy CDN list pricing.";
@@ -274,6 +276,16 @@ export const CONTACT_HEADLINE = [
 
 export const CONTACT_LEAD =
   "Write to us with questions, partnerships, or anything you'd run on a fleet of idle machines. We read everything.";
+
+/** The Contact section's social links, in page order. `link` keys into
+ *  `links` (lib/links.ts) so the URLs keep one source; the llms-full contact
+ *  line maps over this same list, so the mirror cannot drift from the page. */
+export const CONTACT_SOCIALS = [
+  { link: "github", name: "GitHub" },
+  { link: "discord", name: "Discord" },
+  { link: "linkedin", name: "LinkedIn" },
+  { link: "x", name: "X" },
+] as const satisfies readonly { link: keyof typeof links; name: string }[];
 
 /** The operator path under the fleet panel: the homepage FAQ answers
  *  publishers, and node operators go to the run-a-node docs from here. */

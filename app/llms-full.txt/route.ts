@@ -5,6 +5,7 @@ import {
   COMPARE_ROWS,
   CONTACT_HEADLINE,
   CONTACT_LEAD,
+  CONTACT_SOCIALS,
   type FigureCopy,
   HERO_FIGURES,
   HERO_HEADLINE,
@@ -261,7 +262,7 @@ ${CONTACT_HEADLINE.join(" ")}
 
 ${CONTACT_LEAD}
 
-Email ${EMAIL} · GitHub ${links.github} · X ${links.x} · LinkedIn ${links.linkedin} · Discord ${links.discord}
+Email ${EMAIL} · ${CONTACT_SOCIALS.map((s) => `${s.name} ${links[s.link]}`).join(" · ")}
 
 Run a node on the testnet: ${links.runNode}
 

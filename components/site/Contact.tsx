@@ -1,18 +1,24 @@
+import type { ReactElement } from "react";
 import { EMAIL, links } from "@/lib/links";
-import { CONTACT_HEADLINE, CONTACT_LEAD, CONTACT_RUN_NODE } from "@/lib/copy";
+import {
+  CONTACT_HEADLINE,
+  CONTACT_LEAD,
+  CONTACT_RUN_NODE,
+  CONTACT_SOCIALS,
+} from "@/lib/copy";
 import { highlightBrand } from "@/components/ui/brand";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { FleetStatus } from "@/components/site/FleetStatus";
 
-// Solid monochrome glyphs leading each contact link. Decorative — every link
-// carries its own visible text label — so each <svg> is aria-hidden. iconClass
-// sizes them in em (1.05×), so each glyph scales with its link's font-size;
-// shrink-0 keeps the box from compressing in the inline-flex link. The
-// envelope is an original geometric glyph; the X and LinkedIn glyphs are from
-// Simple Icons (CC0 / public domain) — the marks are trademarks of their
-// owners, shown nominatively as links to our own profiles. The GitHub and
-// Discord glyphs are likewise from Simple Icons (CC0 / public domain).
+// Solid monochrome glyphs leading each contact link. Decorative — the email
+// link carries its visible address and each social pill an aria-label naming
+// the platform — so each <svg> is aria-hidden. iconClass sizes them in em
+// (1.05×), so each glyph scales with its link's font-size; shrink-0 keeps the
+// box from compressing in the inline-flex link. The envelope is an original
+// geometric glyph; the GitHub, Discord, LinkedIn and X glyphs are from Simple
+// Icons (CC0 / public domain), and those marks are trademarks of their owners,
+// shown nominatively as links to our own profiles.
 const iconClass = "size-[1.05em] shrink-0";
 
 function MailIcon() {
@@ -83,6 +89,18 @@ function XIcon() {
   );
 }
 
+// The list and its order live in CONTACT_SOCIALS (lib/copy.ts); this only
+// pairs each entry with its glyph.
+const SOCIAL_ICONS: Record<
+  (typeof CONTACT_SOCIALS)[number]["link"],
+  () => ReactElement
+> = {
+  github: GitHubIcon,
+  discord: DiscordIcon,
+  linkedin: LinkedInIcon,
+  x: XIcon,
+};
+
 export function Contact() {
   return (
     <Frame id="contact" tone="ink" className="overflow-hidden max-md:pb-2">
@@ -123,7 +141,7 @@ export function Contact() {
             style={{ "--reveal-delay": "220ms" }}
             className="flex flex-col gap-y-4 @md:gap-y-8"
           >
-            <div className="flex flex-col flex-wrap gap-x-10 gap-y-4 @md:flex-row @md:items-baseline">
+            <div className="flex">
               <a
                 className="underline-brutal text-lead font-semibold tracking-[0.02em]"
                 href={links.contact}
@@ -134,56 +152,31 @@ export function Contact() {
                   →
                 </span>
               </a>
-              <a
-                className="underline-brutal text-lead font-semibold tracking-[0.02em]"
-                href={links.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <LinkedInIcon />
-                linkedin
-                <span className="arrow" aria-hidden>
-                  →
-                </span>
-              </a>
-              <a
-                className="underline-brutal text-lead font-semibold tracking-[0.02em]"
-                href={links.x}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <XIcon />X
-                <span className="arrow" aria-hidden>
-                  →
-                </span>
-              </a>
             </div>
-            <div className="flex flex-col flex-wrap gap-x-10 gap-y-4 @md:flex-row @md:items-baseline">
-              <a
-                className="underline-brutal text-lead font-semibold tracking-[0.02em]"
-                href={links.github}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <GitHubIcon />
-                github
-                <span className="arrow" aria-hidden>
-                  →
-                </span>
-              </a>
-              <a
-                className="underline-brutal text-lead font-semibold tracking-[0.02em]"
-                href={links.discord}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <DiscordIcon />
-                discord
-                <span className="arrow" aria-hidden>
-                  →
-                </span>
-              </a>
-            </div>
+            {/* Icon-only at rest; the name slides in on mouse hover or
+                keyboard focus only (see a.social-pill in globals.css), so a
+                tap on touch navigates straight away. */}
+            <ul className="flex flex-wrap gap-3" aria-label="decdn elsewhere">
+              {CONTACT_SOCIALS.map(({ link, name }) => {
+                const Icon = SOCIAL_ICONS[link];
+                return (
+                  <li key={name}>
+                    <a
+                      className="social-pill"
+                      href={links[link]}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`decdn on ${name}`}
+                    >
+                      <Icon />
+                      <span className="social-pill-label">
+                        <span>{name}</span>
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
           </div>
         </div>
 
