@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { FaqList, INITIAL_FAQ_STATE, nextFaqState } from "./FaqList";
+import { FaqList } from "./FaqList";
 import { FAQ_ITEMS } from "@/lib/faq";
 
 // FaqList owns a useState, so test-utils/react-tree's walkers would throw on
@@ -18,8 +18,9 @@ const controls = [...html.matchAll(/aria-controls="([^"]+)"/g)].map(
 );
 
 describe("FaqList", () => {
-  // The card on the right has to show something; index 0 on both server and
-  // client, in both layouts, is the hydration contract.
+  // The card on the right has to show something, and the phone accordion
+  // has to open something; index 0 on both server and client is the
+  // hydration contract.
   it("ships with the first answer open, and only the first", () => {
     expect(html.match(/aria-expanded="true"/g)).toHaveLength(1);
     expect(html.match(/data-selected="true"/g)).toHaveLength(2); // dt + dd
@@ -39,37 +40,5 @@ describe("FaqList", () => {
   it("tells the grid how many question rows it has", () => {
     expect(html).toContain(`style="--faq-n:${FAQ_ITEMS.length}"`);
     expect(html.match(/<dt /g)).toHaveLength(FAQ_ITEMS.length);
-  });
-});
-
-describe("nextFaqState", () => {
-  const state = (selected: number, open: number[]) => ({
-    selected,
-    open: new Set(open),
-  });
-
-  // Closing another answer would move the tapped question or the page, so
-  // at phone width a tap only ever changes its own answer.
-  it("opens a phone answer without closing the others", () => {
-    const next = nextFaqState(state(0, [0]), 3, true);
-    expect([...next.open].sort()).toEqual([0, 3]);
-    expect(next.selected).toBe(3);
-  });
-
-  it("closes an open phone answer on a second tap, leaving the card", () => {
-    const next = nextFaqState(state(3, [0, 3]), 3, true);
-    expect([...next.open]).toEqual([0]);
-    expect(next.selected).toBe(3);
-  });
-
-  it("selects on desktop and shows the same answer if the window narrows", () => {
-    const next = nextFaqState(state(0, [0, 2, 5]), 4, false);
-    expect(next.selected).toBe(4);
-    expect([...next.open]).toEqual([4]);
-  });
-
-  it("does not mutate the previous state", () => {
-    nextFaqState(INITIAL_FAQ_STATE, 2, true);
-    expect([...INITIAL_FAQ_STATE.open]).toEqual([0]);
   });
 });

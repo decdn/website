@@ -1,80 +1,37 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
+import { flushSync } from "react-dom";
 import { FaqItem } from "@/components/ui/FaqItem";
 import { FAQ_ITEMS } from "@/lib/faq";
+import { scrollInstantly } from "@/lib/scroll";
 
-export type FaqState = {
-  /** The answer on the desktop card: always one, the last one opened. */
-  selected: number;
-  /** The answers open at phone width, where each one sits under its question. */
-  open: ReadonlySet<number>;
-};
-
-// Index 0 in both layouts, on server and client, so the static HTML matches
-// hydration whichever layout the reader ends up in.
-export const INITIAL_FAQ_STATE: FaqState = { selected: 0, open: new Set([0]) };
-
-// At phone width a tap toggles only its own answer and never closes another.
-// Closing an answer above the tapped question would pull the question up the
-// screen, and scrolling to make up for it would move the page instead; either
-// way the reader loses their place. Opening or closing an answer under its
-// own question changes nothing above it, so nothing on screen moves.
-//
-// The desktop card has to show something, so there a tap selects, and the
-// phone set follows the card so narrowing the window shows the same answer.
-export function nextFaqState(
-  state: FaqState,
-  index: number,
-  stacked: boolean,
-): FaqState {
-  if (!stacked) return { selected: index, open: new Set([index]) };
-  const open = new Set(state.open);
-  if (open.delete(index)) return { ...state, open };
-  open.add(index);
-  return { selected: index, open };
-}
-
-// Whether the grid is in its one-column phone layout. The breakpoint is a
-// container query in globals.css, so read the layout the CSS chose rather
-// than restating the width here.
-function isStacked(grid: HTMLElement) {
-  return getComputedStyle(grid).gridTemplateColumns.split(" ").length === 1;
-}
-
+// Exactly one answer is open at all times: the card on the right has to show
+// something, and the same rule keeps the phone-width accordion predictable.
+// Index 0 on both server and client, so the static HTML matches hydration.
 export function FaqList({ section }: { section: string }) {
-  const [state, setState] = useState(INITIAL_FAQ_STATE);
-  // Drives the ARIA and styling. False until measured: the desktop reading of
-  // INITIAL_FAQ_STATE is the one the static HTML was rendered with.
-  const [stacked, setStacked] = useState(false);
-  const gridRef = useRef<HTMLDListElement>(null);
+  const [selected, setSelected] = useState(0);
 
-  useEffect(() => {
-    const grid = gridRef.current;
-    if (!grid) return;
-    const ro = new ResizeObserver(() => setStacked(isStacked(grid)));
-    ro.observe(grid);
-    return () => ro.disconnect();
-  }, []);
-
-  // A tap reads the layout itself rather than trusting `stacked`, so what it
-  // does never depends on the observer having reported yet.
-  const select = (index: number) => {
-    const grid = gridRef.current;
-    if (!grid) return;
-    const nowStacked = isStacked(grid);
-    setStacked(nowStacked);
-    // The desktop card's own question has nothing to change.
-    if (!nowStacked && state.selected === index) return;
-    setState((s) => nextFaqState(s, index, nowStacked));
+  // At phone width each answer opens under its own question, so opening one
+  // below the open answer collapses that answer above it and the tapped
+  // question jumps up the screen. Committing the change synchronously and
+  // scrolling by the tapped question's shift keeps it where the reader's
+  // thumb was. On the desktop grid the questions never move, so the shift is
+  // zero and nothing scrolls. scrollInstantly, not `behavior: "instant"`:
+  // older iOS Safari ignores that enum and would animate the correction
+  // after the jump. `.faq-grid` opts out of scroll anchoring so the browser
+  // can't correct a second time on top of this one.
+  const select = (i: number) => {
+    const question = document.querySelector(`[aria-controls="faq-a-${i}"]`);
+    const before = question?.getBoundingClientRect().top;
+    flushSync(() => setSelected(i));
+    if (!question || before === undefined) return;
+    const shift = question.getBoundingClientRect().top - before;
+    if (shift !== 0) scrollInstantly(window.scrollY + shift);
   };
 
   return (
-    <dl
-      ref={gridRef}
-      className="faq-grid"
-      style={{ "--faq-n": FAQ_ITEMS.length }}
-    >
+    <dl className="faq-grid" style={{ "--faq-n": FAQ_ITEMS.length }}>
       {FAQ_ITEMS.map((item, i) => (
         <FaqItem
           key={item.q}
@@ -82,8 +39,7 @@ export function FaqList({ section }: { section: string }) {
           ordinal={`${section}.${i + 1}`}
           q={item.q}
           a={item.a}
-          selected={stacked ? state.open.has(i) : state.selected === i}
-          locked={!stacked && state.selected === i}
+          selected={i === selected}
           onSelect={select}
           delay={i * 80}
         />

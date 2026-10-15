@@ -6,7 +6,6 @@ export function FaqItem({
   index,
   ordinal,
   selected,
-  locked = false,
   onSelect,
   delay = 0,
 }: {
@@ -16,10 +15,7 @@ export function FaqItem({
   index: number;
   /** Document-style number shown on the row and ghosted on the card, e.g. "04.1". */
   ordinal: string;
-  /** Whether this answer is showing. */
   selected: boolean;
-  /** The desktop card's answer: showing, and can't be closed from here. */
-  locked?: boolean;
   onSelect: (index: number) => void;
   delay?: number;
 }) {
@@ -39,19 +35,18 @@ export function FaqItem({
       >
         {/* Disclosure, not tabs: a native button keeps Tab/Enter/Space for
             free and lets the dt/dd pairing survive without ARIA overrides.
-            The desktop card always shows one answer, so its button can't
-            collapse it: aria-disabled (not disabled) says so while keeping
-            the button reachable, per the APG accordion pattern. Every tap
-            still reports: FaqList reads the layout at tap time and ignores
-            the card's own question there. At phone width every button
-            toggles its own answer. */}
+            One answer is always open, so the open one can't be collapsed:
+            aria-disabled (not disabled) says so while keeping the button
+            reachable, per the APG accordion pattern. */}
         <button
           type="button"
           className="faq-q"
           aria-expanded={selected}
-          aria-disabled={locked || undefined}
+          aria-disabled={selected || undefined}
           aria-controls={answerId}
-          onClick={() => onSelect(index)}
+          onClick={() => {
+            if (!selected) onSelect(index);
+          }}
         >
           <span
             aria-hidden

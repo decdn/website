@@ -1403,8 +1403,7 @@ a.hero-status:hover .arrow {
    showing. The rows are all auto tracks, so an answer taller than rows 2
    to n-1 grows those rows rather than clipping. At phone width the cards
    stack under their own question and take their content height, so
-   nothing can be clipped there either, and each opens and closes on its
-   own (see FaqList) so a tap never moves anything above it.
+   nothing can be clipped there either.
 
    Breakpoints are container queries against Frame's @container wrapper —
    these rules are unlayered and would beat @xl: utilities. */
@@ -1421,6 +1420,9 @@ a.hero-status:hover .arrow {
      Tailwind mt-* on the <dl> would lose to this rule. */
   margin: clamp(1rem, 3vw, 2.5rem) 0 0;
   border-bottom: 1px solid var(--faq-rule);
+  /* FaqList keeps the tapped question in place itself; a browser scroll
+     anchor inside the list would correct a second time. */
+  overflow-anchor: none;
 }
 
 .faq-row {
