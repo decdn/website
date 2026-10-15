@@ -1470,6 +1470,13 @@ a.hero-status:hover .arrow {
 .faq-card[data-selected="true"] {
   display: block;
 }
+/* A closed answer that keeps its height until it is scrolled off screen, so
+   closing it never moves what the reader is looking at (see FaqList).
+   visibility: hidden also takes it out of the accessibility tree. */
+.faq-card[data-spacer="true"] {
+  display: block;
+  visibility: hidden;
+}
 
 /* Restarts each time a card becomes the selected one: the animation-name
    flips from none to brutal-rise, which is what kicks it off. */
@@ -1498,11 +1505,12 @@ a.hero-status:hover .arrow {
     padding: 1.75rem 0;
   }
 
-  /* Both selectors: the base `.faq-card[data-selected="true"] { display:
-     block }` above is more specific than a bare .faq-card and would win
+  /* All three selectors: the base `[data-selected]` and `[data-spacer]`
+     rules above are more specific than a bare .faq-card and would win
      inside this query otherwise. */
   .faq-card,
-  .faq-card[data-selected="true"] {
+  .faq-card[data-selected="true"],
+  .faq-card[data-spacer="true"] {
     display: flex;
     flex-direction: column;
     grid-column: 2;

@@ -6,6 +6,7 @@ export function FaqItem({
   index,
   ordinal,
   selected,
+  spacer = false,
   onSelect,
   delay = 0,
 }: {
@@ -16,6 +17,8 @@ export function FaqItem({
   /** Document-style number shown on the row and ghosted on the card, e.g. "04.1". */
   ordinal: string;
   selected: boolean;
+  /** Closed, but still holding its height at phone width (see FaqList). */
+  spacer?: boolean;
   onSelect: (index: number) => void;
   delay?: number;
 }) {
@@ -66,6 +69,7 @@ export function FaqItem({
       <dd
         id={answerId}
         data-selected={selected ? "true" : undefined}
+        data-spacer={spacer ? "true" : undefined}
         className="faq-card"
       >
         <div className="faq-answer flex max-w-[60ch] flex-col gap-[1em] text-body leading-[1.7] text-paper/85">

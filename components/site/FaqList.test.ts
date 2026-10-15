@@ -1,7 +1,7 @@
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it } from "vitest";
-import { FaqList } from "./FaqList";
+import { FaqList, nextSpacers } from "./FaqList";
 import { FAQ_ITEMS } from "@/lib/faq";
 
 // FaqList owns a useState, so test-utils/react-tree's walkers would throw on
@@ -41,4 +41,29 @@ describe("FaqList", () => {
     expect(html).toContain(`style="--faq-n:${FAQ_ITEMS.length}"`);
     expect(html.match(/<dt /g)).toHaveLength(FAQ_ITEMS.length);
   });
+});
+
+describe("nextSpacers", () => {
+  const sorted = (s: ReadonlySet<number>) => [...s].sort();
+
+  // Closing an on-screen answer above the tap keeps its space.
+  it("keeps the closing answer's space when asked", () => {
+    expect(sorted(nextSpacers(new Set(), 3, 0, true))).toEqual([0]);
+    expect(sorted(nextSpacers(new Set(), 3, 0, false))).toEqual([]);
+  });
+
+  // Reopening a spacer's own question fills the space it held.
+  it("never leaves the tapped answer as a spacer", () => {
+    expect(sorted(nextSpacers(new Set([0, 2]), 0, 3, false))).toEqual([2]);
+  });
+
+  it("keeps earlier spacers and does not mutate the input", () => {
+    const before = new Set([1]);
+    expect(sorted(nextSpacers(before, 4, 2, true))).toEqual([1, 2]);
+    expect(sorted(before)).toEqual([1]);
+  });
+});
+
+it("ships with no spacers", () => {
+  expect(html).not.toContain("data-spacer");
 });
