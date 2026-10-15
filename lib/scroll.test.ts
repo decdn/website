@@ -1,10 +1,11 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   HOME_SECTION_ID,
   focusSection,
   homeNavTarget,
   parseScrollMarginTop,
   queueSectionFocus,
+  scrollInstantly,
   shouldInterceptNavClick,
   takeSectionFocus,
 } from "./scroll";
@@ -222,4 +223,34 @@ describe("queueSectionFocus / takeSectionFocus", () => {
     takeSectionFocus("");
     expect(takeSectionFocus("#method")).toBeNull();
   });
+});
+
+describe("scrollInstantly", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  // "" is the real page: smoothness comes from the motion-safe:scroll-smooth
+  // class, not an inline style. Leaving any inline value behind would
+  // override that class's reduced-motion gate site-wide.
+  it.each(["smooth", ""])(
+    "jumps with scroll-behavior forced to auto, then restores %j",
+    (initial) => {
+      const style = { scrollBehavior: initial };
+      const seen: string[] = [];
+      const scrollTo = vi.fn(() => {
+        seen.push(style.scrollBehavior);
+      });
+      vi.stubGlobal("document", { documentElement: { style } });
+      vi.stubGlobal("window", { scrollX: 12, scrollTo });
+
+      scrollInstantly(480);
+
+      // The horizontal position is kept, and the jump runs under "auto" so
+      // <html>'s smooth scrolling can't animate it.
+      expect(scrollTo).toHaveBeenCalledExactlyOnceWith(12, 480);
+      expect(seen).toEqual(["auto"]);
+      expect(style.scrollBehavior).toBe(initial);
+    },
+  );
 });

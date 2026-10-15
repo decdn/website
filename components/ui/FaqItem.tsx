@@ -59,26 +59,32 @@ export function FaqItem({
           </span>
         </button>
       </dt>
-      {/* No data-reveal here: at phone width the card toggles display, and a
-          view()-timeline reveal created mid-scroll would leave a freshly
-          opened answer dim until the reader scrolls. The .faq-answer rise
-          is the card's entrance instead. */}
+      {/* No data-reveal here: at phone width the card opens and closes as
+          the reader taps, and a view()-timeline reveal created mid-scroll
+          would leave a freshly opened answer dim until the reader scrolls.
+          The height slide and the .faq-answer rise are its entrance instead.
+          See .faq-card in globals.css for what the dd, .faq-clip and
+          .faq-panel each do. */}
       <dd
         id={answerId}
         data-selected={selected ? "true" : undefined}
         className="faq-card"
       >
-        <div className="faq-answer flex max-w-[60ch] flex-col gap-[1em] text-body leading-[1.7] text-paper/85">
-          {a.map((paragraph) => (
-            <p key={paragraph}>{highlightBrand(paragraph)}</p>
-          ))}
+        <div className="faq-clip">
+          <div className="faq-panel">
+            <div className="faq-answer flex max-w-[60ch] flex-col gap-[1em] text-body leading-[1.7] text-paper/85">
+              {a.map((paragraph) => (
+                <p key={paragraph}>{highlightBrand(paragraph)}</p>
+              ))}
+            </div>
+            {/* Ties the card back to its row when the selected question
+                sits far below the card's top edge. Hidden at phone width,
+                where the card renders directly under its question. */}
+            <span aria-hidden className="faq-ghost hug">
+              {ordinal}
+            </span>
+          </div>
         </div>
-        {/* Ties the card back to its row when the selected question sits far
-            below the card's top edge. Hidden at phone width, where the card
-            renders directly under its question. */}
-        <span aria-hidden className="faq-ghost hug">
-          {ordinal}
-        </span>
       </dd>
     </>
   );

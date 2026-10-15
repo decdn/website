@@ -116,9 +116,30 @@ describe("FaqItem", () => {
 
   // The ghost ordinal is a visual tether to the row, not content: it must
   // not read as part of the answer.
+  // globals.css slides the dd's single grid row between 0fr and 1fr: any
+  // second child would get a row that never collapses, and a renamed class
+  // would leave the card unstyled. Pin the chain the stylesheet keys off.
+  it("nests the answer where the slide and card CSS expect it", () => {
+    const [, dd] = childElements(render(false));
+    expect(attrs(dd).className).toBe("faq-card");
+    const clips = childElements(dd);
+    expect(clips).toHaveLength(1);
+    expect(attrs(clips[0]).className).toBe("faq-clip");
+    const panels = childElements(clips[0]);
+    expect(panels).toHaveLength(1);
+    expect(attrs(panels[0]).className).toBe("faq-panel");
+    expect(
+      childElements(panels[0]).map(
+        (c) => String(attrs(c).className).split(" ")[0],
+      ),
+    ).toEqual(["faq-answer", "faq-ghost"]);
+  });
+
   it("hides the ghost ordinal from assistive tech", () => {
     const [, dd] = childElements(render(true));
-    const ghost = childElements(dd).find((c) => c.type === "span");
+    const ghost = findSome(dd, "span").find((c) =>
+      String(attrs(c).className).startsWith("faq-ghost"),
+    );
     expect(ghost).toBeDefined();
     expect(attrs(ghost!)["aria-hidden"]).toBe(true);
     expect(textOf(ghost!)).toBe("04.4");

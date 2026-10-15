@@ -467,7 +467,7 @@ a.hero-status:hover .arrow {
    below. The cursor blinks independently except offscreen.
    The cascade restarts every cycle. Shares the "tool
    panel" vocabulary with .fleet: soft corners, a solid 1px rule, a hard
-   offset shadow. .faq-card keeps the solid rule. */
+   offset shadow. .faq-panel keeps the solid rule. */
 
 .terminal {
   font-family: var(--font-mono);
@@ -1477,7 +1477,8 @@ a.hero-status:hover .arrow {
    showing. The rows are all auto tracks, so an answer taller than rows 2
    to n-1 grows those rows rather than clipping. At phone width the cards
    stack under their own question and take their content height, so
-   nothing can be clipped there either.
+   nothing can be clipped there either; opening and closing slides that
+   height (see .faq-card below) and never scrolls the page.
 
    Breakpoints are container queries against Frame's @container wrapper —
    these rules are unlayered and would beat @xl: utilities. */
@@ -1494,6 +1495,9 @@ a.hero-status:hover .arrow {
      Tailwind mt-* on the <dl> would lose to this rule. */
   margin: clamp(1rem, 3vw, 2.5rem) 0 0;
   border-bottom: 1px solid var(--faq-rule);
+  /* An answer collapsing above the tapped question slides that question
+     up; the browser must not scroll the page to hold it in place. */
+  overflow-anchor: none;
 }
 
 .faq-row {
@@ -1525,10 +1529,40 @@ a.hero-status:hover .arrow {
   cursor: default;
 }
 
+/* The dd is the part that grows and shrinks at phone width: one grid row
+   moving between 0fr and 1fr animates between nothing and the answer's
+   height without measuring it, and the closing and opening answers move
+   together, so whatever sits between them slides rather than jumps.
+   Visibility keeps a closed answer out of the accessibility tree and the
+   tab order; as a transition it stays visible for the whole slide. */
 .faq-card {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows 250ms var(--ease-soft),
+    margin-bottom 250ms var(--ease-soft),
+    visibility 250ms;
+}
+.faq-card[data-selected="true"] {
+  grid-template-rows: 1fr;
+  margin-bottom: 1.5rem;
+  visibility: visible;
+}
+
+/* The dd's only grid item. min-height: 0 lets the row shrink below the
+   content, and with no padding or border of its own it can reach zero:
+   the card's padding lives on .faq-panel inside, where the clip cuts it
+   off with everything else. */
+.faq-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* The card the reader sees. */
+.faq-panel {
   position: relative;
-  display: none;
-  margin: 0 0 1.5rem;
   padding: var(--faq-pad);
   /* Solid like .terminal and .fleet, but rounder; filled with a
      dark grey so the card reads as a panel, not a hole in the ink. A shade
@@ -1537,9 +1571,6 @@ a.hero-status:hover .arrow {
   background: color-mix(in srgb, var(--paper) 8%, var(--ink));
   border: 1px solid var(--faq-edge);
   border-radius: var(--card-radius);
-}
-.faq-card[data-selected="true"] {
-  display: block;
 }
 
 /* Restarts each time a card becomes the selected one: the animation-name
@@ -1569,22 +1600,35 @@ a.hero-status:hover .arrow {
     padding: 1.75rem 0;
   }
 
-  /* Both selectors: the base `.faq-card[data-selected="true"] { display:
-     block }` above is more specific than a bare .faq-card and would win
-     inside this query otherwise. */
+  /* Both selectors: the base `.faq-card[data-selected="true"]` rule above
+     is more specific than a bare .faq-card and would otherwise keep its
+     margin-bottom here. No height slide at this width: nothing beside the
+     card moves. */
   .faq-card,
   .faq-card[data-selected="true"] {
-    display: flex;
-    flex-direction: column;
     grid-column: 2;
     grid-row: 2 / var(--faq-n);
+    grid-template-rows: 1fr;
     align-self: stretch;
     margin: 0;
     visibility: hidden;
+    transition: none;
+  }
+  /* Its own content height again, so an answer taller than the rows it
+     spans grows those rows rather than being clipped; a grid so the panel
+     stretches to the card's full height. */
+  .faq-clip {
+    display: grid;
+    min-height: auto;
+    overflow: visible;
+  }
+  .faq-panel {
+    display: flex;
+    flex-direction: column;
   }
   /* Reserves the ghost ordinal's corner so a long answer's last line can
      never run under it. */
-  .faq-card .faq-answer {
+  .faq-panel .faq-answer {
     padding-bottom: calc(var(--text-h3) + var(--faq-pad) * 0.5);
   }
   .faq-card[data-selected="true"] {
@@ -1607,7 +1651,8 @@ a.hero-status:hover .arrow {
 
 @media (prefers-reduced-motion: reduce) {
   .faq-q,
-  .faq-ordinal {
+  .faq-ordinal,
+  .faq-card {
     transition: none;
   }
   .faq-card[data-selected="true"] .faq-answer {
