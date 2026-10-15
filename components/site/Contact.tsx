@@ -5,8 +5,9 @@ import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { FleetStatus } from "@/components/site/FleetStatus";
 
-// Solid monochrome glyphs leading each contact link. Decorative — every link
-// carries its own visible text label — so each <svg> is aria-hidden. iconClass
+// Solid monochrome glyphs leading each contact link. Decorative — the email
+// link carries its visible address and each social pill an aria-label naming
+// the platform — so each <svg> is aria-hidden. iconClass
 // sizes them in em (1.05×), so each glyph scales with its link's font-size;
 // shrink-0 keeps the box from compressing in the inline-flex link. The
 // envelope is an original geometric glyph; the X and LinkedIn glyphs are from
@@ -83,6 +84,13 @@ function XIcon() {
   );
 }
 
+const SOCIALS = [
+  { href: links.github, name: "GitHub", Icon: GitHubIcon },
+  { href: links.discord, name: "Discord", Icon: DiscordIcon },
+  { href: links.linkedin, name: "LinkedIn", Icon: LinkedInIcon },
+  { href: links.x, name: "X", Icon: XIcon },
+] as const;
+
 export function Contact() {
   return (
     <Frame id="contact" tone="ink" className="overflow-hidden max-md:pb-2">
@@ -123,7 +131,7 @@ export function Contact() {
             style={{ "--reveal-delay": "220ms" }}
             className="flex flex-col gap-y-4 @md:gap-y-8"
           >
-            <div className="flex flex-col flex-wrap gap-x-10 gap-y-4 @md:flex-row @md:items-baseline">
+            <div className="flex">
               <a
                 className="underline-brutal text-lead font-semibold tracking-[0.02em]"
                 href={links.contact}
@@ -134,56 +142,28 @@ export function Contact() {
                   →
                 </span>
               </a>
-              <a
-                className="underline-brutal text-lead font-semibold tracking-[0.02em]"
-                href={links.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <LinkedInIcon />
-                linkedin
-                <span className="arrow" aria-hidden>
-                  →
-                </span>
-              </a>
-              <a
-                className="underline-brutal text-lead font-semibold tracking-[0.02em]"
-                href={links.x}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <XIcon />X
-                <span className="arrow" aria-hidden>
-                  →
-                </span>
-              </a>
             </div>
-            <div className="flex flex-col flex-wrap gap-x-10 gap-y-4 @md:flex-row @md:items-baseline">
-              <a
-                className="underline-brutal text-lead font-semibold tracking-[0.02em]"
-                href={links.github}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <GitHubIcon />
-                github
-                <span className="arrow" aria-hidden>
-                  →
-                </span>
-              </a>
-              <a
-                className="underline-brutal text-lead font-semibold tracking-[0.02em]"
-                href={links.discord}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <DiscordIcon />
-                discord
-                <span className="arrow" aria-hidden>
-                  →
-                </span>
-              </a>
-            </div>
+            {/* Icon-only at rest; the name slides in on hover or keyboard
+                focus (see a.social-pill in globals.css), so a tap on touch
+                navigates straight away. */}
+            <ul className="flex flex-wrap gap-3" aria-label="decdn elsewhere">
+              {SOCIALS.map(({ href, name, Icon }) => (
+                <li key={name}>
+                  <a
+                    className="social-pill"
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`decdn on ${name}`}
+                  >
+                    <Icon />
+                    <span className="social-pill-label">
+                      <span>{name}</span>
+                    </span>
+                  </a>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
 
