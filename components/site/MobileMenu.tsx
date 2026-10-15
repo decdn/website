@@ -203,7 +203,7 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         return;
       }
 
-      // Restore the prior scroll position synchronously — a smooth
+      // Restore the prior scroll position without animating — a smooth
       // scroll here would visibly glide from y=0. Home lands at the top;
       // a section restores the prior position so scrollToAnchor can
       // animate from there.
