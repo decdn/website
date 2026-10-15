@@ -1420,6 +1420,9 @@ a.hero-status:hover .arrow {
      Tailwind mt-* on the <dl> would lose to this rule. */
   margin: clamp(1rem, 3vw, 2.5rem) 0 0;
   border-bottom: 1px solid var(--faq-rule);
+  /* FaqList keeps the tapped question in place itself; a browser scroll
+     anchor inside the list would correct a second time. */
+  overflow-anchor: none;
 }
 
 .faq-row {

@@ -14,6 +14,7 @@ import {
   HOME_SECTION_ID,
   focusSection,
   queueSectionFocus,
+  scrollInstantly,
   scrollToAnchor,
 } from "@/lib/scroll";
 
@@ -202,19 +203,11 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
         return;
       }
 
-      // Restore the prior scroll position synchronously. We bypass
-      // `<html>`'s motion-safe:scroll-smooth manually instead of
-      // passing `behavior: "instant"` — Safari only honoured the
-      // "instant" enum from 18.4; older versions silently fall back
-      // to "auto", which re-introduces the smooth scroll from y=0
-      // we're trying to suppress.
-      const html = document.documentElement;
-      const prevScrollBehavior = html.style.scrollBehavior;
-      html.style.scrollBehavior = "auto";
-      // Home lands at the top; a section restores the prior position so
-      // scrollToAnchor can animate from there.
-      window.scrollTo(0, isHome ? 0 : scrollYRef.current);
-      html.style.scrollBehavior = prevScrollBehavior;
+      // Restore the prior scroll position synchronously — a smooth
+      // scroll here would visibly glide from y=0. Home lands at the top;
+      // a section restores the prior position so scrollToAnchor can
+      // animate from there.
+      scrollInstantly(isHome ? 0 : scrollYRef.current);
 
       if (isHome) {
         // Clear any #section fragment — the top is canonical home, no

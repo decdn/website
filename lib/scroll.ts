@@ -94,6 +94,19 @@ export function takeSectionFocus(hash: string): string | null {
   return id !== null && hash === `#${id}` ? id : null;
 }
 
+// Jumps the window to `top` with no animation, keeping the horizontal
+// position. `<html>`'s motion-safe:scroll-smooth is bypassed by hand
+// rather than by passing `behavior: "instant"`: Safari only honours that
+// enum from 18.4, and older versions fall back to "auto", which defers to
+// the smooth CSS and animates the jump we meant to hide.
+export function scrollInstantly(top: number) {
+  const html = document.documentElement;
+  const prevScrollBehavior = html.style.scrollBehavior;
+  html.style.scrollBehavior = "auto";
+  window.scrollTo(window.scrollX, top);
+  html.style.scrollBehavior = prevScrollBehavior;
+}
+
 // `<html>` scroll-behavior is forced to `auto` for the lifetime of
 // the rAF: without it, each per-frame `window.scrollTo` defers to
 // `motion-safe:scroll-smooth` and queues yet another browser
