@@ -117,7 +117,7 @@ export function Contact() {
           <h2
             data-reveal
             id="contact-h"
-            className="hug flex flex-col text-h2 leading-[0.92] font-semibold"
+            className="contact-h hug flex flex-col text-h2 leading-[0.92] font-semibold"
           >
             <span>{CONTACT_HEADLINE[0]}</span>
             {/* Whisper, not the dimmed second voice Compare uses: the fleet

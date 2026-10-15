@@ -371,6 +371,28 @@ a.social-pill:focus-visible .social-pill-label {
   }
 }
 
+/* Contact's headline beside the fleet panel (56rem = @4xl, the grid's
+   breakpoint): trim the first line to cap height so the h and k of "the
+   network is open." (lib/copy.ts), which rise to Geist's cap height
+   (710/1000), sit level with the panel's top border. text-box-trim skips
+   flex containers, so it sits on the first span. Fallback without
+   text-box: with ascent + descent = 1.3em at leading 0.92, cap top sits
+   (0.92 - 1.3) / 2 + (1.005 - 0.71) = 0.105em below the line box; Chromium
+   measured 0.092-0.1em after pixel rounding. 0.095em is within 1px of both
+   up to --text-h2's 84px max. */
+@container (width >= 56rem) {
+  .contact-h > :first-child {
+    margin-top: -0.095em;
+  }
+
+  @supports (text-box: trim-start cap alphabetic) {
+    .contact-h > :first-child {
+      margin-top: 0;
+      text-box: trim-start cap alphabetic;
+    }
+  }
+}
+
 /* The hero's single primary action: a solid ink block with the same hard
    offset shadow as the tool panels, so it reads as the page's one button
    rather than a fourth underlined link. */
