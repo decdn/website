@@ -162,7 +162,7 @@ const tryWindows = `On Windows, in PowerShell: \`${getCommand("<hash>", "windows
 
 const tryItems = ITEMS.map(
   (item) =>
-    `- ${item.name} (${item.kind}, ${formatSize(item.bytes)}, ${item.license}): \`${getCommand(item.hash, "unix", item.namespace)}\``,
+    `- ${item.name} (${item.kind}, ${formatSize(item.bytes)}, ${item.license}): \`${getCommand(item.hash, "unix", item.namespace, item.entry)}\``,
 ).join("\n");
 
 const methodSteps = METHOD_STEPS.map(

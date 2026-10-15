@@ -33,6 +33,10 @@ export type Item = {
   source: string;
   /** `b3:` + 64 lowercase hex characters. */
   hash: string;
+  /** The manifest path of the bundle's one entry, for a single-file bundle.
+   *  The item's `decdn:` URI names that entry, so `decdn get` writes just
+   *  that file. */
+  entry?: string;
   /** The namespace the item is published under (ADR 002). Carried as the
    *  `?ns=` of the item's `decdn:` URI, so a node that has not cached the
    *  item pulls it from that namespace's origins. A routing hint only: the
@@ -89,25 +93,38 @@ export const PLATFORMS: readonly {
   { id: "windows", label: "windows", shell: "powershell", prompt: "PS>" },
 ];
 
-/** The `decdn:` URI of the bundle whose manifest has `hash` (`b3:<hex>`),
- *  with the `?ns=` routing hint when it has a `namespace`. `hash` and
- *  `namespace` also take placeholder strings for prose examples. */
-export function bundleUri(hash: string, namespace?: number | string): string {
-  const uri = `decdn:${hash.replace(/^b3:/, "")}/`;
+/** The `decdn:` URI of the bundle whose manifest has `hash` (`b3:<hex>`):
+ *  the whole bundle (`decdn:<hex>/`), or its `entry` path when given
+ *  (`decdn:<hex>/<entry>`), with the `?ns=` routing hint when it has a
+ *  `namespace`. Each path segment is percent-encoded, `'` included, so the
+ *  URI stays inside the command's single quotes. `hash` and `namespace` also
+ *  take placeholder strings for prose examples. */
+export function bundleUri(
+  hash: string,
+  namespace?: number | string,
+  entry?: string,
+): string {
+  const path = (entry ?? "")
+    .split("/")
+    .map((segment) => encodeURIComponent(segment).replace(/'/g, "%27"))
+    .join("/");
+  const uri = `decdn:${hash.replace(/^b3:/, "")}/${path}`;
   return namespace === undefined ? uri : `${uri}?ns=${namespace}`;
 }
 
 /** The one line that installs `decdn` and gets the bundle `hash` (published
- *  under `namespace`, when it has one) into the current directory: a POSIX
- *  shell pipe on macOS and Linux; on Windows, the PowerShell installer run as
- *  a script block, so the `get` arguments reach it. The URI is single-quoted,
- *  so neither shell reads its `?` as a pattern. */
+ *  under `namespace`, when it has one), or just its `entry`, into the current
+ *  directory: a POSIX shell pipe on macOS and Linux; on Windows, the
+ *  PowerShell installer run as a script block, so the `get` arguments reach
+ *  it. The URI is single-quoted, so neither shell reads its `?` as a
+ *  pattern. */
 export function getCommand(
   hash: string,
   platform: Platform = "unix",
   namespace?: number | string,
+  entry?: string,
 ): string {
-  const get = `get '${bundleUri(hash, namespace)}'`;
+  const get = `get '${bundleUri(hash, namespace, entry)}'`;
   return platform === "windows"
     ? `& ([scriptblock]::Create((irm ${links.installerPs1}))) ${get}`
     : `curl -fsSL ${links.installer} | sh -s -- ${get}`;
