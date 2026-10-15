@@ -1,5 +1,11 @@
+import type { ReactElement } from "react";
 import { EMAIL, links } from "@/lib/links";
-import { CONTACT_HEADLINE, CONTACT_LEAD, CONTACT_RUN_NODE } from "@/lib/copy";
+import {
+  CONTACT_HEADLINE,
+  CONTACT_LEAD,
+  CONTACT_RUN_NODE,
+  CONTACT_SOCIALS,
+} from "@/lib/copy";
 import { highlightBrand } from "@/components/ui/brand";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
@@ -7,13 +13,12 @@ import { FleetStatus } from "@/components/site/FleetStatus";
 
 // Solid monochrome glyphs leading each contact link. Decorative — the email
 // link carries its visible address and each social pill an aria-label naming
-// the platform — so each <svg> is aria-hidden. iconClass
-// sizes them in em (1.05×), so each glyph scales with its link's font-size;
-// shrink-0 keeps the box from compressing in the inline-flex link. The
-// envelope is an original geometric glyph; the X and LinkedIn glyphs are from
-// Simple Icons (CC0 / public domain) — the marks are trademarks of their
-// owners, shown nominatively as links to our own profiles. The GitHub and
-// Discord glyphs are likewise from Simple Icons (CC0 / public domain).
+// the platform — so each <svg> is aria-hidden. iconClass sizes them in em
+// (1.05×), so each glyph scales with its link's font-size; shrink-0 keeps the
+// box from compressing in the inline-flex link. The envelope is an original
+// geometric glyph; the GitHub, Discord, LinkedIn and X glyphs are from Simple
+// Icons (CC0 / public domain), and those marks are trademarks of their owners,
+// shown nominatively as links to our own profiles.
 const iconClass = "size-[1.05em] shrink-0";
 
 function MailIcon() {
@@ -84,12 +89,17 @@ function XIcon() {
   );
 }
 
-const SOCIALS = [
-  { href: links.github, name: "GitHub", Icon: GitHubIcon },
-  { href: links.discord, name: "Discord", Icon: DiscordIcon },
-  { href: links.linkedin, name: "LinkedIn", Icon: LinkedInIcon },
-  { href: links.x, name: "X", Icon: XIcon },
-] as const;
+// The list and its order live in CONTACT_SOCIALS (lib/copy.ts); this only
+// pairs each entry with its glyph.
+const SOCIAL_ICONS: Record<
+  (typeof CONTACT_SOCIALS)[number]["link"],
+  () => ReactElement
+> = {
+  github: GitHubIcon,
+  discord: DiscordIcon,
+  linkedin: LinkedInIcon,
+  x: XIcon,
+};
 
 export function Contact() {
   return (
@@ -143,26 +153,29 @@ export function Contact() {
                 </span>
               </a>
             </div>
-            {/* Icon-only at rest; the name slides in on hover or keyboard
-                focus (see a.social-pill in globals.css), so a tap on touch
-                navigates straight away. */}
+            {/* Icon-only at rest; the name slides in on mouse hover or
+                keyboard focus only (see a.social-pill in globals.css), so a
+                tap on touch navigates straight away. */}
             <ul className="flex flex-wrap gap-3" aria-label="decdn elsewhere">
-              {SOCIALS.map(({ href, name, Icon }) => (
-                <li key={name}>
-                  <a
-                    className="social-pill"
-                    href={href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`decdn on ${name}`}
-                  >
-                    <Icon />
-                    <span className="social-pill-label">
-                      <span>{name}</span>
-                    </span>
-                  </a>
-                </li>
-              ))}
+              {CONTACT_SOCIALS.map(({ link, name }) => {
+                const Icon = SOCIAL_ICONS[link];
+                return (
+                  <li key={name}>
+                    <a
+                      className="social-pill"
+                      href={links[link]}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`decdn on ${name}`}
+                    >
+                      <Icon />
+                      <span className="social-pill-label">
+                        <span>{name}</span>
+                      </span>
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
           </div>
         </div>

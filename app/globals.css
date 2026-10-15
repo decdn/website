@@ -297,15 +297,17 @@ a.underline-brutal:hover .arrow {
   color: var(--whisper);
 }
 
-/* Contact's social links: a 44px icon circle at rest that widens into a
-   pill naming the platform. The width animates through a 0fr→1fr grid track,
-   so each pill grows to its label's real width with no max-width guess and no
-   JS, and the flex row reflows every frame, sliding the neighbours along.
-   Hover only expands on fine pointers: on touch a tap must navigate at once
-   rather than spend itself revealing the label. */
+/* Contact's social links: a 44px icon circle at rest (the minimum touch
+   target) that widens into a pill naming the platform. The width animates
+   through a 0fr→1fr grid track, so each pill grows to its label's real width
+   with no max-width guess and no JS, and the flex row reflows every frame,
+   sliding the neighbours along. Hover only expands on devices that can hover
+   with a fine pointer: otherwise iOS Safari spends the first tap on :hover
+   instead of following the link. */
 a.social-pill {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   height: 44px;
   min-width: 44px;
   padding-inline: 12px;
@@ -318,8 +320,8 @@ a.social-pill {
   line-height: 1;
   text-decoration: none;
   transition:
-    border-color 250ms ease-out,
-    padding-inline-end 250ms ease-out;
+    border-color 250ms var(--ease-soft),
+    padding-inline-end 250ms var(--ease-soft);
 }
 
 .social-pill-label {
@@ -327,9 +329,9 @@ a.social-pill {
   grid-template-columns: 0fr;
   opacity: 0;
   transition:
-    grid-template-columns 250ms ease-out,
-    opacity 250ms ease-out,
-    margin-inline-start 250ms ease-out;
+    grid-template-columns 250ms var(--ease-soft),
+    opacity 250ms var(--ease-soft),
+    margin-inline-start 250ms var(--ease-soft);
 }
 
 .social-pill-label > span {

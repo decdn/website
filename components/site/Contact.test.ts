@@ -1,24 +1,27 @@
 import { describe, expect, it, vi } from "vitest";
+import { CONTACT_SOCIALS } from "@/lib/copy";
 import { links } from "@/lib/links";
-import { attrs, findSome } from "@/test-utils/react-tree";
+import { attrs, findSome, textOf } from "@/test-utils/react-tree";
 import { Contact } from "./Contact";
 
-// FleetStatus is a client component that calls useStats, which can't run
-// outside a renderer; the links under test don't depend on it.
+// findSome expands function components, so without this FleetStatus would
+// call useStats (and its useState) outside a renderer and throw; the links
+// under test don't depend on it.
 vi.mock("@/components/site/FleetStatus", () => ({ FleetStatus: () => null }));
 
-const anchors = () => findSome(Contact(), "a").map(attrs);
-const pills = () => anchors().filter((a) => a.className === "social-pill");
+const anchors = () => findSome(Contact(), "a");
+const pills = () =>
+  anchors().filter((a) => attrs(a).className === "social-pill");
 
 describe("Contact links", () => {
   it("keeps the email as the first, underlined link", () => {
-    const [email] = anchors();
+    const email = attrs(anchors()[0]);
     expect(email.href).toBe(links.contact);
     expect(email.className).toContain("underline-brutal");
   });
 
   it("lists the social pills as GitHub, Discord, LinkedIn, X", () => {
-    expect(pills().map((p) => p.href)).toEqual([
+    expect(pills().map((p) => attrs(p).href)).toEqual([
       links.github,
       links.discord,
       links.linkedin,
@@ -26,18 +29,16 @@ describe("Contact links", () => {
     ]);
   });
 
-  it.each([
-    ["GitHub", 0],
-    ["Discord", 1],
-    ["LinkedIn", 2],
-    ["X", 3],
-  ] as const)(
-    "%s opens in a new tab and is named for screen readers",
+  it.each(CONTACT_SOCIALS.map((s, i) => [s.name, i] as const))(
+    "%s opens in a new tab and its accessible name contains its visible label",
     (name, i) => {
       const pill = pills()[i];
-      expect(pill.target).toBe("_blank");
-      expect(pill.rel).toBe("noopener noreferrer");
-      expect(pill["aria-label"]).toContain(name);
+      const label = textOf(pill);
+      expect(label).toBe(name);
+      expect(attrs(pill).target).toBe("_blank");
+      expect(attrs(pill).rel).toBe("noopener noreferrer");
+      expect(attrs(pill)["aria-label"]).toBe(`decdn on ${name}`);
+      expect(attrs(pill)["aria-label"]).toContain(label);
     },
   );
 });
