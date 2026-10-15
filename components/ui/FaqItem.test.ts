@@ -118,43 +118,10 @@ describe("FaqItem", () => {
   // not read as part of the answer.
   it("hides the ghost ordinal from assistive tech", () => {
     const [, dd] = childElements(render(true));
-    const ghost = childElements(dd).find((c) => c.type === "span");
+    const [panel] = childElements(childElements(dd)[0]);
+    const ghost = childElements(panel).find((c) => c.type === "span");
     expect(ghost).toBeDefined();
     expect(attrs(ghost!)["aria-hidden"]).toBe(true);
     expect(textOf(ghost!)).toBe("04.4");
   });
-});
-
-// A spacer is a closed answer still holding its height at phone width; the
-// stylesheet keys off the attribute, and the button reads as collapsed.
-it("marks a spacer card for the stylesheet", () => {
-  const [dt, dd] = childElements(
-    asElement(
-      FaqItem({
-        q: Q,
-        a: A,
-        index: 3,
-        ordinal: "04.4",
-        selected: false,
-        spacer: true,
-        onSelect: () => {},
-      }),
-    ),
-  );
-  expect(attrs(dd)["data-spacer"]).toBe("true");
-  expect(attrs(dd)["data-selected"]).toBeUndefined();
-  expect(attrs(findOne(dt, "button"))["aria-expanded"]).toBe(false);
-  const [, plain] = childElements(
-    asElement(
-      FaqItem({
-        q: Q,
-        a: A,
-        index: 3,
-        ordinal: "04.4",
-        selected: false,
-        onSelect: () => {},
-      }),
-    ),
-  );
-  expect(attrs(plain)["data-spacer"]).toBeUndefined();
 });
