@@ -85,7 +85,7 @@ function XIcon() {
 
 export function Contact() {
   return (
-    <Frame id="contact" tone="ink" className="overflow-hidden max-md:pb-6">
+    <Frame id="contact" tone="ink" className="overflow-hidden max-md:pb-2">
       <SectionHeader
         index="06"
         label="Contact us"
