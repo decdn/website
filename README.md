@@ -33,10 +33,10 @@ pnpm format:check # prettier --check . (CI)
 ## Project layout
 
 - `app/` — App Router entry (`layout.tsx`, `page.tsx`, `globals.css`) plus the blog routes (`blog/`, `blog/[slug]/`), the `legal/[doc]` route, the sitemap/robots handlers, the `llms.txt` / `llms-full.txt` handlers, and file-convention metadata assets.
-- `components/layout/` — chrome rendered by `app/layout.tsx` on every route (`Chrome`, `MobileMenu`, `Footer`, `ScrollReveal`).
+- `components/layout/` — the site chrome mounted in `app/layout.tsx` on every route (`Chrome` → `MobileMenu`, `Footer`, `ScrollReveal`) plus `chrome-active`, the nav's section and tone tables.
 - `components/home/` — the homepage sections composed by `app/page.tsx`, one folder per section (`hero/`, `compare/`, `method/`, `faq/`, `try/`, `contact/`) with its sub-parts, plus `brand.tsx`, which they share.
 - `components/blog/`, `components/legal/` — components used only by those routes (`PostRow`, `LegalDoc`).
-- `components/ui/` — generic primitives with no site content (Frame, SectionHeader, Prose, Figure, PanelFigure, Pill, CodeBlock). A new component that takes site data, or is used by one feature only, goes in that feature's folder instead.
+- `components/ui/` — generic primitives with no site content (Frame, SectionHeader, Prose, Figure, PanelFigure, Pill, CodeBlock). A component that takes site data or domain types goes in its feature's folder; a primitive with no site content stays in `ui/` even if only one feature uses it today.
 - `lib/` — shared helpers (`links.ts`, `copy.ts`, `stats.ts`, `blog.ts`, `faq.ts`, `legal.ts`, `jsonld.tsx`, `schema.ts`, …). The site's prose _and_ its displayed values live in `lib/copy.ts` as plain data — the comparison table maps over it and the `llms-full.txt` mirror serialises it, so anything inlined in a component drifts from the mirror. Prose that names the product renders through `highlightBrand` (`components/home/brand.tsx`).
 - `test-utils/` — test-only helpers for walking the element tree a server component returns.
 - `scripts/` — postbuild guards run against `./out` by `pnpm build`: `check-out.mjs` (advertised URLs, dotted routes, panel captions) and `check-og-image.mjs` (social cards).

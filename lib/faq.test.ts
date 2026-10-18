@@ -2,11 +2,11 @@ import { describe, expect, it } from "vitest";
 import { FAQ_ITEMS } from "./faq";
 
 // FAQ_ITEMS is consumed three ways — rendered as <dt>/<dd> by
-// components/home/faq/Faq.tsx, restated as Question/Answer nodes by
-// `faqPageNode`, and serialised under `#### ` headings by
-// app/llms-full.txt/route.ts. lib/copy.ts's strings
-// are screened for the whitespace and delimiter hazards that creates; these
-// were not, despite going through the same three consumers.
+// components/home/faq/FaqItem.tsx (mapped in FaqList.tsx), restated as
+// Question/Answer nodes by `faqPageNode`, and serialised under `#### `
+// headings by app/llms-full.txt/route.ts. lib/copy.ts's strings are screened
+// for the whitespace and delimiter hazards that creates; these were not,
+// despite going through the same three consumers.
 
 const FIELDS: readonly [string, string][] = FAQ_ITEMS.flatMap(
   ({ q, a }, i): [string, string][] => [
