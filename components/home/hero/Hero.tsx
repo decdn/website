@@ -63,7 +63,7 @@ export function Hero() {
               </a>
               <div className="flex flex-col items-start gap-y-5 @md:flex-row @md:gap-x-8">
                 <a
-                  className="underline-brutal text-cta font-medium tracking-[0.14em] uppercase opacity-70 hover:opacity-100"
+                  className="underline-brutal text-[0.875rem] font-medium tracking-[0.14em] uppercase opacity-70 hover:opacity-100"
                   href={links.litepaper}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -78,7 +78,7 @@ export function Hero() {
                     the GitHub mark can stay solid black, as GitHub's logo
                     guidelines ask. */}
                 <a
-                  className="underline-brutal text-cta font-medium tracking-[0.14em] uppercase text-ink/70! hover:text-ink!"
+                  className="underline-brutal text-[0.875rem] font-medium tracking-[0.14em] uppercase text-ink/70! hover:text-ink!"
                   href={links.github}
                 >
                   <span className="inline-flex text-ink">
