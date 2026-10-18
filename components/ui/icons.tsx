@@ -4,10 +4,11 @@
 // glyph scales with its link's font-size; shrink-0 keeps the box from
 // compressing in an inline-flex link. The envelope and the litepaper page are
 // original geometric glyphs; the GitHub, Discord and X glyphs are from Simple
-// Icons (CC0 / public domain); the LinkedIn path matches LinkedIn's official
-// [in] logo (brand.linkedin.com/in-logo) and is used only in an approved
-// colour (white or black). Those marks are trademarks of their owners, shown
-// nominatively as links to our own profiles.
+// Icons (CC0 / public domain). The LinkedIn glyph is from Simple Icons v13 or
+// earlier (CC0; removed in v14 at LinkedIn's request) — LinkedIn's official
+// [in] logo is only offered as PNG with a ® mark — and is used only in an
+// approved colour (white or black). Those marks are trademarks of their
+// owners, shown nominatively as links to our own profiles.
 const iconClass = "size-[1.05em] shrink-0";
 
 export function GitHubIcon() {
