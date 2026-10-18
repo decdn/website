@@ -74,11 +74,16 @@ export function Hero() {
                     →
                   </span>
                 </a>
+                {/* The label dims through its colour rather than opacity so
+                    the GitHub mark can stay solid black, as GitHub's logo
+                    guidelines ask. */}
                 <a
-                  className="underline-brutal text-cta font-medium tracking-[0.14em] uppercase opacity-70 hover:opacity-100"
+                  className="underline-brutal text-cta font-medium tracking-[0.14em] uppercase text-ink/70! hover:text-ink!"
                   href={links.github}
                 >
-                  <GitHubIcon />
+                  <span className="inline-flex text-ink">
+                    <GitHubIcon />
+                  </span>
                   GitHub
                   <span className="arrow" aria-hidden>
                     →

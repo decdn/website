@@ -3,9 +3,11 @@
 // so each <svg> is aria-hidden. iconClass sizes them in em (1.05×), so each
 // glyph scales with its link's font-size; shrink-0 keeps the box from
 // compressing in an inline-flex link. The envelope and the litepaper page are
-// original geometric glyphs; the GitHub, Discord, LinkedIn and X glyphs are
-// from Simple Icons (CC0 / public domain), and those marks are trademarks of
-// their owners, shown nominatively as links to our own profiles.
+// original geometric glyphs; the GitHub, Discord and X glyphs are from Simple
+// Icons (CC0 / public domain); the LinkedIn path matches LinkedIn's official
+// [in] logo (brand.linkedin.com/in-logo) and is used only in an approved
+// colour (white or black). Those marks are trademarks of their owners, shown
+// nominatively as links to our own profiles.
 const iconClass = "size-[1.05em] shrink-0";
 
 export function GitHubIcon() {
