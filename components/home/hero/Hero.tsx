@@ -9,6 +9,7 @@ import {
 import { highlightBrand } from "@/components/home/brand";
 import { Figure } from "@/components/ui/Figure";
 import { Frame } from "@/components/ui/Frame";
+import { GitHubIcon, LitepaperIcon } from "@/components/ui/icons";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { HeroTerminal } from "@/components/home/hero/HeroTerminal";
 
@@ -49,32 +50,41 @@ export function Hero() {
               {highlightBrand(HERO_LEAD)}
             </p>
 
-            {/* One primary action; the litepaper and source sit beside it as
-                quieter text links so the eye lands on the try-it section. */}
-            <div className="rise rise-4 flex flex-col items-start gap-x-8 gap-y-5 @md:flex-row @md:items-center">
+            {/* One primary action; the litepaper and GitHub sit beside it as
+                quieter text links so the eye lands on the try-it section.
+                Below @md all three stack, one per line; above it the links
+                wrap under the button when the column is too narrow. */}
+            <div className="rise rise-4 flex flex-col items-start gap-x-8 gap-y-5 @md:flex-row @md:flex-wrap @md:items-center">
               <a className="cta-primary" href="#try">
                 try it out
                 <span className="arrow" aria-hidden>
                   →
                 </span>
               </a>
-              <div className="flex gap-x-8">
+              <div className="flex flex-col items-start gap-y-5 @md:flex-row @md:gap-x-8">
                 <a
-                  className="underline-brutal text-cta font-medium tracking-[0.14em] uppercase opacity-70 hover:opacity-100"
+                  className="underline-brutal text-[0.875rem] font-medium tracking-[0.14em] uppercase opacity-70 hover:opacity-100"
                   href={links.litepaper}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
+                  <LitepaperIcon />
                   litepaper
                   <span className="arrow" aria-hidden>
                     →
                   </span>
                 </a>
+                {/* The label dims through its colour rather than opacity so
+                    the GitHub mark can stay solid black, as GitHub's logo
+                    guidelines ask. */}
                 <a
-                  className="underline-brutal text-cta font-medium tracking-[0.14em] uppercase opacity-70 hover:opacity-100"
+                  className="underline-brutal text-[0.875rem] font-medium tracking-[0.14em] uppercase text-ink/70! hover:text-ink!"
                   href={links.github}
                 >
-                  source
+                  <span className="inline-flex text-ink">
+                    <GitHubIcon />
+                  </span>
+                  GitHub
                   <span className="arrow" aria-hidden>
                     →
                   </span>
