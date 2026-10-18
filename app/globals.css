@@ -33,7 +33,8 @@
   --card-radius: 16px;
   /* The dropdown menu's radius (SelectMenu). Rounder than the tool panels:
      a menu floats over the page rather than sitting square in it. Its rows
-     subtract the menu's padding so the two curves stay concentric. */
+     subtract the menu's 1px border and 6px padding (7px) so the two curves
+     stay concentric; change those together. */
   --menu-radius: 12px;
   /* The system monospace stack: --font-mono's tail, and on its own the face
      for glyphs no Geist Mono Google subset carries (the terminal's → and ✓,

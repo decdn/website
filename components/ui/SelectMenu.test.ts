@@ -1,17 +1,19 @@
 import { describe, expect, it } from "vitest";
-import { SelectMenuPanel, optionId } from "./SelectMenu";
+import { NativeSelect, SelectMenuPanel, optionId } from "./SelectMenu";
 import type { ListboxGroup } from "./listbox-state";
 import {
   asElement,
   attrs,
   findAll,
+  findOne,
   findSome,
   textOf,
 } from "@/test-utils/react-tree";
 
-// SelectMenu itself runs hooks, so the tree walker can't call it;
-// SelectMenuPanel is its render half. The keyboard, type-ahead and placement
-// behind it are covered in listbox-state.test.ts.
+// SelectMenu itself runs hooks, so the tree walker can't call it.
+// SelectMenuPanel is the custom list's render half and NativeSelect the
+// touch fallback; the keyboard, pointer, type-ahead and placement logic
+// behind them is covered in listbox-state.test.ts.
 
 const groups: ListboxGroup[] = [
   {
@@ -92,21 +94,25 @@ describe("SelectMenuPanel", () => {
     );
   });
 
-  it("marks only the current value aria-selected, with the only check", () => {
+  // APG select-only combobox: aria-selected follows the highlight (the
+  // option aria-activedescendant points at); the check mark shows the value.
+  it("puts aria-selected on the highlighted option only", () => {
     const opts = byRole("option");
     expect(opts.map((el) => attrs(el)["aria-selected"])).toEqual([
       false,
-      true,
       false,
+      true,
     ]);
-    expect(opts.map((el) => findAll(el, "svg").length)).toEqual([0, 1, 0]);
   });
 
-  it("highlights the active option, not the selected one", () => {
+  it("marks the current value with the only check and data-current", () => {
     const opts = byRole("option");
-    const lit = (el: (typeof opts)[number]) =>
-      String(attrs(el).className).includes("bg-whisper-text");
-    expect(opts.map(lit)).toEqual([false, false, true]);
+    expect(opts.map((el) => findAll(el, "svg").length)).toEqual([0, 1, 0]);
+    expect(opts.map((el) => attrs(el)["data-current"])).toEqual([
+      undefined,
+      true,
+      undefined,
+    ]);
   });
 
   it("hands hover and click back by option index", () => {
@@ -129,7 +135,58 @@ describe("SelectMenuPanel", () => {
     const classes = String(attrs(panel()).className).split(/\s+/);
     expect(classes).toContain("absolute");
     expect(classes).not.toContain("fixed");
-    expect(classes).not.toContain("overflow-hidden");
-    expect(attrs(panel()).style).toBeUndefined();
+  });
+});
+
+describe("NativeSelect", () => {
+  const changes: string[] = [];
+  const native = (g: ListboxGroup[] = groups) =>
+    asElement(
+      NativeSelect({
+        groups: g,
+        value: "b",
+        onChange: (v) => changes.push(v),
+        labelledBy: "caption",
+        children: "Bravo",
+      }),
+    );
+
+  // The <label> that used to wrap the select is gone, so this is now its
+  // only accessible name.
+  it("is named by the caller's label", () => {
+    expect(attrs(findOne(native(), "select"))["aria-labelledby"]).toBe(
+      "caption",
+    );
+  });
+
+  it("shows the face to sight only; the select carries the value", () => {
+    const face = findAll(native(), "span").find(
+      (el) => attrs(el)["aria-hidden"],
+    );
+    expect(face && textOf(face)).toBe("Bravo");
+    expect(attrs(findOne(native(), "select")).value).toBe("b");
+  });
+
+  it("has one optgroup per group, labelled, with its options", () => {
+    const optgroups = findAll(native(), "optgroup");
+    expect(optgroups.map((g) => attrs(g).label)).toEqual(["model", "iso"]);
+    expect(optgroups.map((g) => findAll(g, "option").length)).toEqual([2, 1]);
+  });
+
+  it("drops optgroups when there is only one group", () => {
+    const single = native([groups[0]]);
+    expect(findAll(single, "optgroup")).toHaveLength(0);
+    expect(findAll(single, "option").map((o) => attrs(o).value)).toEqual([
+      "a",
+      "b",
+    ]);
+  });
+
+  it("passes the chosen value to onChange", () => {
+    const onChange = attrs(findOne(native(), "select")).onChange as (e: {
+      target: { value: string };
+    }) => void;
+    onChange({ target: { value: "c" } });
+    expect(changes).toEqual(["c"]);
   });
 });

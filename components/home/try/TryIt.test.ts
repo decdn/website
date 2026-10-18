@@ -3,39 +3,38 @@ import { BUNDLE_GROUPS, commandFor } from "./TryIt";
 import {
   CLOSED,
   flatOptions,
-  keyToAction,
-  reduce,
+  step,
   type ListboxState,
 } from "@/components/ui/listbox-state";
-import { ITEMS, PLATFORMS, getCommand, groupByKind } from "@/lib/models";
+import { ITEMS, PLATFORMS, groupByKind } from "@/lib/models";
 
 // TryIt runs hooks, so the tree walker can't call it. What it renders comes
 // from BUNDLE_GROUPS (the picker's options) and commandFor (the terminal
-// line); these tests drive the picker's keyboard logic over the real
-// catalogue and check the line that results.
+// line); these tests press keys through `step`, the logic SelectMenu's
+// keydown handler runs, over the real catalogue, and check the line that
+// results.
 
 const options = flatOptions(BUNDLE_GROUPS);
 const labels = options.map((o) => o.label);
+const first = options[0].value;
 
-/** The picker's value after `keys`, the way SelectMenu applies them. */
-function pickWith(keys: string[], value = ITEMS[0].id): string {
+/** The picker's value after `keys`, starting from `value`. */
+function pickWith(keys: string[], value = first): string {
   let state: ListboxState = CLOSED;
   let current = value;
   keys.forEach((key, i) => {
-    const ctx = {
-      labels,
-      selected: options.findIndex((o) => o.value === current),
-    };
-    const r = keyToAction({ key }, state, i * 50);
+    const selected = options.findIndex((o) => o.value === current);
+    const r = step(state, { key }, { labels, selected }, i * 50);
     if (!r) return;
-    if (r.action) state = reduce(state, r.action, ctx);
-    if (r.commit) {
-      current = options[state.active].value;
-      state = CLOSED;
-    }
+    state = r.state;
+    if (r.commit !== undefined) current = options[r.commit].value;
   });
   return current;
 }
+
+/** The hex of an item's hash: what the command's `decdn:` URI carries. */
+const hexOf = (id: string) =>
+  ITEMS.find((i) => i.id === id)!.hash.replace(/^b3:/, "");
 
 describe("the bundle picker", () => {
   it("offers every item, grouped by kind in the catalogue's order", () => {
@@ -47,37 +46,35 @@ describe("the bundle picker", () => {
     );
   });
 
+  it("labels each option with its item's name", () => {
+    for (const option of options) {
+      expect(option.label).toBe(ITEMS.find((i) => i.id === option.value)!.name);
+    }
+  });
+
   it.each(PLATFORMS.map((p) => p.id))(
-    "selecting an item updates the %s command to that item",
+    "selecting an item switches the %s command to that item's hash",
     (platform) => {
       const id = pickWith(["Enter", "ArrowDown", "ArrowDown", "Enter"]);
-      const item = ITEMS.find((i) => i.id === id)!;
       expect(id).toBe(options[2].value);
-      expect(commandFor(id, platform)).toBe(
-        getCommand(item.hash, platform, item.namespace, item.entry),
-      );
-      expect(commandFor(id, platform)).not.toBe(
-        commandFor(ITEMS[0].id, platform),
-      );
+      expect(commandFor(id, platform)).toContain(hexOf(id));
+      expect(commandFor(id, platform)).not.toContain(hexOf(first));
     },
   );
 
   it("type-ahead picks by name", () => {
     const ubuntu = ITEMS.find((i) => i.name.startsWith("Ubuntu"))!;
-    expect(pickWith(["u", "Enter"])).toBe(ubuntu.id);
-    expect(commandFor(pickWith(["u", "Enter"]), "unix")).toContain(
-      ubuntu.hash.replace(/^b3:/, ""),
-    );
+    const id = pickWith(["u", "Enter"]);
+    expect(id).toBe(ubuntu.id);
+    expect(commandFor(id, "unix")).toContain(hexOf(ubuntu.id));
   });
 
-  it("Escape leaves the value and the command as they were", () => {
-    const before = commandFor(ITEMS[0].id, "unix");
-    const id = pickWith(["Enter", "End", "Escape"]);
-    expect(id).toBe(ITEMS[0].id);
-    expect(commandFor(id, "unix")).toBe(before);
+  it("Escape leaves the value, and so the command, as it was", () => {
+    const start = options[3].value;
+    expect(pickWith(["Enter", "End", "Escape"], start)).toBe(start);
   });
 
-  it("an unknown id falls back to the first item's command", () => {
+  it("an unknown id falls back to the first catalogue item's command", () => {
     expect(commandFor("nope", "unix")).toBe(commandFor(ITEMS[0].id, "unix"));
   });
 });

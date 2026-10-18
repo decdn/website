@@ -14,9 +14,11 @@ import {
 import {
   CLOSED,
   flatOptions,
-  keyToAction,
+  mouseAction,
   placeMenu,
   reduce,
+  scrollToKeep,
+  step,
   type ListboxAction,
   type ListboxGroup,
   type ListboxOption,
@@ -46,6 +48,9 @@ type SelectMenuProps = {
   /** What the trigger shows — the current value, styled by the caller.
    *  Positioned children anchor to the control's own box. */
   children: ReactNode;
+  /** Viewport px covered at the top (a fixed nav), read each time the list
+   *  is placed, so it never opens underneath. */
+  topInset?: () => number;
 };
 
 /**
@@ -70,7 +75,8 @@ function nativeOptions(options: readonly ListboxOption[]) {
   ));
 }
 
-function NativeSelect({
+/** The touch fallback and the static HTML. Exported for its test. */
+export function NativeSelect({
   groups,
   value,
   onChange,
@@ -110,6 +116,7 @@ function ListboxSelect({
   onChange,
   labelledBy,
   children,
+  topInset,
 }: SelectMenuProps) {
   const listId = useId();
   const options = flatOptions(groups);
@@ -132,11 +139,11 @@ function ListboxSelect({
   }
 
   function onKeyDown(e: KeyboardEvent<HTMLButtonElement>) {
-    const result = keyToAction(e, state, e.timeStamp);
+    const result = step(state, e, ctx, e.timeStamp);
     if (!result) return;
     if (result.prevent) e.preventDefault();
-    if (result.commit) pick(state.active);
-    else if (result.action) apply(result.action);
+    if (result.commit === undefined) setState(result.state);
+    else pick(result.commit);
   }
 
   // Placed once per opening (and on resize), before the first paint, from
@@ -150,7 +157,7 @@ function ListboxSelect({
       if (!panel || !trigger) return;
       panel.style.maxHeight = "";
       const rect = trigger.getBoundingClientRect();
-      const row = panel.querySelector<HTMLElement>('[aria-selected="true"]');
+      const row = panel.querySelector<HTMLElement>("[data-current]");
       const text = panel.querySelector<HTMLElement>("[data-option-text]");
       const p = placeMenu({
         triggerTop: rect.top,
@@ -160,6 +167,7 @@ function ListboxSelect({
         menuHeight: panel.offsetHeight,
         selectedCenter: row ? row.offsetTop + row.offsetHeight / 2 : 0,
         textInset: text?.offsetLeft ?? 0,
+        topInset: topInset?.() ?? 0,
       });
       panel.style.top = `${p.top}px`;
       panel.style.left = `${p.left}px`;
@@ -170,10 +178,9 @@ function ListboxSelect({
     place();
     window.addEventListener("resize", place);
     return () => window.removeEventListener("resize", place);
-  }, [state.open]);
+  }, [state.open, topInset]);
 
-  // A height-clamped list scrolls itself to keep the highlight in view. By
-  // hand rather than scrollIntoView, which would scroll the page as well.
+  // A height-clamped list scrolls itself to keep the highlight in view.
   useLayoutEffect(() => {
     const panel = panelRef.current;
     if (!state.open || !panel || panel.scrollHeight <= panel.clientHeight) {
@@ -183,14 +190,12 @@ function ListboxSelect({
       `[data-index="${state.active}"]`,
     );
     if (!row) return;
-    if (row.offsetTop < panel.scrollTop) {
-      panel.scrollTop = row.offsetTop;
-    } else if (
-      row.offsetTop + row.offsetHeight >
-      panel.scrollTop + panel.clientHeight
-    ) {
-      panel.scrollTop = row.offsetTop + row.offsetHeight - panel.clientHeight;
-    }
+    panel.scrollTop = scrollToKeep(
+      row.offsetTop,
+      row.offsetHeight,
+      panel.scrollTop,
+      panel.clientHeight,
+    );
   }, [state.open, state.active]);
 
   useEffect(() => {
@@ -225,14 +230,15 @@ function ListboxSelect({
         // preventDefault, which keeps a drag from selecting text, also
         // skips the button's own focusing.
         onMouseDown={(e) => {
-          if (e.button !== 0) return;
+          const action = mouseAction("press", state.open, e);
+          if (!action) return;
           e.preventDefault();
           triggerRef.current?.focus();
-          apply(state.open ? { type: "close" } : { type: "open" });
+          apply(action);
         }}
-        // A click with no pointer behind it comes from assistive tech.
         onClick={(e) => {
-          if (e.detail === 0) apply({ type: "open" });
+          const action = mouseAction("click", state.open, e);
+          if (action) apply(action);
         }}
         onBlur={() => setState(CLOSED)}
         className="block w-full cursor-pointer text-left focus-visible:outline-2 focus-visible:outline-offset-4"
@@ -275,7 +281,11 @@ type SelectMenuPanelProps = {
  * The list's markup, without state, so its structure can be tested without
  * a DOM. Stays mounted while closed (`hidden`) so the trigger's
  * aria-controls always points at it. Positioned `absolute` against the
- * trigger's wrapper; SelectMenu sets its offsets when it opens.
+ * trigger's wrapper; ListboxSelect sets its offsets when it opens and on
+ * resize.
+ *
+ * `aria-selected` follows the highlight, as in the APG select-only
+ * combobox; the check mark and `data-current` mark the current value.
  */
 export function SelectMenuPanel({
   id,
@@ -289,22 +299,23 @@ export function SelectMenuPanel({
   onPick,
 }: SelectMenuPanelProps) {
   const row = (option: ListboxOption, index: number) => {
-    const selected = option.value === value;
+    const current = option.value === value;
     return (
       <div
         key={option.value}
         id={optionId(id, index)}
         role="option"
-        aria-selected={selected}
+        aria-selected={index === active}
+        data-current={current || undefined}
         data-index={index}
         onMouseMove={() => onHover?.(index)}
         onClick={() => onPick?.(index)}
-        className={`flex cursor-default items-center gap-1.5 rounded-[calc(var(--menu-radius)-6px)] py-[3px] pr-6 pl-1.5 ${
+        className={`flex cursor-default items-center gap-1.5 rounded-[calc(var(--menu-radius)-7px)] py-[3px] pr-6 pl-1.5 ${
           index === active ? "bg-whisper-text text-paper" : ""
         }`}
       >
         <span className="flex w-4 shrink-0 justify-center">
-          {selected && (
+          {current && (
             <svg
               aria-hidden
               viewBox="0 0 16 16"

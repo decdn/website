@@ -1,7 +1,9 @@
 // The select-only combobox's behaviour, as pure functions: which key does
 // what (WAI-ARIA APG "Select-Only Combobox"), where the highlight goes, and
-// where the open list sits. SelectMenu.tsx only wires these to the DOM, so
-// vitest — which runs without one — can cover the whole interaction here.
+// where the open list sits, plus the small decisions behind each pointer
+// event. SelectMenu.tsx wires these to the DOM and keeps only what needs one
+// (measuring, focus, document listeners), which vitest, running without a
+// DOM, does not reach.
 
 export type ListboxOption = { value: string; label: string };
 
@@ -37,7 +39,7 @@ export const CLOSED: ListboxState = {
 export const TYPEAHEAD_MS = 500;
 
 export type ListboxAction =
-  | { type: "open"; to?: "selected" | "first" | "last" }
+  | { type: "open"; to?: "first" | "last" }
   | { type: "close" }
   | { type: "move"; by: 1 | -1 }
   | { type: "home" }
@@ -67,6 +69,7 @@ export function typeaheadMatch(
   active: number,
   buffer: string,
 ): number {
+  if (!buffer) return -1;
   const n = labels.length;
   const repeated = [...buffer].every((c) => c === buffer[0]);
   const needle = (repeated ? buffer[0] : buffer).toLowerCase();
@@ -85,8 +88,9 @@ export function reduce(
 ): ListboxState {
   const last = labels.length - 1;
   if (last < 0) return CLOSED;
-  // Every action but close/hover works from an open list, so a key that
-  // arrives while closed opens on the selected option first (APG).
+  // Every action but close/hover works from an open list, so one that
+  // arrives while closed opens on the selected option first (APG). A `move`
+  // on a closed list only opens; it doesn't also step.
   const base: ListboxState = state.open
     ? state
     : { ...CLOSED, open: true, active: clamp(selected, last) };
@@ -101,11 +105,16 @@ export function reduce(
       return CLOSED;
     case "move":
       if (!state.open) return base;
-      return { ...base, active: clamp(base.active + action.by, last) };
+      return {
+        ...base,
+        active: clamp(base.active + action.by, last),
+        typed: "",
+      };
+    // Navigating ends a type-ahead word, so a Space right after selects.
     case "home":
-      return { ...base, active: 0 };
+      return { ...base, active: 0, typed: "" };
     case "end":
-      return { ...base, active: last };
+      return { ...base, active: last, typed: "" };
     case "hover":
       if (!state.open) return state;
       return { ...state, active: clamp(action.index, last) };
@@ -131,9 +140,15 @@ export type KeyInput = {
   metaKey?: boolean;
 };
 
+/** A key's effect: an `action` for `reduce`, or `commit` to pick the
+ *  highlighted option and close — never both. */
+export type KeyResult =
+  | { action: ListboxAction; commit?: never; prevent: boolean }
+  | { commit: true; action?: never; prevent: true };
+
 /**
- * What a keydown on the trigger does: an `action` for `reduce`, `commit` to
- * pick the highlighted option and close, and whether to `preventDefault`.
+ * What a keydown on the trigger does (see `KeyResult`), and whether to
+ * `preventDefault`.
  * `null` means the key is not ours — it does its usual thing, so PageUp,
  * PageDown and the rest still scroll the page while the list is open.
  *
@@ -145,9 +160,9 @@ export function keyToAction(
   { key, altKey, ctrlKey, metaKey }: KeyInput,
   state: ListboxState,
   now: number,
-): { action?: ListboxAction; commit?: boolean; prevent: boolean } | null {
+): KeyResult | null {
   const printable = key.length === 1 && !altKey && !ctrlKey && !metaKey;
-  const type = (): { action: ListboxAction; prevent: boolean } => ({
+  const type = (): KeyResult => ({
     action: { type: "type", char: key, now },
     prevent: true,
   });
@@ -189,6 +204,59 @@ export function keyToAction(
   return printable ? type() : null;
 }
 
+/**
+ * One keydown, end to end: the next state, and `commit`, the index of the
+ * option to hand to onChange, when the key picks one. `null` when the key
+ * is not ours. SelectMenu's handler is this plus preventDefault and
+ * onChange, so testing `step` tests the handler's logic.
+ */
+export function step(
+  state: ListboxState,
+  key: KeyInput,
+  ctx: ListboxContext,
+  now: number,
+): { state: ListboxState; commit?: number; prevent: boolean } | null {
+  const result = keyToAction(key, state, now);
+  if (!result) return null;
+  if (result.commit) {
+    return { state: CLOSED, commit: state.active, prevent: result.prevent };
+  }
+  return { state: reduce(state, result.action, ctx), prevent: result.prevent };
+}
+
+/**
+ * What a mouse event on the trigger does. A primary-button press toggles the
+ * list, like a native menu (other buttons do nothing). A click arrives after
+ * that press and is ignored — except a click with `detail` 0, which has no
+ * press behind it: assistive tech activating the button. That one only
+ * opens, so it can't undo a keyboard Space that already did.
+ */
+export function mouseAction(
+  kind: "press" | "click",
+  open: boolean,
+  { button = 0, detail = 1 }: { button?: number; detail?: number } = {},
+): ListboxAction | null {
+  if (kind === "click") return detail === 0 ? { type: "open" } : null;
+  if (button !== 0) return null;
+  return open ? { type: "close" } : { type: "open" };
+}
+
+/** The list's `scrollTop` that brings a row into view with the least
+ *  movement, or the current one if it already is. Applied to the list
+ *  itself; scrollIntoView would scroll the page as well. */
+export function scrollToKeep(
+  rowTop: number,
+  rowHeight: number,
+  scrollTop: number,
+  clientHeight: number,
+): number {
+  if (rowTop < scrollTop) return rowTop;
+  if (rowTop + rowHeight > scrollTop + clientHeight) {
+    return rowTop + rowHeight - clientHeight;
+  }
+  return scrollTop;
+}
+
 export type PlaceInput = {
   /** The trigger's box, in viewport px (getBoundingClientRect). */
   triggerTop: number;
@@ -203,6 +271,12 @@ export type PlaceInput = {
   textInset: number;
   /** Closest the list may come to a viewport edge. */
   margin?: number;
+  /** Viewport px covered at the top, e.g. by a fixed nav that would paint
+   *  over the list. The list keeps `margin` below it. */
+  topInset?: number;
+  /** Smallest height a clamped list gets, about one row: when there is
+   *  no room at all it overflows the viewport rather than vanishing. */
+  minHeight?: number;
   /** Space between trigger and list when the list opens beside it. */
   gap?: number;
 };
@@ -215,8 +289,11 @@ export type Placement = { top: number; left: number; maxHeight?: number };
  * Where the list opens, macOS-style: over the trigger with the selected row
  * centred on it and its text lined up with the trigger's; failing that,
  * directly below the trigger, then directly above; failing both, on the
- * roomier side with a `maxHeight` so it scrolls inside itself. Never past
- * `margin` from the viewport's edges at the moment it opens.
+ * roomier side with a `maxHeight` so it scrolls inside itself. At the moment
+ * it opens it keeps `margin` from the viewport's bottom, from `topInset` at
+ * the top, and from the left edge when shifted to line up the text. The
+ * right edge is not checked: the list is as wide as the trigger unless a
+ * label is longer.
  *
  * The result is relative to the trigger, not the viewport: the list is
  * `position: absolute` in the trigger's wrapper, so when the page scrolls
@@ -231,10 +308,13 @@ export function placeMenu({
   selectedCenter,
   textInset,
   margin = 8,
+  topInset = 0,
+  minHeight = 32,
   gap = 4,
 }: PlaceInput): Placement {
+  const minTop = topInset + margin;
   const fits = (top: number) =>
-    triggerTop + top >= margin &&
+    triggerTop + top >= minTop &&
     triggerTop + top + menuHeight <= viewportHeight - margin;
 
   const over = Math.round(triggerHeight / 2 - selectedCenter);
@@ -250,9 +330,10 @@ export function placeMenu({
   if (fits(above)) return { top: above, left: 0 };
 
   const roomBelow = viewportHeight - margin - (triggerTop + below);
-  const roomAbove = triggerTop - gap - margin;
+  const roomAbove = triggerTop - gap - minTop;
   if (roomBelow >= roomAbove) {
-    return { top: below, left: 0, maxHeight: Math.max(roomBelow, 0) };
+    return { top: below, left: 0, maxHeight: Math.max(roomBelow, minHeight) };
   }
-  return { top: -gap - roomAbove, left: 0, maxHeight: roomAbove };
+  const height = Math.max(roomAbove, minHeight);
+  return { top: -gap - height, left: 0, maxHeight: height };
 }

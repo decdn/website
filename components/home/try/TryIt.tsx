@@ -17,7 +17,7 @@ import {
   sourceLabel,
 } from "@/lib/models";
 
-/** The picker's groups: one per kind, in `KINDS` order. */
+/** The picker's groups: one per kind that has items, in `KINDS` order. */
 export const BUNDLE_GROUPS: ListboxGroup[] = groupByKind(ITEMS).map(
   (group) => ({
     id: group.kind,
@@ -25,6 +25,11 @@ export const BUNDLE_GROUPS: ListboxGroup[] = groupByKind(ITEMS).map(
     options: group.items.map((item) => ({ value: item.id, label: item.name })),
   }),
 );
+
+// The fixed nav paints over anything beneath it, so the open list keeps
+// clear of its bottom edge.
+const navBottom = () =>
+  document.querySelector(".chrome-nav")?.getBoundingClientRect().bottom ?? 0;
 
 /** The picked item, falling back to the first for an unknown id. */
 export function itemFor(id: string): Item | undefined {
@@ -125,6 +130,7 @@ export function TryIt() {
               setCopied(false);
             }}
             labelledBy={captionId}
+            topInset={navBottom}
           >
             <span className="block truncate border-b border-current pr-8 pb-2 text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold tracking-[-0.02em]">
               {item.name}
