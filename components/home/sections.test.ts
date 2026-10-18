@@ -1,11 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { Compare } from "./Compare";
-import { Contact } from "./Contact";
-import { Faq } from "./Faq";
-import { Hero } from "./Hero";
-import { Method } from "./Method";
-import { Try } from "./Try";
-import { DARK_SECTIONS, SECTION_IDS } from "./chrome-active";
+import { Compare } from "./compare/Compare";
+import { Contact } from "./contact/Contact";
+import { Faq } from "./faq/Faq";
+import { Hero } from "./hero/Hero";
+import { Method } from "./method/Method";
+import { Try } from "./try/Try";
+import { DARK_SECTIONS, SECTION_IDS } from "@/components/layout/chrome-active";
 import { asElement, attrs } from "@/test-utils/react-tree";
 
 // The nav picks its tone from DARK_SECTIONS, a hand copy of each section's

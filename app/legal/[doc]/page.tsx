@@ -1,6 +1,6 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { notFound } from "next/navigation";
-import { LegalDoc } from "@/components/ui/LegalDoc";
+import { LegalDoc } from "@/components/legal/LegalDoc";
 import { JsonLd } from "@/lib/jsonld";
 import {
   getLegalDoc,

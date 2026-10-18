@@ -12,12 +12,12 @@ import {
   shouldInterceptNavClick,
   takeSectionFocus,
 } from "@/lib/scroll";
-import { MobileMenu } from "@/components/site/MobileMenu";
+import { MobileMenu } from "@/components/layout/MobileMenu";
 import {
   DARK_SECTIONS,
   SECTION_IDS,
   resolveActiveSection,
-} from "@/components/site/chrome-active";
+} from "@/components/layout/chrome-active";
 
 // Hash anchors are written `/#section`. Required because this nav also
 // renders on /blog/*, where a bare `#section` resolves against the

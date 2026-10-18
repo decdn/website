@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { FaqItem } from "@/components/ui/FaqItem";
+import { FaqItem } from "@/components/home/faq/FaqItem";
 import { FAQ_ITEMS } from "@/lib/faq";
 
 // Exactly one answer is open at all times: the card on the right has to show

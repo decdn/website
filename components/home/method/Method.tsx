@@ -1,6 +1,6 @@
 import { METHOD_STEPS, STACK } from "@/lib/copy";
 import { Frame } from "@/components/ui/Frame";
-import { MethodRow } from "@/components/ui/MethodRow";
+import { MethodRow } from "@/components/home/method/MethodRow";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 
 export function Method() {

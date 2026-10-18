@@ -6,11 +6,11 @@ import {
   HERO_LEAD,
   HERO_STATUS,
 } from "@/lib/copy";
-import { highlightBrand } from "@/components/ui/brand";
+import { highlightBrand } from "@/components/home/brand";
 import { Figure } from "@/components/ui/Figure";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { HeroTerminal } from "@/components/site/HeroTerminal";
+import { HeroTerminal } from "@/components/home/hero/HeroTerminal";
 
 export function Hero() {
   return (

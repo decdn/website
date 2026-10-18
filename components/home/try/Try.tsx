@@ -1,8 +1,8 @@
 import { TRY_HEADLINE, TRY_LEAD } from "@/lib/copy";
-import { highlightBrand } from "@/components/ui/brand";
+import { highlightBrand } from "@/components/home/brand";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
-import { TryIt } from "@/components/site/TryIt";
+import { TryIt } from "@/components/home/try/TryIt";
 
 export function Try() {
   return (

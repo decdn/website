@@ -1,6 +1,6 @@
 import { COMPARE_HEADLINE, COMPARE_LEAD, COMPARE_ROWS } from "@/lib/copy";
-import { highlightBrand } from "@/components/ui/brand";
-import { ComparisonRow } from "@/components/ui/ComparisonRow";
+import { highlightBrand } from "@/components/home/brand";
+import { ComparisonRow } from "@/components/home/compare/ComparisonRow";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 

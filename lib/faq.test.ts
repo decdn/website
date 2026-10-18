@@ -1,9 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { FAQ_ITEMS } from "./faq";
 
-// FAQ_ITEMS is consumed three ways — rendered as <dt>/<dd> by components/site/
-// Faq.tsx, restated as Question/Answer nodes by `faqPageNode`, and serialised
-// under `#### ` headings by app/llms-full.txt/route.ts. lib/copy.ts's strings
+// FAQ_ITEMS is consumed three ways — rendered as <dt>/<dd> by
+// components/home/faq/Faq.tsx, restated as Question/Answer nodes by
+// `faqPageNode`, and serialised under `#### ` headings by
+// app/llms-full.txt/route.ts. lib/copy.ts's strings
 // are screened for the whitespace and delimiter hazards that creates; these
 // were not, despite going through the same three consumers.
 

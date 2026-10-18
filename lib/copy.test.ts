@@ -93,7 +93,7 @@ describe("copy strings", () => {
 });
 
 describe("STACK", () => {
-  // components/site/Method.tsx lays the strip out 2 / 3 / 6 across, and its
+  // components/home/method/Method.tsx lays the strip out 2 / 3 / 6 across, and its
   // hairlines only close when the count divides evenly by the column count.
   it("has exactly six items", () => {
     expect(STACK).toHaveLength(6);
@@ -128,7 +128,7 @@ describe("SOURCE_REPOS", () => {
 
 describe("COMPARE_ROWS", () => {
   // Hardcoded, not `COMPARE_ROWS.length`: the section header says "seven
-  // axes" in prose (components/site/Compare.tsx), so the count is a published
+  // axes" in prose (components/home/compare/Compare.tsx), so the count is a published
   // claim rather than an implementation detail.
   it("has exactly seven axes", () => {
     expect(COMPARE_ROWS).toHaveLength(7);
@@ -141,7 +141,7 @@ describe("COMPARE_ROWS", () => {
 
   // Two emphasised rows would render two display-size rows; zero would
   // silently downgrade the price row to a normal one. It has to be *first*
-  // because components/site/Compare.tsx keys the reveal cascade on array
+  // because components/home/compare/Compare.tsx keys the reveal cascade on array
   // position — reordering the rows would break the cascade with nothing else
   // to catch it.
   it("emphasises exactly one row, it is price, and it leads", () => {

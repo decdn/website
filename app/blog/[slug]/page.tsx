@@ -6,7 +6,7 @@ import remarkGfm from "remark-gfm";
 import { CodeBlock } from "@/components/ui/CodeBlock";
 import { Frame } from "@/components/ui/Frame";
 import { Pill } from "@/components/ui/Pill";
-import { META } from "@/components/ui/PostRow";
+import { META } from "@/components/blog/PostRow";
 import { Prose } from "@/components/ui/Prose";
 import {
   blogPostingNode,
