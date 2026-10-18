@@ -17,7 +17,7 @@
 //
 // Plain strings only — no JSX, because the mirror emits them as text. Where a
 // sentence names the product, write `deCDN` and let `highlightBrand`
-// (components/ui/brand.tsx) wrap it at render time; the mirror takes the same
+// (components/home/brand.tsx) wrap it at render time; the mirror takes the same
 // string verbatim.
 
 import type { links } from "@/lib/links";
@@ -93,8 +93,8 @@ export type CompareRow = {
   decdn: string;
   /** The price row: display-size typography, legacy value struck through.
    *  Exactly one row carries it, and it must be the first row — the reveal
-   *  cascade in components/site/Compare.tsx is keyed on array position, not on
-   *  this flag. lib/copy.test.ts pins both halves. */
+   *  cascade in components/home/compare/Compare.tsx is keyed on array
+   *  position, not on this flag. lib/copy.test.ts pins both halves. */
   emphasis?: true;
 };
 
@@ -104,8 +104,8 @@ export type CompareRow = {
  *
  *  `as const satisfies` rather than a plain annotation: the annotation widened
  *  `.length` to `number` and the axis names to `string`, which is what let
- *  components/site/Compare.tsx index the last axis without the compiler
- *  knowing the array is non-empty. */
+ *  components/home/compare/Compare.tsx index the last axis without the
+ *  compiler knowing the array is non-empty. */
 export const COMPARE_ROWS = [
   {
     axis: "price",

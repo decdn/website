@@ -7,7 +7,9 @@ import { Contact } from "./Contact";
 // findSome expands function components, so without this FleetStatus would
 // call useStats (and its useState) outside a renderer and throw; the links
 // under test don't depend on it.
-vi.mock("@/components/site/FleetStatus", () => ({ FleetStatus: () => null }));
+vi.mock("@/components/home/contact/FleetStatus", () => ({
+  FleetStatus: () => null,
+}));
 
 const anchors = () => findSome(Contact(), "a");
 const pills = () =>

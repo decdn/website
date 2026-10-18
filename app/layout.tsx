@@ -4,9 +4,9 @@ import { links, INDEXABLE, SITE_URL } from "@/lib/links";
 import { SITE_TITLE, SITE_DESCRIPTION } from "@/lib/copy";
 import { organizationNode, serviceNode, websiteNode } from "@/lib/schema";
 import { OG_SITE, TWITTER_SITE } from "@/lib/metadata";
-import { Chrome } from "@/components/site/Chrome";
-import { Footer } from "@/components/site/Footer";
-import { ScrollReveal } from "@/components/site/ScrollReveal";
+import { Chrome } from "@/components/layout/Chrome";
+import { Footer } from "@/components/layout/Footer";
+import { ScrollReveal } from "@/components/layout/ScrollReveal";
 import { JsonLd } from "@/lib/jsonld";
 import "./globals.css";
 

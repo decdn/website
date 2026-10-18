@@ -1,4 +1,4 @@
-import { FaqList } from "@/components/site/FaqList";
+import { FaqList } from "@/components/home/faq/FaqList";
 import { FAQ_ITEMS } from "@/lib/faq";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";

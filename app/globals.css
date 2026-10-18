@@ -928,7 +928,7 @@ a.hero-status:hover .arrow {
    site-wide dashed ring (base layer, top of file). No mix-blend-mode is used — the parent nav toggles
    `data-tone` per-section to work around Safari's bug with
    `mix-blend-mode: difference` on `position: fixed` elements
-   (see components/site/Chrome.tsx). */
+   (see components/layout/Chrome.tsx). */
 
 .chrome-nav {
   background-color: transparent;

@@ -1,6 +1,6 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { Frame } from "@/components/ui/Frame";
-import { BLOG_GRID_COLS, PostRow } from "@/components/ui/PostRow";
+import { BLOG_GRID_COLS, PostRow } from "@/components/blog/PostRow";
 import { listIndexPosts } from "@/lib/blog";
 import { BLOG_DESCRIPTION, BLOG_TITLE } from "@/lib/copy";
 import { JsonLd } from "@/lib/jsonld";

@@ -3,7 +3,7 @@ import path from "node:path";
 import { createElement, isValidElement } from "react";
 import { describe, expect, it } from "vitest";
 import { Frame } from "./Frame";
-import { highlightBrand } from "./brand";
+import { highlightBrand } from "@/components/home/brand";
 import { asElement, attrs } from "@/test-utils/react-tree";
 
 // The paper-contrast fix is a string contract across three files: Frame sets

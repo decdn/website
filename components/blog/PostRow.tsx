@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { PostMeta } from "@/lib/blog";
 import { dottedDate, readLabel, seriesLabel } from "@/lib/blog";
-import { Pill } from "./Pill";
+import { Pill } from "@/components/ui/Pill";
 
 // Shared 5-track grid for the index "field-log" table — `#` · date ·
 // title/summary · read · arrow. The column-header row in app/blog/page.tsx
