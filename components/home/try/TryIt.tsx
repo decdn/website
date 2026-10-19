@@ -196,7 +196,20 @@ export function TryIt() {
           <span className="terminal-dot" />
           <span className="terminal-dot" />
           <span className="terminal-dot" />
-          <span className="terminal-label">{shell.shell}</span>
+          {/* Both shell names share one cell so the label keeps the longer
+              one's width; on a narrow screen "powershell" would otherwise
+              wrap the head onto a second line that "terminal" doesn't. */}
+          <span className="terminal-label grid">
+            {PLATFORMS.map((p) => (
+              <span
+                key={p.id}
+                aria-hidden={p.id !== shell.id || undefined}
+                className={`[grid-area:1/1] ${p.id === shell.id ? "" : "invisible"}`}
+              >
+                {p.shell}
+              </span>
+            ))}
+          </span>
           <span
             role="group"
             aria-label="operating system"
