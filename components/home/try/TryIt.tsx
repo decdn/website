@@ -36,13 +36,23 @@ export function itemFor(id: string): Item | undefined {
   return ITEMS.find((i) => i.id === id) ?? ITEMS[0];
 }
 
-/** The line the terminal shows for the picked item on `platform`. */
+/** The line the terminal shows for item `id` on `platform`. */
 export function commandFor(id: string, platform: Platform): string {
   const item = itemFor(id);
   return item
     ? getCommand(item.hash, platform, item.namespace, item.entry)
     : "";
 }
+
+// Every line the terminal can show, for the sizing stack in the command block.
+const ALL_LINES = PLATFORMS.flatMap((p) =>
+  ITEMS.map((i) => ({
+    platform: p.id,
+    itemId: i.id,
+    prompt: p.prompt,
+    command: commandFor(i.id, p.id),
+  })),
+);
 
 const COPIED_MS = 2000;
 
@@ -115,7 +125,7 @@ export function TryIt() {
     <div
       data-reveal
       style={{ "--reveal-delay": "120ms" }}
-      className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] @4xl:items-start @4xl:gap-12"
+      className="grid grid-cols-[minmax(0,1fr)] gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] @4xl:items-start @4xl:gap-12"
     >
       <div className="flex flex-col gap-8 @4xl:self-stretch">
         <div className="flex flex-col gap-3">
@@ -148,21 +158,37 @@ export function TryIt() {
           </SelectMenu>
         </div>
 
-        {/* Beside the terminal, the source row sinks to its bottom edge. */}
-        <div className="grid flex-1 grid-cols-2 content-between gap-y-4">
-          <Figure label="size" value={formatSize(item.bytes)} />
-          <Figure label="license" value={item.license} />
-          <div className="col-span-2 flex flex-col gap-1">
-            <span className="meta opacity-60">source</span>
-            <a
-              className="self-start text-body font-medium tracking-[-0.01em] break-all underline decoration-1 underline-offset-4 hover:decoration-whisper"
-              href={item.source}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {sourceLabel(item.source)}
-            </a>
-          </div>
+        {/* Every bundle's facts share one cell, all but the chosen one
+            invisible, so a license or source that wraps on a narrow screen
+            doesn't push the terminal down. The copies hold real links, so
+            they stay `invisible` (out of tab order), never `opacity-0`. Each
+            copy spreads its rows to the cell's height, so the source row sits
+            on the bottom edge — beside the terminal, the terminal's. */}
+        <div className="grid flex-1">
+          {ITEMS.map((i) => {
+            const shown = i.id === item.id;
+            return (
+              <div
+                key={i.id}
+                aria-hidden={!shown || undefined}
+                className={`grid grid-cols-2 content-between gap-y-4 [grid-area:1/1] ${shown ? "" : "invisible"}`}
+              >
+                <Figure label="size" value={formatSize(i.bytes)} />
+                <Figure label="license" value={i.license} />
+                <div className="col-span-2 flex flex-col gap-1">
+                  <span className="meta opacity-60">source</span>
+                  <a
+                    className="self-start text-body font-medium tracking-[-0.01em] break-all underline decoration-1 underline-offset-4 hover:decoration-whisper"
+                    href={i.source}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {sourceLabel(i.source)}
+                  </a>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -171,7 +197,24 @@ export function TryIt() {
           <span className="terminal-dot" />
           <span className="terminal-dot" />
           <span className="terminal-dot" />
-          <span className="terminal-label">{shell.shell}</span>
+          {/* Every shell name shares one cell, so the label keeps the longest
+              one's width. Otherwise a longer name squeezes the OS toggle's
+              labels onto two lines and the head changes height with the
+              shell. */}
+          <span className="terminal-label grid">
+            {PLATFORMS.map((p) => {
+              const shown = p.id === shell.id;
+              return (
+                <span
+                  key={p.id}
+                  aria-hidden={!shown || undefined}
+                  className={`[grid-area:1/1] ${shown ? "" : "invisible"}`}
+                >
+                  {p.shell}
+                </span>
+              );
+            })}
+          </span>
           <span
             role="group"
             aria-label="operating system"
@@ -198,22 +241,48 @@ export function TryIt() {
           </span>
         </div>
 
-        <pre className="m-0 px-[18px] pt-[18px] pb-4 font-[inherit] break-all whitespace-pre-wrap">
-          <span className="prompt select-none">{shell.prompt} </span>
-          <code ref={codeRef}>{command}</code>
+        {/* Every line shares one cell, all but the chosen one invisible, so
+            the block holds the tallest line's height and switching bundle or
+            shell doesn't push the page below it. Each copy carries the
+            visible line's markup, prompt margin included, so it wraps the
+            same way. */}
+        <pre className="m-0 grid px-[18px] pt-[18px] pb-4 font-[inherit] break-all whitespace-pre-wrap">
+          {ALL_LINES.map((line) => {
+            const shown = line.platform === shell.id && line.itemId === item.id;
+            return (
+              <span
+                key={`${line.platform}:${line.itemId}`}
+                aria-hidden={!shown || undefined}
+                className={`[grid-area:1/1] ${shown ? "" : "invisible"}`}
+              >
+                <span className="prompt select-none">{line.prompt} </span>
+                <code ref={shown ? codeRef : undefined}>{line.command}</code>
+              </span>
+            );
+          })}
         </pre>
 
         <div className="flex items-center justify-between gap-6 px-[18px] pb-[18px]">
           <span className="dim text-[11px] tracking-[0.08em]">
             testnet · sponsored · no wallet
           </span>
+          {/* The longer label sits invisibly in the live one's cell, so the
+              button keeps its width and "copied ✓" can't wrap the row. */}
           <button
             type="button"
             onClick={copy}
-            className="meta cursor-pointer border-b border-current pb-[2px] hover:border-whisper"
+            className="group meta grid cursor-pointer justify-items-end"
             aria-live="polite"
           >
-            {copied ? "copied ✓" : "copy"}
+            <span
+              aria-hidden
+              className="invisible border-b pb-[2px] [grid-area:1/1]"
+            >
+              copied ✓
+            </span>
+            <span className="border-b border-current pb-[2px] [grid-area:1/1] group-hover:border-whisper">
+              {copied ? "copied ✓" : "copy"}
+            </span>
           </button>
         </div>
 
