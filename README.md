@@ -55,6 +55,10 @@ pnpm format:check # prettier --check . (CI)
 - **Machine-readable surfaces.** `/llms.txt` is a curated index of this origin and `/llms-full.txt` is every page as one plain-text document; both derive their page entries from `listPosts()`, `LEGAL_SLUGS`, `lib/faq.ts` and `lib/copy.ts`, are listed in `app/sitemap-pages.xml/route.ts`, and are advertised through `alternates.types` in `app/layout.tsx` and a `Link:` header in `public/_headers`. `scripts/check-out.mjs` resolves every advertised same-origin URL against `out/` after a build. The protocol documentation has its own pair on `docs.decdn.org`, served by Mintlify.
 - **Live testnet stats.** The hero terminal and the Contact fleet panel render a loading state into the static HTML and fill in after mount from `https://data.decdn.org/stats-421614.json` (rewritten every five minutes by the `decdn/stats` indexer). The fetch lives in `lib/stats.ts` / `lib/use-stats.ts`; the CSP in `public/_headers` allowlists the origin under `connect-src`, so change `STATS_ORIGIN` and the CSP together.
 
+## Testing
+
+This project is tested with BrowserStack. Unit tests run under vitest (`pnpm test`); cross-browser checks use [BrowserStack](https://www.browserstack.com/) through its Open Source Sponsorship Program.
+
 ## Deploy
 
 Cloudflare Pages serves the `out/` directory produced by `pnpm build`.
