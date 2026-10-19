@@ -1,7 +1,9 @@
 "use client";
 
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useId, useRef, useState, useSyncExternalStore } from "react";
 import { Figure } from "@/components/ui/Figure";
+import { SelectMenu } from "@/components/ui/SelectMenu";
+import type { ListboxGroup } from "@/components/ui/listbox-state";
 import { TRY_NOTES } from "@/lib/copy";
 import {
   ITEMS,
@@ -15,14 +17,31 @@ import {
   sourceLabel,
 } from "@/lib/models";
 
-const GROUPS = groupByKind(ITEMS);
+/** The picker's groups: one per kind that has items, in `KINDS` order. */
+export const BUNDLE_GROUPS: ListboxGroup[] = groupByKind(ITEMS).map(
+  (group) => ({
+    id: group.kind,
+    label: group.label,
+    options: group.items.map((item) => ({ value: item.id, label: item.name })),
+  }),
+);
 
-function itemOptions(items: readonly Item[]) {
-  return items.map((item) => (
-    <option key={item.id} value={item.id}>
-      {item.name}
-    </option>
-  ));
+// The fixed nav paints over anything beneath it, so the open list keeps
+// clear of its bottom edge.
+const navBottom = () =>
+  document.querySelector(".chrome-nav")?.getBoundingClientRect().bottom ?? 0;
+
+/** The picked item, falling back to the first for an unknown id. */
+export function itemFor(id: string): Item | undefined {
+  return ITEMS.find((i) => i.id === id) ?? ITEMS[0];
+}
+
+/** The line the terminal shows for the picked item on `platform`. */
+export function commandFor(id: string, platform: Platform): string {
+  const item = itemFor(id);
+  return item
+    ? getCommand(item.hash, platform, item.namespace, item.entry)
+    : "";
 }
 
 const COPIED_MS = 2000;
@@ -58,11 +77,12 @@ export function TryIt() {
   const platform = chosen ?? detected;
   const [copied, setCopied] = useState(false);
   const codeRef = useRef<HTMLElement>(null);
+  const captionId = useId();
 
-  const item = ITEMS.find((i) => i.id === id) ?? ITEMS[0];
+  const item = itemFor(id);
   const shell = PLATFORMS.find((p) => p.id === platform) ?? PLATFORMS[0];
   if (!item || !shell) return null;
-  const command = getCommand(item.hash, platform, item.namespace, item.entry);
+  const command = commandFor(item.id, platform);
 
   function flashCopied() {
     setCopied(true);
@@ -98,37 +118,23 @@ export function TryIt() {
       className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] @4xl:items-start @4xl:gap-12"
     >
       <div className="flex flex-col gap-8 @4xl:self-stretch">
-        <label className="flex flex-col gap-3">
-          <span className="meta opacity-60">
+        <div className="flex flex-col gap-3">
+          <span id={captionId} className="meta opacity-60">
             select a bundle · {ITEMS.length} seeded
           </span>
-          {/* The native menu takes the select's font-size, so the select
-              stays at body size and sits invisibly over a headline-sized
-              face. The ring moves to the wrapper for the same reason. */}
-          <span className="relative has-[select:focus-visible]:outline-2 has-[select:focus-visible]:outline-offset-4">
-            <span
-              aria-hidden
-              className="block truncate border-b border-current pr-8 pb-2 text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold tracking-[-0.02em]"
-            >
+          <SelectMenu
+            groups={BUNDLE_GROUPS}
+            value={item.id}
+            onChange={(value) => {
+              setId(value);
+              setCopied(false);
+            }}
+            labelledBy={captionId}
+            topInset={navBottom}
+          >
+            <span className="block truncate border-b border-current pr-8 pb-2 text-[clamp(1.25rem,2.2vw,1.75rem)] font-semibold tracking-[-0.02em]">
               {item.name}
             </span>
-            <select
-              value={item.id}
-              onChange={(e) => {
-                setId(e.target.value);
-                setCopied(false);
-              }}
-              className="absolute inset-0 w-full cursor-pointer appearance-none text-body opacity-0"
-            >
-              {/* One kind needs no group headings; several get one each. */}
-              {GROUPS.length > 1
-                ? GROUPS.map((group) => (
-                    <optgroup key={group.kind} label={group.label}>
-                      {itemOptions(group.items)}
-                    </optgroup>
-                  ))
-                : itemOptions(ITEMS)}
-            </select>
             <svg
               aria-hidden
               viewBox="0 0 16 16"
@@ -139,8 +145,8 @@ export function TryIt() {
             >
               <path d="M3 6l5 5 5-5" />
             </svg>
-          </span>
-        </label>
+          </SelectMenu>
+        </div>
 
         {/* Beside the terminal, the source row sinks to its bottom edge. */}
         <div className="grid flex-1 grid-cols-2 content-between gap-y-4">
