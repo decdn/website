@@ -36,7 +36,7 @@ export function itemFor(id: string): Item | undefined {
   return ITEMS.find((i) => i.id === id) ?? ITEMS[0];
 }
 
-/** The line the terminal shows for the picked item on `platform`. */
+/** The line the terminal shows for item `id` on `platform`. */
 export function commandFor(id: string, platform: Platform): string {
   const item = itemFor(id);
   return item
@@ -44,12 +44,11 @@ export function commandFor(id: string, platform: Platform): string {
     : "";
 }
 
-// Every line the terminal can show. Stacked invisibly under the visible one,
-// they hold the command block at the tallest line's height, so switching
-// bundle or shell never resizes the panel and shifts the page below it.
+// Every line the terminal can show, for the sizing stack in the command block.
 const ALL_LINES = PLATFORMS.flatMap((p) =>
   ITEMS.map((i) => ({
-    key: `${p.id}:${i.id}`,
+    platform: p.id,
+    itemId: i.id,
     prompt: p.prompt,
     command: commandFor(i.id, p.id),
   })),
@@ -160,17 +159,19 @@ export function TryIt() {
         </div>
 
         {/* Every bundle's facts share one cell, all but the chosen one
-            invisible, so a long license or source that wraps on a narrow
-            screen doesn't resize the column. Beside the terminal, the source
-            row sinks to its bottom edge. */}
+            invisible, so a license or source that wraps on a narrow screen
+            doesn't push the terminal down. The copies hold real links, so
+            they stay `invisible` (out of tab order), never `opacity-0`. Each
+            copy spreads its rows to the cell's height, so the source row sits
+            on the bottom edge — beside the terminal, the terminal's. */}
         <div className="grid flex-1">
           {ITEMS.map((i) => {
-            const chosen = i.id === item.id;
+            const shown = i.id === item.id;
             return (
               <div
                 key={i.id}
-                aria-hidden={!chosen || undefined}
-                className={`grid grid-cols-2 content-between gap-y-4 [grid-area:1/1] ${chosen ? "" : "invisible"}`}
+                aria-hidden={!shown || undefined}
+                className={`grid grid-cols-2 content-between gap-y-4 [grid-area:1/1] ${shown ? "" : "invisible"}`}
               >
                 <Figure label="size" value={formatSize(i.bytes)} />
                 <Figure label="license" value={i.license} />
@@ -196,19 +197,23 @@ export function TryIt() {
           <span className="terminal-dot" />
           <span className="terminal-dot" />
           <span className="terminal-dot" />
-          {/* Both shell names share one cell so the label keeps the longer
-              one's width; on a narrow screen "powershell" would otherwise
-              wrap the head onto a second line that "terminal" doesn't. */}
+          {/* Every shell name shares one cell, so the label keeps the longest
+              one's width. Otherwise a longer name squeezes the OS toggle's
+              labels onto two lines and the head changes height with the
+              shell. */}
           <span className="terminal-label grid">
-            {PLATFORMS.map((p) => (
-              <span
-                key={p.id}
-                aria-hidden={p.id !== shell.id || undefined}
-                className={`[grid-area:1/1] ${p.id === shell.id ? "" : "invisible"}`}
-              >
-                {p.shell}
-              </span>
-            ))}
+            {PLATFORMS.map((p) => {
+              const shown = p.id === shell.id;
+              return (
+                <span
+                  key={p.id}
+                  aria-hidden={!shown || undefined}
+                  className={`[grid-area:1/1] ${shown ? "" : "invisible"}`}
+                >
+                  {p.shell}
+                </span>
+              );
+            })}
           </span>
           <span
             role="group"
@@ -236,33 +241,48 @@ export function TryIt() {
           </span>
         </div>
 
+        {/* Every line shares one cell, all but the chosen one invisible, so
+            the block holds the tallest line's height and switching bundle or
+            shell doesn't push the page below it. Each copy carries the
+            visible line's markup, prompt margin included, so it wraps the
+            same way. */}
         <pre className="m-0 grid px-[18px] pt-[18px] pb-4 font-[inherit] break-all whitespace-pre-wrap">
-          {ALL_LINES.map((line) => (
-            <span
-              key={line.key}
-              aria-hidden
-              className="invisible [grid-area:1/1]"
-            >
-              {line.prompt} {line.command}
-            </span>
-          ))}
-          <span className="[grid-area:1/1]">
-            <span className="prompt select-none">{shell.prompt} </span>
-            <code ref={codeRef}>{command}</code>
-          </span>
+          {ALL_LINES.map((line) => {
+            const shown = line.platform === shell.id && line.itemId === item.id;
+            return (
+              <span
+                key={`${line.platform}:${line.itemId}`}
+                aria-hidden={!shown || undefined}
+                className={`[grid-area:1/1] ${shown ? "" : "invisible"}`}
+              >
+                <span className="prompt select-none">{line.prompt} </span>
+                <code ref={shown ? codeRef : undefined}>{line.command}</code>
+              </span>
+            );
+          })}
         </pre>
 
         <div className="flex items-center justify-between gap-6 px-[18px] pb-[18px]">
           <span className="dim text-[11px] tracking-[0.08em]">
             testnet · sponsored · no wallet
           </span>
+          {/* The longer label sits invisibly in the live one's cell, so the
+              button keeps its width and "copied ✓" can't wrap the row. */}
           <button
             type="button"
             onClick={copy}
-            className="meta cursor-pointer border-b border-current pb-[2px] hover:border-whisper"
+            className="group meta grid cursor-pointer justify-items-end"
             aria-live="polite"
           >
-            {copied ? "copied ✓" : "copy"}
+            <span
+              aria-hidden
+              className="invisible border-b pb-[2px] [grid-area:1/1]"
+            >
+              copied ✓
+            </span>
+            <span className="border-b border-current pb-[2px] [grid-area:1/1] group-hover:border-whisper">
+              {copied ? "copied ✓" : "copy"}
+            </span>
           </button>
         </div>
 
