@@ -17,6 +17,17 @@ import {
 
 const GROUPS = groupByKind(ITEMS);
 
+// Every line the terminal can show. Stacked invisibly under the visible one,
+// they hold the command block at the tallest line's height, so switching
+// bundle or shell never resizes the panel and shifts the page below it.
+const ALL_LINES = PLATFORMS.flatMap((p) =>
+  ITEMS.map((i) => ({
+    key: `${p.id}:${i.id}`,
+    prompt: p.prompt,
+    command: getCommand(i.hash, p.id, i.namespace, i.entry),
+  })),
+);
+
 function itemOptions(items: readonly Item[]) {
   return items.map((item) => (
     <option key={item.id} value={item.id}>
@@ -95,7 +106,7 @@ export function TryIt() {
     <div
       data-reveal
       style={{ "--reveal-delay": "120ms" }}
-      className="grid gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] @4xl:items-start @4xl:gap-12"
+      className="grid grid-cols-[minmax(0,1fr)] gap-10 @4xl:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] @4xl:items-start @4xl:gap-12"
     >
       <div className="flex flex-col gap-8 @4xl:self-stretch">
         <label className="flex flex-col gap-3">
@@ -142,21 +153,35 @@ export function TryIt() {
           </span>
         </label>
 
-        {/* Beside the terminal, the source row sinks to its bottom edge. */}
-        <div className="grid flex-1 grid-cols-2 content-between gap-y-4">
-          <Figure label="size" value={formatSize(item.bytes)} />
-          <Figure label="license" value={item.license} />
-          <div className="col-span-2 flex flex-col gap-1">
-            <span className="meta opacity-60">source</span>
-            <a
-              className="self-start text-body font-medium tracking-[-0.01em] break-all underline decoration-1 underline-offset-4 hover:decoration-whisper"
-              href={item.source}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {sourceLabel(item.source)}
-            </a>
-          </div>
+        {/* Every bundle's facts share one cell, all but the chosen one
+            invisible, so a long license or source that wraps on a narrow
+            screen doesn't resize the column. Beside the terminal, the source
+            row sinks to its bottom edge. */}
+        <div className="grid flex-1">
+          {ITEMS.map((i) => {
+            const chosen = i.id === item.id;
+            return (
+              <div
+                key={i.id}
+                aria-hidden={!chosen || undefined}
+                className={`grid grid-cols-2 content-between gap-y-4 [grid-area:1/1] ${chosen ? "" : "invisible"}`}
+              >
+                <Figure label="size" value={formatSize(i.bytes)} />
+                <Figure label="license" value={i.license} />
+                <div className="col-span-2 flex flex-col gap-1">
+                  <span className="meta opacity-60">source</span>
+                  <a
+                    className="self-start text-body font-medium tracking-[-0.01em] break-all underline decoration-1 underline-offset-4 hover:decoration-whisper"
+                    href={i.source}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {sourceLabel(i.source)}
+                  </a>
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -192,9 +217,20 @@ export function TryIt() {
           </span>
         </div>
 
-        <pre className="m-0 px-[18px] pt-[18px] pb-4 font-[inherit] break-all whitespace-pre-wrap">
-          <span className="prompt select-none">{shell.prompt} </span>
-          <code ref={codeRef}>{command}</code>
+        <pre className="m-0 grid px-[18px] pt-[18px] pb-4 font-[inherit] break-all whitespace-pre-wrap">
+          {ALL_LINES.map((line) => (
+            <span
+              key={line.key}
+              aria-hidden
+              className="invisible [grid-area:1/1]"
+            >
+              {line.prompt} {line.command}
+            </span>
+          ))}
+          <span className="[grid-area:1/1]">
+            <span className="prompt select-none">{shell.prompt} </span>
+            <code ref={codeRef}>{command}</code>
+          </span>
         </pre>
 
         <div className="flex items-center justify-between gap-6 px-[18px] pb-[18px]">
