@@ -29,7 +29,7 @@ Two deployment shapes:
 
 A **client** is a lightweight QUIC endpoint that consumes content and pays for it.
 
-- **Identity.** A network keypair generated at first startup and persistent across sessions, plus a per-connection binding to an Ethereum address that the node discards on disconnect — no stake, no on-chain registration.
+- **Identity.** A network keypair generated at first startup and persistent across sessions, plus a per-connection binding to an Ethereum address that the node discards on disconnect — no bond, no on-chain registration.
 - **Discovery.** Takes candidates from its own peer store or the on-chain registry and probes them; it runs no DHT lookup. Publishes nothing and holds no network role.
 - **Payment.** Opens one on-chain USDC pool, reuses it for every node it buys from, and signs cumulative off-chain vouchers as bytes flow ([payments](/protocol/payments)).
 - **Trust model.** Verifies hashes on all bytes received. Trusts no node for content, and none for availability either — a node may decline to serve, and the client simply re-routes without paying for the attempt.
