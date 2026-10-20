@@ -955,11 +955,20 @@ a.hero-status:hover .arrow {
   font-size: 12px;
 }
 
+/* The tone flip below only happens while scrolled, so the tone colours snap
+   here instead of fading: a fast fling crosses a section in ~100ms, under
+   the fade's 260ms, and the bar stayed paper over ink sections (a white
+   flash at the top of the screen). Leaving the scrolled state still fades,
+   via the base rule above. */
 .chrome-nav[data-scrolled="true"] {
   backdrop-filter: blur(14px) saturate(1.1);
   -webkit-backdrop-filter: blur(14px) saturate(1.1);
   background-color: color-mix(in srgb, var(--paper) 92%, transparent);
   border-bottom-color: color-mix(in srgb, var(--ink) 24%, transparent);
+  transition:
+    backdrop-filter 260ms var(--ease-soft),
+    -webkit-backdrop-filter 260ms var(--ease-soft),
+    box-shadow 360ms var(--ease-soft);
 }
 
 .chrome-nav[data-scrolled="true"][data-tone="ink"] {
