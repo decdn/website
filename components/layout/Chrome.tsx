@@ -308,8 +308,10 @@ export function Chrome() {
           </div>
         </div>
       </nav>
-      {/* A sibling of <nav>, not a child: the nav's fixed z-50 is a
-        stacking context, and the toggle must clear the drawer panel. */}
+      {/* A sibling of <nav>, not a child: the drawer layers around the
+        nav (overlay 55 < nav 58 < panel 60 < toggle 65), which only works
+        if all four share <body>'s stacking context. Nested, they would
+        also inherit the scrolled nav's backdrop-filter containing block. */}
       <MobileMenu
         activeSection={effectiveActive}
         tone={toggleTone}

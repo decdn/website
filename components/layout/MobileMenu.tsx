@@ -101,19 +101,24 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
     style.overflow = "hidden";
 
     // Menu content doesn't change while open, so no need to re-query on
-    // every Tab keystroke. The toggle sits outside the panel, so it is
-    // appended manually so keyboard users can Tab from the last row to the close ×.
+    // every Tab keystroke. The toggle lives outside the panel but just
+    // before it in DOM order, so it is prepended: the trap then wraps
+    // last row → × and × → last row, and the browser handles × ↔ first
+    // row itself. Without it, Tab past the last row would land on page
+    // content hidden behind the panel.
     const panel = panelRef.current!;
-    const focusables: HTMLElement[] = Array.from(
+    const panelFocusables = Array.from(
       panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
     );
-    if (toggleRef.current) focusables.push(toggleRef.current);
+    const focusables = toggleRef.current
+      ? [toggleRef.current, ...panelFocusables]
+      : panelFocusables;
 
     // rAF before the initial focus so the panel's open transition is in
     // flight first — otherwise iOS Safari scrolls the focused element
     // into view through the transform.
     const raf = requestAnimationFrame(() => {
-      focusables[0]?.focus({ preventScroll: true });
+      panelFocusables[0]?.focus({ preventScroll: true });
     });
 
     const onKey = (e: KeyboardEvent) => {
@@ -255,14 +260,13 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   }, []);
 
   // Chrome renders toggle/overlay/panel beside its <nav>, directly
-  // under <body>, so they share the root stacking context: the toggle
-  // sits above the panel (z-65 > z-60) while the wordmark stays inside
-  // the nav (z-50 resting, z-58 when the drawer opens — see
-  // globals.css's data-mobile-open block). The nav always sits below
-  // the panel, so the wordmark is naturally covered when the drawer
-  // opens. No portal: all three prerender, so the toggle is in the
-  // first paint rather than popping in at hydration (#322).
-  const drawer = (
+  // under <body>, so all four share the root stacking context and
+  // interleave: overlay z-55 < nav z-58 (open; z-50 resting — see
+  // globals.css's data-mobile-open block) < panel z-60 < toggle z-65.
+  // The panel covers the wordmark while the × stays on top. No portal:
+  // all three prerender, so the toggle is in the first paint rather
+  // than popping in at hydration (#322).
+  return (
     <>
       <button
         ref={toggleRef}
@@ -355,6 +359,4 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
       </aside>
     </>
   );
-
-  return drawer;
 }

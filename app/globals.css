@@ -1263,8 +1263,8 @@ a.hero-status:hover .arrow {
 }
 
 /* --- mobile menu ------------------------------------------------------
-   Phone-only (<md) slide-out drawer. See MobileMenu.tsx for the
-   stacking/focus model. */
+   Phone and tablet (<xl, 1280px) slide-out drawer. See MobileMenu.tsx
+   for the stacking/focus model. */
 
 /* A 44px hit area around an 18px glyph. The box overhangs the gutter by
    11px and insets the bars 13px, so the glyph sits 2px inside the gutter;

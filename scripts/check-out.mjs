@@ -2,7 +2,7 @@
 //
 // `pnpm test` runs against modules, so it can prove that llms.txt lists a post
 // and that the sitemap lists llms.txt, but not that either file exists once
-// `output: "export"` has run. Three failures live in exactly that gap:
+// `output: "export"` has run. These failures live in exactly that gap:
 //
 //   1. A <loc> or a curated-index entry pointing at a route the build stopped
 //      emitting. The sitemap's two llms entries are string literals with no
@@ -15,8 +15,15 @@
 //      that the tree walker cannot invoke, so the built HTML is the only place
 //      its caption can be observed.
 //   4. The mobile menu toggle leaving the prerendered HTML. MobileMenu is a
-//      client component too; gated behind hydration (#322) the hamburger
-//      pops in late on phones, and only the built HTML shows it is missing.
+//      client component too; if it is ever gated behind hydration again (the
+//      cause of #322), the hamburger pops in late on phones, and only the
+//      built HTML can show it is missing.
+//   5. The toggle moving back inside the Primary <nav>. The nav is a stacking
+//      context, so a nested toggle sits under the drawer panel and the close
+//      × is hidden; Chrome is a hooks client component, so again only the
+//      built HTML can show where it landed.
+//
+// The numbered checks below are assertions, not the failure classes above.
 //
 // Exits non-zero with the specific failures listed. Run by `pnpm build`.
 
@@ -129,10 +136,22 @@ if (home) {
 
   // 6. The mobile menu toggle and the panel its aria-controls names are in
   //    the static HTML, so the hamburger is in the first paint (#322).
-  for (const marker of ['class="mm-toggle"', 'id="mm-panel"']) {
+  for (const marker of ['aria-controls="mm-panel"', 'id="mm-panel"']) {
     if (!home.includes(marker)) {
       fail(`index.html: ${marker} not prerendered — the toggle pops in late`);
     }
+  }
+
+  // 7. The toggle is a sibling of the Primary nav, not inside it: the nav's
+  //    fixed z-50 is a stacking context and the toggle must clear the panel.
+  //    Navs never nest, so the lazy match ends at the Primary nav's own close.
+  const nav = home.match(/<nav[^>]*aria-label="Primary"[^>]*>[\s\S]*?<\/nav>/);
+  if (!nav) {
+    fail('index.html: <nav aria-label="Primary"> not found');
+  } else if (nav[0].includes('aria-controls="mm-panel"')) {
+    fail(
+      "index.html: mobile menu toggle is inside <nav> — it sits under the drawer panel",
+    );
   }
 }
 
