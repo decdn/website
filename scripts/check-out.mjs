@@ -14,6 +14,9 @@
 //   3. HeroTerminal dropping its disclaimer caption. It is a client component
 //      that the tree walker cannot invoke, so the built HTML is the only place
 //      its caption can be observed.
+//   4. The mobile menu toggle leaving the prerendered HTML. MobileMenu is a
+//      client component too; gated behind hydration (#322) the hamburger
+//      pops in late on phones, and only the built HTML shows it is missing.
 //
 // Exits non-zero with the specific failures listed. Run by `pnpm build`.
 
@@ -122,6 +125,14 @@ if (home) {
   // 5. The llms.txt alternate link the root layout advertises.
   if (!home.includes(`href="${ORIGIN}/llms.txt"`)) {
     fail('index.html: <link rel="alternate" ... llms.txt> missing');
+  }
+
+  // 6. The mobile menu toggle and the panel its aria-controls names are in
+  //    the static HTML, so the hamburger is in the first paint (#322).
+  for (const marker of ['class="mm-toggle"', 'id="mm-panel"']) {
+    if (!home.includes(marker)) {
+      fail(`index.html: ${marker} not prerendered — the toggle pops in late`);
+    }
   }
 }
 

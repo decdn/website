@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
-import { createPortal } from "react-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { links } from "@/lib/links";
 import {
@@ -50,24 +43,9 @@ const EXTERNAL: readonly DrawerLink[] = [
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-// Hydration gate for the createPortal target. Reads false on the
-// server and true after hydration, without a useState+useEffect
-// round-trip that would trip the react-hooks/set-state-in-effect rule.
-const noopSubscribe = () => () => {};
-const getHydratedSnapshot = () => true;
-const getServerSnapshot = () => false;
-
 export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  // Static export: document.body isn't available during prerender. Gate
-  // the portal until after hydration so the first client render matches
-  // the prerendered HTML.
-  const isHydrated = useSyncExternalStore(
-    noopSubscribe,
-    getHydratedSnapshot,
-    getServerSnapshot,
-  );
 
   const toggleRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -123,8 +101,8 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
     style.overflow = "hidden";
 
     // Menu content doesn't change while open, so no need to re-query on
-    // every Tab keystroke. The portalled toggle is appended manually so
-    // keyboard users can Tab from the last row to the close ×.
+    // every Tab keystroke. The toggle sits outside the panel, so it is
+    // appended manually so keyboard users can Tab from the last row to the close ×.
     const panel = panelRef.current!;
     const focusables: HTMLElement[] = Array.from(
       panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
@@ -276,12 +254,14 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
     setOpen(false);
   }, []);
 
-  // Portal target: toggle/overlay/panel all live in <body> so the
-  // toggle can sit above the panel (z-65 > z-60) while the wordmark
-  // stays inside the nav (z-50 resting, z-58 when the drawer opens
-  // — see Chrome.tsx + globals.css's data-mobile-open block). The
-  // nav always sits below the panel, so the wordmark is naturally
-  // covered when the drawer opens.
+  // Chrome renders toggle/overlay/panel beside its <nav>, directly
+  // under <body>, so they share the root stacking context: the toggle
+  // sits above the panel (z-65 > z-60) while the wordmark stays inside
+  // the nav (z-50 resting, z-58 when the drawer opens — see
+  // globals.css's data-mobile-open block). The nav always sits below
+  // the panel, so the wordmark is naturally covered when the drawer
+  // opens. No portal: all three prerender, so the toggle is in the
+  // first paint rather than popping in at hydration (#322).
   const drawer = (
     <>
       <button
@@ -376,5 +356,5 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
     </>
   );
 
-  return isHydrated ? createPortal(drawer, document.body) : null;
+  return drawer;
 }
