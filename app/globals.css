@@ -926,8 +926,9 @@ a.hero-status:hover .arrow {
 
 /* --- chrome nav -------------------------------------------------------
    Top navbar affordances. The bar is transparent over the hero and
-   fades in a tone-matched frosted backdrop once the user scrolls past
-   the threshold. The active section's nav item shows a full-width
+   brings in a tone-matched frosted backdrop once the user scrolls past
+   the threshold (the blur fades in; the tint and tone colours snap, see
+   the scrolled rule below). The active section's nav item shows a full-width
    whisper-green underline (scales in from the left) and a brighter
    label opacity; hover shows a short underline preview. Focus uses the
    site-wide dashed ring (base layer, top of file). No mix-blend-mode is used — the parent nav toggles
@@ -955,11 +956,12 @@ a.hero-status:hover .arrow {
   font-size: 12px;
 }
 
-/* The tone flip below only happens while scrolled, so the tone colours snap
-   here instead of fading: a fast fling crosses a section in ~100ms, under
-   the fade's 260ms, and the bar stayed paper over ink sections (a white
-   flash at the top of the screen). Leaving the scrolled state still fades,
-   via the base rule above. */
+/* This list leaves out background-color, border-bottom-color and color, so
+   the tone flip below (only ever while scrolled, see resolveActiveSection)
+   snaps: a fast fling crosses a section in ~100ms, under the 260–300ms
+   fades, and a fading bar shows paper over an ink section as a white flash.
+   Leaving the scrolled state still fades via the base rule above; keep the
+   durations here in step with it. */
 .chrome-nav[data-scrolled="true"] {
   backdrop-filter: blur(14px) saturate(1.1);
   -webkit-backdrop-filter: blur(14px) saturate(1.1);
@@ -1071,6 +1073,10 @@ a.hero-status:hover .arrow {
       background-color 260ms var(--ease-soft),
       border-bottom-color 260ms var(--ease-soft),
       box-shadow 360ms var(--ease-soft);
+  }
+  /* Outranks the plain .chrome-nav above, so drop the blur fade here too. */
+  .chrome-nav[data-scrolled="true"] {
+    transition: box-shadow 360ms var(--ease-soft);
   }
   .nav-item .nav-label,
   .nav-item .nav-underline {
@@ -1291,6 +1297,10 @@ a.hero-status:hover .arrow {
   border: 0;
   padding: 0;
   cursor: pointer;
+}
+/* Fade only into the open state (ink over the white panel). The tone flip
+   while closed snaps with the nav bar; see .chrome-nav[data-scrolled]. */
+.mm-toggle[data-open="true"] {
   transition: color 400ms var(--ease-soft);
 }
 .mm-toggle:focus-visible {
@@ -1458,6 +1468,7 @@ a.hero-status:hover .arrow {
 
 @media (prefers-reduced-motion: reduce) {
   .mm-toggle,
+  .mm-toggle[data-open="true"],
   .mm-toggle::before,
   .mm-toggle::after {
     transition: none;
