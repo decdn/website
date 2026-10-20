@@ -215,102 +215,108 @@ export function Chrome() {
     "intro",
   );
   const onDark = DARK_SECTIONS.has(effectiveActive);
-  // The toggle is portalled to <body> (see MobileMenu.tsx) and lives
+  // The toggle is rendered beside the nav (see MobileMenu.tsx) and lives
   // on top of the paper panel while the drawer is open — force it to
   // paper then so its × reads against the white panel.
   const toggleTone = mobileOpen ? "paper" : onDark ? "ink" : "paper";
 
   return (
-    <nav
-      ref={navRef}
-      aria-label="Primary"
-      data-scrolled={scrolled ? "true" : undefined}
-      data-tone={onDark ? "ink" : "paper"}
-      data-mobile-open={mobileOpen ? "true" : undefined}
-      className={`chrome-nav fixed inset-x-0 top-0 z-50 px-frame-gutter py-5 ${
-        onDark ? "text-paper" : "text-ink"
-      }`}
-    >
-      <div className="mx-auto grid w-full max-w-frame grid-cols-[1fr_auto_1fr] items-center gap-4">
-        <Link
-          href="/"
-          onClick={handleNavClick}
-          className="col-start-1 flex items-center gap-3 no-underline"
-        >
-          {/* Both variants stay mounted and toggled via `display` so the
+    <>
+      <nav
+        ref={navRef}
+        aria-label="Primary"
+        data-scrolled={scrolled ? "true" : undefined}
+        data-tone={onDark ? "ink" : "paper"}
+        data-mobile-open={mobileOpen ? "true" : undefined}
+        className={`chrome-nav fixed inset-x-0 top-0 z-50 px-frame-gutter py-5 ${
+          onDark ? "text-paper" : "text-ink"
+        }`}
+      >
+        <div className="mx-auto grid w-full max-w-frame grid-cols-[1fr_auto_1fr] items-center gap-4">
+          <Link
+            href="/"
+            onClick={handleNavClick}
+            className="col-start-1 flex items-center gap-3 no-underline"
+          >
+            {/* Both variants stay mounted and toggled via `display` so the
               tone flip never flashes — browsers fetch hidden <img> tags
               eagerly enough that the swap-in variant is already in cache.
               Only one variant carries alt text; the duplicate stays alt=""
               so screen readers announce "decdn" once, not twice. */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/wordmark-light.svg"
-            alt="decdn"
-            width={120}
-            height={32}
-            className={`h-8 w-auto ${onDark ? "hidden" : "block"}`}
-          />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/wordmark-dark.svg"
-            alt=""
-            width={120}
-            height={32}
-            className={`h-8 w-auto ${onDark ? "block" : "hidden"}`}
-          />
-          <span className="meta hidden opacity-70 sm:inline">labs</span>
-        </Link>
-
-        <ul className="hidden items-center gap-7 xl:flex">
-          {NAV.map((item) => {
-            const isActive = effectiveActive === item.id;
-            return (
-              <li key={item.id}>
-                <Link
-                  href={`/#${item.id}`}
-                  onClick={handleNavClick}
-                  aria-current={isActive ? "true" : undefined}
-                  className="nav-item"
-                >
-                  <span className="nav-label">{item.label}</span>
-                  <span aria-hidden className="nav-underline" />
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-
-        <div className="col-start-3 flex items-center gap-5 justify-self-end">
-          <a
-            href={links.docs}
-            className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
-          >
-            <span>Docs</span>
-            <span aria-hidden>→</span>
-          </a>
-          <Link
-            href={links.blog}
-            className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
-          >
-            <span>Blog</span>
-            <span aria-hidden>→</span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/wordmark-light.svg"
+              alt="decdn"
+              width={120}
+              height={32}
+              className={`h-8 w-auto ${onDark ? "hidden" : "block"}`}
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/wordmark-dark.svg"
+              alt=""
+              width={120}
+              height={32}
+              className={`h-8 w-auto ${onDark ? "block" : "hidden"}`}
+            />
+            <span className="meta hidden opacity-70 sm:inline">labs</span>
           </Link>
-          <a
-            href={links.litepaper}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
-          >
-            <span>Litepaper</span>
-            <span aria-hidden>→</span>
-          </a>
-          <MobileMenu
-            activeSection={effectiveActive}
-            tone={toggleTone}
-            onOpenChange={handleMobileOpenChange}
-          />
+
+          <ul className="hidden items-center gap-7 xl:flex">
+            {NAV.map((item) => {
+              const isActive = effectiveActive === item.id;
+              return (
+                <li key={item.id}>
+                  <Link
+                    href={`/#${item.id}`}
+                    onClick={handleNavClick}
+                    aria-current={isActive ? "true" : undefined}
+                    className="nav-item"
+                  >
+                    <span className="nav-label">{item.label}</span>
+                    <span aria-hidden className="nav-underline" />
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+
+          <div className="col-start-3 flex items-center gap-5 justify-self-end">
+            <a
+              href={links.docs}
+              className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
+            >
+              <span>Docs</span>
+              <span aria-hidden>→</span>
+            </a>
+            <Link
+              href={links.blog}
+              className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
+            >
+              <span>Blog</span>
+              <span aria-hidden>→</span>
+            </Link>
+            <a
+              href={links.litepaper}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
+            >
+              <span>Litepaper</span>
+              <span aria-hidden>→</span>
+            </a>
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+      {/* A sibling of <nav>, not a child: the drawer layers around the
+        nav (overlay 55 < nav 58 < panel 60 < toggle 65), which only works
+        if all four share <body>'s stacking context. Nested, they would
+        also inherit the scrolled nav's backdrop-filter containing block. */}
+      <MobileMenu
+        activeSection={effectiveActive}
+        tone={toggleTone}
+        onOpenChange={handleMobileOpenChange}
+      />
+    </>
   );
 }

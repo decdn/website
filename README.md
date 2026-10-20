@@ -39,7 +39,7 @@ pnpm format:check # prettier --check . (CI)
 - `components/ui/` — generic primitives with no site content (Frame, SectionHeader, Prose, Figure, PanelFigure, Pill, CodeBlock). A component that takes site data or domain types goes in its feature's folder; a primitive with no site content stays in `ui/` even if only one feature uses it today.
 - `lib/` — shared helpers (`links.ts`, `copy.ts`, `stats.ts`, `blog.ts`, `faq.ts`, `legal.ts`, `jsonld.tsx`, `schema.ts`, …). The site's prose _and_ its displayed values live in `lib/copy.ts` as plain data — the comparison table maps over it and the `llms-full.txt` mirror serialises it, so anything inlined in a component drifts from the mirror. Prose that names the product renders through `highlightBrand` (`components/home/brand.tsx`).
 - `test-utils/` — test-only helpers for walking the element tree a server component returns.
-- `scripts/` — postbuild guards run against `./out` by `pnpm build`: `check-out.mjs` (advertised URLs, dotted routes, panel captions) and `check-og-image.mjs` (social cards).
+- `scripts/` — postbuild guards run against `./out` by `pnpm build`: `check-out.mjs` (advertised URLs, dotted routes, panel captions, the prerendered mobile menu toggle) and `check-og-image.mjs` (social cards).
 - `content/blog/` — MDX posts loaded by `lib/blog.ts` and rendered by `app/blog/[slug]/page.tsx`.
 - `content/legal/` — MDX for the legal pages (`privacy`, `terms`, `disclaimer`), loaded by `lib/legal.ts` and rendered by `app/legal/[doc]/page.tsx`.
 - `docs/` — Mintlify source for `docs.decdn.org`. Built and deployed independently of `pnpm build`; not part of the static export and not imported from the website code.

@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
-import { createPortal } from "react-dom";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { links } from "@/lib/links";
 import {
@@ -50,24 +43,9 @@ const EXTERNAL: readonly DrawerLink[] = [
 const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
-// Hydration gate for the createPortal target. Reads false on the
-// server and true after hydration, without a useState+useEffect
-// round-trip that would trip the react-hooks/set-state-in-effect rule.
-const noopSubscribe = () => () => {};
-const getHydratedSnapshot = () => true;
-const getServerSnapshot = () => false;
-
 export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  // Static export: document.body isn't available during prerender. Gate
-  // the portal until after hydration so the first client render matches
-  // the prerendered HTML.
-  const isHydrated = useSyncExternalStore(
-    noopSubscribe,
-    getHydratedSnapshot,
-    getServerSnapshot,
-  );
 
   const toggleRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
@@ -123,19 +101,24 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
     style.overflow = "hidden";
 
     // Menu content doesn't change while open, so no need to re-query on
-    // every Tab keystroke. The portalled toggle is appended manually so
-    // keyboard users can Tab from the last row to the close ×.
+    // every Tab keystroke. The toggle lives outside the panel but just
+    // before it in DOM order, so it is prepended: the trap then wraps
+    // last row → × and × → last row, and the browser handles × ↔ first
+    // row itself. Without it, Tab past the last row would land on page
+    // content hidden behind the panel.
     const panel = panelRef.current!;
-    const focusables: HTMLElement[] = Array.from(
+    const panelFocusables = Array.from(
       panel.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
     );
-    if (toggleRef.current) focusables.push(toggleRef.current);
+    const focusables = toggleRef.current
+      ? [toggleRef.current, ...panelFocusables]
+      : panelFocusables;
 
     // rAF before the initial focus so the panel's open transition is in
     // flight first — otherwise iOS Safari scrolls the focused element
     // into view through the transform.
     const raf = requestAnimationFrame(() => {
-      focusables[0]?.focus({ preventScroll: true });
+      panelFocusables[0]?.focus({ preventScroll: true });
     });
 
     const onKey = (e: KeyboardEvent) => {
@@ -276,13 +259,14 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
     setOpen(false);
   }, []);
 
-  // Portal target: toggle/overlay/panel all live in <body> so the
-  // toggle can sit above the panel (z-65 > z-60) while the wordmark
-  // stays inside the nav (z-50 resting, z-58 when the drawer opens
-  // — see Chrome.tsx + globals.css's data-mobile-open block). The
-  // nav always sits below the panel, so the wordmark is naturally
-  // covered when the drawer opens.
-  const drawer = (
+  // Chrome renders toggle/overlay/panel beside its <nav>, directly
+  // under <body>, so all four share the root stacking context and
+  // interleave: overlay z-55 < nav z-58 (open; z-50 resting — see
+  // globals.css's data-mobile-open block) < panel z-60 < toggle z-65.
+  // The panel covers the wordmark while the × stays on top. No portal:
+  // all three prerender, so the toggle is in the first paint rather
+  // than popping in at hydration (#322).
+  return (
     <>
       <button
         ref={toggleRef}
@@ -375,6 +359,4 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
       </aside>
     </>
   );
-
-  return isHydrated ? createPortal(drawer, document.body) : null;
 }
