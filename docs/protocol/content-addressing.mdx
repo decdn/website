@@ -29,7 +29,7 @@ A hash answers "what is this blob?". It does not answer "who is responsible for 
 | Named (non-zero) | Routes to that namespace's authorized origins. If none hold the bytes, the fetch fails.                                        |
 | Default (zero)   | No publisher, no authorized origins — served best-effort from cache or DHT-discovered holders, with no availability guarantee. |
 
-The namespace is a **routing hint, not a trust anchor**: bytes are verified against the hash independently, so a wrong or hostile namespace can only cause a failed fetch, never corrupt or mis-attributed delivery. Cache-only serving stays permissionless — any staked operator may re-serve bytes it holds, for any hash, under any namespace. Only the origin role is namespace-gated ([takedown](/protocol/takedown#origin-assignment)).
+The namespace is a **routing hint, not a trust anchor**: bytes are verified against the hash independently, so a wrong or hostile namespace can only cause a failed fetch, never corrupt or mis-attributed delivery. Cache-only serving stays permissionless — any bonded operator may re-serve bytes it holds, for any hash, under any namespace. Only the origin role is namespace-gated ([takedown](/protocol/takedown#origin-assignment)).
 
 ## Hash-to-object-key mapping
 

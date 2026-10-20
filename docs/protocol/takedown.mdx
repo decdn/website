@@ -62,7 +62,7 @@ Without positive authority, origin assignment would be entirely off-protocol: no
 
 Re-uploading blacklisted content under a fresh hash (trivial re-encoding) is defeated by **origin blacklisting** — the blacklist contract can blacklist an **operator address**. A blacklisted operator is ejected from the registry, drops out of every namespace's authorized origin set, has its remaining bond enter forced unbonding, and cannot re-register under the same address while the entry stands. It cannot self-reinstate by re-bonding: lifting the ban is a governance action.
 
-Ejection is not slashing — the bond is returned after unbonding absent a separate offense. Serving a blacklisted hash is the slashable act; repeatedly sourcing blacklisted content is what gets an operator ejected. Together they raise the cost of hash evasion from "re-encode" to "spin up a new operator, restake, re-register".
+Ejection is not slashing — the bond is returned after unbonding absent a separate offense. Serving a blacklisted hash is the slashable act; repeatedly sourcing blacklisted content is what gets an operator ejected. Together they raise the cost of hash evasion from "re-encode" to "spin up a new operator, re-bond, re-register".
 
 ## Local denylist
 
