@@ -43,7 +43,7 @@ pnpm check:og-image   # postbuild social-card guard over ./out (runs inside `pnp
 - `test-utils/` — test-only helpers (`react-tree.ts` walks the element tree a server component returns). Nothing under `app/` or `components/` imports from here.
 - `content/blog/` — MDX posts loaded by `lib/blog.ts` and rendered via `app/blog/[slug]/page.tsx`.
 - `content/legal/` — MDX for the legal pages (`privacy`, `terms`, `disclaimer`) loaded by `lib/legal.ts` and rendered via `app/legal/[doc]/page.tsx`.
-- `scripts/` — build-time guards run against the export, not shipped with it (`check-out.mjs` for advertised URLs, dotted routes, the `PANEL_CAPTIONS` strings and the prerendered mobile menu toggle (outside the nav) in the built homepage; `check-og-image.mjs` for social cards; both chained off `pnpm build`). Node built-ins only, no dependencies; `scripts/check-og-image.test.ts` spawns its script against fixture exports (`check-out.mjs` has no test of its own).
+- `scripts/` — build-time guards run against the export, not shipped with it (`check-out.mjs` for advertised URLs, dotted routes, the `PANEL_CAPTIONS` strings and the prerendered mobile menu toggle (outside the nav) in the built homepage, and width/height on every prerendered inline `<svg>` across all built pages; `check-og-image.mjs` for social cards; both chained off `pnpm build`). Node built-ins only, no dependencies; `scripts/check-og-image.test.ts` spawns its script against fixture exports (`check-out.mjs` has no test of its own).
 - `docs/` — Mintlify source for `docs.decdn.org` (separate build pipeline, not part of the static export).
 - Path alias `@/*` → project root (e.g. `@/lib/links`, not `@/src/...`).
 

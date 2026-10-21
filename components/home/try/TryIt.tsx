@@ -151,6 +151,8 @@ export function TryIt() {
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
+              width={20}
+              height={20}
               className="pointer-events-none absolute right-0 bottom-3.5 size-5"
             >
               <path d="M3 6l5 5 5-5" />

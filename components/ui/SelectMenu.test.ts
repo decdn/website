@@ -108,6 +108,10 @@ describe("SelectMenuPanel", () => {
   it("marks the current value with the only check and data-current", () => {
     const opts = byRole("option");
     expect(opts.map((el) => findAll(el, "svg").length)).toEqual([0, 1, 0]);
+    // Intrinsic size for a pre-stylesheet paint (scripts/check-out.mjs, class
+    // 6); this svg mounts after hydration, so the build check never sees it.
+    const check = attrs(findOne(opts[1], "svg"));
+    expect([check.width, check.height]).toEqual([14, 14]);
     expect(opts.map((el) => attrs(el)["data-current"])).toEqual([
       undefined,
       true,
