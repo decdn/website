@@ -72,6 +72,8 @@ export function PostRow({ post, delay }: { post: PostMeta; delay: number }) {
                   strokeWidth={2}
                   strokeLinecap="round"
                   strokeLinejoin="round"
+                  width="0.64em"
+                  height="0.64em"
                   className="inline-block size-[0.64em] -translate-y-px rotate-[20deg]"
                 >
                   <path d="M12 17v5" />

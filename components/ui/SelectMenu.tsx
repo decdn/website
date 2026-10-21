@@ -324,6 +324,8 @@ export function SelectMenuPanel({
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              width={14}
+              height={14}
               className="size-3.5"
             >
               <path d="M3 8.5l3.5 3.5L13 4.5" />

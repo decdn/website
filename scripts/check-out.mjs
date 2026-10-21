@@ -22,12 +22,20 @@
 //      context, so a nested toggle sits under the drawer panel and the close
 //      × is hidden; Chrome is a hooks client component, so again only the
 //      built HTML can show where it landed.
+//   6. An inline <svg> without width/height attributes. Its size lives in a
+//      Tailwind class, so a paint before the stylesheet applies draws it at
+//      its container's full width — on reload in Firefox (Linux) the hero's
+//      litepaper glyph showed as a container-wide blue block for ~250ms. Why
+//      Firefox painted early is unconfirmed (a script forcing layout mid-load
+//      is its documented trigger; headless runs did not reproduce it). TryIt's
+//      chevron sits in a hooks client component, so only the built HTML shows
+//      its prerendered markup.
 //
 // The numbered checks below are assertions, not the failure classes above.
 //
 // Exits non-zero with the specific failures listed. Run by `pnpm build`.
 
-import { readFileSync, existsSync } from "node:fs";
+import { readFileSync, readdirSync, existsSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -154,6 +162,31 @@ if (home) {
     );
   }
 }
+
+// 8. Every prerendered inline <svg> carries non-empty width and height, so a
+//    paint before the stylesheet applies draws it at that size, not at full
+//    container width. An <svg> mounted after hydration (SelectMenu's check
+//    mark) is not in out/ and does not need to be — the CSS has applied by
+//    then; SelectMenu.test.ts covers it. The homepage must yield at least
+//    one, or the scan would pass on nothing.
+let homeSvgs = 0;
+const htmlFiles = readdirSync(OUT, { recursive: true })
+  .filter((relative) => relative.endsWith(".html"))
+  .sort();
+for (const relative of htmlFiles) {
+  const html = readFileSync(path.join(OUT, relative), "utf8");
+  for (const [tag] of html.matchAll(/<svg\b[^>]*>/g)) {
+    if (relative === "index.html") homeSvgs++;
+    if (!/\swidth="[^"]+"/.test(tag) || !/\sheight="[^"]+"/.test(tag)) {
+      const label = tag.match(/\sclass="([^"]*)"/)?.[1] ?? tag.slice(0, 80);
+      fail(
+        `${relative}: <svg class="${label}"> without width/height — an unstyled paint draws it at full container width`,
+      );
+    }
+  }
+}
+if (homeSvgs === 0)
+  fail("index.html: no inline <svg> found — check 8 scanned nothing");
 
 if (failures.length > 0) {
   console.error(`check-out: ${failures.length} failure(s)\n`);
