@@ -44,12 +44,12 @@ export function Method() {
               <span className="hug text-h3 leading-none font-semibold @6xl:text-[3.4cqi]">
                 {name}
               </span>
-              <span className="meta flex items-start gap-2.5 text-[12px] opacity-60">
+              <span className="meta flex items-start gap-2.5 text-[12px]">
                 <span
                   aria-hidden
-                  className="mt-[0.33em] size-1.5 shrink-0 bg-current"
+                  className="mt-[0.33em] size-1.5 shrink-0 bg-whisper"
                 />
-                {role}
+                <span className="opacity-60">{role}</span>
               </span>
             </li>
           ))}
