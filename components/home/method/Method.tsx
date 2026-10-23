@@ -47,7 +47,7 @@ export function Method() {
               <span className="meta flex items-start gap-2.5 text-[12px]">
                 <span
                   aria-hidden
-                  className="mt-[0.33em] size-1.5 shrink-0 bg-whisper opacity-40"
+                  className="mt-[0.33em] size-1.5 shrink-0 bg-whisper opacity-60"
                 />
                 <span className="opacity-60">{role}</span>
               </span>
