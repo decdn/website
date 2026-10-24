@@ -42,6 +42,21 @@ describe("launch catalogue", () => {
     expect(new Set(ITEMS.map((i) => i.id)).size).toBe(ITEMS.length);
     expect(new Set(ITEMS.map((i) => i.hash)).size).toBe(ITEMS.length);
   });
+
+  // The first item is the one selected by default, so a first pull finishes
+  // on a laptop (decdn/website#336).
+  it("leads with the ~500 MB try-it bundle", () => {
+    const hex =
+      "d0a3eac609db6f49de12213574a302e42afd45f15b2cd89aa46b8a3e91f74d13";
+    const first = ITEMS[0]!;
+    expect(first.id).toBe("qwen-qwen2.5-0.5b-instruct-q4_k_m-gguf");
+    expect(first.hash).toBe(`b3:${hex}`);
+    expect(first.bytes).toBe(491_400_032);
+    expect(formatSize(first.bytes)).toBe("0.5 GB");
+    expect(getCommand(first.hash, "unix", first.namespace, first.entry)).toBe(
+      `curl -fsSL https://up.decdn.org/decdn.sh | sh -s -- get 'decdn:${hex}/?ns=1'`,
+    );
+  });
 });
 
 describe("groupByKind", () => {
