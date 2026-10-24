@@ -2,6 +2,16 @@
   "version": 2,
   "items": [
     {
+      "id": "qwen-qwen2.5-0.5b-instruct-q4_k_m-gguf",
+      "kind": "model",
+      "name": "Qwen2.5 0.5B Instruct (GGUF Q4_K_M)",
+      "license": "Apache-2.0",
+      "source": "https://huggingface.co/Qwen/Qwen2.5-0.5B-Instruct-GGUF",
+      "hash": "b3:d0a3eac609db6f49de12213574a302e42afd45f15b2cd89aa46b8a3e91f74d13",
+      "namespace": 1,
+      "bytes": 491400032
+    },
+    {
       "id": "mistralai-mistral-7b-instruct-v0.3",
       "kind": "model",
       "name": "Mistral 7B Instruct v0.3",
