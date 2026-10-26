@@ -81,7 +81,7 @@ const other = await client.get("decdn:<64 hex>");
 | Request | `response.verified` |
 | --- | --- |
 | A blob, or a file of a bundle | `true`: the body hashes as it streams, and ends with `HASH_MISMATCH` or `TRUNCATED` instead of `done` |
-| A byte range, or a bundle's index page | `"skipped"`: these bytes hash to nothing |
+| A byte range of a bundle file, or a bundle's index page | `"skipped"`: these bytes hash to nothing. A blob takes no range. |
 | Any request with `verify: false` | `false` |
 
 A site rewrites HTML and CSS as it serves them, so the SDK fetches those files by their own hash on the gateway's bare host and verifies them too. Pass `verify: true` to refuse anything that cannot be verified.
