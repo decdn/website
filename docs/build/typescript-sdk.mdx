@@ -1,0 +1,111 @@
+---
+title: TypeScript SDK
+description: Fetch and verify deCDN content from Node.js or a web page with @decdn/client, through a public or a loopback decdn gateway.
+---
+
+`@decdn/client` is a TypeScript client for Node.js 20.19+ and evergreen browsers. It speaks HTTP to a `decdn gateway`. The gateway pays for every pull and verifies it. The SDK hashes the bytes again with BLAKE3 wherever it holds a whole blob named by its hash. It has no native code and needs no wallet library.
+
+```bash
+pnpm add @decdn/client
+```
+
+## Which gateway
+
+| Gateway | Where your code runs | Who pays |
+| --- | --- | --- |
+| Public, such as `https://decdn.link` | Node.js or any web page | The operator's pool, within a daily allowance |
+| Loopback, `decdn gateway` on `http://127.0.0.1:8484` | Node.js with the gateway token, or a page on one of its site origins | The capability registered for the requesting host |
+
+The gateway's HTTP contract is in [appendix-gateway](https://github.com/decdn/decdn/blob/main/adr/appendix-gateway.md). Browser pages and public gateways need a gateway release that answers every origin ([cross-origin reads](https://github.com/decdn/decdn/blob/main/adr/appendix-gateway.md#cross-origin-reads)): decdn v0.3.0 or later.
+
+## Fetch from a public gateway
+
+```ts
+import { DecdnClient } from "@decdn/client";
+
+const client = await DecdnClient.open({ gatewayUrl: "https://decdn.link" });
+
+const blob = await client.get("decdn:<64 hex>");
+const bytes = await blob.bytes(); // rejects with HASH_MISMATCH on bad bytes
+
+const page = await client.get("decdn:<manifest hash>/docs/index.html");
+const text = await page.text();
+```
+
+A `decdn:<hash>/<path>` URI names one file of a [bundle](https://github.com/decdn/decdn/blob/main/adr/appendix-bundles.md). The SDK reads the bundle manifest once per client, checks the manifest's own hash, and hashes the file against the entry the manifest gives.
+
+A byte window of a file that declares its size comes back as `206`:
+
+```ts
+const part = await client.get("decdn:<manifest hash>/model.bin", {
+  range: { offset: 0, length: 1 << 20 },
+});
+part.contentRange; // { offset, length, size }
+```
+
+## Use the local gateway from Node.js
+
+A loopback gateway pays with a capability that a pool owner issues to one of the gateway's delegate keys ([ADR 003](https://github.com/decdn/decdn/blob/main/adr/003-payments.md)). Mint the delegate, have the pool owner assign it, then register the capability for the host your requests name:
+
+```ts
+import { DecdnClient } from "@decdn/client";
+import { readLoopbackToken } from "@decdn/client/node";
+
+const client = await DecdnClient.open({
+  gatewayUrl: "http://127.0.0.1:8484",
+  token: await readLoopbackToken(), // ~/.decdn/gateway/token
+  host: "example.com",
+});
+
+const { address } = await client.loopback.delegate();
+// The pool owner runs: decdn pool assign --pool <id> --signer <address> ...
+await client.loopback.registerCapability({ capability: "dcap1:...", scope: "example.com" });
+
+const r = await client.get("decdn:<64 hex>");
+```
+
+The SDK does not start the gateway. Run `decdn gateway` yourself, or the `decdn/decdn` Docker image.
+
+## Pages on a site origin
+
+A bundle opened as a website has its own origin, `https://<hash32>.decdn.link/`. A page there opens the client without a URL. Its own paths and other content both verify:
+
+```ts
+const client = await DecdnClient.open();
+const style = await client.get("/css/site.css");
+const other = await client.get("decdn:<64 hex>");
+```
+
+## What the SDK verifies
+
+| Request | `response.verified` |
+| --- | --- |
+| A blob, or a file of a bundle | `true`: the body hashes as it streams, and ends with `HASH_MISMATCH` or `TRUNCATED` instead of `done` |
+| A byte range, or a bundle's index page | `"skipped"`: these bytes hash to nothing |
+| Any request with `verify: false` | `false` |
+
+A site rewrites HTML and CSS as it serves them, so the SDK fetches those files by their own hash on the gateway's bare host and verifies them too. Pass `verify: true` to refuse anything that cannot be verified.
+
+## When the gateway does not pay
+
+A public gateway answers `402` when its allowance is spent and `503` when its pool cannot pay. Both reach your code as a `DecdnError` with `retryAfterSecs` and `fallbackUri`, the canonical `decdn:` URI. Fetch that URI with a paying client of your own (`decdn get`), or wait and retry. The SDK retries nothing on its own. `get(uri, { retry: true })` waits out one `Retry-After` and tries once more.
+
+## Point a namespace
+
+The owner of a namespace on the `PublisherRegistry` points it at a bundle. The public gateway then serves that bundle at `https://<ns>.decdn.link/`:
+
+```ts
+const client = await DecdnClient.open({
+  gatewayUrl: "https://decdn.link",
+  pointer: { chainId: 421614, publisherRegistry: "0x..." },
+});
+await client.pointer.set({
+  namespace: 42n,
+  root: "decdn:<manifest hash>/",
+  signer: { privateKey: "0x..." }, // or a viem account
+});
+```
+
+The pointer is an EIP-712 signature over the namespace, the bundle's manifest hash and a sequence number. The gateway stores a pointer only when its signer owns the namespace and its sequence number is above the last one from that signer.
+
+The package README lists every method and error code: [sdk/typescript](https://github.com/decdn/decdn/tree/main/sdk/typescript).
