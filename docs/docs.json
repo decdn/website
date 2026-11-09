@@ -123,7 +123,7 @@
         "groups": [
           {
             "group": "SDKs",
-            "pages": ["build/typescript-sdk"]
+            "pages": ["build/typescript-sdk", "build/python-sdk"]
           }
         ]
       }

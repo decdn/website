@@ -1,0 +1,135 @@
+---
+title: Python SDK
+description: Fetch and verify deCDN content from Python with decdn, synchronously or with asyncio, through a public or a loopback decdn gateway.
+---
+
+`decdn` is a Python client for Python 3.11 to 3.13. It speaks HTTP to a `decdn gateway`. The gateway pays for every pull and verifies it. The SDK hashes the bytes again with BLAKE3 wherever it holds a whole blob named by its hash. It needs no wallet library. `Client` is synchronous and `AsyncClient` is its `asyncio` twin: both take the same arguments and return the same shapes.
+
+```bash
+pip install decdn
+# or
+uv add decdn
+```
+
+The package is on [PyPI](https://pypi.org/project/decdn/). Python 3.14 is not yet supported, because coincurve ships no 3.14 wheels.
+
+## Which gateway
+
+| Gateway | Where your code runs | Who pays |
+| --- | --- | --- |
+| Public, such as `https://decdn.link` | Anywhere with network access | The operator's pool, within a daily allowance |
+| Loopback, `decdn gateway` on `http://127.0.0.1:8484` | The same machine, with the gateway token | The capability registered for the requesting host |
+
+The gateway's HTTP contract is in [appendix-gateway](https://github.com/decdn/decdn/blob/main/adr/appendix-gateway.md). `decdn` 0.1 works with any loopback gateway. A public gateway needs one that answers every origin ([cross-origin reads](https://github.com/decdn/decdn/blob/main/adr/appendix-gateway.md#cross-origin-reads)): decdn v0.3.0 or later.
+
+## Fetch from a public gateway
+
+```python
+from decdn import ByteRange, Client
+
+with Client("https://decdn.link") as client:
+    blob = client.get("decdn:<64 hex>")
+    data = blob.read()  # raises HASH_MISMATCH on bad bytes
+
+    page = client.get("decdn:<manifest hash>/docs/index.html")
+    text = page.text()
+```
+
+A `decdn:<hash>/<path>` URI names one file of a [bundle](https://github.com/decdn/decdn/blob/main/adr/appendix-bundles.md). The SDK reads the bundle manifest once per client, checks the manifest's own hash, and hashes the file against the entry the manifest gives.
+
+A byte window of a file that declares its size comes back as `206`:
+
+```python
+part = client.get("decdn:<manifest hash>/model.bin", range=ByteRange(offset=0, length=1 << 20))
+part.content_range  # ContentRange(offset=0, length=1048576, size=...)
+```
+
+`ByteRange` takes an `offset` and, optionally, a `length`. The same calls work awaited, and a body can stream instead of being read whole:
+
+```python
+from decdn import AsyncClient
+
+async with AsyncClient("https://decdn.link") as client:
+    blob = await client.get("decdn:<64 hex>")
+    async for chunk in blob.iter_bytes():  # a mismatch raises at the end
+        ...
+```
+
+A response is a context manager too. Leaving its block closes the connection if the body was not read.
+
+## Use the local gateway
+
+A loopback gateway pays with a capability that a pool owner issues to one of the gateway's delegate keys ([ADR 003](https://github.com/decdn/decdn/blob/main/adr/003-payments.md)). Mint the delegate, have the pool owner assign it, then register the capability for the host your requests name:
+
+```python
+from decdn import Client
+from decdn.local import read_loopback_token
+
+with Client(
+    "http://127.0.0.1:8484",
+    token=read_loopback_token(),  # ~/.decdn/gateway/token
+    host="example.com",  # sent as x-decdn-host
+) as client:
+    delegate = client.loopback.delegate()
+    # The pool owner runs: decdn pool assign --pool <id> --signer <delegate.address> ...
+    client.loopback.register_capability(capability="dcap1:...", scope="example.com")
+
+    r = client.get("decdn:<64 hex>")
+```
+
+Without a capability that covers the host, a request fails with `PAYMENT_REQUIRED`. `client.loopback.capabilities()` lists the capabilities the gateway holds, and `parse_capability` decodes a `dcap1:` token offline.
+
+The SDK does not start the gateway. Run `decdn gateway` yourself, or the `decdn/decdn` Docker image. A `localhost`, `127.0.0.1` or `::1` URL opens a loopback client, so a public gateway you run locally needs another host name, such as `decdn.localhost`. `read_loopback_token(data_dir=None)` reads the token from the gateway's data directory, `~/.decdn/gateway` by default.
+
+## What the SDK verifies
+
+`get` takes `verify="auto"`, `True` or `False`. The default is `"auto"`, or whatever the client was constructed with. `response.verified` says what happened:
+
+| Request | `response.verified` |
+| --- | --- |
+| A blob, or a file of a bundle | `True`: the body hashes as it streams. A body that does not hash to its name, or is cut short, raises `HASH_MISMATCH` or `TRUNCATED` instead of ending cleanly |
+| A byte range of a bundle file, or a bundle's index page | `"skipped"`: these bytes hash to nothing. A blob declares no size, so a range on one fails with `CONFIG`. |
+| Any request with `verify=False` | `False`: nothing is hashed and no manifest is read |
+
+`verified` being `True` names the check, not its result. A body is consumed once, by `read()`, `text()` or `json()`, or by `iter_bytes()`. Chunks reach you before the last one is hashed, so act on the bytes only once the iteration finishes, or once `read()` returns. A failed check raises the same error again on every later call.
+
+A site rewrites HTML and CSS as it serves them, so the SDK fetches those files by their own hash and verifies them too. Pass `verify=True` to refuse anything that cannot be verified: such a request fails with `CONFIG`.
+
+## When the gateway does not pay
+
+A public gateway answers `402` when its allowance is spent and `503` when its pool cannot pay. They reach your code as a `DecdnError` with `code` `PAYMENT_REQUIRED` or `POOL_UNFUNDED`, and with `retry_after_secs` and `fallback_uri`, the canonical `decdn:` URI. Fetch that URI with a paying client of your own (`decdn get`), or wait and retry. The SDK retries nothing on its own. `get(uri, retry=True)` waits out one `Retry-After` and tries once more, and `retry=30.0` does so only when the wait is at most 30 seconds.
+
+## Point a namespace
+
+The owner of a namespace on the `PublisherRegistry` points it at a bundle. The public gateway then serves that bundle at `https://<ns>.decdn.link/`:
+
+```python
+from decdn import Client, PointerDomain
+
+domain = PointerDomain(chain_id=421614, publisher_registry="0x...")
+
+with Client("https://decdn.link", pointer=domain) as client:
+    result = client.pointer.set(
+        namespace=42,
+        root="decdn:<manifest hash>/",
+        signer="0x...",  # a raw secp256k1 key: hex or 32 bytes
+    )
+    result.url  # https://42.decdn.link/
+```
+
+A wallet can sign instead: any object with `sign_typed_data(typed_data) -> str` is a `TypedDataSigner`. An `eth-account` `LocalAccount` returns a `SignedMessage`, so it needs a small adapter:
+
+```python
+class AccountSigner:
+    def __init__(self, account):
+        self.account = account
+
+    def sign_typed_data(self, typed_data):
+        return "0x" + self.account.sign_typed_data(full_message=typed_data).signature.hex()
+```
+
+Then pass `signer=AccountSigner(account)`.
+
+The pointer is an EIP-712 signature over the namespace, the bundle's manifest hash and a sequence number, which defaults to the current Unix second. `pointer_typed_data` gives the typed data to a wallet that signs it. The chain id and registry are the deployment the gateway verifies against. The gateway stores a pointer only when its signer owns the namespace and its sequence number is above the last one from that signer.
+
+The package README has the full API and every error code: [decdn/sdk-python](https://github.com/decdn/sdk-python).
