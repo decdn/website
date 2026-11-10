@@ -16,6 +16,6 @@ Then open the URL printed by the dev server.
 - `overview/` — what deCDN is, who participates, how it works
 - `protocol/` — technical reference
 - `run-a-node/` — node operator guide: requirements, setup, earnings, operation, compliance, FAQ
-- `build/` — building on deCDN: the TypeScript SDK
+- `build/` — building on deCDN: the TypeScript and Python SDKs
 
 Source of truth for all technical claims is `decdn/adr/` in the sibling repo.
