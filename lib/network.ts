@@ -710,8 +710,8 @@ export const TOURS: Record<TourId, Tour> = {
     ],
   },
   gateway: {
-    name: "Through a gateway",
-    button: "Through a gateway",
+    name: "Gateway",
+    button: "Gateway",
     steps: [
       {
         topics: ["http", "gateway"],
