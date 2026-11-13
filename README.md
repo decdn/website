@@ -34,7 +34,7 @@ pnpm format:check # prettier --check . (CI)
 
 - `app/` — App Router entry (`layout.tsx`, `page.tsx`, `globals.css`) plus the blog routes (`blog/`, `blog/[slug]/`), the `legal/[doc]` route, the sitemap/robots handlers, the `llms.txt` / `llms-full.txt` handlers, and file-convention metadata assets.
 - `components/layout/` — the site chrome mounted in `app/layout.tsx` on every route (`Chrome` → `MobileMenu`, `Footer`, `ScrollReveal`) plus `chrome-active`, the nav's section and tone tables.
-- `components/home/` — the homepage sections composed by `app/page.tsx`, one folder per section (`hero/`, `compare/`, `method/`, `faq/`, `try/`, `contact/`) with its sub-parts.
+- `components/home/` — the homepage sections composed by `app/page.tsx`, one folder per section (`hero/`, `compare/`, `try/`, `faq/`, `contact/`) with its sub-parts.
 - `components/brand.tsx` — `highlightBrand`, shared by the homepage and `/network/`.
 - `components/blog/`, `components/legal/`, `components/network/` — components used only by those routes (`PostRow`, `LegalDoc`, `NetworkExplainer`).
 - `components/ui/` — generic primitives with no site content (Frame, SectionHeader, Prose, Figure, PanelFigure, Pill, CodeBlock). A component that takes site data or domain types goes in its feature's folder; a primitive with no site content stays in `ui/` even if only one feature uses it today.

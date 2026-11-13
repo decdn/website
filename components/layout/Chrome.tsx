@@ -19,23 +19,25 @@ import {
   resolveActiveSection,
 } from "@/components/layout/chrome-active";
 
-// Hash anchors are written `/#section`. Required because this nav also
-// renders on /blog/*, where a bare `#section` resolves against the
-// current URL (e.g. /blog/foo/#section) instead of the home page.
-const NAV = [
-  { id: "compare", label: "compare" },
-  { id: "try", label: "try it" },
-  { id: "faq", label: "faq" },
-  { id: "contact", label: "contact" },
-] as const;
+type NavEntry =
+  | { kind: "section"; id: (typeof SECTION_IDS)[number]; label: string }
+  | { kind: "internal" | "external"; href: string; label: string };
 
-// Routes and off-site pages share the section links' style, after them.
-const PAGES = [
+// One list in reading order: what deCDN is, trying it, questions and
+// contact, then further reading. Section anchors are written `/#section`
+// because this nav also renders on /blog/* and /network/, where a bare
+// `#section` would resolve against the current URL. External entries open
+// in a new tab.
+const NAV: readonly NavEntry[] = [
+  { kind: "section", id: "compare", label: "compare" },
   { kind: "internal", href: links.network, label: "how it works" },
-  { kind: "external", href: links.docs, label: "docs" },
+  { kind: "section", id: "try", label: "try it" },
+  { kind: "section", id: "faq", label: "faq" },
+  { kind: "section", id: "contact", label: "contact" },
   { kind: "internal", href: links.blog, label: "blog" },
+  { kind: "external", href: links.docs, label: "docs" },
   { kind: "external", href: links.litepaper, label: "litepaper" },
-] as const;
+];
 
 export function Chrome() {
   const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
@@ -271,51 +273,52 @@ export function Chrome() {
 
           <ul className="hidden items-center gap-7 xl:flex">
             {NAV.map((item) => {
-              const isActive = effectiveActive === item.id;
-              return (
-                <li key={item.id}>
-                  <Link
-                    href={`/#${item.id}`}
-                    onClick={handleNavClick}
-                    aria-current={isActive ? "true" : undefined}
-                    className="nav-item"
-                  >
-                    <span className="nav-label">{item.label}</span>
-                    <span aria-hidden className="nav-underline" />
-                  </Link>
-                </li>
-              );
-            })}
-            {PAGES.map((page) => {
-              const isActive =
-                page.kind === "internal" && pathname.startsWith(page.href);
-              const label = (
-                <>
-                  <span className="nav-label">{page.label}</span>
-                  <span aria-hidden className="nav-underline" />
-                </>
-              );
-              return (
-                <li key={page.href}>
-                  {page.kind === "internal" ? (
+              if (item.kind === "section") {
+                const isActive = effectiveActive === item.id;
+                return (
+                  <li key={item.id}>
                     <Link
-                      href={page.href}
+                      href={`/#${item.id}`}
+                      onClick={handleNavClick}
+                      aria-current={isActive ? "true" : undefined}
+                      className="nav-item"
+                    >
+                      <span className="nav-label">{item.label}</span>
+                      <span aria-hidden className="nav-underline" />
+                    </Link>
+                  </li>
+                );
+              }
+              if (item.kind === "internal") {
+                const isActive = pathname.startsWith(item.href);
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
                       aria-current={isActive ? "page" : undefined}
                       className="nav-item"
                     >
-                      {label}
+                      <span className="nav-label">{item.label}</span>
+                      <span aria-hidden className="nav-underline" />
                     </Link>
-                  ) : (
-                    <a
-                      href={page.href}
-                      {...(page.href === links.litepaper
-                        ? { target: "_blank", rel: "noopener noreferrer" }
-                        : {})}
-                      className="nav-item"
-                    >
-                      {label}
-                    </a>
-                  )}
+                  </li>
+                );
+              }
+              return (
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="nav-item"
+                  >
+                    <span className="nav-label">{item.label}</span>
+                    <span aria-hidden className="nav-ext">
+                      ↗
+                    </span>
+                    <span className="sr-only"> (opens in a new tab)</span>
+                    <span aria-hidden className="nav-underline" />
+                  </a>
                 </li>
               );
             })}

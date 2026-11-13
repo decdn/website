@@ -303,7 +303,7 @@ export function NetworkExplainer() {
   const last = current ? current.steps.length - 1 : 0;
 
   return (
-    <div className="nx">
+    <div className="nx" data-tone="paper">
       <div className="nx-top">
         <h1>{highlightBrand(NETWORK_HEADLINE)}</h1>
         <button

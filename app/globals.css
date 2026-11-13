@@ -85,7 +85,6 @@
   --text-lead: clamp(1rem, 0.6vw + 0.82rem, 1.125rem);
   --text-h3: clamp(1.375rem, 4vw, 3.5rem);
   --text-h2: clamp(1.875rem, 5.8vw, 5.25rem);
-  --text-method-row: clamp(2rem, 6.5vw, 6rem);
   --text-h1: clamp(2.25rem, 7vw, 6.5rem);
   --text-price: clamp(1.125rem, 5vw, 4rem);
 }
@@ -1050,20 +1049,30 @@ a.hero-status:hover .arrow {
   pointer-events: none;
 }
 
-.nav-item:hover:not([aria-current="true"]) {
+.nav-item .nav-ext {
+  margin-left: 4px;
+  font-size: 11px;
+  line-height: 1;
+  opacity: 0.65;
+  transition: opacity 220ms var(--ease-soft);
+}
+
+/* aria-current is "true" on the home section in view and "page" on the
+   route the visitor is on (/network/, /blog/); both draw the underline. */
+.nav-item:hover:not([aria-current]) {
   --u: 0.4;
 }
 
-.nav-item:hover:not([aria-current="true"]) .nav-label {
+.nav-item:hover:not([aria-current]) :is(.nav-label, .nav-ext) {
   opacity: 0.9;
 }
 
-.nav-item[aria-current="true"] {
+.nav-item:is([aria-current="true"], [aria-current="page"]) {
   --u: 1;
   --u-color: var(--whisper);
 }
 
-.nav-item[aria-current="true"] .nav-label {
+.nav-item:is([aria-current="true"], [aria-current="page"]) .nav-label {
   opacity: 1;
 }
 
@@ -1079,6 +1088,7 @@ a.hero-status:hover .arrow {
     transition: box-shadow 360ms var(--ease-soft);
   }
   .nav-item .nav-label,
+  .nav-item .nav-ext,
   .nav-item .nav-underline {
     transition: none;
   }
@@ -1705,6 +1715,21 @@ a.hero-status:hover .arrow {
   .faq-card[data-selected="true"] .faq-answer {
     animation: none;
   }
+}
+
+/* --- site footer --------------------------------------------------------
+   Continues the tone of the page's last section, read from the data-tone
+   that Frame puts on every section. Ink when the last section is ink or
+   carries no tone. */
+
+.site-footer {
+  background: var(--ink);
+  color: var(--paper);
+}
+body:has(main > [data-tone="paper"]:last-child) .site-footer {
+  background: var(--paper);
+  color: var(--ink);
+  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
 }
 
 /* --- network explainer (/network/) --------------------------------------

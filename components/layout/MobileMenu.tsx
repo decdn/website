@@ -34,8 +34,8 @@ type DrawerLink = {
 
 const EXTERNAL: readonly DrawerLink[] = [
   { kind: "internal", href: links.network, label: "how it works" },
-  { kind: "internal", href: links.docs, label: "docs" },
   { kind: "internal", href: links.blog, label: "blog" },
+  { kind: "external", href: links.docs, label: "docs" },
   { kind: "external", href: links.litepaper, label: "litepaper" },
   { kind: "external", href: links.stats, label: "network stats" },
 ] as const;
@@ -340,8 +340,11 @@ export function MobileMenu({ activeSection, tone, onOpenChange }: Props) {
               >
                 <span className="mm-label">{e.label}</span>
                 <span aria-hidden className="mm-arrow">
-                  →
+                  {e.kind === "external" ? "↗" : "→"}
                 </span>
+                {e.kind === "external" ? (
+                  <span className="sr-only"> (opens in a new tab)</span>
+                ) : null}
               </a>
             </li>
           ))}
