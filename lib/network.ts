@@ -693,7 +693,7 @@ export const TOURS: Record<TourId, Tour> = {
       },
       {
         topics: ["sdk", "iroh", "cache"],
-        text: "decdn get pulls peer to peer from nearby nodes over iroh.",
+        text: "The user's app pulls peer to peer from nearby nodes over iroh.",
       },
       {
         topics: ["cache", "dht", "origin", "storage"],
@@ -749,7 +749,7 @@ export const TOURS: Record<TourId, Tour> = {
       },
       {
         topics: ["sdk", "iroh", "cache"],
-        text: "decdn get opens a paid stream to the lowest-latency node.",
+        text: "The user's app opens a paid stream to the lowest-latency node.",
       },
       {
         topics: ["cache", "dht", "origin"],
