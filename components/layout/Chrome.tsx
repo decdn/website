@@ -23,17 +23,16 @@ type NavEntry =
   | { kind: "section"; id: (typeof SECTION_IDS)[number]; label: string }
   | { kind: "internal" | "external"; href: string; label: string };
 
-// One list in reading order: what deCDN is, trying it, questions and
-// contact, then further reading. Section anchors are written `/#section`
-// because this nav also renders on /blog/* and /network/, where a bare
-// `#section` would resolve against the current URL. External entries open
-// in a new tab.
+// One list: the homepage sections in page order, then the other pages and
+// further reading. Section anchors are written `/#section` because this nav
+// also renders on /blog/* and /network/, where a bare `#section` would
+// resolve against the current URL. External entries open in a new tab.
 const NAV: readonly NavEntry[] = [
   { kind: "section", id: "compare", label: "compare" },
-  { kind: "internal", href: links.network, label: "how it works" },
   { kind: "section", id: "try", label: "try it" },
   { kind: "section", id: "faq", label: "faq" },
   { kind: "section", id: "contact", label: "contact" },
+  { kind: "internal", href: links.network, label: "how it works" },
   { kind: "internal", href: links.blog, label: "blog" },
   { kind: "external", href: links.docs, label: "docs" },
   { kind: "external", href: links.litepaper, label: "litepaper" },
