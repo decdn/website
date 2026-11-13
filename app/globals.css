@@ -2086,27 +2086,15 @@ body:has(main > [data-tone="paper"]:last-child) .site-footer {
 .nx-conn {
   position: relative;
 }
-.nx-conn::before {
-  content: "";
+.nx-arrow {
   position: absolute;
-  top: 4px;
-  bottom: 4px;
+  top: 0;
   left: 50%;
-  width: 1.5px;
-  background: var(--nx-muted);
-  opacity: 0.55;
-}
-.nx-conn::after {
-  content: "";
-  position: absolute;
-  top: 4px;
-  left: calc(50% - 4px);
-  width: 7px;
-  height: 7px;
-  border-left: 1.5px solid var(--nx-muted);
-  border-top: 1.5px solid var(--nx-muted);
-  transform: rotate(45deg);
-  opacity: 0.8;
+  display: block;
+  height: 100%;
+  transform: translateX(-50%);
+  color: var(--nx-muted);
+  opacity: 0.75;
 }
 .nx-conn span {
   position: absolute;

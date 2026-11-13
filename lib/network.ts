@@ -451,7 +451,7 @@ export const TOPICS: Record<TopicId, Topic> = {
     summary: "A publisher can pay for its users' downloads.",
     body: [
       "sponsord lets a publisher run one pool and hand each user a signed download capability. The user's client pays from the publisher's pool within limits the publisher sets, so the user needs no wallet and no USDC.",
-      "A public onramp page decides who gets a capability, for example behind a CAPTCHA, and gives the user an installer that fetches the file.",
+      "The publisher decides who qualifies: any user it has authenticated can be sponsored, through the publisher's own sign-in or its onramp page. The capability is tied to the user's key, capped and time-limited.",
     ],
     facts: [
       ["Daemon", "sponsord"],
@@ -676,16 +676,16 @@ export const TOUR_HINT = "Walk through a download step by step. Pick who pays:";
 
 export const TOURS: Record<TourId, Tour> = {
   sponsored: {
-    name: "Publisher-funded p2p",
-    button: "Publisher-funded p2p",
+    name: "Sponsored",
+    button: "Sponsored",
     steps: [
       {
         topics: ["sponsor", "pool"],
-        text: "The publisher funds a PaymentPool and runs sponsord behind an onramp.",
+        text: "The publisher funds a PaymentPool and runs sponsord for its users.",
       },
       {
         topics: ["sponsor", "sdk"],
-        text: "A user runs the installer, gets a throwaway key and passes a captcha.",
+        text: "A user authenticates with the publisher, however the publisher chooses.",
       },
       {
         topics: ["sponsor", "pool"],
@@ -693,7 +693,7 @@ export const TOURS: Record<TourId, Tour> = {
       },
       {
         topics: ["sdk", "iroh", "cache"],
-        text: "decdn get pulls peer to peer from nearby nodes over iroh.",
+        text: "The user's app pulls peer to peer from nearby nodes over iroh.",
       },
       {
         topics: ["cache", "dht", "origin", "storage"],
@@ -710,8 +710,8 @@ export const TOURS: Record<TourId, Tour> = {
     ],
   },
   gateway: {
-    name: "Through a gateway",
-    button: "Through a gateway",
+    name: "Gateway",
+    button: "Gateway",
     steps: [
       {
         topics: ["http", "gateway"],
@@ -749,7 +749,7 @@ export const TOURS: Record<TourId, Tour> = {
       },
       {
         topics: ["sdk", "iroh", "cache"],
-        text: "decdn get opens a paid stream to the lowest-latency node.",
+        text: "The user's app opens a paid stream to the lowest-latency node.",
       },
       {
         topics: ["cache", "dht", "origin"],
