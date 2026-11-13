@@ -15,6 +15,7 @@ export const links = {
   installerPs1: "https://up.decdn.org/decdn.ps1",
   stats: "https://stats.decdn.org/",
   blog: "/blog/",
+  network: "/network/",
   contact: `mailto:${EMAIL}`,
   privacy: "/legal/privacy/",
   terms: "/legal/terms/",
@@ -45,6 +46,10 @@ export const SERVICE_ID = `${SITE_URL}#service`;
 // with `next.config.ts`'s `trailingSlash: true` and `links.blog`. For a post's
 // own URL use `postUrl` in lib/blog.ts rather than concatenating here.
 export const BLOG_URL = `${SITE_URL}blog/`;
+
+// Absolute URL of the network-layers explainer, for the sitemap and JSON-LD.
+// Must agree with `links.network`.
+export const NETWORK_URL = new URL(links.network, links.site).toString();
 
 // `links.docs` is a deep link into the docs product, so every consumer that
 // wants the host has to strip the path. Three did it independently

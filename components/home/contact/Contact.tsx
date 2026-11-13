@@ -6,7 +6,7 @@ import {
   CONTACT_RUN_NODE,
   CONTACT_SOCIALS,
 } from "@/lib/copy";
-import { highlightBrand } from "@/components/home/brand";
+import { highlightBrand } from "@/components/brand";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { FleetStatus } from "@/components/home/contact/FleetStatus";

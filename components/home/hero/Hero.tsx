@@ -6,7 +6,7 @@ import {
   HERO_LEAD,
   HERO_STATUS,
 } from "@/lib/copy";
-import { highlightBrand } from "@/components/home/brand";
+import { highlightBrand } from "@/components/brand";
 import { Figure } from "@/components/ui/Figure";
 import { Frame } from "@/components/ui/Frame";
 import { GitHubIcon, LitepaperIcon } from "@/components/ui/icons";

@@ -1,4 +1,4 @@
-import { highlightBrand } from "@/components/home/brand";
+import { highlightBrand } from "@/components/brand";
 
 export function FaqItem({
   q,

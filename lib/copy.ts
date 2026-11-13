@@ -17,7 +17,7 @@
 //
 // Plain strings only — no JSX, because the mirror emits them as text. Where a
 // sentence names the product, write `deCDN` and let `highlightBrand`
-// (components/home/brand.tsx) wrap it at render time; the mirror takes the same
+// (components/brand.tsx) wrap it at render time; the mirror takes the same
 // string verbatim.
 
 import type { links } from "@/lib/links";

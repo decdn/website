@@ -34,6 +34,7 @@ type DrawerLink = {
 };
 
 const EXTERNAL: readonly DrawerLink[] = [
+  { kind: "internal", href: links.network, label: "network" },
   { kind: "internal", href: links.docs, label: "docs" },
   { kind: "internal", href: links.blog, label: "blog" },
   { kind: "external", href: links.litepaper, label: "litepaper" },

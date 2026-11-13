@@ -282,6 +282,13 @@ export function Chrome() {
           </ul>
 
           <div className="col-start-3 flex items-center gap-5 justify-self-end">
+            <Link
+              href={links.network}
+              className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
+            >
+              <span>Network</span>
+              <span aria-hidden>→</span>
+            </Link>
             <a
               href={links.docs}
               className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
