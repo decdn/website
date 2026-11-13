@@ -24,8 +24,8 @@ import {
 // current URL (e.g. /blog/foo/#section) instead of the home page.
 const NAV = [
   { id: "compare", label: "compare" },
-  { id: "faq", label: "faq" },
   { id: "try", label: "try it" },
+  { id: "faq", label: "faq" },
   { id: "contact", label: "contact" },
 ] as const;
 

@@ -2,7 +2,6 @@ import { Compare } from "@/components/home/compare/Compare";
 import { Contact } from "@/components/home/contact/Contact";
 import { Faq } from "@/components/home/faq/Faq";
 import { Hero } from "@/components/home/hero/Hero";
-import { Method } from "@/components/home/method/Method";
 import { Try } from "@/components/home/try/Try";
 import { JsonLd } from "@/lib/jsonld";
 import { faqPageNode } from "@/lib/schema";
@@ -16,9 +15,8 @@ export default function Home() {
       <JsonLd data={faqPageNode} />
       <Hero />
       <Compare />
-      <Method />
-      <Faq />
       <Try />
+      <Faq />
       <Contact />
     </main>
   );

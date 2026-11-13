@@ -3,7 +3,6 @@ import { Compare } from "./compare/Compare";
 import { Contact } from "./contact/Contact";
 import { Faq } from "./faq/Faq";
 import { Hero } from "./hero/Hero";
-import { Method } from "./method/Method";
 import { Try } from "./try/Try";
 import { DARK_SECTIONS, SECTION_IDS } from "@/components/layout/chrome-active";
 import { asElement, attrs } from "@/test-utils/react-tree";
@@ -15,9 +14,8 @@ import { asElement, attrs } from "@/test-utils/react-tree";
 const SECTIONS = {
   intro: Hero,
   compare: Compare,
-  method: Method,
-  faq: Faq,
   try: Try,
+  faq: Faq,
   contact: Contact,
 } satisfies Record<(typeof SECTION_IDS)[number], () => unknown>;
 
