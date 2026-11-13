@@ -451,7 +451,7 @@ export const TOPICS: Record<TopicId, Topic> = {
     summary: "A publisher can pay for its users' downloads.",
     body: [
       "sponsord lets a publisher run one pool and hand each user a signed download capability. The user's client pays from the publisher's pool within limits the publisher sets, so the user needs no wallet and no USDC.",
-      "A public onramp page decides who gets a capability, for example behind a CAPTCHA, and gives the user an installer that fetches the file.",
+      "The publisher decides who qualifies: any user it has authenticated can be sponsored, through the publisher's own sign-in or its onramp page. The capability is tied to the user's key, capped and time-limited.",
     ],
     facts: [
       ["Daemon", "sponsord"],
@@ -681,11 +681,11 @@ export const TOURS: Record<TourId, Tour> = {
     steps: [
       {
         topics: ["sponsor", "pool"],
-        text: "The publisher funds a PaymentPool and runs sponsord behind an onramp.",
+        text: "The publisher funds a PaymentPool and runs sponsord for its users.",
       },
       {
         topics: ["sponsor", "sdk"],
-        text: "A user runs the installer, gets a throwaway key and passes a captcha.",
+        text: "A user authenticates with the publisher, however the publisher chooses.",
       },
       {
         topics: ["sponsor", "pool"],
