@@ -1,4 +1,4 @@
-import { SITE_URL } from "@/lib/links";
+import { NETWORK_URL, SITE_URL } from "@/lib/links";
 import { listPosts, postUrl } from "@/lib/blog";
 import { LEGAL_SLUGS, getLegalDoc, legalUrl } from "@/lib/legal";
 
@@ -61,6 +61,7 @@ const BODY = `<?xml version="1.0" encoding="UTF-8"?>
   <url><loc>${SITE_URL}llms.txt</loc></url>
   <url><loc>${SITE_URL}llms-full.txt</loc></url>
   <url><loc>${SITE_URL}blog/</loc><lastmod>${siteLastMod}</lastmod></url>
+  <url><loc>${NETWORK_URL}</loc></url>
 ${legalUrls}
 ${postUrls}
 </urlset>

@@ -1,5 +1,5 @@
 import { TRY_HEADLINE, TRY_LEAD } from "@/lib/copy";
-import { highlightBrand } from "@/components/home/brand";
+import { highlightBrand } from "@/components/brand";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { TryIt } from "@/components/home/try/TryIt";

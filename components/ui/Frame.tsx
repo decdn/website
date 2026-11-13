@@ -27,7 +27,12 @@ export function Frame({ id, tone, className = "", children }: FrameProps) {
     .filter(Boolean)
     .join(" ");
   return (
-    <section id={id} aria-labelledby={`${id}-h`} className={sectionClass}>
+    <section
+      id={id}
+      aria-labelledby={`${id}-h`}
+      data-tone={tone}
+      className={sectionClass}
+    >
       <div className="@container relative z-10 mx-auto flex w-full max-w-frame flex-1 flex-col">
         {children}
       </div>

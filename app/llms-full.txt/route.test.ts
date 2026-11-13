@@ -10,9 +10,7 @@ import {
   COMPARE_ROWS,
   HERO_FIGURES,
   HERO_LEAD,
-  METHOD_STEPS,
   SOURCE_REPOS,
-  STACK,
   statusBlock,
 } from "@/lib/copy";
 import { FAQ_ITEMS } from "@/lib/faq";
@@ -43,9 +41,8 @@ const owned = EMBEDDED.reduce((doc, text) => doc.replace(text, ""), body);
 const HOMEPAGE_SUBSECTIONS = [
   "### Intro",
   "### Side by side",
-  "### How it works",
-  "### FAQ",
   "### Try it",
+  "### FAQ",
   "### Contact us",
 ];
 
@@ -137,11 +134,6 @@ describe("homepage mirror", () => {
     );
   });
 
-  it.each(METHOD_STEPS)("has the $word step and its body", (step) => {
-    expect(lines).toContain(`#### ${step.n} ${step.word}`);
-    expect(body).toContain(step.body);
-  });
-
   it.each(FAQ_ITEMS)("has the FAQ entry $q", ({ q, a }) => {
     expect(lines).toContain(`#### ${q}`);
     expect(body).toContain(a.join("\n\n"));
@@ -162,12 +154,6 @@ describe("homepage mirror", () => {
   // makes the mirror provably the same data the page renders.
   it.each([...HERO_FIGURES])("mirrors the $label figure", (figure) => {
     expect(body).toContain(`${figure.label}: ${figure.value}`);
-  });
-
-  it("mirrors the stack strip in order", () => {
-    expect(lines).toContain(
-      `Stack: ${STACK.map((s) => `${s.name} (${s.role})`).join(" · ")}`,
-    );
   });
 
   // The header prose says "the three legal documents" in words, the way

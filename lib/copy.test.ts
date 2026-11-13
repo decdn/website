@@ -12,12 +12,10 @@ import {
   HERO_FIGURES,
   HERO_HEADLINE,
   HERO_LEAD,
-  METHOD_STEPS,
   PANEL_CAPTIONS,
   SITE_DESCRIPTION,
   SITE_TITLE,
   SOURCE_REPOS,
-  STACK,
   statusBlock,
   TARGET_RATE,
   TRY_LEAD,
@@ -56,15 +54,6 @@ const ALL_STRINGS: readonly [string, string][] = [
     [`COMPARE_ROWS.${r.axis}.traditional`, r.traditional],
     [`COMPARE_ROWS.${r.axis}.decdn`, r.decdn],
   ]),
-  ...METHOD_STEPS.flatMap((s): [string, string][] => [
-    [`METHOD_STEPS.${s.n}.n`, s.n],
-    [`METHOD_STEPS.${s.n}.word`, s.word],
-    [`METHOD_STEPS.${s.n}.body`, s.body],
-  ]),
-  ...STACK.flatMap((s): [string, string][] => [
-    [`STACK.${s.name}.name`, s.name],
-    [`STACK.${s.name}.role`, s.role],
-  ]),
   ...SOURCE_REPOS.flatMap((r): [string, string][] => [
     [`SOURCE_REPOS.${r.name}.name`, r.name],
     [`SOURCE_REPOS.${r.name}.note`, r.note],
@@ -90,21 +79,6 @@ describe("copy strings", () => {
       expect(value).not.toContain("|");
     },
   );
-});
-
-describe("STACK", () => {
-  // components/home/method/Method.tsx lays the strip out 2 / 3 / 6 across,
-  // and its hairlines only close when the count divides evenly by the column
-  // count.
-  it("has exactly six items", () => {
-    expect(STACK).toHaveLength(6);
-  });
-
-  // `name` is the React key in Method.tsx and the label in ALL_STRINGS above.
-  it("names each item once", () => {
-    const names = STACK.map((s) => s.name);
-    expect(new Set(names).size).toBe(names.length);
-  });
 });
 
 describe("SOURCE_REPOS", () => {
@@ -156,20 +130,6 @@ describe("COMPARE_ROWS", () => {
     const price = ROWS.find((r) => r.axis === "price");
     expect(price?.traditional).toBe("$0.04–$0.20 /GB");
     expect(price?.decdn).toBe("$0.01 /GB");
-  });
-});
-
-describe("METHOD_STEPS", () => {
-  it("numbers the steps 01–03", () => {
-    expect(METHOD_STEPS.map((s) => s.n)).toEqual(["01", "02", "03"]);
-  });
-
-  it("names the steps probe, swarm, settle", () => {
-    expect(METHOD_STEPS.map((s) => s.word)).toEqual([
-      "probe",
-      "swarm",
-      "settle",
-    ]);
   });
 });
 

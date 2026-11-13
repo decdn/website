@@ -19,16 +19,24 @@ import {
   resolveActiveSection,
 } from "@/components/layout/chrome-active";
 
-// Hash anchors are written `/#section`. Required because this nav also
-// renders on /blog/*, where a bare `#section` resolves against the
-// current URL (e.g. /blog/foo/#section) instead of the home page.
-const NAV = [
-  { id: "compare", label: "compare" },
-  { id: "method", label: "method" },
-  { id: "faq", label: "faq" },
-  { id: "try", label: "try it" },
-  { id: "contact", label: "contact" },
-] as const;
+type NavEntry =
+  | { kind: "section"; id: (typeof SECTION_IDS)[number]; label: string }
+  | { kind: "internal" | "external"; href: string; label: string };
+
+// One list: the homepage sections in page order, then the other pages and
+// further reading. Section anchors are written `/#section` because this nav
+// also renders on /blog/* and /network/, where a bare `#section` would
+// resolve against the current URL. External entries open in a new tab.
+const NAV: readonly NavEntry[] = [
+  { kind: "section", id: "compare", label: "compare" },
+  { kind: "section", id: "try", label: "try it" },
+  { kind: "section", id: "faq", label: "faq" },
+  { kind: "section", id: "contact", label: "contact" },
+  { kind: "internal", href: links.network, label: "how it works" },
+  { kind: "internal", href: links.blog, label: "blog" },
+  { kind: "external", href: links.docs, label: "docs" },
+  { kind: "external", href: links.litepaper, label: "litepaper" },
+];
 
 export function Chrome() {
   const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
@@ -232,11 +240,11 @@ export function Chrome() {
           onDark ? "text-paper" : "text-ink"
         }`}
       >
-        <div className="mx-auto grid w-full max-w-frame grid-cols-[1fr_auto_1fr] items-center gap-4">
+        <div className="mx-auto flex w-full max-w-frame items-center justify-between gap-4">
           <Link
             href="/"
             onClick={handleNavClick}
-            className="col-start-1 flex items-center gap-3 no-underline"
+            className="flex items-center gap-3 no-underline"
           >
             {/* Both variants stay mounted and toggled via `display` so the
               tone flip never flashes — browsers fetch hidden <img> tags
@@ -264,48 +272,56 @@ export function Chrome() {
 
           <ul className="hidden items-center gap-7 xl:flex">
             {NAV.map((item) => {
-              const isActive = effectiveActive === item.id;
+              if (item.kind === "section") {
+                const isActive = effectiveActive === item.id;
+                return (
+                  <li key={item.id}>
+                    <Link
+                      href={`/#${item.id}`}
+                      onClick={handleNavClick}
+                      aria-current={isActive ? "true" : undefined}
+                      className="nav-item"
+                    >
+                      <span className="nav-label">{item.label}</span>
+                      <span aria-hidden className="nav-underline" />
+                    </Link>
+                  </li>
+                );
+              }
+              if (item.kind === "internal") {
+                const isActive = pathname.startsWith(item.href);
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      aria-current={isActive ? "page" : undefined}
+                      className="nav-item"
+                    >
+                      <span className="nav-label">{item.label}</span>
+                      <span aria-hidden className="nav-underline" />
+                    </Link>
+                  </li>
+                );
+              }
               return (
-                <li key={item.id}>
-                  <Link
-                    href={`/#${item.id}`}
-                    onClick={handleNavClick}
-                    aria-current={isActive ? "true" : undefined}
+                <li key={item.href}>
+                  <a
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="nav-item"
                   >
                     <span className="nav-label">{item.label}</span>
+                    <span aria-hidden className="nav-ext">
+                      ↗
+                    </span>
+                    <span className="sr-only"> (opens in a new tab)</span>
                     <span aria-hidden className="nav-underline" />
-                  </Link>
+                  </a>
                 </li>
               );
             })}
           </ul>
-
-          <div className="col-start-3 flex items-center gap-5 justify-self-end">
-            <a
-              href={links.docs}
-              className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
-            >
-              <span>Docs</span>
-              <span aria-hidden>→</span>
-            </a>
-            <Link
-              href={links.blog}
-              className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
-            >
-              <span>Blog</span>
-              <span aria-hidden>→</span>
-            </Link>
-            <a
-              href={links.litepaper}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
-            >
-              <span>Litepaper</span>
-              <span aria-hidden>→</span>
-            </a>
-          </div>
         </div>
       </nav>
       {/* A sibling of <nav>, not a child: the drawer layers around the

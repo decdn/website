@@ -17,7 +17,7 @@
 //
 // Plain strings only — no JSX, because the mirror emits them as text. Where a
 // sentence names the product, write `deCDN` and let `highlightBrand`
-// (components/home/brand.tsx) wrap it at render time; the mirror takes the same
+// (components/brand.tsx) wrap it at render time; the mirror takes the same
 // string verbatim.
 
 import type { links } from "@/lib/links";
@@ -148,53 +148,6 @@ export const COMPARE_ROWS = [
 /** The axis names, as a union — `COMPARE_ROWS` is `as const`, so this stays in
  *  step with the rows without being restated. */
 export type Axis = (typeof COMPARE_ROWS)[number]["axis"];
-
-export type MethodStep = {
-  /** Zero-padded ordinal shown in the leading column. */
-  n: string;
-  word: string;
-  body: string;
-};
-
-export const METHOD_STEPS: readonly MethodStep[] = [
-  {
-    n: "01",
-    word: "probe",
-    body: "The client draws candidate nodes from the on-chain CapacityBond registry, or from its own peer store of nodes it has measured before — if that store is fresh, it skips the probe entirely. Otherwise it probes a shortlist of candidates in parallel for who holds the file and how fast they answer. It ranks holders by measured round-trip time alone. Price is not a rank key: the client pays the rate the node signs, and can cap it with a ceiling of its own. No reputation score is kept.",
-  },
-  {
-    n: "02",
-    word: "swarm",
-    body: "Bytes stream directly from the chosen node. For files over 64 MiB with at least two holders, the client splits the fetch across several nodes — one per operator — and fills its downlink from all of them at once. Every chunk is verified against the BLAKE3 tree hash as it lands. Bytes that fail verification never get a voucher, so the node that sent them is paid nothing for that range, and the client refetches it from another node. Trust no node — verify every byte.",
-  },
-  {
-    n: "03",
-    word: "settle",
-    body: "You pay per megabyte in USDC, automatically, as the bytes arrive — no monthly invoice, no subscription, no whole-file minimum. Pay for what you pulled, nothing more.",
-  },
-];
-
-export type StackItem = {
-  name: string;
-  /** What the piece does in the protocol — the small label under the name. */
-  role: string;
-};
-
-/** The stack under the method steps, in render order. Rendered by `Method`;
- *  serialised by `stackLine()`. This is the section's only stack summary: put
- *  per-piece detail in `role`, not in a separate strip beside it. */
-export const STACK: readonly StackItem[] = [
-  { name: "Rust", role: "node & client" },
-  { name: "BLAKE3", role: "verification" },
-  { name: "QUIC", role: "transport" },
-  { name: "iroh", role: "connectivity" },
-  { name: "USDC", role: "payment" },
-  { name: "EVM", role: "settlement" },
-];
-
-/** The stack as one line of text, for the machine mirror. */
-export const stackLine = (): string =>
-  STACK.map(({ name, role }) => `${name} (${role})`).join(" · ");
 
 /** The target price, as the page and both machine surfaces quote it. */
 export const TARGET_RATE = "$0.01/GB";

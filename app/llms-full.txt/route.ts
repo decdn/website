@@ -10,10 +10,8 @@ import {
   HERO_FIGURES,
   HERO_HEADLINE,
   HERO_LEAD,
-  METHOD_STEPS,
   SITE_DESCRIPTION,
   SOURCE_REPOS,
-  stackLine,
   statusBlock,
   TRY_HEADLINE,
   TRY_LEAD,
@@ -165,11 +163,6 @@ const tryItems = ITEMS.map(
     `- ${item.name} (${item.kind}, ${formatSize(item.bytes)}, ${item.license}): \`${getCommand(item.hash, "unix", item.namespace, item.entry)}\``,
 ).join("\n");
 
-const methodSteps = METHOD_STEPS.map(
-  (step) =>
-    `#### ${step.n} ${assertHeadingText(step.word, `method ${step.n} word`)}\n\n${step.body}`,
-).join("\n\n");
-
 const faq = FAQ_ITEMS.map(
   ({ q, a }, i) =>
     `#### ${assertHeadingText(q, `faq[${i}] question`)}\n\n${a.join("\n\n")}`,
@@ -234,16 +227,6 @@ ${COMPARE_LEAD}
 
 ${compareTable}
 
-### How it works
-
-Stack: ${stackLine()}
-
-${methodSteps}
-
-### FAQ
-
-${faq}
-
 ### Try it
 
 ${TRY_HEADLINE}
@@ -255,6 +238,10 @@ ${tryItems}
 ${tryWindows}
 
 ${TRY_NOTES.join(" ")}
+
+### FAQ
+
+${faq}
 
 ### Contact us
 

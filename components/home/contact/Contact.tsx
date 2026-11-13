@@ -6,7 +6,7 @@ import {
   CONTACT_RUN_NODE,
   CONTACT_SOCIALS,
 } from "@/lib/copy";
-import { highlightBrand } from "@/components/home/brand";
+import { highlightBrand } from "@/components/brand";
 import { Frame } from "@/components/ui/Frame";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { FleetStatus } from "@/components/home/contact/FleetStatus";
@@ -32,7 +32,7 @@ const SOCIAL_ICONS: Record<
 
 export function Contact() {
   return (
-    <Frame id="contact" tone="ink" className="overflow-hidden max-md:pb-2">
+    <Frame id="contact" tone="paper" className="overflow-hidden max-md:pb-2">
       <SectionHeader
         index="06"
         label="Contact us"
@@ -116,7 +116,7 @@ export function Contact() {
           <a
             data-reveal
             style={{ "--reveal-delay": "320ms" }}
-            className="meta inline-flex items-center gap-2 text-paper/60 transition-colors duration-200 ease-(--ease-soft) hover:text-paper focus-visible:text-paper"
+            className="meta inline-flex items-center gap-2 text-ink/60 transition-colors duration-200 ease-(--ease-soft) hover:text-ink focus-visible:text-ink"
             href={links.runNode}
             target="_blank"
             rel="noopener noreferrer"
