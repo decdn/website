@@ -295,15 +295,15 @@ export const TOPICS: Record<TopicId, Topic> = {
     summary:
       "On-chain rules that decide who may take part and what may be served.",
     body: [
-      "Governance sits beside the stack because its rules reach every layer, and anyone can read them on the chain. It vets publishers and their origins, sets the bond that delivery nodes post and keeps the content blacklist.",
+      "Governance sits beside the stack because its rules reach every layer, and anyone can read them on Ethereum. It vets publishers and their origins, sets the bond that delivery nodes post and keeps the content blacklist.",
       "Every governable parameter has a hardcoded safety range, so no vote can push fees to 100% or a bond to zero.",
     ],
     facts: [
-      ["Chain", "an EVM blockchain"],
+      ["Chain", "Ethereum"],
       ["Decides", "origins, bonds, fees, blacklist"],
       ["Bounds", "hardcoded per parameter"],
     ],
-    related: ["publishers", "staking", "blacklist", "voting"],
+    related: ["publishers", "staking", "blacklist", "feerouter", "voting"],
     source: "ADR 009 · ADR 016",
   },
   publishers: {
@@ -386,6 +386,7 @@ export const TOPICS: Record<TopicId, Topic> = {
     ],
     facts: [
       ["Currency", "USDC"],
+      ["Chain", "any chain"],
       ["Unit", "1 MiB"],
       ["On-chain", "fund and redeem only"],
     ],
@@ -427,8 +428,8 @@ export const TOPICS: Record<TopicId, Topic> = {
     source: "ADR 003",
   },
   feerouter: {
-    hue: "pay",
-    eyebrow: "Payment · settlement",
+    hue: "gov",
+    eyebrow: "Governance · settlement",
     title: "FeeRouter",
     summary:
       "Splits every redemption between the operator, buyback and the treasury.",
@@ -507,13 +508,13 @@ export const GOVERNANCE_RAIL: Rail = {
       tag: "governs content",
     },
     {
-      topic: "voting",
-      label: "Voting",
-      detail: "Weighted by bytes served",
-      tag: "governs the rules",
+      topic: "feerouter",
+      label: "FeeRouter",
+      detail: "Splits each redemption",
+      tag: "governs fees",
     },
   ],
-  foot: "EVM blockchain · read by anyone",
+  foot: "Ethereum · read by anyone",
 };
 
 export const PAYMENT_RAIL: Rail = {
@@ -535,19 +536,13 @@ export const PAYMENT_RAIL: Rail = {
       tag: "off-chain",
     },
     {
-      topic: "feerouter",
-      label: "FeeRouter",
-      detail: "Splits each redemption",
-      tag: "on-chain",
-    },
-    {
       topic: "sponsor",
       label: "Sponsorship",
       detail: "Publishers pay for users",
       tag: "sponsord",
     },
   ],
-  foot: "USDC · settled on an EVM blockchain",
+  foot: "USDC · settled on any chain",
 };
 
 export type Layer = {
@@ -704,7 +699,7 @@ export const TOURS: Record<TourId, Tour> = {
         text: "The client verifies each MiB and pays a voucher from the publisher's pool.",
       },
       {
-        topics: ["pool", "feerouter"],
+        topics: ["cache", "origin", "pool", "feerouter"],
         text: "Nodes redeem the vouchers, and FeeRouter splits each payment.",
       },
     ],
@@ -760,11 +755,11 @@ export const TOURS: Record<TourId, Tour> = {
         text: "Each verified MiB costs one voucher, signed by the user's key.",
       },
       {
-        topics: ["pool", "feerouter"],
+        topics: ["cache", "origin", "pool", "feerouter"],
         text: "Nodes redeem. The user tops up, or reclaims the rest after 48 h.",
       },
       {
-        topics: ["staking", "blacklist", "voting"],
+        topics: ["staking", "blacklist"],
         text: "Every node is bonded, so breaking the rules costs it stake.",
       },
     ],
