@@ -142,6 +142,25 @@ function Links({ items }: { items: readonly [string, string][] }) {
     <div className="nx-links" aria-hidden>
       {items.map(([cls, label]) => (
         <div key={cls} className={`nx-conn ${cls}`}>
+          {/* One path for shaft and head, so the head sits on the shaft's
+              axis. It spans the gap from layer to layer: the tail meets the
+              layer below and the head points into the layer above. */}
+          <svg
+            className="nx-arrow"
+            width="12"
+            height="34"
+            viewBox="0 0 12 34"
+            aria-hidden
+          >
+            <path
+              d="M6 34V2M2 6l4-4 4 4"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
           <span>{label}</span>
         </div>
       ))}
