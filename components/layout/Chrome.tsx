@@ -24,10 +24,17 @@ import {
 // current URL (e.g. /blog/foo/#section) instead of the home page.
 const NAV = [
   { id: "compare", label: "compare" },
-  { id: "method", label: "method" },
   { id: "faq", label: "faq" },
   { id: "try", label: "try it" },
   { id: "contact", label: "contact" },
+] as const;
+
+// Routes and off-site pages share the section links' style, after them.
+const PAGES = [
+  { kind: "internal", href: links.network, label: "how it works" },
+  { kind: "external", href: links.docs, label: "docs" },
+  { kind: "internal", href: links.blog, label: "blog" },
+  { kind: "external", href: links.litepaper, label: "litepaper" },
 ] as const;
 
 export function Chrome() {
@@ -232,11 +239,11 @@ export function Chrome() {
           onDark ? "text-paper" : "text-ink"
         }`}
       >
-        <div className="mx-auto grid w-full max-w-frame grid-cols-[1fr_auto_1fr] items-center gap-4">
+        <div className="mx-auto flex w-full max-w-frame items-center justify-between gap-4">
           <Link
             href="/"
             onClick={handleNavClick}
-            className="col-start-1 flex items-center gap-3 no-underline"
+            className="flex items-center gap-3 no-underline"
           >
             {/* Both variants stay mounted and toggled via `display` so the
               tone flip never flashes — browsers fetch hidden <img> tags
@@ -279,40 +286,40 @@ export function Chrome() {
                 </li>
               );
             })}
+            {PAGES.map((page) => {
+              const isActive =
+                page.kind === "internal" && pathname.startsWith(page.href);
+              const label = (
+                <>
+                  <span className="nav-label">{page.label}</span>
+                  <span aria-hidden className="nav-underline" />
+                </>
+              );
+              return (
+                <li key={page.href}>
+                  {page.kind === "internal" ? (
+                    <Link
+                      href={page.href}
+                      aria-current={isActive ? "page" : undefined}
+                      className="nav-item"
+                    >
+                      {label}
+                    </Link>
+                  ) : (
+                    <a
+                      href={page.href}
+                      {...(page.href === links.litepaper
+                        ? { target: "_blank", rel: "noopener noreferrer" }
+                        : {})}
+                      className="nav-item"
+                    >
+                      {label}
+                    </a>
+                  )}
+                </li>
+              );
+            })}
           </ul>
-
-          <div className="col-start-3 flex items-center gap-5 justify-self-end">
-            <Link
-              href={links.network}
-              className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
-            >
-              <span>Network</span>
-              <span aria-hidden>→</span>
-            </Link>
-            <a
-              href={links.docs}
-              className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
-            >
-              <span>Docs</span>
-              <span aria-hidden>→</span>
-            </a>
-            <Link
-              href={links.blog}
-              className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
-            >
-              <span>Blog</span>
-              <span aria-hidden>→</span>
-            </Link>
-            <a
-              href={links.litepaper}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="meta hidden items-center gap-2 no-underline border-b border-current pb-[2px] xl:flex"
-            >
-              <span>Litepaper</span>
-              <span aria-hidden>→</span>
-            </a>
-          </div>
         </div>
       </nav>
       {/* A sibling of <nav>, not a child: the drawer layers around the

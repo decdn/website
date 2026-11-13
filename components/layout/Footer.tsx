@@ -1,9 +1,21 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { links } from "@/lib/links";
 
+// Routes whose last section is paper, so the footer continues it in paper.
+const LIGHT_PREFIXES = [links.network, links.blog] as const;
+
 export function Footer() {
+  const pathname = usePathname();
+  const light = LIGHT_PREFIXES.some((p) => pathname.startsWith(p));
   return (
-    <footer className="bg-ink px-frame-gutter py-10 text-paper">
+    <footer
+      className={`px-frame-gutter py-10 ${
+        light ? "border-t border-ink/10 bg-paper text-ink" : "bg-ink text-paper"
+      }`}
+    >
       <div className="@container mx-auto flex max-w-frame flex-col gap-3">
         <span aria-hidden className="rule opacity-40" />
         <div className="grid grid-cols-1 gap-6 text-micro tracking-[0.2em] uppercase @md:grid-cols-3 @md:items-start @md:gap-2">

@@ -21,7 +21,6 @@ type Props = {
 
 const SECTIONS: readonly { id: SectionId; label: string }[] = [
   { id: "compare", label: "compare" },
-  { id: "method", label: "method" },
   { id: "faq", label: "faq" },
   { id: "try", label: "try it" },
   { id: "contact", label: "contact" },
@@ -34,7 +33,7 @@ type DrawerLink = {
 };
 
 const EXTERNAL: readonly DrawerLink[] = [
-  { kind: "internal", href: links.network, label: "network" },
+  { kind: "internal", href: links.network, label: "how it works" },
   { kind: "internal", href: links.docs, label: "docs" },
   { kind: "internal", href: links.blog, label: "blog" },
   { kind: "external", href: links.litepaper, label: "litepaper" },
