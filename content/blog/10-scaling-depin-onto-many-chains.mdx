@@ -1,0 +1,85 @@
+---
+title: "Scaling DePIN onto Many Chains"
+slug: scaling-depin-onto-many-chains
+date: 2026-12-03
+summary: "Most DePINs put the token, the governance and every payment on one chain. We split them: governance once on Ethereum, payments on any chain where customers already hold USDC, joined by one message. How decdn got there, and six rules any DePIN can use."
+bucket: pillar
+tags: [depin, multichain, governance, stablecoins]
+---
+
+A DePIN is a physical network paid for by a token. Think radios, GPUs, disks and bandwidth. Almost every DePIN makes the same early decision without noticing. It picks a chain. That chain then holds the token, the staking, the governance and every payment a customer makes.
+
+That works until you ask who the customers are. Customers hold stablecoins on many chains. Payments are the busiest traffic a DePIN has. They are small, frequent and price-sensitive. Governance is the quietest. It runs a few proposals a month. One chain is the wrong home for both.
+
+We think stablecoin payments are the best way for a DePIN to scale and bring real money in. Three requirements follow.
+
+1. **Governance must not depend on one chain.** If the vote and the bond live on one chain, the trust model inherits that chain's sequencer, bridge and validator set.
+2. **Payments belong on cheap, fast chains.** They are frequent, small and price-sensitive. Pick the chains where they cost the least, and use more than one.
+3. **Customers pay from the USDC they already hold.** USDC sits on many chains, from Arbitrum and Base to Avalanche and Arc. A customer should not bridge to your chain before buying anything. That does not scale. The payment rail has to go where the USDC is.
+
+decdn started as the usual DePIN, with one chain for everything. This post tells how we got out of that, and what any DePIN can take from it.
+
+## How deCDN got here
+
+**April: one chain for everything.** We picked one low-cost L2. We put the token, the bond, the payment pools and governance on it. We left cross-chain payment pools out of v1. Users on other chains bridged. That was the right call for a first deployment. It gave us one set of addresses, one RPC endpoint and one clock to reason about.
+
+**Late April: the coupling loosens.** Our payment design already called the pool chain-agnostic. By month end, the chain choice stopped being a protocol decision. We demoted it to an appendix. The payment model needs no particular chain. It needs USDC, and a chain that cannot censor a redemption longer than the grace window.
+
+**Before launch: one token.** We looked at accepting several stablecoins. We dropped the idea. Every extra token adds an allowlist, a price oracle and new token behavior to defend against. A pool takes one immutable USDC address. That choice kept the payment contract small enough to move.
+
+**August: payments become rare events.** The shared payment pool lets a client open a pool once and pay many nodes from it. Opens are rare and sit off the fetch path. Cheap, fast opens stopped being a requirement. The choice of chain became a question of cost and neutrality, not latency.
+
+**November: the one tie left.** A security review in early November tied the two layers together again. The payment contract started asking the bond registry whether a node was a bonded, active operator. The check stopped unbonded addresses from inflating the served-bytes total that sets governance quorum. On one chain, it cost little. It also exposed the price of the single-chain decision. Every new payment chain would need its own copy of the bond, or a trusted feed of the bond's state. A trust model that mirrors itself onto every chain is only as strong as its weakest mirror.
+
+## The idea
+
+Stop mirroring trust. Keep governance on Ethereum. Let payments run on any chain that has native USDC. Connect the two with one message.
+
+Each payment contract pays a node its share at once. In the reference deployment that share is 60%. The contract fixes it, so no vote can lower it. The contract holds the rest. Anyone can send that remainder to Ethereum in a single Circle CCTP transfer. The transfer carries a note of how many bytes each node served. Ethereum decides what that means for votes, buyback and treasury. The payment chain never learns about the token, the bond or the vote.
+
+## What any DePIN can take from this
+
+You do not need our contracts to use the pattern. Six rules carry over.
+
+1. **Separate the trust layer from the payment layer.** Governance, bonds and slashing change rarely and need the most neutral home you can find. Payments change constantly and need cheap, fast chains.
+2. **Let customers pay in what they already hold.** Accept one widely held stablecoin, natively, on every chain where it exists. Do not ask customers to bridge. Do not build a multi-token system to avoid saying no.
+3. **Send proof, not state.** Do not copy your bond or your registry onto every payment chain. Send the trust layer one message that proves itself, and let that message carry money and activity together.
+4. **Make payment contracts boring.** Give them no admin keys, no governance and no upgrade path. Fix every setting at deploy time. Guarantee the provider's share in the contract itself, so no vote can lower it.
+5. **Price influence in money.** Make voting weight cost real money per unit of work, and set that price on the trust layer. Then no payment chain can mint weight cheaply, whoever deploys it.
+6. **Admit chains by rule, not by list.** State what a chain needs: a native stablecoin, a canonical way to reach the trust layer, and a censorship window shorter than your grace period. Our rule admits rollups such as Arbitrum and Base. It admits L1s too: Avalanche, with an open validator set, and Arc, with a permissioned one. Then let anyone deploy.
+
+## Prior art
+
+None of the pieces is new. Beefy sends the fees from each chain it runs on back to Ethereum, and Circle's CCTP is one of its transports. Wormhole's MultiGov collects votes on spoke chains and tallies them on a hub chain. EigenLayer lets operators put restaked ETH behind services that run elsewhere. Each one moves money, votes or security to a chain that holds the trust. We join the pieces for delivery work. The money that crosses the chain prices the weight, and the same message says which node earned it. We have not found another DePIN that combines them this way.
+
+## What it costs
+
+Heavy actions run on Ethereum. Registering a node costs about a million gas, once. Bond changes, slash challenges and votes also run there. These actions are rare. The frequent ones, payment and redemption, stay on the payment chains, where gas is cheap.
+
+Operator income arrives in two places. The immediate share lands on the payment chain. The rest lands on Ethereum after a transfer. A standard CCTP transfer takes minutes to reach Ethereum. From rollups such as Arbitrum and Base it takes about 15 to 20 minutes.
+
+You inherit the stablecoin's trust model. For USDC, Circle can pause transfers, freeze addresses and pause CCTP message receipt.
+
+## The neutral position
+
+x402 names a payment network by its chain id. Each facilitator decides which networks it supports. The payment protocol sits above any single chain. decdn now does the same for delivery, and names chains the same way, with neutral CAIP-2 identifiers. That leaves room for non-EVM chains such as Solana later. A client says which chain it pays on. A node says which chains it accepts. Nothing else in the trust model depends on any one payment chain.
+
+## What's next
+
+The public testnet is live, and we are bringing this system to it. It puts payments on EVM chains, starting with Arbitrum, and governance on Ethereum. Payments will run on a number of testnets at once, and governance will run on Ethereum Sepolia. Today the testnet runs on Arbitrum Sepolia alone. Running several payment chains at once is the point of this design, so we test it there. We run the full path: pay on any chain, serve, send to Ethereum, vote.
+
+These testnets cover our admission rule. They are EVM chains with Circle's native testnet USDC, and all support CCTP V2 with hooks. The last test is the censorship window, and the set covers each form of it: rollups, where forced inclusion through Ethereum keeps the window inside our 48-hour grace period, and L1s with open and permissioned validator sets, such as Avalanche Fuji and Arc. Testing both L1 forms shows us what the rule needs on chains without a sequencer.
+
+Mainnet follows the same shape. Payments start on Arbitrum and spread to the other EVM chains where customers already hold USDC. Governance stays on Ethereum.
+
+## Follow along, or join the pilot
+
+We build this in the open. Follow [@decdn\_](https://x.com/decdn_) for updates, watch the [decdn repository on GitHub](https://github.com/decdn/decdn) as the contracts and the testnet work land, or join us on [Discord](https://discord.gg/vVbNswKVGX).
+
+If you move data, join our pilot programme. We set it up with you, and delivery during the pilot is on us. Email [info@decdn.org](mailto:info@decdn.org) to start.
+
+Want to read first? [The docs](https://docs.decdn.org/overview/introduction) explain how the network works, from content addressing to payments.
+
+---
+
+_Prior art is public documentation: the [Beefy revenue bridge](https://docs.beefy.finance/ecosystem/protocol/revenue-bridge), [Wormhole MultiGov](https://wormhole.com/docs/products/multigov/concepts/architecture/) and [EigenLayer](https://docs.eigencloud.xyz/eigenlayer/concepts/key-terms)._
