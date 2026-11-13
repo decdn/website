@@ -174,7 +174,7 @@ function Drawer({
         data-open={id !== null ? "true" : undefined}
         role="dialog"
         aria-modal="false"
-        aria-labelledby="nx-drawer-title"
+        aria-labelledby={topic ? "nx-drawer-title" : undefined}
         aria-hidden={id === null}
         inert={id === null}
       >
