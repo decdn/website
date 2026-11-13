@@ -676,8 +676,8 @@ export const TOUR_HINT = "Walk through a download step by step. Pick who pays:";
 
 export const TOURS: Record<TourId, Tour> = {
   sponsored: {
-    name: "Publisher-funded p2p",
-    button: "Publisher-funded p2p",
+    name: "Sponsored",
+    button: "Sponsored",
     steps: [
       {
         topics: ["sponsor", "pool"],
