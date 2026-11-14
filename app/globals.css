@@ -1186,13 +1186,13 @@ a.hero-status:hover .arrow {
 
 .prose a {
   color: inherit;
-  text-decoration: none;
-  border-bottom: 1px solid currentColor;
-  transition: border-bottom-color 160ms var(--ease-soft);
+  text-decoration: underline 1px currentColor;
+  text-underline-offset: 0.2em;
+  transition: text-decoration-color 160ms var(--ease-soft);
 }
 
 .prose a:hover {
-  border-bottom-color: color-mix(in srgb, currentColor 40%, transparent);
+  text-decoration-color: color-mix(in srgb, currentColor 40%, transparent);
 }
 
 .prose a:focus-visible {
