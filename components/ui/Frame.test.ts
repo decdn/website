@@ -46,3 +46,31 @@ describe("brand-text contrast wiring", () => {
     expect(css).toMatch(/--color-whisper-text:\s*var\(--whisper-text\)/);
   });
 });
+
+describe("Frame attributes", () => {
+  const section = (props: { navDark?: boolean; unnamed?: boolean } = {}) =>
+    attrs(
+      asElement(
+        Frame({
+          id: "t",
+          tone: "ink",
+          ...props,
+          children: createElement("p", null, "x"),
+        }),
+      ),
+    );
+
+  // Chrome finds the band with `[data-nav-dark]`. React would write a false
+  // value as the string "false", which still matches — so off must mean the
+  // attribute is absent, not false.
+  it("omits data-nav-dark unless navDark is set", () => {
+    expect(section()["data-nav-dark"]).toBeUndefined();
+    expect(section({ navDark: false })["data-nav-dark"]).toBeUndefined();
+    expect(section({ navDark: true })["data-nav-dark"]).toBe(true);
+  });
+
+  it("is named by its ${id}-h heading unless unnamed", () => {
+    expect(section()["aria-labelledby"]).toBe("t-h");
+    expect(section({ unnamed: true })["aria-labelledby"]).toBeUndefined();
+  });
+});

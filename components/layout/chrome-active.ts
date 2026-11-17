@@ -33,3 +33,26 @@ export function resolveActiveSection<T>(
 ): T {
   return pathname === "/" && scrolled ? observed : fallback;
 }
+
+// Routes whose page opens on a `data-nav-dark` band (the blog masthead,
+// components/blog/BlogMasthead.tsx). Keep in step with the pages that render
+// one: it is what the prerendered nav paints before any observer has run.
+export function opensOnDarkBand(pathname: string): boolean {
+  return pathname === "/blog" || pathname.startsWith("/blog/");
+}
+
+export type BandReading = { pathname: string; dark: boolean };
+
+// Whether a `data-nav-dark` band sits under the nav. The observer's reading
+// wins once it has reported for this route; before that — the prerendered
+// HTML, the first frame after hydration, and the frame after a client-side
+// route change — the route's own default stands in, so the nav never paints
+// ink text over the dark band.
+export function resolveOverDarkBand(
+  pathname: string,
+  reading: BandReading | null,
+): boolean {
+  return reading?.pathname === pathname
+    ? reading.dark
+    : opensOnDarkBand(pathname);
+}

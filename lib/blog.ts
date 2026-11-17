@@ -69,10 +69,11 @@ export const countWords = (s: string): number => (s.match(/\S+/g) ?? []).length;
 export const readingMinutes = (words: number): number =>
   Math.max(1, Math.round(words / WORDS_PER_MINUTE));
 
-// --- display formatters (shared by the index list and the post page) ---
+// --- display formatters ---
+// `longDate` for the blog index and post pages; `dottedDate` and
+// `seriesLabel` for the post's OG card (opengraph-image.tsx).
 
-// `2026-05-11` → `2026·05·11`. The machine-readable value stays in
-// `<time dateTime>`; only the rendered string gets the middle dots.
+// `2026-05-11` → `2026·05·11`.
 export const dottedDate = (iso: string): string => iso.replaceAll("-", "·");
 
 const LONG_DATE = new Intl.DateTimeFormat("en-US", {
@@ -87,9 +88,6 @@ export const longDate = (iso: string): string =>
   LONG_DATE.format(new Date(`${iso}T00:00:00Z`));
 
 const pad2 = (n: number): string => String(n).padStart(2, "0");
-
-/** `8` → `08 min`. Receives `PostMeta.readMin` (integer ≥ 1). */
-export const readLabel = (min: number): string => `${pad2(min)} min`;
 
 /** `2` → `02`. Receives `PostMeta.seriesNumber`. */
 export const seriesLabel = (n: number): string => pad2(n);

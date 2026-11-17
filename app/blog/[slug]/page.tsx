@@ -127,7 +127,7 @@ export default async function BlogPost({
         </header>
       </BlogMasthead>
 
-      <Frame id="post-body" tone="paper" labelledBy="post-h">
+      <Frame id="post-body" tone="paper" unnamed>
         <article className="flex flex-col gap-10">
           <Prose>
             <MDXRemote

@@ -15,7 +15,7 @@ export function PostRow({ post }: { post: PostMeta }) {
         >
           {longDate(post.date)}
         </time>
-        <h2 className="text-[clamp(1.375rem,2.4vw,1.75rem)] leading-[1.2] font-semibold tracking-[-0.02em] text-balance">
+        <h2 className="text-h4 leading-[1.2] font-semibold tracking-[-0.02em] text-balance">
           {post.pinned && (
             <span title="Pinned" className="mr-2 text-whisper">
               <span className="sr-only">Pinned. </span>

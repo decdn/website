@@ -15,7 +15,6 @@ import {
   postImageUrl,
   postUrl,
   readingMinutes,
-  readLabel,
   seriesLabel,
   type PostMeta,
   type Slug,
@@ -101,11 +100,6 @@ describe("display formatters", () => {
   it("longDate spells the month out and keeps the day in UTC", () => {
     expect(longDate("2026-05-11")).toBe("May 11, 2026");
     expect(longDate("2026-11-01")).toBe("November 1, 2026");
-  });
-
-  it("readLabel zero-pads to two digits", () => {
-    expect(readLabel(8)).toBe("08 min");
-    expect(readLabel(12)).toBe("12 min");
   });
 
   it("seriesLabel zero-pads to two digits", () => {

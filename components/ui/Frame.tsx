@@ -10,9 +10,11 @@ type FrameProps = {
   /** Marks a dark band at the top of an off-home page: the fixed nav takes
    *  the ink tone while the band sits under it (Chrome.tsx). */
   navDark?: boolean;
-  /** The heading that names the section; defaults to `${id}-h`. A body
-   *  section under a masthead points at the masthead's h1 instead. */
-  labelledBy?: string;
+  /** Leaves the section without an accessible name (no `aria-labelledby`),
+   *  so it isn't a landmark. For the body under a masthead, whose h1 already
+   *  names the masthead section — naming both would list the same landmark
+   *  twice. Otherwise every Frame is named by its `${id}-h` heading. */
+  unnamed?: boolean;
   children: ReactNode;
 };
 
@@ -29,7 +31,7 @@ export function Frame({
   tone,
   className = "",
   navDark = false,
-  labelledBy,
+  unnamed = false,
   children,
 }: FrameProps) {
   const sectionClass = [
@@ -42,7 +44,7 @@ export function Frame({
   return (
     <section
       id={id}
-      aria-labelledby={labelledBy ?? `${id}-h`}
+      aria-labelledby={unnamed ? undefined : `${id}-h`}
       data-nav-dark={navDark || undefined}
       className={sectionClass}
     >

@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { resolveActiveSection } from "./chrome-active";
+import {
+  opensOnDarkBand,
+  resolveActiveSection,
+  resolveOverDarkBand,
+} from "./chrome-active";
 
 describe("resolveActiveSection", () => {
   it.each([
@@ -48,6 +52,41 @@ describe("resolveActiveSection", () => {
   ] as const)("$name", ({ pathname, scrolled, observed, expected }) => {
     expect(resolveActiveSection(pathname, scrolled, observed, "intro")).toBe(
       expected,
+    );
+  });
+});
+
+describe("opensOnDarkBand", () => {
+  it.each([
+    ["/blog/", true],
+    ["/blog", true],
+    ["/blog/testnet-is-live/", true],
+    ["/", false],
+    ["/network/", false],
+    ["/legal/privacy/", false],
+    ["/blogroll/", false],
+  ])("%s → %s", (pathname, expected) => {
+    expect(opensOnDarkBand(pathname)).toBe(expected);
+  });
+});
+
+describe("resolveOverDarkBand", () => {
+  it("uses the route default before the observer reports", () => {
+    expect(resolveOverDarkBand("/blog/", null)).toBe(true);
+    expect(resolveOverDarkBand("/", null)).toBe(false);
+  });
+
+  it("uses the observer's reading for the current route", () => {
+    const reading = { pathname: "/blog/a/", dark: false };
+    expect(resolveOverDarkBand("/blog/a/", reading)).toBe(false);
+  });
+
+  it("ignores a reading left over from another route", () => {
+    expect(
+      resolveOverDarkBand("/blog/b/", { pathname: "/blog/a/", dark: false }),
+    ).toBe(true);
+    expect(resolveOverDarkBand("/", { pathname: "/blog/", dark: true })).toBe(
+      false,
     );
   });
 });

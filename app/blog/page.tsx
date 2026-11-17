@@ -80,7 +80,7 @@ export default function BlogIndex() {
         </header>
       </BlogMasthead>
 
-      <Frame id="posts" tone="paper" labelledBy="blog-h">
+      <Frame id="posts" tone="paper" unnamed>
         <div className="mx-auto w-full max-w-[48rem]">
           {posts.length === 0 ? (
             <p className="text-body opacity-60">Nothing yet.</p>
