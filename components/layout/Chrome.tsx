@@ -23,10 +23,13 @@ type NavEntry =
   | { kind: "section"; id: (typeof SECTION_IDS)[number]; label: string }
   | { kind: "internal" | "external"; href: string; label: string };
 
-// One list: the homepage sections in page order, then the other pages and
-// further reading. Section anchors are written `/#section` because this nav
-// also renders on /blog/* and /network/, where a bare `#section` would
-// resolve against the current URL. External entries open in a new tab.
+// Homepage sections in page order, then the other pages, then further
+// reading. From xl up the bar splits it by `kind`, not position: on-site
+// entries (section + internal) form one list centred in the bar, external
+// ones a second list at its right edge. Section anchors are written
+// `/#section` because this nav also renders on /blog/* and /network/,
+// where a bare `#section` would resolve against the current URL. External
+// entries open in a new tab.
 const NAV: readonly NavEntry[] = [
   { kind: "section", id: "compare", label: "compare" },
   { kind: "section", id: "try", label: "try it" },
@@ -37,6 +40,8 @@ const NAV: readonly NavEntry[] = [
   { kind: "external", href: links.docs, label: "docs" },
   { kind: "external", href: links.litepaper, label: "litepaper" },
 ];
+const onSiteNav = NAV.filter((item) => item.kind !== "external");
+const externalNav = NAV.filter((item) => item.kind === "external");
 
 export function Chrome() {
   const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
@@ -228,6 +233,57 @@ export function Chrome() {
   // paper then so its × reads against the white panel.
   const toggleTone = mobileOpen ? "paper" : onDark ? "ink" : "paper";
 
+  const renderItem = (item: NavEntry) => {
+    if (item.kind === "section") {
+      const isActive = effectiveActive === item.id;
+      return (
+        <li key={item.id}>
+          <Link
+            href={`/#${item.id}`}
+            onClick={handleNavClick}
+            aria-current={isActive ? "true" : undefined}
+            className="nav-item"
+          >
+            <span className="nav-label">{item.label}</span>
+            <span aria-hidden className="nav-underline" />
+          </Link>
+        </li>
+      );
+    }
+    if (item.kind === "internal") {
+      const isActive = pathname.startsWith(item.href);
+      return (
+        <li key={item.href}>
+          <Link
+            href={item.href}
+            aria-current={isActive ? "page" : undefined}
+            className="nav-item"
+          >
+            <span className="nav-label">{item.label}</span>
+            <span aria-hidden className="nav-underline" />
+          </Link>
+        </li>
+      );
+    }
+    return (
+      <li key={item.href}>
+        <a
+          href={item.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="nav-item"
+        >
+          <span className="nav-label">{item.label}</span>
+          <span aria-hidden className="nav-ext">
+            ↗
+          </span>
+          <span className="sr-only"> (opens in a new tab)</span>
+          <span aria-hidden className="nav-underline" />
+        </a>
+      </li>
+    );
+  };
+
   return (
     <>
       <nav
@@ -240,7 +296,7 @@ export function Chrome() {
           onDark ? "text-paper" : "text-ink"
         }`}
       >
-        <div className="mx-auto flex w-full max-w-frame items-center justify-between gap-4">
+        <div className="mx-auto flex w-full max-w-frame items-center justify-between gap-4 xl:grid xl:grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] xl:gap-7">
           <Link
             href="/"
             onClick={handleNavClick}
@@ -270,58 +326,19 @@ export function Chrome() {
             <span className="meta hidden opacity-70 sm:inline">labs</span>
           </Link>
 
-          <ul className="hidden items-center gap-7 xl:flex">
-            {NAV.map((item) => {
-              if (item.kind === "section") {
-                const isActive = effectiveActive === item.id;
-                return (
-                  <li key={item.id}>
-                    <Link
-                      href={`/#${item.id}`}
-                      onClick={handleNavClick}
-                      aria-current={isActive ? "true" : undefined}
-                      className="nav-item"
-                    >
-                      <span className="nav-label">{item.label}</span>
-                      <span aria-hidden className="nav-underline" />
-                    </Link>
-                  </li>
-                );
-              }
-              if (item.kind === "internal") {
-                const isActive = pathname.startsWith(item.href);
-                return (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      aria-current={isActive ? "page" : undefined}
-                      className="nav-item"
-                    >
-                      <span className="nav-label">{item.label}</span>
-                      <span aria-hidden className="nav-underline" />
-                    </Link>
-                  </li>
-                );
-              }
-              return (
-                <li key={item.href}>
-                  <a
-                    href={item.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="nav-item"
-                  >
-                    <span className="nav-label">{item.label}</span>
-                    <span aria-hidden className="nav-ext">
-                      ↗
-                    </span>
-                    <span className="sr-only"> (opens in a new tab)</span>
-                    <span aria-hidden className="nav-underline" />
-                  </a>
-                </li>
-              );
-            })}
-          </ul>
+          {/* Explicit column starts: with either list skipped, auto-placement
+            would slide the other into the wrong track. */}
+          {onSiteNav.length > 0 && (
+            <ul className="hidden items-center gap-7 justify-self-center xl:col-start-2 xl:flex">
+              {onSiteNav.map(renderItem)}
+            </ul>
+          )}
+
+          {externalNav.length > 0 && (
+            <ul className="hidden items-center gap-7 justify-self-end xl:col-start-3 xl:flex">
+              {externalNav.map(renderItem)}
+            </ul>
+          )}
         </div>
       </nav>
       {/* A sibling of <nav>, not a child: the drawer layers around the
