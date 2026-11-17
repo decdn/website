@@ -12,11 +12,8 @@ export function Footer() {
     <footer className="bg-paper px-frame-gutter pb-10 text-ink">
       <div className="@container mx-auto flex max-w-frame flex-col gap-3">
         <span aria-hidden className="rule opacity-40" />
-        <div className="grid grid-cols-1 gap-6 text-micro tracking-[0.2em] uppercase @md:grid-cols-3 @md:items-start @md:gap-2">
+        <div className="grid grid-cols-1 gap-6 text-micro tracking-[0.2em] uppercase @md:grid-cols-2 @md:items-start @md:gap-2">
           <span className="opacity-80">© decdn labs · open source</span>
-          <span className="opacity-80 @md:text-center">
-            built in rust · probably over-engineered
-          </span>
           {/* Phones: legal pages stacked bottom-left, presskit bottom-right,
               one rule under both. @md: a right-aligned column with the
               presskit underlined on its own. */}
