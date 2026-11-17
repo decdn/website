@@ -24,10 +24,12 @@ type NavEntry =
   | { kind: "internal" | "external"; href: string; label: string };
 
 // Homepage sections in page order, then the other pages, then further
-// reading. On-site entries render as one list centred in the bar; external
-// ones sit in a second list at the right edge. Section anchors are written `/#section` because this nav
-// also renders on /blog/* and /network/, where a bare `#section` would
-// resolve against the current URL. External entries open in a new tab.
+// reading. From xl up the bar splits it by `kind`, not position: on-site
+// entries (section + internal) form one list centred in the bar, external
+// ones a second list at its right edge. Section anchors are written
+// `/#section` because this nav also renders on /blog/* and /network/,
+// where a bare `#section` would resolve against the current URL. External
+// entries open in a new tab.
 const NAV: readonly NavEntry[] = [
   { kind: "section", id: "compare", label: "compare" },
   { kind: "section", id: "try", label: "try it" },
