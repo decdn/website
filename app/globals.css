@@ -1718,11 +1718,14 @@ a.hero-status:hover .arrow {
 }
 
 /* --- site footer --------------------------------------------------------
-   Every page ends on a paper section and the footer (paper too) reads as
-   its tail: its own rule marks the break, so the last section keeps only
-   half a frame pad above it and the footer adds none. */
+   Assumes every route ends on a paper block (a Frame section, or .nx on
+   /network/) — the footer is paper too, so a route ending on ink would
+   butt against it. The footer reads as that block's tail: it adds no top
+   pad, its own rule marks the break, and a Frame that ends <main> gets
+   half a frame pad below its content. Unlayered so it beats Frame's
+   py-frame-pad-y utility. .nx sets the same bottom pad itself. */
 
-main > :last-child {
+main > section:last-child {
   padding-bottom: calc(var(--spacing-frame-pad-y) / 2);
 }
 
@@ -1750,7 +1753,9 @@ main > :last-child {
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  padding: 84px var(--spacing-frame-gutter) 16px;
+  /* Bottom pad matches the Frame that ends every other route (see the
+     site footer note). */
+  padding: 84px var(--spacing-frame-gutter) calc(var(--spacing-frame-pad-y) / 2);
   background: var(--paper);
   color: var(--ink);
   font-size: 15px;

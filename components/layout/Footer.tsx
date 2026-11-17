@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { links } from "@/lib/links";
 
-// Paper, like the section every page ends on; globals.css trims that
-// section's bottom pad so the footer's rule reads as its tail.
+// Always paper: every route ends on a paper block (see the "site footer"
+// note in globals.css). No top pad — the rule below is the break, and
+// globals.css sets the bottom pad of the Frame that ends <main> to sit
+// against it.
 export function Footer() {
   return (
     <footer className="bg-paper px-frame-gutter pb-10 text-ink">
