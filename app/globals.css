@@ -1729,7 +1729,15 @@ a.hero-status:hover .arrow {
 body:has(main > [data-tone="paper"]:last-child) .site-footer {
   background: var(--paper);
   color: var(--ink);
-  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+}
+/* When the footer continues a toned section it reads as that section's
+   tail, so the footer's own rule marks the break: half a frame pad above
+   it rather than a full one plus the footer's padding. */
+main > [data-tone]:last-child {
+  padding-bottom: calc(var(--spacing-frame-pad-y) / 2);
+}
+body:has(main > [data-tone]:last-child) .site-footer {
+  padding-top: 0;
 }
 
 /* --- network explainer (/network/) --------------------------------------
