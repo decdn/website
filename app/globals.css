@@ -1094,26 +1094,6 @@ a.hero-status:hover .arrow {
   }
 }
 
-/* --- blog masthead -------------------------------------------------------
-   The dark band atop /blog/ and every post. The brand green rises from the
-   bottom-right corner: a wide soft ellipse for the wash, a tighter, brighter
-   one at the corner itself. Static on purpose — the glow is the page's one
-   loud element and needs no motion to carry it. */
-.blog-masthead {
-  background-color: var(--ink);
-  background-image:
-    radial-gradient(
-      ellipse 45% 75% at 100% 100%,
-      color-mix(in srgb, var(--whisper) 70%, transparent),
-      transparent 100%
-    ),
-    radial-gradient(
-      ellipse 95% 150% at 100% 100%,
-      color-mix(in srgb, var(--whisper) 38%, transparent),
-      transparent 70%
-    );
-}
-
 /* --- prose: MDX body styling ------------------------------------------ */
 /* Long-form post body. Wrapped in <Prose>. Tokens drawn from the shared
    scale (--text-body, --text-lead, --text-h3) so headings track the same
