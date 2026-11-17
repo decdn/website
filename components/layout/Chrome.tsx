@@ -40,6 +40,8 @@ const NAV: readonly NavEntry[] = [
   { kind: "external", href: links.docs, label: "docs" },
   { kind: "external", href: links.litepaper, label: "litepaper" },
 ];
+const onSiteNav = NAV.filter((item) => item.kind !== "external");
+const externalNav = NAV.filter((item) => item.kind === "external");
 
 export function Chrome() {
   const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
@@ -324,13 +326,19 @@ export function Chrome() {
             <span className="meta hidden opacity-70 sm:inline">labs</span>
           </Link>
 
-          <ul className="hidden items-center gap-7 justify-self-center xl:flex">
-            {NAV.filter((item) => item.kind !== "external").map(renderItem)}
-          </ul>
+          {/* Explicit column starts: with either list skipped, auto-placement
+            would slide the other into the wrong track. */}
+          {onSiteNav.length > 0 && (
+            <ul className="hidden items-center gap-7 justify-self-center xl:col-start-2 xl:flex">
+              {onSiteNav.map(renderItem)}
+            </ul>
+          )}
 
-          <ul className="hidden items-center gap-7 justify-self-end xl:flex">
-            {NAV.filter((item) => item.kind === "external").map(renderItem)}
-          </ul>
+          {externalNav.length > 0 && (
+            <ul className="hidden items-center gap-7 justify-self-end xl:col-start-3 xl:flex">
+              {externalNav.map(renderItem)}
+            </ul>
+          )}
         </div>
       </nav>
       {/* A sibling of <nav>, not a child: the drawer layers around the
