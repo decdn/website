@@ -11,7 +11,6 @@ import {
   ogCardSlugs,
   parseImage,
   parseSlug,
-  parseTags,
   postImageUrl,
   postUrl,
   readingMinutes,
@@ -105,28 +104,6 @@ describe("display formatters", () => {
   it("seriesLabel zero-pads to two digits", () => {
     expect(seriesLabel(2)).toBe("02");
     expect(seriesLabel(11)).toBe("11");
-  });
-});
-
-describe("parseTags", () => {
-  it("returns undefined when absent or an empty array", () => {
-    expect(parseTags(undefined, "x.mdx")).toBeUndefined();
-    expect(parseTags([], "x.mdx")).toBeUndefined();
-  });
-
-  it("trims and de-duplicates, preserving source order", () => {
-    expect(
-      parseTags(["  transport ", "transport", "settlement"], "x.mdx"),
-    ).toEqual(["transport", "settlement"]);
-  });
-
-  it.each<[string, unknown]>([
-    ["a bare string", "primer"],
-    ["a non-string element", ["primer", 1]],
-    ["an empty-string element", ["primer", ""]],
-    ["a whitespace-only element", ["primer", "   "]],
-  ])("throws (with file context) on %s", (_label, input) => {
-    expect(() => parseTags(input, "bad.mdx")).toThrow(/bad\.mdx.*tags/s);
   });
 });
 
@@ -420,19 +397,12 @@ describe("blogPostingNode", () => {
     expect(node.image).toBe(postImageUrl(base));
   });
 
-  // `keywords: post.tags?.join(", ")` must stay absent — not `""` — when a post
-  // has no tags, or every untagged post ships an empty schema.org field.
-  it("omits keywords entirely when the post has no tags", () => {
-    expect(JSON.stringify(blogPostingNode(base))).not.toContain("keywords");
-  });
-
   it("carries a full, self-contained JSON-LD shape", () => {
-    const node = blogPostingNode({ ...base, tags: ["a", "b"] });
+    const node = blogPostingNode(base);
     expect(node["@context"]).toBe("https://schema.org");
     expect(node["@type"]).toBe("BlogPosting");
     expect(node.headline).toBe(base.title);
     expect(node.description).toBe(base.summary);
-    expect(node.keywords).toBe("a, b");
     expect(node.wordCount).toBe(base.words);
     expect(node.datePublished).toBe(base.date);
     expect(node.dateModified).toBe(base.date);
@@ -463,19 +433,7 @@ describe("listPosts metadata", () => {
     }
   });
 
-  it("exposes tags as a non-empty string array when present", () => {
-    for (const p of posts) {
-      if (p.tags === undefined) continue;
-      expect(p.tags.length).toBeGreaterThan(0);
-      for (const t of p.tags) {
-        expect(typeof t).toBe("string");
-        expect(t).toBe(t.trim());
-        expect(t).not.toBe("");
-      }
-    }
-  });
-
-  // Mirror the tags loop for `image`. No fixture currently uses the
+  // Loop over every post for `image`. No fixture currently uses the
   // override, so today this is a no-op — but the first time an author
   // adds `image:` to a real post, this guards the invariant that the
   // emitted value is always an absolute, parseable URL with a hostname.

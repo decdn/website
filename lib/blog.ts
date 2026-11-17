@@ -35,7 +35,6 @@ export type PostMeta = {
   date: IsoDate;
   summary: string;
   bucket?: string;
-  tags?: string[];
   /** Sticks the post to the top of the index, above the date sort, with a
    *  pin marker on its row. Multiple pinned posts keep newest-first order
    *  among themselves. Defaults to false. */
@@ -105,27 +104,6 @@ const formatDate = (value: unknown): string => {
 // `.mdx?` extension. Frontmatter `slug:` overrides when present.
 const fileToSlug = (filename: string): string =>
   filename.replace(/^\d+-/, "").replace(/\.mdx?$/, "");
-
-// Frontmatter `tags`: optional array of non-empty strings. Returned
-// trimmed and de-duplicated in source order; an empty `[]` is treated as
-// "no tags" — same as omitting the key. Throws (with file context) on
-// any other shape. Exported for tests.
-export const parseTags = (
-  value: unknown,
-  filename: string,
-): string[] | undefined => {
-  if (value === undefined) return undefined;
-  if (
-    !Array.isArray(value) ||
-    !value.every((t): t is string => typeof t === "string" && t.trim() !== "")
-  ) {
-    throw new Error(
-      `[blog] ${filename}: frontmatter \`tags\` must be an array of non-empty strings when present`,
-    );
-  }
-  const tags = [...new Set(value.map((t) => t.trim()))];
-  return tags.length > 0 ? tags : undefined;
-};
 
 // Frontmatter `image`: optional override for the generated OG card.
 // Accepts a site-relative path (leading `/` followed by a non-`/` char,
@@ -322,7 +300,6 @@ const parseEntry = (filename: string): RawPost | null => {
     );
   }
   const bucket = typeof data.bucket === "string" ? data.bucket : undefined;
-  const tags = parseTags(data.tags, filename);
   const image = parseImage(data.image, filename);
   const words = countWords(content);
 
@@ -332,7 +309,6 @@ const parseEntry = (filename: string): RawPost | null => {
     date,
     summary,
     bucket,
-    tags,
     image,
     pinned,
     words,
@@ -383,7 +359,6 @@ const toMeta = (e: PostSource): PostMeta => ({
   date: e.date,
   summary: e.summary,
   bucket: e.bucket,
-  tags: e.tags,
   image: e.image,
   pinned: e.pinned,
   seriesNumber: e.seriesNumber,
@@ -475,7 +450,6 @@ type BlogPostingNode = {
   url: string;
   mainEntityOfPage: string;
   image: string;
-  keywords?: string;
   wordCount: number;
   datePublished: IsoDate;
   dateModified: IsoDate;
@@ -502,7 +476,6 @@ export const blogPostingNode = (post: PostMeta): BlogPostingNode => {
     // Override-vs-fallback selection, and the cache-buster mismatch with the
     // og:image meta, are both explained in `postImageUrl`'s JSDoc.
     image: postImageUrl(post),
-    keywords: post.tags?.join(", "),
     wordCount: post.words,
     datePublished: post.date,
     dateModified: post.date,

@@ -57,7 +57,6 @@ export async function generateMetadata({
       url: `/blog/${post.slug}/`,
       type: "article",
       publishedTime: post.date,
-      tags: post.tags,
       ...(ogImages && { images: ogImages }),
     },
     twitter: {
