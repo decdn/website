@@ -1718,26 +1718,12 @@ a.hero-status:hover .arrow {
 }
 
 /* --- site footer --------------------------------------------------------
-   Continues the tone of the page's last section, read from the data-tone
-   that Frame puts on every section. Ink when the last section is ink or
-   carries no tone. */
+   Every page ends on a paper section and the footer (paper too) reads as
+   its tail: its own rule marks the break, so the last section keeps only
+   half a frame pad above it and the footer adds none. */
 
-.site-footer {
-  background: var(--ink);
-  color: var(--paper);
-}
-body:has(main > [data-tone="paper"]:last-child) .site-footer {
-  background: var(--paper);
-  color: var(--ink);
-}
-/* When the footer continues a toned section it reads as that section's
-   tail, so the footer's own rule marks the break: half a frame pad above
-   it rather than a full one plus the footer's padding. */
-main > [data-tone]:last-child {
+main > :last-child {
   padding-bottom: calc(var(--spacing-frame-pad-y) / 2);
-}
-body:has(main > [data-tone]:last-child) .site-footer {
-  padding-top: 0;
 }
 
 /* --- network explainer (/network/) --------------------------------------
