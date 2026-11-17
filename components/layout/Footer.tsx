@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { links } from "@/lib/links";
 
-// Always paper: every route ends on a paper block (see the "site footer"
+// Always paper, because every route currently ends on a paper block. If a
+// route ever ends on an ink or other toned block, the footer must match that
+// tone again; the tone-matching version is in 9c20dc4 (see the "site footer"
 // note in globals.css). No top pad — the rule below is the break, and
 // globals.css sets the bottom pad of the Frame that ends <main> to sit
 // against it.
