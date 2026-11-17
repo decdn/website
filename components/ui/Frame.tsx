@@ -43,7 +43,6 @@ export function Frame({
     <section
       id={id}
       aria-labelledby={labelledBy ?? `${id}-h`}
-      data-tone={tone}
       data-nav-dark={navDark || undefined}
       className={sectionClass}
     >

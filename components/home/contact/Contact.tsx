@@ -32,7 +32,7 @@ const SOCIAL_ICONS: Record<
 
 export function Contact() {
   return (
-    <Frame id="contact" tone="paper" className="overflow-hidden max-md:pb-2">
+    <Frame id="contact" tone="paper" className="overflow-hidden">
       <SectionHeader
         index="06"
         label="Contact us"

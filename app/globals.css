@@ -1720,18 +1720,18 @@ a.hero-status:hover .arrow {
 }
 
 /* --- site footer --------------------------------------------------------
-   Continues the tone of the page's last section, read from the data-tone
-   that Frame puts on every section. Ink when the last section is ink or
-   carries no tone. */
+   The footer is always paper because every route currently ends on a paper
+   block (a Frame section, or .nx on /network/). If a route ever ends on an
+   ink or other toned block, the footer must match that tone again: the
+   tone-matching rules (.site-footer here, the class in Footer.tsx, and the
+   data-tone attributes on Frame and .nx that they read) are in 9c20dc4 and
+   can be restored from git. The footer reads as that block's tail: it
+   adds no top pad, its own rule marks the break, and a Frame that ends
+   <main> gets half a frame pad below its content. Unlayered so it beats
+   Frame's py-frame-pad-y utility. .nx sets the same bottom pad itself. */
 
-.site-footer {
-  background: var(--ink);
-  color: var(--paper);
-}
-body:has(main > [data-tone="paper"]:last-child) .site-footer {
-  background: var(--paper);
-  color: var(--ink);
-  border-top: 1px solid color-mix(in srgb, var(--ink) 10%, transparent);
+main > section:last-child {
+  padding-bottom: calc(var(--spacing-frame-pad-y) / 2);
 }
 
 /* --- network explainer (/network/) --------------------------------------
@@ -1758,7 +1758,9 @@ body:has(main > [data-tone="paper"]:last-child) .site-footer {
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  padding: 84px var(--spacing-frame-gutter) 16px;
+  /* Bottom pad matches the Frame that ends every other route (see the
+     site footer note). */
+  padding: 84px var(--spacing-frame-gutter) calc(var(--spacing-frame-pad-y) / 2);
   background: var(--paper);
   color: var(--ink);
   font-size: 15px;
