@@ -1094,6 +1094,26 @@ a.hero-status:hover .arrow {
   }
 }
 
+/* --- blog masthead -------------------------------------------------------
+   The dark band atop /blog/ and every post. The brand green rises from the
+   bottom-right corner: a wide soft ellipse for the wash, a tighter, brighter
+   one at the corner itself. Static on purpose — the glow is the page's one
+   loud element and needs no motion to carry it. */
+.blog-masthead {
+  background-color: var(--ink);
+  background-image:
+    radial-gradient(
+      ellipse 45% 75% at 100% 100%,
+      color-mix(in srgb, var(--whisper) 70%, transparent),
+      transparent 100%
+    ),
+    radial-gradient(
+      ellipse 95% 150% at 100% 100%,
+      color-mix(in srgb, var(--whisper) 38%, transparent),
+      transparent 70%
+    );
+}
+
 /* --- prose: MDX body styling ------------------------------------------ */
 /* Long-form post body. Wrapped in <Prose>. Tokens drawn from the shared
    scale (--text-body, --text-lead, --text-h3) so headings track the same
@@ -1132,10 +1152,12 @@ a.hero-status:hover .arrow {
     "ss01" on,
     "zero" on;
   font-variant-numeric: tabular-nums;
-  font-size: var(--text-h3);
+  /* Same scale as the blog index's post titles: section heads sit well
+     below the masthead title. */
+  font-size: clamp(1.375rem, 2.4vw, 1.75rem);
   font-weight: 600;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
 }
 
 /* Larger gap before an h2 than the base 1.4em — scoped to non-first
@@ -1143,7 +1165,7 @@ a.hero-status:hover .arrow {
    margin (mirrors `.prose > * + *`; wins it on specificity). h3 needs no
    such rule: its pre-heading gap is just the base 1.4em. */
 .prose > * + h2 {
-  margin-block-start: 1.7em;
+  margin-block-start: 2em;
 }
 
 .prose h3 {

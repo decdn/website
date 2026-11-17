@@ -41,6 +41,10 @@ const NAV: readonly NavEntry[] = [
 export function Chrome() {
   const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
   const [scrolled, setScrolled] = useState(false);
+  // Off-home pages can open on a dark band (the blog masthead). Such a band
+  // carries `data-nav-dark`, and the nav takes the ink tone while it sits
+  // under the nav — see the observer below.
+  const [overDarkBand, setOverDarkBand] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   // This component lives in the root layout, so a `next/link` client-side
@@ -193,6 +197,35 @@ export function Chrome() {
     };
   }, [pathname]);
 
+  // Same 1px-slice technique as the section observer above, for the
+  // `data-nav-dark` bands off-home pages render. A band is the page's top
+  // section; the slice is rebuilt on resize like the one above.
+  useEffect(() => {
+    const band = document.querySelector<HTMLElement>("[data-nav-dark]");
+    if (band === null) return;
+    let io: IntersectionObserver | null = null;
+    const build = () => {
+      io?.disconnect();
+      const navH = Math.min(
+        navRef.current?.offsetHeight ?? 0,
+        Math.max(0, window.innerHeight - 1),
+      );
+      const bottomInset = Math.max(0, window.innerHeight - navH - 1);
+      io = new IntersectionObserver(
+        ([entry]) => setOverDarkBand(entry.isIntersecting),
+        { rootMargin: `-${navH}px 0px -${bottomInset}px 0px`, threshold: 0 },
+      );
+      io.observe(band);
+    };
+    build();
+    window.addEventListener("resize", build, { passive: true });
+    return () => {
+      window.removeEventListener("resize", build);
+      io?.disconnect();
+      setOverDarkBand(false);
+    };
+  }, [pathname]);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     // Re-sync after a client-side nav too: the route change resets scroll
@@ -222,7 +255,7 @@ export function Chrome() {
     active,
     "intro",
   );
-  const onDark = DARK_SECTIONS.has(effectiveActive);
+  const onDark = DARK_SECTIONS.has(effectiveActive) || overDarkBand;
   // The toggle is rendered beside the nav (see MobileMenu.tsx) and lives
   // on top of the paper panel while the drawer is open — force it to
   // paper then so its × reads against the white panel.

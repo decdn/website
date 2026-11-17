@@ -75,6 +75,17 @@ export const readingMinutes = (words: number): number =>
 // `<time dateTime>`; only the rendered string gets the middle dots.
 export const dottedDate = (iso: string): string => iso.replaceAll("-", "·");
 
+const LONG_DATE = new Intl.DateTimeFormat("en-US", {
+  year: "numeric",
+  month: "long",
+  day: "numeric",
+  timeZone: "UTC",
+});
+
+/** `2026-05-11` → `May 11, 2026`. Read as UTC so the day never shifts. */
+export const longDate = (iso: string): string =>
+  LONG_DATE.format(new Date(`${iso}T00:00:00Z`));
+
 const pad2 = (n: number): string => String(n).padStart(2, "0");
 
 /** `8` → `08 min`. Receives `PostMeta.readMin` (integer ≥ 1). */

@@ -4,6 +4,7 @@ import {
   buildOgImages,
   countWords,
   dottedDate,
+  longDate,
   getPost,
   listIndexPosts,
   listPosts,
@@ -95,6 +96,11 @@ describe("readingMinutes", () => {
 describe("display formatters", () => {
   it("dottedDate swaps hyphens for middle dots", () => {
     expect(dottedDate("2026-05-11")).toBe("2026·05·11");
+  });
+
+  it("longDate spells the month out and keeps the day in UTC", () => {
+    expect(longDate("2026-05-11")).toBe("May 11, 2026");
+    expect(longDate("2026-11-01")).toBe("November 1, 2026");
   });
 
   it("readLabel zero-pads to two digits", () => {

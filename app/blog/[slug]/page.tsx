@@ -5,18 +5,15 @@ import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import { CodeBlock } from "@/components/ui/CodeBlock";
 import { Frame } from "@/components/ui/Frame";
-import { Pill } from "@/components/ui/Pill";
-import { META } from "@/components/blog/PostRow";
+import { BlogMasthead } from "@/components/blog/BlogMasthead";
 import { Prose } from "@/components/ui/Prose";
 import {
   blogPostingNode,
   buildOgImages,
-  dottedDate,
   getPost,
   listPosts,
+  longDate,
   postUrl,
-  readLabel,
-  seriesLabel,
 } from "@/lib/blog";
 import { JsonLd } from "@/lib/jsonld";
 import { BLOG_CRUMB, breadcrumbNode, HOME_CRUMB } from "@/lib/schema";
@@ -85,12 +82,8 @@ export default async function BlogPost({
   // Prev/next: the posts one number above (more recent) and below this
   // one in the series. `find` returns undefined at the ends.
   const all = listPosts();
-  const num = seriesLabel(post.seriesNumber);
   const newer = all.find((p) => p.seriesNumber === post.seriesNumber + 1);
   const older = all.find((p) => p.seriesNumber === post.seriesNumber - 1);
-
-  const tags = post.tags ?? [];
-  const minutes = readLabel(post.readMin);
 
   // BlogPosting assembly is shared with the blog index's `Blog` graph via
   // `blogPostingNode` (lib/blog.ts) so the two can't diverge under the same
@@ -107,48 +100,35 @@ export default async function BlogPost({
     <main>
       <JsonLd data={postingSchema} />
       <JsonLd data={breadcrumbSchema} />
-      <Frame id="post" tone="paper">
-        <article className="flex flex-col gap-10">
+      <BlogMasthead id="post">
+        <div className="flex flex-col">
           <Link
             href="/blog/"
-            aria-label="Back to field notes"
-            className="meta inline-flex items-center gap-2 self-start opacity-60 no-underline transition-opacity hover:opacity-100"
+            className="self-start text-lead font-semibold no-underline opacity-90 transition-opacity hover:opacity-100"
           >
-            <span aria-hidden>←</span> field notes
+            Blog
           </Link>
+          <span aria-hidden className="rule mt-4 opacity-30" />
+        </div>
+        <header className="mx-auto mt-14 flex w-full max-w-[68ch] flex-col gap-5 pb-2">
+          <time
+            dateTime={post.date}
+            className="text-body leading-none tabular-nums opacity-75"
+          >
+            {longDate(post.date)}
+          </time>
+          <h1
+            id="post-h"
+            className="hug text-[clamp(2rem,4.6vw,3.5rem)] leading-[1.05] font-bold text-balance"
+          >
+            {post.title}
+          </h1>
+          <p className="text-body opacity-75">{post.readMin} min read</p>
+        </header>
+      </BlogMasthead>
 
-          {/* Centered masthead — meta line, title, and tags align on the
-              page's vertical axis above the (centered) body. The "← field
-              notes" back-link above stays flush-left as nav chrome. */}
-          <header className="flex flex-col items-center gap-6 text-center">
-            <div
-              className={`${META} flex flex-wrap items-center justify-center gap-x-3 gap-y-1 tabular-nums opacity-60`}
-            >
-              <span>§ {num}</span>
-              <span aria-hidden>·</span>
-              <time dateTime={post.date}>{dottedDate(post.date)}</time>
-              <span aria-hidden>·</span>
-              <span>{minutes}</span>
-            </div>
-            <h1
-              id="post-h"
-              className="hug text-h2 text-balance leading-[0.95] font-bold"
-            >
-              {post.title}
-            </h1>
-            {tags.length > 0 && (
-              <ul className="flex flex-wrap justify-center gap-2">
-                {tags.map((tag) => (
-                  <li key={tag}>
-                    <Pill>#{tag}</Pill>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </header>
-
-          <span aria-hidden className="rule opacity-20" />
-
+      <Frame id="post-body" tone="paper" labelledBy="post-h">
+        <article className="flex flex-col gap-10">
           <Prose>
             <MDXRemote
               source={post.body}
@@ -159,58 +139,41 @@ export default async function BlogPost({
 
           {(older || newer) && (
             <nav
-              aria-label="More field notes"
-              className="mt-4 grid gap-6 border-t border-current/15 pt-10 @xl:grid-cols-2 @xl:gap-10"
+              aria-label="More posts"
+              className="mx-auto mt-6 grid w-full max-w-[68ch] gap-8 border-t border-current/12 pt-10 @xl:grid-cols-2"
             >
               {older ? (
-                <Link
-                  href={`/blog/${older.slug}/`}
-                  className="group flex flex-col gap-2 no-underline"
-                >
-                  {/* The title holds steady on hover — the glyph slides +
-                      greens and the label lifts, mirroring the index row's
-                      `→`. */}
-                  <span className="meta opacity-60 transition-opacity duration-300 ease-out group-hover:opacity-90">
-                    <span
-                      aria-hidden
-                      className="inline-block transition-[translate,color] duration-300 ease-out group-hover:-translate-x-1 group-hover:text-whisper"
-                    >
-                      ←
-                    </span>{" "}
-                    earlier
-                  </span>
-                  <span className="hug text-lead leading-[1.2] font-bold">
-                    {older.title}
-                  </span>
-                </Link>
+                <PostLink post={older} label="Previous post" />
               ) : (
                 <span aria-hidden className="hidden @xl:block" />
               )}
-              {newer ? (
-                <Link
-                  href={`/blog/${newer.slug}/`}
-                  className="group flex flex-col gap-2 no-underline @xl:items-end @xl:text-right"
-                >
-                  <span className="meta opacity-60 transition-opacity duration-300 ease-out group-hover:opacity-90">
-                    later{" "}
-                    <span
-                      aria-hidden
-                      className="inline-block transition-[translate,color] duration-300 ease-out group-hover:translate-x-1 group-hover:text-whisper"
-                    >
-                      →
-                    </span>
-                  </span>
-                  <span className="hug text-lead leading-[1.2] font-bold">
-                    {newer.title}
-                  </span>
-                </Link>
-              ) : (
-                <span aria-hidden className="hidden @xl:block" />
-              )}
+              {newer && <PostLink post={newer} label="Next post" alignEnd />}
             </nav>
           )}
         </article>
       </Frame>
     </main>
+  );
+}
+
+function PostLink({
+  post,
+  label,
+  alignEnd = false,
+}: {
+  post: { slug: string; title: string };
+  label: string;
+  alignEnd?: boolean;
+}) {
+  return (
+    <Link
+      href={`/blog/${post.slug}/`}
+      className={`group flex flex-col gap-2 no-underline ${alignEnd ? "@xl:items-end @xl:text-right" : ""}`}
+    >
+      <span className="text-body opacity-60">{label}</span>
+      <span className="text-lead leading-[1.3] font-semibold text-balance underline decoration-transparent decoration-1 underline-offset-[0.2em] transition-[text-decoration-color] duration-200 ease-soft group-hover:decoration-current">
+        {post.title}
+      </span>
+    </Link>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata, ResolvingMetadata } from "next";
 import { Frame } from "@/components/ui/Frame";
-import { BLOG_GRID_COLS, PostRow } from "@/components/blog/PostRow";
+import { BlogMasthead } from "@/components/blog/BlogMasthead";
+import { PostRow } from "@/components/blog/PostRow";
 import { listIndexPosts } from "@/lib/blog";
 import { BLOG_DESCRIPTION, BLOG_TITLE } from "@/lib/copy";
 import { JsonLd } from "@/lib/jsonld";
@@ -63,55 +64,34 @@ export default function BlogIndex() {
     <main>
       <JsonLd data={breadcrumbSchema} />
       <JsonLd data={blogSchema} />
-      <Frame id="blog" tone="paper">
-        <header className="flex flex-col gap-6">
+      <BlogMasthead id="blog">
+        <header className="mx-auto flex max-w-[48rem] flex-col items-center gap-6 pb-4 text-center">
           <h1
             id="blog-h"
-            className="hug rise rise-0 text-h2 leading-[0.92] font-bold"
+            className="hug text-h2 leading-[0.95] font-bold text-balance"
           >
             {BLOG_TITLE}
           </h1>
-          {/* .rise forces opacity:1 at rest (fill: forwards), so the
-              dimmed lead sits inside a .rise wrapper rather than carrying
-              the class itself. */}
-          <div className="rise rise-1">
-            <p className="max-w-[60ch] text-lead leading-[1.7] opacity-75">
-              Long-form posts on the deCDN protocol — what it is, why now, and
-              how the pieces fit together. Published when something&apos;s worth
-              saying.
-            </p>
-          </div>
+          <p className="max-w-[52ch] text-lead leading-[1.6] opacity-75">
+            Long-form posts on the deCDN protocol — what it is, why now, and how
+            the pieces fit together. Published when something&apos;s worth
+            saying.
+          </p>
         </header>
+      </BlogMasthead>
 
-        {posts.length === 0 ? (
-          <>
-            <span aria-hidden className="rule mt-16 opacity-20" />
-            <p className="mt-16 text-body opacity-60">Nothing yet.</p>
-          </>
-        ) : (
-          <div className="mt-16 flex flex-col">
-            <div
-              aria-hidden
-              className={`meta hidden pb-3 opacity-60 @xl:grid ${BLOG_GRID_COLS}`}
-            >
-              <span>#</span>
-              <span>date</span>
-              <span>title · summary</span>
-              <span className="text-right">read</span>
-              <span />
-            </div>
-            <span aria-hidden className="rule rule-2" />
-            <ul className="flex flex-col divide-y divide-current/12">
-              {posts.map((post, i) => (
-                <PostRow
-                  key={post.slug}
-                  post={post}
-                  delay={Math.min(i, 4) * 80}
-                />
+      <Frame id="posts" tone="paper" labelledBy="blog-h">
+        <div className="mx-auto w-full max-w-[48rem]">
+          {posts.length === 0 ? (
+            <p className="text-body opacity-60">Nothing yet.</p>
+          ) : (
+            <ul className="-my-10 flex flex-col divide-y divide-current/12 @xl:-my-12">
+              {posts.map((post) => (
+                <PostRow key={post.slug} post={post} />
               ))}
             </ul>
-          </div>
-        )}
+          )}
+        </div>
       </Frame>
     </main>
   );
