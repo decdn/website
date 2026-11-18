@@ -51,7 +51,7 @@ export function Chrome() {
   const [scrolled, setScrolled] = useState(false);
   // Off-home pages can open on a dark band (the blog masthead). Such a band
   // carries `data-nav-dark`, and the nav takes the ink tone while it sits
-  // under the nav — see the band observer below and resolveOverDarkBand.
+  // under the nav — see the band reading below and resolveOverDarkBand.
   const [band, setBand] = useState<BandReading | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
@@ -205,55 +205,40 @@ export function Chrome() {
     };
   }, [pathname]);
 
-  // Same 1px-slice technique as the section observer above, for the first
-  // `[data-nav-dark]` band on the page (assumed to be its top section). Like
-  // that observer, the slice is rebuilt, rAF-coalesced, on window resize and
-  // on nav-size changes. Each reading is tagged with its route so a stale
-  // one never paints on the next page. The reading uses the band's bottom
-  // edge rather than `isIntersecting`, so top overscroll (which pulls the
-  // band below the slice) still reads as dark — see bandUnderNav.
+  // Whether the first `[data-nav-dark]` band on the page (assumed to be its
+  // top section) sits under the nav. Read from scroll and resize events, not
+  // an IntersectionObserver like the sections above: on iOS the observer
+  // reports late after a momentum fling, so the logo went black at the top
+  // for about a second while the bar (driven by scroll events) had already
+  // settled. Reading the band's bottom edge also keeps top overscroll, which
+  // pulls the band down, reading as dark — see bandUnderNav. Each reading is
+  // tagged with its route so a stale one never paints on the next page, and
+  // state only changes when the reading flips.
   useEffect(() => {
     const el = document.querySelector<HTMLElement>("[data-nav-dark]");
     if (el === null) return;
 
-    let io: IntersectionObserver | null = null;
-    const build = () => {
-      io?.disconnect();
-      const rawNavH = navRef.current?.offsetHeight ?? 0;
-      const navH = Math.min(rawNavH, Math.max(0, window.innerHeight - 1));
-      const bottomInset = Math.max(0, window.innerHeight - navH - 1);
-      io = new IntersectionObserver(
-        ([entry]) =>
-          setBand({
-            pathname,
-            dark: bandUnderNav(entry.boundingClientRect.bottom, navH),
-          }),
-        { rootMargin: `-${navH}px 0px -${bottomInset}px 0px`, threshold: 0 },
+    let last: boolean | null = null;
+    const read = () => {
+      const dark = bandUnderNav(
+        el.getBoundingClientRect().bottom,
+        navRef.current?.offsetHeight ?? 0,
       );
-      io.observe(el);
+      if (dark === last) return;
+      last = dark;
+      setBand({ pathname, dark });
     };
 
-    let resizeRaf = 0;
-    const onResize = () => {
-      if (resizeRaf) return;
-      resizeRaf = requestAnimationFrame(() => {
-        resizeRaf = 0;
-        build();
-      });
-    };
-
-    build();
+    read();
     const ro =
-      typeof ResizeObserver !== "undefined"
-        ? new ResizeObserver(onResize)
-        : null;
+      typeof ResizeObserver !== "undefined" ? new ResizeObserver(read) : null;
     if (ro && navRef.current) ro.observe(navRef.current);
-    window.addEventListener("resize", onResize, { passive: true });
+    window.addEventListener("scroll", read, { passive: true });
+    window.addEventListener("resize", read, { passive: true });
     return () => {
-      window.removeEventListener("resize", onResize);
-      if (resizeRaf) cancelAnimationFrame(resizeRaf);
+      window.removeEventListener("scroll", read);
+      window.removeEventListener("resize", read);
       ro?.disconnect();
-      io?.disconnect();
     };
   }, [pathname]);
 
