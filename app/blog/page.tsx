@@ -3,7 +3,7 @@ import { Frame } from "@/components/ui/Frame";
 import { BlogMasthead } from "@/components/blog/BlogMasthead";
 import { PostRow } from "@/components/blog/PostRow";
 import { listIndexPosts } from "@/lib/blog";
-import { BLOG_DESCRIPTION, BLOG_TITLE } from "@/lib/copy";
+import { BLOG_DESCRIPTION, BLOG_META_TITLE, BLOG_TITLE } from "@/lib/copy";
 import { JsonLd } from "@/lib/jsonld";
 import { BLOG_URL } from "@/lib/links";
 import { BLOG_CRUMB, blogNode, breadcrumbNode, HOME_CRUMB } from "@/lib/schema";
@@ -28,12 +28,12 @@ export async function generateMetadata(
 ): Promise<Metadata> {
   const ogImages = await inheritedOgImages(parent);
   return {
-    title: BLOG_TITLE,
+    title: BLOG_META_TITLE,
     description: BLOG_DESCRIPTION,
     alternates: { canonical: "/blog/" },
     openGraph: {
       ...OG_SITE,
-      title: BLOG_TITLE,
+      title: BLOG_META_TITLE,
       description: BLOG_DESCRIPTION,
       url: "/blog/",
       type: "website",
@@ -45,7 +45,7 @@ export async function generateMetadata(
     twitter: {
       ...TWITTER_SITE,
       card: "summary_large_image",
-      title: BLOG_TITLE,
+      title: BLOG_META_TITLE,
       description: BLOG_DESCRIPTION,
       ...imagesField(ogImages),
     },

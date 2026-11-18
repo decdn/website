@@ -8,6 +8,27 @@ export type FaqEntry = { q: string; a: readonly string[] };
 
 export const FAQ_ITEMS = [
   {
+    q: "What is deCDN?",
+    a: [
+      "deCDN is a decentralized content delivery network for large files such as AI models, datasets, Linux images and video. Independent operators run the nodes, post a bond to join, and earn USDC for every megabyte they deliver.",
+      "Your files stay in the storage you already use. Clients download each file from several nodes at once and check every chunk against its BLAKE3 hash, so altered bytes are rejected and a node that drops out doesn't stop the download.",
+    ],
+  },
+  {
+    q: "How is deCDN different from IPFS or Filecoin?",
+    a: [
+      "IPFS and Filecoin are built around storing data. deCDN doesn't store your files, it serves them: your origin stays in S3, R2, B2, NFS or a local disk, and nodes cache only what your users actually request.",
+      "Delivery is a paid market. Nodes quote a per-megabyte price in USDC and compete for every request, so popular content stays cached because serving it pays, not because volunteers keep it around.",
+    ],
+  },
+  {
+    q: "Is deCDN peer-to-peer?",
+    a: [
+      "Not in the BitTorrent or browser sense. Your users only download: their devices never upload, serve or store anything for anyone else.",
+      "The nodes are servers run by operators who have posted a bond. They talk to each other over a peer-to-peer QUIC mesh, so a node that doesn't have a file can pull it from another node and pay for it.",
+    ],
+  },
+  {
     q: "How do I put my files on deCDN?",
     a: [
       "Set up origin nodes in front of your own storage, whether that is an S3-compatible bucket, an NFS mount or a local disk, and join the network. Your files stay where they are.",
@@ -47,6 +68,20 @@ export const FAQ_ITEMS = [
     a: [
       "Governance keeps a public, on-chain blacklist of content hashes, network-wide or for a single region. Nodes have 24 hours to stop serving a listed hash, and repeated offenses result in removal from the network.",
       "Every entry is public, so a wrongful one is visible to anyone, and governance can lift it.",
+    ],
+  },
+  {
+    q: "Is deCDN censorship-resistant?",
+    a: [
+      "No, and it isn't designed to be. Governance can add a content hash to the on-chain blacklist, and nodes have 24 hours to stop serving it.",
+      "What deCDN does avoid is a single point of failure: no one company runs delivery, and a download keeps going when individual nodes drop out.",
+    ],
+  },
+  {
+    q: "Is deCDN live?",
+    a: [
+      "A public testnet has been running on Arbitrum Sepolia since October 13, 2026, and the code is open source. You can download a real file from it today with the commands on this page.",
+      `Testnet figures are not production guarantees, and ${TARGET_RATE} is a public target rate, not a price the protocol enforces.`,
     ],
   },
 ] as const satisfies readonly FaqEntry[];

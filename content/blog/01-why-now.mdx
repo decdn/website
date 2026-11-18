@@ -8,13 +8,13 @@ bucket: pillar
 
 Decentralized CDNs have been attempted for a decade. Most got stuck before they shipped. The thing that's different now isn't ambition — it's that the four prerequisite layers all became production-grade in the last 24–36 months. Until they did, every serious attempt was structurally blocked by problems outside its own protocol: the transport wasn't fast enough, the settlement layer was too expensive, the unit of account was too volatile, or the legal posture made compliance a single point of failure.
 
-**decdn** is the first attempt that gets to design _only_ the protocol, because the rails it runs on are finally ready. This is what changed.
+**deCDN** is the first attempt that gets to design _only_ the protocol, because the rails it runs on are finally ready. This is what changed.
 
 ## Transport: QUIC stopped being a research project
 
 QUIC was an IETF draft until 2021. By 2024 it carried roughly a third of public web traffic and shipped natively in every major OS. The properties that matter for a delivery network are now load-bearing parts of the public internet, not a thing we have to build.
 
-- **Concurrent probing, then connection reuse.** For a CDN, the critical-path latency is probe fan-out, not the handshake: a cache-miss probes ~30 peers in parallel over `cdn/probe/v1` and `cdn/dht/v1`, taking the fastest good answers within a bounded ~500ms collection window and exiting early once enough replies arrive. Every connection still completes a full TLS 1.3 handshake — decdn does not use 0-RTT — but connection reuse and QUIC stream multiplexing carry repeat requests over an already-open connection instead of paying a fresh handshake each time. Five years ago we'd have had to build all of this on TCP+TLS ourselves.
+- **Concurrent probing, then connection reuse.** For a CDN, the critical-path latency is probe fan-out, not the handshake: a cache-miss probes ~30 peers in parallel over `cdn/probe/v1` and `cdn/dht/v1`, taking the fastest good answers within a bounded ~500ms collection window and exiting early once enough replies arrive. Every connection still completes a full TLS 1.3 handshake — deCDN does not use 0-RTT — but connection reuse and QUIC stream multiplexing carry repeat requests over an already-open connection instead of paying a fresh handshake each time. Five years ago we'd have had to build all of this on TCP+TLS ourselves.
 - **NAT traversal as a library function.** iroh ships hole-punching, relay fallback, and direct-path upgrade as a single `Endpoint` API. The fraction of node operators behind residential NAT we can usefully include just went from ~10% to ~95% without us writing networking code.
 - **Connection migration.** A node operator's IP changing mid-stream — laptop sleep, mobile handoff, ISP renegotiation — doesn't kill the delivery session. This is the difference between "you need a static IP and a real datacenter" and "your spare 1U at home counts."
 

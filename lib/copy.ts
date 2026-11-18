@@ -30,12 +30,17 @@ export const SITE_DESCRIPTION =
  *  an aria-hidden full stop, so they stay explicit at the call site rather
  *  than being mapped over. */
 export const HERO_HEADLINE = [
-  "the delivery layer",
+  "a decentralized cdn",
   "anyone can serve",
 ] as const;
 
+/** Opens with a plain definition so the page says what deCDN is before the
+ *  Berlin-to-Tokyo example: crawlers and AI answer engines tend to quote the
+ *  opening sentence of a page's first paragraph, and the h1 is display copy.
+ *  Starts with "Built for" rather than the brand because prose is
+ *  sentence-cased (see lib/copy.test.ts) and the brand begins lowercase. */
 export const HERO_LEAD =
-  "A 14-gigabyte file posted in Berlin streams to a client in Tokyo from several nodes at once, every chunk verified with BLAKE3, paid for per megabyte in USDC. The code is open. The network is open. The price is posted.";
+  "Built for large files, deCDN is an open-source decentralized content delivery network: independent, bonded operators serve your bytes from the storage you already use. A 14-gigabyte file posted in Berlin streams to a client in Tokyo from several nodes at once, every chunk verified with BLAKE3, paid for per megabyte in USDC. The code is open. The network is open. The price is posted.";
 
 /** The badge at the right-hand end of the hero's section-header row. */
 export const HERO_BADGE = "testnet";
@@ -185,11 +190,26 @@ export const PANEL_CAPTIONS = {
     "Live deCDN fleet panel. Nodes registered in the CapacityBond contract on the Arbitrum Sepolia testnet, each with its self-declared region, operator address and most recent settlement, and the bytes served and USDC settled over the last 24 hours, read in the browser from the public stats file the deCDN indexer publishes every five minutes. Testnet figures, not mainnet revenue. See the disclaimer at /legal/disclaimer/ for forward-looking statements.",
 } as const;
 
-/** Blog index identity. Read by app/blog/page.tsx for its metadata, by
- *  `blogNode` for the `Blog` schema node, and by the llms.txt index — one
- *  string so the three can't disagree about what the section is. */
+/** Blog index identity. Read by app/blog/page.tsx for its h1, by `blogNode`
+ *  for the `Blog` schema node, and by the llms.txt index — one string so the
+ *  three can't disagree about what the section is. The <title> is
+ *  BLOG_META_TITLE below. BLOG_DESCRIPTION feeds the page's meta and social
+ *  description, `blogNode` and llms.txt; the visible lede under the h1 is
+ *  separate copy in app/blog/page.tsx. */
 export const BLOG_TITLE = "field notes";
-export const BLOG_DESCRIPTION = "Long-form posts on the deCDN protocol.";
+export const BLOG_DESCRIPTION =
+  "Long-form posts on deCDN, a decentralized CDN for large files: why it is possible now, how the protocol works, what node operators earn, and who needs it.";
+/** The blog index's <title> and social-card title. Separate from BLOG_TITLE
+ *  so the page keeps "field notes" as its h1 and schema name while the
+ *  search result names the category; the root template appends " · deCDN". */
+export const BLOG_META_TITLE = "Decentralized CDN field notes";
+
+/** The 404 page (app/not-found.tsx): its <title> and h1, and the line above
+ *  the way-out links. Lowercase title to match the other non-home h1s
+ *  ("field notes", "privacy policy"). */
+export const NOT_FOUND_TITLE = "page not found";
+export const NOT_FOUND_LEAD =
+  "Nothing lives at this address. The link may be old or mistyped, so try one of these instead.";
 
 export type SourceRepo = {
   /** Repo name under the GitHub org; the URL is `repoUrl(name)` in lib/links.ts. */
