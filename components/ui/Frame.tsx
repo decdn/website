@@ -8,7 +8,10 @@ type FrameProps = {
   /** Extra classes on the outer <section>. */
   className?: string;
   /** Marks a dark band at the top of an off-home page: the fixed nav takes
-   *  the ink tone while the band sits under it (Chrome.tsx). */
+   *  the ink tone while the band sits under it (Chrome.tsx). Only for the
+   *  page's first section: the nav also reads a band still below it as dark
+   *  (to cover top overscroll), so a mid-page band would ink it from load.
+   *  BlogMasthead is the one caller. */
   navDark?: boolean;
   /** Leaves the section without an accessible name (no `aria-labelledby`),
    *  so it isn't a landmark. For the body under a masthead, whose h1 already

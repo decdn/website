@@ -206,7 +206,8 @@ export function Chrome() {
   }, [pathname]);
 
   // Whether the first `[data-nav-dark]` band on the page (assumed to be its
-  // top section) sits under the nav. Read from scroll and resize events, not
+  // top section) sits under the nav. Read on scroll, on resize and when the nav
+  // or the band changes size (e.g. a webfont swap rewraps the masthead), not
   // an IntersectionObserver like the sections above: on iOS the observer
   // reports late after a momentum fling, so the logo went black at the top
   // for about a second while the bar (driven by scroll events) had already
@@ -233,6 +234,7 @@ export function Chrome() {
     const ro =
       typeof ResizeObserver !== "undefined" ? new ResizeObserver(read) : null;
     if (ro && navRef.current) ro.observe(navRef.current);
+    ro?.observe(el);
     window.addEventListener("scroll", read, { passive: true });
     window.addEventListener("resize", read, { passive: true });
     return () => {
