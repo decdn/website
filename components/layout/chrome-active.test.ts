@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  bandUnderNav,
   opensOnDarkBand,
   resolveActiveSection,
   resolveOverDarkBand,
@@ -88,5 +89,21 @@ describe("resolveOverDarkBand", () => {
     expect(resolveOverDarkBand("/", { pathname: "/blog/", dark: true })).toBe(
       false,
     );
+  });
+});
+
+describe("bandUnderNav", () => {
+  it("is dark while the band covers the slice", () => {
+    expect(bandUnderNav(600, 72)).toBe(true);
+  });
+
+  it("stays dark when overscroll pulls the band below the slice", () => {
+    // Band top at 150 (> slice), bottom far below.
+    expect(bandUnderNav(750, 72)).toBe(true);
+  });
+
+  it("is light once the band has scrolled past the slice", () => {
+    expect(bandUnderNav(40, 72)).toBe(false);
+    expect(bandUnderNav(72, 72)).toBe(false);
   });
 });

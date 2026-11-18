@@ -16,6 +16,7 @@ import { MobileMenu } from "@/components/layout/MobileMenu";
 import {
   type BandReading,
   DARK_SECTIONS,
+  bandUnderNav,
   SECTION_IDS,
   resolveActiveSection,
   resolveOverDarkBand,
@@ -208,7 +209,9 @@ export function Chrome() {
   // `[data-nav-dark]` band on the page (assumed to be its top section). Like
   // that observer, the slice is rebuilt, rAF-coalesced, on window resize and
   // on nav-size changes. Each reading is tagged with its route so a stale
-  // one never paints on the next page.
+  // one never paints on the next page. The reading uses the band's bottom
+  // edge rather than `isIntersecting`, so top overscroll (which pulls the
+  // band below the slice) still reads as dark — see bandUnderNav.
   useEffect(() => {
     const el = document.querySelector<HTMLElement>("[data-nav-dark]");
     if (el === null) return;
@@ -220,7 +223,11 @@ export function Chrome() {
       const navH = Math.min(rawNavH, Math.max(0, window.innerHeight - 1));
       const bottomInset = Math.max(0, window.innerHeight - navH - 1);
       io = new IntersectionObserver(
-        ([entry]) => setBand({ pathname, dark: entry.isIntersecting }),
+        ([entry]) =>
+          setBand({
+            pathname,
+            dark: bandUnderNav(entry.boundingClientRect.bottom, navH),
+          }),
         { rootMargin: `-${navH}px 0px -${bottomInset}px 0px`, threshold: 0 },
       );
       io.observe(el);

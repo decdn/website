@@ -41,6 +41,14 @@ export function opensOnDarkBand(pathname: string): boolean {
   return pathname === "/blog" || pathname.startsWith("/blog/");
 }
 
+// Whether the band still covers the nav's 1px slice at `sliceY` or lies
+// below it. The band is the page's top section, so "below the slice" only
+// happens when iOS rubber-band overscroll pulls the page down past the top;
+// reading that as dark keeps the logo from flashing black during the bounce.
+export function bandUnderNav(bandBottom: number, sliceY: number): boolean {
+  return bandBottom > sliceY;
+}
+
 export type BandReading = { pathname: string; dark: boolean };
 
 // Whether a `data-nav-dark` band sits under the nav. The observer's reading
