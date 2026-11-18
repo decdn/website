@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { getPost, longDate } from "./blog";
 import { FAQ_ITEMS } from "./faq";
 
 // FAQ_ITEMS is consumed three ways — rendered as <dt>/<dd> by
@@ -38,5 +39,19 @@ describe("FAQ_ITEMS", () => {
 
   it.each(FAQ_ITEMS)("answers $q in at least one paragraph", ({ a }) => {
     expect(a.length).toBeGreaterThan(0);
+  });
+});
+
+// The "Is deCDN live?" answer states the testnet launch date in prose. It
+// can't interpolate it from the post the way it does TARGET_RATE: FaqList is
+// a client component, and lib/blog.ts reads the filesystem. So this holds the
+// hand-written date to the post's frontmatter instead, since the answer also
+// ships as FAQPage structured data.
+describe("Is deCDN live?", () => {
+  it("dates the testnet to the launch post", () => {
+    const post = getPost("testnet-is-live");
+    expect(post).not.toBeNull();
+    const live = FAQ_ITEMS.find((f) => f.q === "Is deCDN live?");
+    expect(live?.a.join(" ")).toContain(longDate(post!.date));
   });
 });
