@@ -30,6 +30,10 @@
 //      is its documented trigger; headless runs did not reproduce it). TryIt's
 //      chevron sits in a hooks client component, so only the built HTML shows
 //      its prerendered markup.
+//   7. The 404 page going indexable again. Its robots tag and missing
+//      canonical come from Next merging app/not-found.tsx's metadata with the
+//      root layout's, and a unit test of the metadata object cannot see the
+//      merge.
 //
 // The numbered checks below are assertions, not the failure classes above.
 //
@@ -187,6 +191,34 @@ for (const relative of htmlFiles) {
 }
 if (homeSvgs === 0)
   fail("index.html: no inline <svg> found — check 8 scanned nothing");
+
+// 9. The 404 page's head. app/not-found.tsx sets robots and drops the
+//    canonical, but Next merges that with the root layout's metadata at
+//    build time, and before the file existed the export emitted `noindex`
+//    beside `index, follow` and a canonical to the homepage. Only the built
+//    HTML shows what the merge produced. The title is read from lib/copy.ts
+//    rather than restated here.
+const notFound = read("404.html");
+if (notFound) {
+  const robots = [
+    ...notFound.matchAll(/<meta name="robots" content="([^"]*)"/g),
+  ].map((m) => m[1]);
+  if (robots.length === 0) fail("404.html: no robots meta");
+  for (const content of robots) {
+    if (!/\bnoindex\b/.test(content)) {
+      fail(`404.html: robots meta "${content}" lets the 404 be indexed`);
+    }
+  }
+  if (/<link rel="canonical"/.test(notFound)) {
+    fail("404.html: has a canonical — a 404 should not name one");
+  }
+  const copy = readFileSync(path.join(ROOT, "lib", "copy.ts"), "utf8");
+  const title = copy.match(/NOT_FOUND_TITLE = "([^"]+)"/)?.[1];
+  if (!title) fail("lib/copy.ts: NOT_FOUND_TITLE not found");
+  else if (!notFound.includes(`<title>${title}`)) {
+    fail(`404.html: <title> does not start with "${title}"`);
+  }
+}
 
 if (failures.length > 0) {
   console.error(`check-out: ${failures.length} failure(s)\n`);
