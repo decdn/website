@@ -44,10 +44,13 @@ export type Topic = {
 
 export type Role = { name: string; does: string; uses: string };
 
-export const NETWORK_TITLE = "Network layers";
+/** The page's <title>, social-card title and breadcrumb name; the root
+ *  template appends " · deCDN". Names the category rather than the page's
+ *  own vocabulary ("layers"), which nobody searches for. */
+export const NETWORK_TITLE = "Decentralized CDN architecture";
 export const NETWORK_HEADLINE = "how deCDN moves content";
 export const NETWORK_DESCRIPTION =
-  "How deCDN moves content: clients, a delivery network of bonded nodes and each publisher's own storage, with governance and payment reaching every layer.";
+  "How deCDN, a decentralized CDN, moves content: clients, bonded delivery nodes and each publisher's own storage, with governance and payment across every layer.";
 export const NETWORK_LEGEND =
   "Arrows show verified bytes moving up. Requests and payment run the other way.";
 

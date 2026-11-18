@@ -190,11 +190,17 @@ export const PANEL_CAPTIONS = {
     "Live deCDN fleet panel. Nodes registered in the CapacityBond contract on the Arbitrum Sepolia testnet, each with its self-declared region, operator address and most recent settlement, and the bytes served and USDC settled over the last 24 hours, read in the browser from the public stats file the deCDN indexer publishes every five minutes. Testnet figures, not mainnet revenue. See the disclaimer at /legal/disclaimer/ for forward-looking statements.",
 } as const;
 
-/** Blog index identity. Read by app/blog/page.tsx for its metadata, by
- *  `blogNode` for the `Blog` schema node, and by the llms.txt index — one
- *  string so the three can't disagree about what the section is. */
+/** Blog index identity. Read by app/blog/page.tsx for its h1, by `blogNode`
+ *  for the `Blog` schema node, and by the llms.txt index — one string so the
+ *  three can't disagree about what the section is. The <title> is
+ *  BLOG_META_TITLE below; BLOG_DESCRIPTION serves all four. */
 export const BLOG_TITLE = "field notes";
-export const BLOG_DESCRIPTION = "Long-form posts on the deCDN protocol.";
+export const BLOG_DESCRIPTION =
+  "Long-form posts on deCDN, a decentralized CDN for large files: why it is possible now, how the protocol works, what node operators earn, and who needs it.";
+/** The blog index's <title> and social-card title. Separate from BLOG_TITLE
+ *  so the page keeps "field notes" as its h1 and schema name while the
+ *  search result names the category; the root template appends " · deCDN". */
+export const BLOG_META_TITLE = "Decentralized CDN field notes";
 
 /** The 404 page (app/not-found.tsx): its <title> and h1, and the line above
  *  the way-out links. Lowercase title to match the other non-home h1s
