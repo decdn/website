@@ -32,10 +32,33 @@ export const organizationNode: Schema<"Organization"> = {
   "@type": "Organization",
   "@id": ORG_ID,
   name: "deCDN",
+  // The lowercase wordmark and CLI spelling, which search and AI engines see
+  // in package names and blog prose.
+  alternateName: ["decdn"],
   url: SITE_URL,
-  logo: `${SITE_URL}d_logo.png`,
+  // An ImageObject rather than a bare URL so consumers get the dimensions
+  // without fetching it; schema.test.ts holds them to the PNG's header.
+  logo: {
+    "@type": "ImageObject",
+    url: `${SITE_URL}d_logo.png`,
+    width: 300,
+    height: 300,
+  },
   description:
     "Organization developing deCDN, a decentralized content delivery network with per-megabyte settlement in USDC.",
+  // The name collides with unrelated products (a Pale Moon add-on also
+  // called deCDN, Alibaba Cloud's DCDN), and search results and AI answers
+  // mix them up. This is the schema.org field for telling them apart.
+  disambiguatingDescription:
+    "The decentralized content delivery network for large files at decdn.org. Not affiliated with the deCDN browser add-on or with Alibaba Cloud DCDN.",
+  knowsAbout: [
+    "Content delivery networks",
+    "Decentralized physical infrastructure networks",
+    "Content addressing",
+    "BLAKE3",
+    "QUIC",
+    "Stablecoin payments",
+  ],
   email: EMAIL,
   sameAs: [links.github, links.x, links.linkedin, links.discord],
 };

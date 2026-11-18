@@ -2,7 +2,7 @@
 title: "Scaling DePIN onto Many Chains"
 slug: scaling-depin-onto-many-chains
 date: 2026-11-13
-summary: "Most DePINs put the token, the governance and every payment on one chain. We split them: governance once on Ethereum, payments on any chain where customers already hold USDC, joined by one message. How decdn got there, and six rules any DePIN can use."
+summary: "Most DePINs put the token, the governance and every payment on one chain. We split them: governance once on Ethereum, payments on any chain where customers already hold USDC, joined by one message. How deCDN got there, and six rules any DePIN can use."
 bucket: pillar
 ---
 
@@ -16,9 +16,9 @@ We think stablecoin payments are the best way for a DePIN to scale and bring rea
 2. **Payments belong on cheap, fast chains.** They are frequent, small and price-sensitive. Pick the chains where they cost the least, and use more than one.
 3. **Customers pay from the USDC they already hold.** USDC sits on many chains, from Arbitrum and Base to Avalanche and Arc. A customer should not bridge to your chain before buying anything. That does not scale. The payment rail has to go where the USDC is.
 
-decdn started as the usual DePIN, with one chain for everything. This post tells how we got out of that, and what any DePIN can take from it.
+deCDN started as the usual DePIN, with one chain for everything. This post tells how we got out of that, and what any DePIN can take from it.
 
-## How decdn got here
+## How deCDN got here
 
 **April: one chain for everything.** We picked one low-cost L2. We put the token, the bond, the payment pools and governance on it. We left cross-chain payment pools out of v1. Users on other chains bridged. That was the right call for a first deployment. It gave us one set of addresses, one RPC endpoint and one clock to reason about.
 
@@ -61,7 +61,7 @@ You inherit the stablecoin's trust model. For USDC, Circle can pause transfers, 
 
 ## The neutral position
 
-x402 names a payment network by its chain id. Each facilitator decides which networks it supports. The payment protocol sits above any single chain. decdn now does the same for delivery, and names chains the same way, with neutral CAIP-2 identifiers. That leaves room for non-EVM chains such as Solana later. A client says which chain it pays on. A node says which chains it accepts. Nothing else in the trust model depends on any one payment chain.
+x402 names a payment network by its chain id. Each facilitator decides which networks it supports. The payment protocol sits above any single chain. deCDN now does the same for delivery, and names chains the same way, with neutral CAIP-2 identifiers. That leaves room for non-EVM chains such as Solana later. A client says which chain it pays on. A node says which chains it accepts. Nothing else in the trust model depends on any one payment chain.
 
 ## What's next
 

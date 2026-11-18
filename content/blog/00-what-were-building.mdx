@@ -2,17 +2,17 @@
 title: "What We're Building"
 slug: what-were-building
 date: 2026-05-04
-summary: "What decdn is, who it's for, and what the protocol composes — a plain-English introduction."
+summary: "What deCDN is, who it's for, and what the protocol composes — a plain-English introduction."
 bucket: pillar
 ---
 
-**decdn** is a content delivery network where there's no central operator. Bytes flow from anyone willing to serve them to anyone willing to pay for them, denominated in dollars, with cryptographic verification at the edge and no contract longer than a single megabyte. This post is the plain-English introduction.
+**deCDN** is a content delivery network where there's no central operator. Bytes flow from anyone willing to serve them to anyone willing to pay for them, denominated in dollars, with cryptographic verification at the edge and no contract longer than a single megabyte. This post is the plain-English introduction.
 
 ## The elevator version
 
 A traditional CDN is a company that runs servers near your users and charges your business a monthly bill. CloudFront, Fastly, Akamai, Cloudflare. They cache your content, route around the slow paths of the public internet, and absorb traffic spikes for you. They charge $0.04–$0.20 per gigabyte. Their operations are opaque to you, and you're locked in to whoever you signed with.
 
-decdn is the same job — caching content near users, routing around the slow paths, absorbing spikes — but the operators are anyone with a server and a stake. They compete on price and latency. There's no monthly bill. You pay per megabyte, in USDC, only for what you actually pulled. The target market rate is **$0.01/GB**, four to twenty times cheaper than incumbent list pricing.
+deCDN is the same job — caching content near users, routing around the slow paths, absorbing spikes — but the operators are anyone with a server and a stake. They compete on price and latency. There's no monthly bill. You pay per megabyte, in USDC, only for what you actually pulled. The target market rate is **$0.01/GB**, four to twenty times cheaper than incumbent list pricing.
 
 ## The two roles
 
@@ -26,7 +26,7 @@ There's no third role. No platform. No middleman. The protocol is the platform.
 
 ## What's underneath
 
-Every part of the stack is a primitive that already exists. decdn is the protocol that composes them.
+Every part of the stack is a primitive that already exists. deCDN is the protocol that composes them.
 
 - **Rust**, for systems-level performance and the absence of a garbage collector introducing tail-latency spikes.
 - **iroh**, for QUIC-based peer-to-peer transport with NAT traversal, hole punching, relay fallback, and connection migration as a library function.
@@ -49,7 +49,7 @@ The split is deliberate. Volatility goes in one currency, used for alignment ove
 
 ## What we're not
 
-To set expectations, here's what decdn does _not_ do.
+To set expectations, here's what deCDN does _not_ do.
 
 - **We don't store data.** Storage is a different invariant. Origin storage stays where it already is — S3, R2, B2, MinIO, NFS, local disk — opaque to the network. We compete only on the delivery layer.
 - **We don't run our own chain.** We deploy on a public L2 and inherit Ethereum-grade security via fraud proofs. We do not split the team's attention between defending consensus and shipping a CDN.
@@ -58,8 +58,8 @@ To set expectations, here's what decdn does _not_ do.
 
 ## Who this is for
 
-If you're a **node operator** — a sysadmin, a homelabber, a datacenter shop with spare bandwidth — decdn is supply-side opportunity. Bond, register, serve, earn USDC.
+If you're a **node operator** — a sysadmin, a homelabber, a datacenter shop with spare bandwidth — deCDN is supply-side opportunity. Bond, register, serve, earn USDC.
 
-If you're a **content publisher** — a team shipping large payloads — decdn is the fraction-of-the-cost alternative to incumbent CDN pricing, with origin protection and optional end-to-end encryption built in.
+If you're a **content publisher** — a team shipping large payloads — deCDN is the fraction-of-the-cost alternative to incumbent CDN pricing, with origin protection and optional end-to-end encryption built in.
 
 If you're an **end user**, you don't have to think about any of this. The client verifies bytes against the requested hash automatically; payment channels open and close in the background; the network finds the fastest peer.

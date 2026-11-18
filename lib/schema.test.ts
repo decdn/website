@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { blogPostingNode, listPosts, postImageUrl } from "./blog";
 import { FAQ_ITEMS } from "./faq";
@@ -38,6 +40,29 @@ describe("site-level @ids", () => {
     expect(organizationNode["@id"]).toBe(ORG_ID);
     expect(websiteNode["@id"]).toBe(SITE_ID);
     expect(serviceNode["@id"]).toBe(SERVICE_ID);
+  });
+});
+
+describe("organization identity", () => {
+  it("names the lowercase spelling as an alternate", () => {
+    expect(organizationNode.alternateName).toEqual(["decdn"]);
+  });
+
+  it("disambiguates from the products that share the name", () => {
+    expect(organizationNode.disambiguatingDescription).toContain("decdn.org");
+  });
+
+  // The logo's declared size has to be the file's real size, or consumers
+  // that trust it will crop or scale it wrongly. PNG stores width and height
+  // as big-endian 32-bit integers at bytes 16 and 20 of the IHDR chunk.
+  it("declares the logo's real pixel size", () => {
+    const png = readFileSync(join(process.cwd(), "public", "d_logo.png"));
+    expect(organizationNode.logo).toEqual({
+      "@type": "ImageObject",
+      url: "https://decdn.org/d_logo.png",
+      width: png.readUInt32BE(16),
+      height: png.readUInt32BE(20),
+    });
   });
 });
 

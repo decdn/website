@@ -2,13 +2,13 @@
 title: "We Don't Store. We Serve."
 slug: we-dont-store-we-serve
 date: 2026-05-29
-summary: "A storage network and a delivery network optimize for opposite invariants. decdn doesn't store — it serves, and leaves origin storage where it already works."
+summary: "A storage network and a delivery network optimize for opposite invariants. deCDN doesn't store — it serves, and leaves origin storage where it already works."
 bucket: pillar
 ---
 
 A storage network and a delivery network look similar from a thousand feet up. They both have nodes. They both run on commodity hardware. They both move bytes around. The trouble starts when you ask which invariant the system optimizes for.
 
-A storage network maximizes durability per dollar — the chance that a given byte is still readable five years from now. A delivery network minimizes time-to-first-byte and cost-per-MB-served — how fast you get something _right now_, and what it costs to get it. These objectives don't share a frontier. Optimizing one is, in practice, deoptimizing the other. The history of decentralized infrastructure is dotted with projects that tried to do both and ended up mediocre at each. **decdn** does not store. It serves. Storage stays where it already is.
+A storage network maximizes durability per dollar — the chance that a given byte is still readable five years from now. A delivery network minimizes time-to-first-byte and cost-per-MB-served — how fast you get something _right now_, and what it costs to get it. These objectives don't share a frontier. Optimizing one is, in practice, deoptimizing the other. The history of decentralized infrastructure is dotted with projects that tried to do both and ended up mediocre at each. **deCDN** does not store. It serves. Storage stays where it already is.
 
 ## The proofs argument
 
@@ -38,11 +38,11 @@ We bill in USDC, off-chain, in payment channels that settle on a low-cost L2 onc
 
 Decentralized storage already exists. So does centralized storage, and it's better than the decentralized stuff for most workloads — cheaper per byte, lower latency to first byte, better tooling, stricter SLAs. We do not need to relitigate this.
 
-decdn's nodes have _opaque_ origin backends. A node can be configured with S3, Cloudflare R2, Backblaze B2, MinIO, NFS, or local disk. The decdn protocol does not see, name, or address the origin. It only sees the BLAKE3 hash of the blob the origin produced. From the rest of the network's perspective, an origin-backed node is just a node that happens to never have a cache miss for certain hashes.
+deCDN's nodes have _opaque_ origin backends. A node can be configured with S3, Cloudflare R2, Backblaze B2, MinIO, NFS, or local disk. The deCDN protocol does not see, name, or address the origin. It only sees the BLAKE3 hash of the blob the origin produced. From the rest of the network's perspective, an origin-backed node is just a node that happens to never have a cache miss for certain hashes.
 
 This is what hidden origins buys us:
 
-- Content publishers reuse infrastructure they already pay for. R2 doesn't charge for egress to a decdn node any more than it charges for egress to anything else. The publisher doesn't pay twice.
+- Content publishers reuse infrastructure they already pay for. R2 doesn't charge for egress to a deCDN node any more than it charges for egress to anything else. The publisher doesn't pay twice.
 - The network surface is small. We don't carry an S3 protocol, a B2 protocol, an NFS shim. There's one small origin adapter — fetch the bytes for a given hash, and report what kind of backend it is — and operators implement it for whichever backend they have.
 - The decentralization story is honest. We don't claim to decentralize storage. We claim to decentralize delivery, and we leave the storage where it works best.
 

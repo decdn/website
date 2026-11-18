@@ -2,18 +2,18 @@
 title: "The Public Testnet Is Live, and It's Open Source"
 slug: testnet-is-live
 date: 2026-10-13
-summary: "The decdn public testnet is live and the code is open source. Pull an open model, a dataset, a Linux install image or a 4K film with one command, or run a pilot on your own data."
+summary: "The deCDN public testnet is live and the code is open source. Pull an open model, a dataset, a Linux install image or a 4K film with one command, or run a pilot on your own data."
 bucket: pillar
 pinned: true
 ---
 
-Today the **decdn** public testnet is live on Arbitrum Sepolia, and the code is open source. You can download something real from the network right now with one command, and if you have data of your own to distribute, you can run it through the testnet with us.
+Today the **deCDN** public testnet is live on Arbitrum Sepolia, and the code is open source. You can download something real from the network right now with one command, and if you have data of your own to distribute, you can run it through the testnet with us.
 
 ## The problem we kept hitting
 
 Big files are awkward to move. Model weights, datasets and install images run to tens of gigabytes, and they reach you from an origin, a CDN edge or a mirror. Whichever one you land on, the download usually comes from that single server. When it throttles you, rate-limits you, or has a bad afternoon, you wait.
 
-## What decdn does
+## What deCDN does
 
 Independent nodes cache content and serve it, and every file is addressed by its BLAKE3 hash. The client checks each piece against that hash the moment it arrives. A piece that fails is thrown out and fetched again from another node, so you end up with exactly the bytes the publisher named, without trusting any machine in between. Large files are pulled from several nodes at once.
 
