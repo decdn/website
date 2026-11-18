@@ -29,3 +29,17 @@
 # force a download. Pin the registered armored-key type so it renders inline.
 /KEYS
   Content-Type: application/pgp-keys
+
+# Cloudflare Pages also serves every deployment on its *.pages.dev
+# hostnames — production at <project>.pages.dev, previews and branch
+# aliases at <hash|branch>.<project>.pages.dev. They are full copies of
+# the site with `index, follow` metadata, and search engines were
+# indexing the production pages.dev host in place of decdn.org. Host-
+# matched rules only apply on those hostnames, so the custom domain is
+# unaffected. Syntax per
+# https://developers.cloudflare.com/pages/configuration/headers/
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex
+
+https://:version.:project.pages.dev/*
+  X-Robots-Tag: noindex
