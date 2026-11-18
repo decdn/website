@@ -196,6 +196,13 @@ export const PANEL_CAPTIONS = {
 export const BLOG_TITLE = "field notes";
 export const BLOG_DESCRIPTION = "Long-form posts on the deCDN protocol.";
 
+/** The 404 page (app/not-found.tsx): its <title> and h1, and the line above
+ *  the way-out links. Lowercase title to match the other non-home h1s
+ *  ("field notes", "privacy policy"). */
+export const NOT_FOUND_TITLE = "page not found";
+export const NOT_FOUND_LEAD =
+  "Nothing lives at this address. The link may be old or mistyped, so try one of these instead.";
+
 export type SourceRepo = {
   /** Repo name under the GitHub org; the URL is `repoUrl(name)` in lib/links.ts. */
   name: string;
