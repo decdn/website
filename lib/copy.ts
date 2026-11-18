@@ -30,12 +30,17 @@ export const SITE_DESCRIPTION =
  *  an aria-hidden full stop, so they stay explicit at the call site rather
  *  than being mapped over. */
 export const HERO_HEADLINE = [
-  "the delivery layer",
+  "a decentralized cdn",
   "anyone can serve",
 ] as const;
 
+/** Opens with a plain definition so the page says what deCDN is before the
+ *  Berlin-to-Tokyo example: crawlers and AI answer engines quote the first
+ *  sentence of the first paragraph, and the h1 is display copy. Starts with
+ *  "Built for" rather than the brand because prose is sentence-cased (see
+ *  lib/copy.test.ts) and the brand begins lowercase. */
 export const HERO_LEAD =
-  "A 14-gigabyte file posted in Berlin streams to a client in Tokyo from several nodes at once, every chunk verified with BLAKE3, paid for per megabyte in USDC. The code is open. The network is open. The price is posted.";
+  "Built for large files, deCDN is an open-source decentralized content delivery network: independent, bonded operators serve your bytes from the storage you already use. A 14-gigabyte file posted in Berlin streams to a client in Tokyo from several nodes at once, every chunk verified with BLAKE3, paid for per megabyte in USDC. The code is open. The network is open. The price is posted.";
 
 /** The badge at the right-hand end of the hero's section-header row. */
 export const HERO_BADGE = "testnet";
