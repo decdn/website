@@ -41,9 +41,18 @@ export function opensOnDarkBand(pathname: string): boolean {
   return pathname === "/blog" || pathname.startsWith("/blog/");
 }
 
+// Whether the band still reaches the nav's bottom edge at `navBottom` or
+// lies below it. The band is the page's top section, so "below" only happens
+// when rubber-band overscroll pulls the page down past the top; reading that
+// as dark keeps the logo from flashing black during the bounce. A bottom
+// exactly on the edge still counts as under.
+export function bandUnderNav(bandBottom: number, navBottom: number): boolean {
+  return bandBottom >= navBottom;
+}
+
 export type BandReading = { pathname: string; dark: boolean };
 
-// Whether a `data-nav-dark` band sits under the nav. The observer's reading
+// Whether a `data-nav-dark` band sits under the nav. The scroll reading
 // wins once it has reported for this route; before that — the prerendered
 // HTML, the first frame after hydration, and the frame after a client-side
 // route change — the route's own default stands in, so the nav never paints
