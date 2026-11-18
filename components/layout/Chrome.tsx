@@ -14,9 +14,11 @@ import {
 } from "@/lib/scroll";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import {
+  type BandReading,
   DARK_SECTIONS,
   SECTION_IDS,
   resolveActiveSection,
+  resolveOverDarkBand,
 } from "@/components/layout/chrome-active";
 
 type NavEntry =
@@ -46,6 +48,10 @@ const externalNav = NAV.filter((item) => item.kind === "external");
 export function Chrome() {
   const [active, setActive] = useState<(typeof SECTION_IDS)[number]>("intro");
   const [scrolled, setScrolled] = useState(false);
+  // Off-home pages can open on a dark band (the blog masthead). Such a band
+  // carries `data-nav-dark`, and the nav takes the ink tone while it sits
+  // under the nav — see the band observer below and resolveOverDarkBand.
+  const [band, setBand] = useState<BandReading | null>(null);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navRef = useRef<HTMLElement>(null);
   // This component lives in the root layout, so a `next/link` client-side
@@ -198,6 +204,52 @@ export function Chrome() {
     };
   }, [pathname]);
 
+  // Same 1px-slice technique as the section observer above, for the first
+  // `[data-nav-dark]` band on the page (assumed to be its top section). Like
+  // that observer, the slice is rebuilt, rAF-coalesced, on window resize and
+  // on nav-size changes. Each reading is tagged with its route so a stale
+  // one never paints on the next page.
+  useEffect(() => {
+    const el = document.querySelector<HTMLElement>("[data-nav-dark]");
+    if (el === null) return;
+
+    let io: IntersectionObserver | null = null;
+    const build = () => {
+      io?.disconnect();
+      const rawNavH = navRef.current?.offsetHeight ?? 0;
+      const navH = Math.min(rawNavH, Math.max(0, window.innerHeight - 1));
+      const bottomInset = Math.max(0, window.innerHeight - navH - 1);
+      io = new IntersectionObserver(
+        ([entry]) => setBand({ pathname, dark: entry.isIntersecting }),
+        { rootMargin: `-${navH}px 0px -${bottomInset}px 0px`, threshold: 0 },
+      );
+      io.observe(el);
+    };
+
+    let resizeRaf = 0;
+    const onResize = () => {
+      if (resizeRaf) return;
+      resizeRaf = requestAnimationFrame(() => {
+        resizeRaf = 0;
+        build();
+      });
+    };
+
+    build();
+    const ro =
+      typeof ResizeObserver !== "undefined"
+        ? new ResizeObserver(onResize)
+        : null;
+    if (ro && navRef.current) ro.observe(navRef.current);
+    window.addEventListener("resize", onResize, { passive: true });
+    return () => {
+      window.removeEventListener("resize", onResize);
+      if (resizeRaf) cancelAnimationFrame(resizeRaf);
+      ro?.disconnect();
+      io?.disconnect();
+    };
+  }, [pathname]);
+
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
     // Re-sync after a client-side nav too: the route change resets scroll
@@ -227,7 +279,8 @@ export function Chrome() {
     active,
     "intro",
   );
-  const onDark = DARK_SECTIONS.has(effectiveActive);
+  const onDark =
+    DARK_SECTIONS.has(effectiveActive) || resolveOverDarkBand(pathname, band);
   // The toggle is rendered beside the nav (see MobileMenu.tsx) and lives
   // on top of the paper panel while the drawer is open — force it to
   // paper then so its × reads against the white panel.
