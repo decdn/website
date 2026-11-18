@@ -35,10 +35,10 @@ export const HERO_HEADLINE = [
 ] as const;
 
 /** Opens with a plain definition so the page says what deCDN is before the
- *  Berlin-to-Tokyo example: crawlers and AI answer engines quote the first
- *  sentence of the first paragraph, and the h1 is display copy. Starts with
- *  "Built for" rather than the brand because prose is sentence-cased (see
- *  lib/copy.test.ts) and the brand begins lowercase. */
+ *  Berlin-to-Tokyo example: crawlers and AI answer engines tend to quote the
+ *  opening sentence of a page's first paragraph, and the h1 is display copy.
+ *  Starts with "Built for" rather than the brand because prose is
+ *  sentence-cased (see lib/copy.test.ts) and the brand begins lowercase. */
 export const HERO_LEAD =
   "Built for large files, deCDN is an open-source decentralized content delivery network: independent, bonded operators serve your bytes from the storage you already use. A 14-gigabyte file posted in Berlin streams to a client in Tokyo from several nodes at once, every chunk verified with BLAKE3, paid for per megabyte in USDC. The code is open. The network is open. The price is posted.";
 
@@ -193,7 +193,9 @@ export const PANEL_CAPTIONS = {
 /** Blog index identity. Read by app/blog/page.tsx for its h1, by `blogNode`
  *  for the `Blog` schema node, and by the llms.txt index — one string so the
  *  three can't disagree about what the section is. The <title> is
- *  BLOG_META_TITLE below; BLOG_DESCRIPTION serves all four. */
+ *  BLOG_META_TITLE below. BLOG_DESCRIPTION feeds the page's meta and social
+ *  description, `blogNode` and llms.txt; the visible lede under the h1 is
+ *  separate copy in app/blog/page.tsx. */
 export const BLOG_TITLE = "field notes";
 export const BLOG_DESCRIPTION =
   "Long-form posts on deCDN, a decentralized CDN for large files: why it is possible now, how the protocol works, what node operators earn, and who needs it.";

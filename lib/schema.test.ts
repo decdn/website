@@ -49,12 +49,16 @@ describe("organization identity", () => {
   });
 
   it("disambiguates from the products that share the name", () => {
-    expect(organizationNode.disambiguatingDescription).toContain("decdn.org");
+    const text = organizationNode.disambiguatingDescription;
+    expect(text).toContain("decdn.org");
+    expect(text).toContain("add-on");
+    expect(text).toContain("Alibaba");
   });
 
   // The logo's declared size has to be the file's real size, or consumers
   // that trust it will crop or scale it wrongly. PNG stores width and height
-  // as big-endian 32-bit integers at bytes 16 and 20 of the IHDR chunk.
+  // as big-endian 32-bit integers at file offsets 16 and 20: the first two
+  // IHDR fields, after the 8-byte signature and the chunk's length and type.
   it("declares the logo's real pixel size", () => {
     const png = readFileSync(join(process.cwd(), "public", "d_logo.png"));
     expect(organizationNode.logo).toEqual({

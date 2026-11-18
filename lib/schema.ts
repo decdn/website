@@ -46,8 +46,8 @@ export const organizationNode: Schema<"Organization"> = {
   },
   description:
     "Organization developing deCDN, a decentralized content delivery network with per-megabyte settlement in USDC.",
-  // The name collides with unrelated products (a Pale Moon add-on also
-  // called deCDN, Alibaba Cloud's DCDN), and search results and AI answers
+  // The name collides with unrelated products (a browser add-on also called
+  // deCDN, Alibaba Cloud's DCDN), and search results and AI answers
   // mix them up. This is the schema.org field for telling them apart.
   disambiguatingDescription:
     "The decentralized content delivery network for large files at decdn.org. Not affiliated with the deCDN browser add-on or with Alibaba Cloud DCDN.",

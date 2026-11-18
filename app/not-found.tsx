@@ -3,11 +3,11 @@ import { Frame } from "@/components/ui/Frame";
 import { NOT_FOUND_LEAD, NOT_FOUND_TITLE } from "@/lib/copy";
 import { links } from "@/lib/links";
 
-// Without this file the export's out/404.html is Next's default page inside
-// the root layout, so it inherited the homepage's title, description and
-// canonical (`https://decdn.org/`) and its `index, follow` robots tag, which
-// sat beside the `noindex` Next injects on a 404. Every unmatched URL on
-// Cloudflare Pages is served this page with a 404 status.
+// Without this file, out/404.html would be Next's default page inside the
+// root layout, inheriting the homepage's title, description, canonical
+// (`https://decdn.org/`) and `index, follow` robots tag, beside the `noindex`
+// Next injects on a 404. Every unmatched URL on Cloudflare Pages is served
+// this page with a 404 status.
 //
 // `robots` overrides the layout's tag so the two Next emits agree, and
 // `canonical: null` drops the inherited one: a 404 has no canonical. Setting
@@ -21,7 +21,9 @@ export const metadata: Metadata = {
 };
 
 // Plain anchors rather than next/link: from a 404 a full page load is fine,
-// and it keeps the component callable as a plain function in its test.
+// and the test's tree walk (test-utils/react-tree.ts) expands every function
+// component it meets, which next/link can't survive outside React; plain
+// <a> elements it can read directly.
 const WAYS_OUT = [
   { label: "home", href: "/" },
   { label: "field notes", href: links.blog },

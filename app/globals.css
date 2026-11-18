@@ -1690,8 +1690,10 @@ a.hero-status:hover .arrow {
      never run under it. Sticky so the answer stays on screen when the
      selected question sits far below the card's top edge: the card spans
      every row, so with a long list its top can be a screen above the
-     question that opened it. The offset clears the fixed nav (≈73px, see
-     the --nav-h note in :root) plus the card's own padding. */
+     question that opened it. The offset clears the fixed nav (≈73px) plus
+     the card's own padding. 5rem is the same nav floor
+     --spacing-frame-pad-y uses; this rule does not read --nav-h (a unitless
+     0, which max() would reject), so update both if the nav grows. */
   .faq-panel .faq-answer {
     position: sticky;
     top: calc(5rem + var(--faq-pad));
