@@ -31,7 +31,7 @@ sequenceDiagram
     P-->>C: Reclaim unspent remainder
 ```
 
-`openPool` happens **once and off the fetch path**, so it is not latency-critical; `topUp` refills a pool that has been drawn down. A node redeems whenever it likes while the pool is open — redeeming a signed, monotone claim needs no dispute window. The owner closes the pool to reclaim what is left, after a **redemption grace window** (48 hours by default, governable within 48h–72h) during which nodes settle outstanding vouchers.
+`openPool` happens **once and off the fetch path**, so it is not latency-critical; `topUp` refills a pool that has been drawn down. A node redeems whenever it likes while the pool is open — redeeming a signed, monotone claim needs no dispute window. The owner closes the pool to reclaim what is left, after a **redemption grace window** (fixed per deployment, 48 hours in the reference deployment) during which nodes settle outstanding vouchers.
 
 ## Capabilities
 
@@ -80,4 +80,4 @@ Each node advertises its own per-MB rate, quoted in every signed probe response.
 
 ## Minimum deposit
 
-`openPool` enforces a governance-set `minDeposit` on the credited deposit. It is a Sybil knob: the per-pool solvency floor bounds loss within one pool, and an attacker escapes it by fanning out across many pools, so the floor taxes the capital locked in simultaneous pools. Deposits stay fully refundable, and the parameter is bounded at **0 to $100** and launches at 0 — zero leaves it dormant, and the ceiling keeps governance from pricing small honest buyers out of opening a pool.
+`openPool` enforces `minDeposit`, fixed when the pool contract is deployed, on the credited deposit. It is a Sybil knob: the per-pool solvency floor bounds loss within one pool, and an attacker escapes it by fanning out across many pools, so the floor taxes the capital locked in simultaneous pools. Deposits stay fully refundable. The reference value is 0, which leaves the floor dormant and keeps small pools open for development and testing; a deployment that needs the Sybil floor sets a non-zero value.
