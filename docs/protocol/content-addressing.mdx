@@ -43,9 +43,9 @@ This also protects origin operators from direct egress cost attacks: an adversar
 
 ## What clients verify vs. trust
 
-| Property          | Verified         | Trusted                                                                                                 |
-| ----------------- | ---------------- | ------------------------------------------------------------------------------------------------------- |
-| Byte correctness  | BLAKE3 hash tree | —                                                                                                       |
-| Blob availability | —                | Node may decline to serve; the client re-routes and re-pays nothing                                     |
-| Rate honesty      | —                | Quoted rate is binding within the [slashing window](/protocol/slashing#the-slashing-window) (slashable) |
-| Origin durability | —                | Origin operator's S3/NFS configuration (off-protocol)                                                   |
+| Property          | Verified                                     | Trusted                                                             |
+| ----------------- | -------------------------------------------- | ------------------------------------------------------------------- |
+| Byte correctness  | BLAKE3 hash tree                             | —                                                                   |
+| Blob availability | —                                            | Node may decline to serve; the client re-routes and re-pays nothing |
+| Rate honesty      | Signed quote, signed back into every voucher | —                                                                   |
+| Origin durability | —                                            | Origin operator's S3/NFS configuration (off-protocol)               |

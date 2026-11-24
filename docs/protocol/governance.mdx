@@ -5,7 +5,7 @@ description: Voting weight is bytes actually delivered, not TOKEN held — a 4% 
 
 ## Decision
 
-OpenZeppelin Governor whose voting weight is an operator's **delivered bytes over a trailing window** — not TOKEN balance — with a **4% quorum** and a **2-day timelock**. All governable parameters have hardcoded safety bounds that governance cannot override. A **3-of-5 emergency multisig** can pause contracts, add emergency blacklist entries, decide slash appeals, and suspend a compromised regional governance body. Its sunset is **split by capability**: the protocol-wide `pause()` brake has a **12-month sunset** enforced via an immutable constructor deadline — governance cannot extend it; prolonging `pause()` past the deadline requires deploying a new contract version and migrating through the standard upgrade path. The narrow unlawful-content-removal power — emergency blacklisting — is **permanent**, discharging an ongoing legal-compliance duty the ~10-day governance cycle cannot meet.
+OpenZeppelin Governor whose voting weight is an operator's **delivered bytes over a trailing window** — not TOKEN balance — with a **4% quorum** and a **2-day timelock**. All governable parameters have hardcoded safety bounds that governance cannot override. A **3-of-5 emergency multisig** can pause contracts, add emergency blacklist entries, and suspend a compromised regional governance body. Its sunset is **split by capability**: the protocol-wide `pause()` brake has a **12-month sunset** enforced via an immutable constructor deadline — governance cannot extend it; prolonging `pause()` past the deadline requires deploying a new contract version and migrating through the standard upgrade path. The narrow unlawful-content-removal power — emergency blacklisting — is **permanent**, discharging an ongoing legal-compliance duty the ~10-day governance cycle cannot meet.
 
 ## Voting weight
 
@@ -14,7 +14,7 @@ Voting weight is each operator's **served bytes over a trailing window** (defaul
 - **Passive TOKEN holders have no vote.** Governance power tracks real delivery, not holdings — you must operate a node and serve bytes to vote.
 - **Fresh operators ramp in.** A new operator that serves heavily on day one still votes at a fraction of its byte share until the tenure ramp completes over several months.
 - **Declared capacity caps weight; it never grants it.** Bytes above what an operator's declared tier could deliver in a week earn no weight, and an operator that declared zero capacity contributes zero for that week however many bytes it served. This is what stops a lightly-bonded operator inflating its weight by serving traffic to accounts it controls.
-- **Slashing zeroes out the vote.** A slashed operator's weight drops to zero for the rest of the window, then recovers as the window slides past the slash.
+- **Weight is priced in USDC.** Each sweep credits an operator's served bytes up to what the sweep's treasury share pays for, so weight always costs real money kept by the protocol. Only an active operator earns new weight.
 
 Bytes are read from the on-chain `FeeRouter` settlement counter, so weight is auditable and cannot be claimed without paid delivery. Voting power is delegable by signed message; the bond itself is not.
 
@@ -28,20 +28,18 @@ The phase ends when the multisig judges the operator set broad and diverse enoug
 
 Even governance cannot set parameters outside these bounds:
 
-| Parameter                                 | Default                                      | Bounds                      |
-| ----------------------------------------- | -------------------------------------------- | --------------------------- |
-| Operator revenue share (`FeeRouter` base) | 90% at launch, 60% after activation          | 40% – 90%                   |
-| Burn share (`FeeRouter`)                  | 0% at launch (dormant), 30% after activation | 0%, or 5% – 50% when active |
-| Treasury share (`FeeRouter`)              | 10%                                          | 0% – 30%                    |
-| Redemption grace window                   | 48 h                                         | 48 h – 72 h                 |
-| Per-operator voting cap                   | 10%                                          | 1% – 10%, decrease-only     |
-| Trailing vote window                      | 13 weeks                                     | 4 – 26 weeks                |
-| Capacity-curve exponent (α)               | 1.2                                          | 1.0 – 1.8                   |
-| Unbonding window                          | 14 days                                      | 7 – 60 days                 |
+| Parameter                     | Default                                        | Bounds                  |
+| ----------------------------- | ---------------------------------------------- | ----------------------- |
+| Operator rebate (`rebateBps`) | 7500 at launch: 90% to the operator end to end | 0 – 9900                |
+| Per-operator voting cap       | 10%                                            | 1% – 10%, decrease-only |
+| Trailing vote window          | 13 weeks                                       | 4 – 26 weeks            |
+| Tenure ramp                   | 6 months                                       | 1 – 24 months           |
+| Capacity-curve exponent (α)   | 1.2                                            | 1.0 – 1.8               |
+| Blacklist compliance windows  | 24 h, 2 h emergency                            | 1 h – 7 days            |
 
-The three `FeeRouter` shares must sum to exactly 100% on every update. The burn share is the one that also accepts **zero**, so the buyback sink can be switched off entirely; what it cannot be is nominally on at a negligible share — either off, or at 5% or more.
+The operator's base share, `operatorBps` (60% in the reference deployment), is an immutable of each payment pool and sits outside governance's reach. Governance sets only how the swept 40% divides: `rebateBps` of it returns to an active operator, and the treasury takes the rest. The rebate tops out at 9900, so the treasury keeps at least 1% of every sweep and served-bytes weight stays earnable.
 
-Bounds are enforced in `require()` checks in the setter functions. A malicious governance proposal that attempts to push the operator revenue share below its floor simply reverts. (The 5% / 15% / 50% slash ladder is a fixed constant in the bond contract, not a governable parameter — see [slashing](/protocol/slashing).)
+Bounds are enforced in `require()` checks in the setter functions. A proposal that pushes a parameter outside its bound simply reverts.
 
 ## Emergency multisig
 
@@ -49,7 +47,6 @@ Bounds are enforced in `require()` checks in the setter functions. A malicious g
 
 - **Pause** any contract (`Pausable`)
 - **Add emergency blacklist entries** (with 14-day auto-expiry or 90-day for CSAM/terrorist categories — see [takedown](/protocol/takedown))
-- **Decide slash appeals** — fast-track or reject an open appeal; the escrow movement itself is performed deterministically by the bond contract
 - **Suspend a regional governance body** — governance must ratify or reverse within 14 days, and silence _lapses_ the suspension rather than sustaining it
 
 Can **not**:
@@ -60,7 +57,7 @@ Can **not**:
 
 The sunset is **split by capability**, and the split is structural rather than a shared clock. The 12-month deadline attaches to **`pause()` alone**: every pausable contract fixes it as an immutable at its own construction, after which `pause()` reverts for every caller — governance included. The pause is the protocol-wide brake and the most centralization-sensitive power the multisig holds, so it is the one that expires.
 
-The other three capabilities carry **no deadline**. Emergency blacklisting (`emergencyAdd`, `emergencyAddOrigin`) and the regional-body suspension backing it live on the non-pausable blacklist contract, discharging a permanent, time-critical legal duty — CSAM, court-ordered and sanctions removal — that the ~10-day governance cycle cannot meet, and touching no economic, treasury or governance lever. Deciding slash appeals likewise never expires; it moves only already-escrowed funds along deterministic grant/uphold paths.
+The other two capabilities carry **no deadline**. Emergency blacklisting (`emergencyAdd`, `emergencyAddOrigin`) and the regional-body suspension backing it live on the non-pausable blacklist contract, discharging a permanent, time-critical legal duty — CSAM, court-ordered and sanctions removal — that the ~10-day governance cycle cannot meet, and touching no economic, treasury or governance lever.
 
 Governance **cannot** modify the `pause()` deadline; retaining `pause()` past the sunset requires deploying a new contract version with a new deadline and migrating to it via the standard upgrade path (timelock + governance vote). This guarantees the sunset cannot be silently extended.
 

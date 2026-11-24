@@ -18,10 +18,10 @@ decdn is not a whitepaper. The protocol runs end-to-end in our test environment 
 
 - **Content-addressed delivery.** Every blob is addressed by its hash, served over QUIC. You can't be handed the wrong bytes without it being provable.
 - **Per-byte payments.** Clients pay nodes through off-chain payment channels settled in USDC, priced per byte served. No subscriptions, no minimums, no egress surprise.
-- **Bonded, slashable nodes.** Operators bond capital against the capacity they declare. Serve honestly and you earn; cheat, and it's provable on-chain and your bond is at risk.
-- **A real appeals path.** Slashing isn't a black box. There's an on-chain dispute and appeal process, so honest operators have recourse and bad actors still pay.
+- **Bonded nodes, self-protecting clients.** Operators bond TOKEN against the capacity they declare. Clients verify every byte against its hash and sign the agreed price into every voucher, so a node that cheats goes unpaid and drops in that client's ranking.
+- **On-chain content compliance.** Nodes follow an on-chain content blacklist, and governance can eject an operator that keeps serving blacklisted content.
 - **Content discovery at scale.** A distributed hash table plus an on-chain origin directory lets any node find and pull content, then cache and serve it, paying the peer it pulled from.
-- **Value that accrues to the network.** Fees from real usage flow back through buyback-and-burn. No inflationary emissions paying for traffic that isn't there.
+- **Token demand that tracks real capacity.** Every operator who joins or adds capacity bonds more TOKEN, so demand grows with the network. No inflationary emissions paying for traffic that isn't there.
 
 The full smart-contract suite is written and tested. The node software serves live traffic in our harness. This is the part most projects are still designing; for us it's the part that already works.
 
@@ -31,7 +31,7 @@ This quarter we do two things at once.
 
 We **open-source the protocol** — the contracts, the node, the wire protocol, all of it. A decentralized network you can't read isn't decentralized, and we'd rather be judged on the code than the pitch.
 
-And we launch a **public testnet** on Arbitrum Sepolia: real nodes, real content, real payment channels, real slashing, running in the open. This is where the protocol stops being something we tested and becomes something anyone can run.
+And we launch a **public testnet** on Arbitrum Sepolia: real nodes, real content, real payment channels, real governance, running in the open. This is where the protocol stops being something we tested and becomes something anyone can run.
 
 A dedicated post for operators who want to run a node is coming when the testnet opens.
 

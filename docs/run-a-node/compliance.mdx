@@ -1,6 +1,6 @@
 ---
 title: Compliance and risk
-description: The operator terms, how the node follows the on-chain blacklist, regional obligations, your own refusal controls, and what can cost you bond.
+description: The operator terms, how the node follows the on-chain blacklist, regional obligations, your own refusal controls, and what can get a node ejected.
 ---
 
 Your node serves content from your own IP address. The node software is built to keep you compliant by default: it follows the on-chain blacklist automatically, scopes regional rules to the region you declare, and gives you local controls to refuse anything you choose. Your own obligations come from the law where you operate, and they apply on top of everything the software does.
@@ -25,7 +25,7 @@ The `ContentBlacklist` contract lists hashes no node may serve, and operators th
 | Regional   | That region's governance body | Nodes that declared the region | 24 h              |
 | Emergency  | 3-of-5 emergency multisig     | Every node                     | 2 h               |
 
-The window is the time between an entry taking effect and it becoming slashable, so normal polling lag never costs you bond. A node running current software stays compliant without any action from you. See [Content takedown](/protocol/takedown).
+The window is the time a node has, after an entry is added, to stop serving it, so normal polling lag never puts you out of compliance. A node running current software stays compliant without any action from you. See [Content takedown](/protocol/takedown).
 
 If you find a blacklisted hash in your cache, remove it at once with `decdn node evict <hash>`.
 
@@ -45,11 +45,8 @@ denied_origins = ["0x<operator-address>"]
 
 `decdn node reload` applies the change without a restart. To stop serving entirely, stop the daemon: `decdn node drain --wait`, or `systemctl stop decdn-node`.
 
-## What can cost you bond
+## What can get a node ejected
 
-Only two offenses are slashable:
+Delivery problems cost you payment and reputation. A client pays only for bytes it has verified, at the price your node quoted, so a corrupt range earns nothing and lowers your local reputation with that client. Refusing a request, downtime and slow service work the same way: the client moves to another node.
 
-- **Rate manipulation.** Charging more than the rate your node signed in a probe response.
-- **Blacklist violation.** Serving a blacklisted hash after its compliance window.
-
-The penalty is 5% of bond for the first offense, 15% for the second and 50% for the third and later, counted over the operator's lifetime. Unmodified node software commits neither offense. A slashed operator can appeal within 30 days with `decdn appeal slash`. Corrupt delivery, refusing a request, downtime and slow service are not slashable: they cost you payment and reputation, not bond. See [Slashing](/protocol/slashing).
+Serving blacklisted content past its compliance window is what governance acts on. Governance can blacklist an operator that keeps doing it, and that ejects the operator from `CapacityBond`: the node leaves the active set and loses its rebate, new vote weight and any origin seats. The bond stays yours, and `unbond` returns it. Unmodified node software stays inside every compliance window on its own. See [Content takedown](/protocol/takedown#origin-blacklisting).

@@ -34,13 +34,13 @@ decdn started as the usual DePIN, with one chain for everything. This post tells
 
 Stop mirroring trust. Keep governance on Ethereum. Let payments run on any chain that has native USDC. Connect the two with one message.
 
-Each payment contract pays a node its share at once. In the reference deployment that share is 60%. The contract fixes it, so no vote can lower it. The contract holds the rest. Anyone can send that remainder to Ethereum in a single Circle CCTP transfer. The transfer carries a note of how many bytes each node served. Ethereum decides what that means for votes, buyback and treasury. The payment chain never learns about the token, the bond or the vote.
+Each payment contract pays a node its share at once. In the reference deployment that share is 60%. The contract fixes it, so no vote can lower it. The contract holds the rest. Anyone can send that remainder to Ethereum in a single Circle CCTP transfer. The transfer carries a note of how many bytes each node served. Ethereum decides what that means for votes, the node's rebate and the treasury. The payment chain never learns about the token, the bond or the vote.
 
 ## What any DePIN can take from this
 
 You do not need our contracts to use the pattern. Six rules carry over.
 
-1. **Separate the trust layer from the payment layer.** Governance, bonds and slashing change rarely and need the most neutral home you can find. Payments change constantly and need cheap, fast chains.
+1. **Separate the trust layer from the payment layer.** Governance, bonds and compliance rules change rarely and need the most neutral home you can find. Payments change constantly and need cheap, fast chains.
 2. **Let customers pay in what they already hold.** Accept one widely held stablecoin, natively, on every chain where it exists. Do not ask customers to bridge. Do not build a multi-token system to avoid saying no.
 3. **Send proof, not state.** Do not copy your bond or your registry onto every payment chain. Send the trust layer one message that proves itself, and let that message carry money and activity together.
 4. **Make payment contracts boring.** Give them no admin keys, no governance and no upgrade path. Fix every setting at deploy time. Guarantee the provider's share in the contract itself, so no vote can lower it.
@@ -53,7 +53,7 @@ None of the pieces is new. Beefy sends the fees from each chain it runs on back 
 
 ## What it costs
 
-Heavy actions run on Ethereum. Registering a node costs about a million gas, once. Bond changes, slash challenges and votes also run there. These actions are rare. The frequent ones, payment and redemption, stay on the payment chains, where gas is cheap.
+Heavy actions run on Ethereum. Registering a node costs about a million gas, once. Bond changes, blacklist updates and votes also run there. These actions are rare. The frequent ones, payment and redemption, stay on the payment chains, where gas is cheap.
 
 Operator income arrives in two places. The immediate share lands on the payment chain. The rest lands on Ethereum after a transfer. A standard CCTP transfer takes minutes to reach Ethereum. From rollups such as Arbitrum and Base it takes about 15 to 20 minutes.
 

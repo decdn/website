@@ -1,6 +1,6 @@
 ---
 title: Bond and earnings
-description: How the TOKEN capacity bond is sized, what can be slashed, how unbonding works, and how a node earns USDC per byte delivered.
+description: How the TOKEN capacity bond is sized, what it commits you to, how unbonding works, and how a node earns USDC per byte delivered.
 ---
 
 ## The capacity bond
@@ -23,18 +23,17 @@ bond = max(minBond, 12.6 × Mbps^1.2)  TOKEN
 
 To raise your declared capacity later, run `decdn node bond --mbps <N>`. It tops the bond up to the new requirement. The full curve and its rationale are in [ADR 026 § Capacity-bond curve](https://github.com/decdn/decdn/blob/main/adr/026-tokenomics.md#capacity-bond-curve).
 
-## What can be slashed
+## What the bond commits you to
 
-Only two offenses are slashable, and each needs signed, on-chain evidence:
+The bond is your registration and capacity commitment. It keeps your node in the active set at its declared tier, and it is what makes you eligible for the operator rebate and for governance weight.
 
-- **Rate manipulation.** Charging more than the rate your node signed in its probe response.
-- **Blacklist violation.** Serving a blacklisted hash after its compliance window has passed.
+Clients hold you to the rest themselves. A client verifies every chunk against its BLAKE3 hash, pays nothing for a bad range and fetches it from another node, and your node loses local reputation with that peer. Each voucher carries the price your node quoted, so a node is paid exactly its quote.
 
-Corrupt or failed delivery is **not** slashable. The client verifies every chunk against its BLAKE3 hash, pays nothing for a bad range and fetches it from another node, and your node loses local reputation with that peer. See [Slashing](/protocol/slashing) and [Compliance and risk](/run-a-node/compliance).
+Your node follows the on-chain content blacklist. Governance can blacklist an operator that keeps serving blacklisted content, which ejects it from the active set: no rebate, no new vote weight, no origin seat. See [Compliance and risk](/run-a-node/compliance).
 
 ## Unbonding
 
-Unbonding takes **14 days**. The node goes inactive when the unbond starts, and the bond stays slashable for the whole window. To lower your capacity, run `decdn node unbond --to-mbps <N>`. To exit fully, run `decdn node deregister`, then `decdn node unbond --all`, then run the unbond command again after the window to withdraw.
+`unbond` returns your TOKEN in the same transaction. The bond that stays must still cover your declared tier. To lower your capacity, run `decdn node unbond --to-mbps <N>`. To exit fully, run `decdn node deregister`, then `decdn node unbond --all`.
 
 ## How you earn
 
@@ -44,12 +43,11 @@ Unbonding takes **14 days**. The node goes inactive when the unbond starts, and 
 
 ## Operator share
 
-Each settlement passes through the on-chain `FeeRouter`, which splits it three ways: operator, buyback-and-burn, and treasury.
+Each redemption splits in two steps:
 
-| Network                  | Operator | Buyback-and-burn | Treasury |
-| ------------------------ | -------- | ---------------- | -------- |
-| Testnet (today)          | 60%      | 30%              | 10%      |
-| Mainnet at launch        | 90%      | 0%               | 10%      |
-| Mainnet after activation | 60%      | 30%              | 10%      |
+1. **At redemption, on the payment chain.** The payment pool pays you `operatorBps` of the amount in the redemption transaction. The reference deployment sets it to 60%. It is fixed in each pool, so no vote can lower it.
+2. **After a sweep, on Ethereum.** The other 40% stays in the pool as your pending protocol share. A permissionless sweep carries it over Circle CCTP to the governance-chain `FeeRouter`, which returns `rebateBps` of it to you while your node is active and sends the rest to the treasury.
 
-Mainnet launches with the buyback bucket dormant, so operators keep 90%. Governance moves it to 60/30/10 only after the network meets set [activation criteria](https://github.com/decdn/decdn/blob/main/adr/018-liquidity-strategy.md). The testnet already runs the target split. See [Governance](/protocol/governance) for the bounds on each share.
+At the launch value, `rebateBps` 7500, you receive 60% + 30% = **90%** end to end and the treasury 10%. Governance tunes `rebateBps` within `[0, 9900]`, so the treasury always keeps at least 1% of each sweep.
+
+The treasury leg is also what prices your governance weight: each sweep credits your served bytes up to what its treasury share pays for. See [Governance](/protocol/governance) for the bounds and [ADR 026 § FeeRouter split](https://github.com/decdn/decdn/blob/main/adr/026-tokenomics.md#feerouter-split) for the full design.

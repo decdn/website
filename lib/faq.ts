@@ -38,7 +38,7 @@ export const FAQ_ITEMS = [
   {
     q: "Who sets the price, and what will I pay?",
     a: [
-      "Each node sets its own per-megabyte rate in USDC and signs it into every quote, so you see the price before a byte moves. A node that charges more than it quoted loses part of its bond.",
+      "Each node sets its own per-megabyte rate in USDC and signs it into every quote, so you see the price before a byte moves. Your client signs that rate into every voucher, so a node is paid exactly what it quoted.",
       `You never pay more than the ceiling you set, and you pay only for bytes that verify, as they arrive, with no minimums or contracts. The network's target is ${TARGET_RATE}.`,
     ],
   },
