@@ -2,11 +2,11 @@
 title: "Show Me the Money: A 100-TB/Month Node, Line by Line"
 slug: show-me-the-money
 date: 2026-06-22
-summary: "A single decdn node at the 100-TB/month launch-fleet target, walked line by line: $1,024 billed, $355 left in liquid USDC after the FeeRouter split, cache-miss pulls, infrastructure, and gas."
+summary: "A single decdn node at the 100-TB/month launch-fleet target, walked line by line: $1,024 billed, $662 left in liquid USDC after the protocol share, cache-miss pulls, infrastructure, and gas."
 bucket: operator
 ---
 
-$1,024 billed. $355 left, in liquid USDC.
+$1,024 billed. $662 left, in liquid USDC.
 
 That is the reference month for a healthy decdn node at the launch-fleet target: 100 TB served at a market rate of $0.01/GB. The point is not to claim every node always earns that number. The point is to show the cash path, line by line, without mixing operator revenue, token alignment, and protocol treasury flow into one blurry headline.
 
@@ -38,25 +38,27 @@ The arithmetic is:
 100,000 GB x 1,024 MB/GB x $0.00001/MB = $1,024
 ```
 
-That $1,024 is gross settlement volume, not operator take-home. Every settlement goes through FeeRouter:
+That $1,024 is gross settlement volume, not operator take-home. Every settlement splits two ways, shown here with the launch values:
 
-| Bucket           | Share | Cash path                    |
-| ---------------- | ----: | ---------------------------- |
-| Operator base    |   60% | USDC to the serving operator |
-| Buyback-and-burn |   30% | USDC buys TOKEN and burns it |
-| Treasury         |   10% | USDC to protocol treasury    |
+| Leg             | Share | Cash path                                                       |
+| --------------- | ----: | --------------------------------------------------------------- |
+| Operator base   |   60% | USDC to the serving operator, in the redemption transaction     |
+| Operator rebate |   30% | USDC to the serving operator, through FeeRouter after the sweep |
+| Treasury        |   10% | USDC to the protocol treasury                                   |
 
-Node-to-node cache-miss pulls do not bypass this split. A peer settlement routes the same way a client settlement does. That keeps the accounting simple and makes fake self-volume uneconomic.
+The rebate is a governable share of the protocol's 40%, and it arrives on the governance chain. The 60% base is fixed in each payment pool.
+
+Node-to-node cache-miss pulls do not bypass this split. A peer settlement routes the same way a client settlement does. That keeps the accounting simple, and fake self-volume always costs the treasury share.
 
 So the reference month becomes:
 
 | Stream                       | Gross billing | Operator cash share |
 | ---------------------------- | ------------: | ------------------: |
-| Client delivery, about 70 TB |          $717 |                $430 |
-| Peer delivery, about 30 TB   |          $307 |                $184 |
-| **Total operator inflow**    |    **$1,024** |            **$614** |
+| Client delivery, about 70 TB |          $717 |                $645 |
+| Peer delivery, about 30 TB   |          $307 |                $276 |
+| **Total operator inflow**    |    **$1,024** |            **$921** |
 
-The other $410 is real value flow, but it is not cash the operator can use to pay the server bill. About $307 funds buyback-and-burn, and about $102 funds treasury.
+The other ~$102 funds the treasury.
 
 ## Cash costs
 
@@ -92,24 +94,16 @@ Put the revenue and costs together:
 
 | Line                                 |    Amount |
 | ------------------------------------ | --------: |
-| Client delivery, operator cash share |     +$430 |
-| Peer delivery, operator cash share   |     +$184 |
+| Client delivery, operator cash share |     +$645 |
+| Peer delivery, operator cash share   |     +$276 |
 | Cache-miss pulls                     |     -$154 |
 | Infrastructure                       |      -$95 |
 | L2 gas                               |      -$10 |
-| **Net liquid USDC**                  | **+$355** |
+| **Net liquid USDC**                  | **+$662** |
 
-That is **$355/month of liquid USDC**, about 35% of gross billed delivery, before any TOKEN-side upside.
+That is **$662/month of liquid USDC**, about 65% of gross billed delivery.
 
 This number moves with operating quality. A warmer cache improves it. Better bandwidth improves it. The reference case is deliberately ordinary: a 1 Gbps-class node, 100 TB/month, 85% cache hit rate, $0.01/GB market pricing.
-
-## What not to count as cash
-
-The operator-aligned return is larger than the cash line, but it should not be mixed into OpEx math.
-
-FeeRouter sends 30% of every settlement to buyback-and-burn. For bonded operators, that burn is aligned with the operator side of the network: capacity providers hold TOKEN bonds, and network usage mechanically removes TOKEN supply. Counting direct USDC plus burn, **90% of every settled byte is operator-aligned**.
-
-But invoices are paid in liquid currency. The operator's cash P&L is the operator base share minus cache-miss pulls, infrastructure, and gas. The burn belongs in the upside story, not the server bill.
 
 ## Why the economics work
 
@@ -121,4 +115,4 @@ Second, payment channels make per-MB billing cheap enough to matter. Most byte-l
 
 Third, cache misses are paid. Popular content spreads because the next node can earn from holding it, not because someone asked nicely.
 
-That is the operator thesis in one sentence: serve useful bytes, keep the right cache warm, and settle in stable currency. The launch-ramp subsidy covers the cold-start period while traffic fills in. After that, break-even sits around 5 TB/month per node in the reference setup. At 100 TB/month, the reference node clears **$355/month** in liquid USDC.
+That is the operator thesis in one sentence: serve useful bytes, keep the right cache warm, and settle in stable currency. The launch-ramp subsidy covers the cold-start period while traffic fills in. At 100 TB/month, the reference node clears **$662/month** in liquid USDC.

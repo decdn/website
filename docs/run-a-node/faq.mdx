@@ -70,14 +70,15 @@ description: Short answers to the questions prospective node operators ask most,
     exact figure. See [Bond and
     earnings](/run-a-node/bond-and-earnings#the-capacity-bond).
   </Accordion>
-  <Accordion title="What can get my bond slashed?">
-    Only rate manipulation and serving blacklisted content after its compliance
-    window. Bad delivery is unpaid, not slashed. See [Compliance and
-    risk](/run-a-node/compliance#what-can-cost-you-bond).
+  <Accordion title="What happens if my node misbehaves?">
+    Bad delivery goes unpaid and costs reputation with that client. An operator
+    that keeps serving blacklisted content after its compliance window can be
+    ejected by governance. See [Compliance and
+    risk](/run-a-node/compliance#what-can-get-a-node-ejected).
   </Accordion>
-  <Accordion title="How long does unbonding take?">
-    14 days, during which the bond stays slashable. See
-    [Unbonding](/run-a-node/bond-and-earnings#unbonding).
+  <Accordion title="How do I get my bond back?">
+    `decdn node unbond` returns your TOKEN in the same transaction. A full exit
+    deregisters first. See [Unbonding](/run-a-node/bond-and-earnings#unbonding).
   </Accordion>
   <Accordion title="How am I paid?">
     Per byte delivered, in USDC. The node redeems its vouchers on-chain
@@ -86,9 +87,9 @@ description: Short answers to the questions prospective node operators ask most,
   </Accordion>
   <Accordion title="What is the price, and what share do operators get?">
     The target client price is about $0.01/GB, and each operator sets its own
-    per-MB rate. Mainnet launches at 90% operator, 0% buyback, 10% treasury, and
-    moves to 60/30/10 once governance confirms the activation criteria. The
-    testnet already runs 60/30/10. See [Operator
+    per-MB rate. The operator receives 60% at redemption and a rebate from the
+    protocol share later, 90% end to end at the launch values; the treasury
+    keeps 10%. See [Operator
     share](/run-a-node/bond-and-earnings#operator-share).
   </Accordion>
 </AccordionGroup>

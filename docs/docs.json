@@ -83,7 +83,6 @@
             "group": "Accountability & Governance",
             "pages": [
               "protocol/reputation",
-              "protocol/slashing",
               "protocol/governance",
               "protocol/takedown"
             ]
@@ -130,7 +129,8 @@
     ]
   },
   "redirects": [
-    { "source": "/node-setup", "destination": "/run-a-node/quickstart" }
+    { "source": "/node-setup", "destination": "/run-a-node/quickstart" },
+    { "source": "/protocol/slashing", "destination": "/protocol/takedown" }
   ],
   "footer": {
     "socials": {

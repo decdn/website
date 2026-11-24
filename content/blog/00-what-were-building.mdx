@@ -35,7 +35,7 @@ Every part of the stack is a primitive that already exists. decdn is the protoco
 - A low-cost EVM L2 for settlement — payment channels open, close, and dispute on-chain, with per-transaction costs in the cents range.
 - **ERC-4337 account abstraction** and **Safe smart wallets**, so operators and clients can use modern wallet UX, batch approvals, and pay gas in stablecoins instead of native chain tokens.
 
-The protocol surface is thin: a wire format for probe and delivery, a payment channel contract, a bonding registry, a slashing judge, a content blacklist, and a governance system. We did not invent any of the underlying primitives. We invented the protocol that composes them.
+The protocol surface is thin: a wire format for probe and delivery, a payment channel contract, a bonding registry, a content blacklist, and a governance system. We did not invent any of the underlying primitives. We invented the protocol that composes them.
 
 ## The economic shape
 
@@ -43,7 +43,7 @@ Two currencies, doing two jobs.
 
 **USDC** is for delivery payments. Every byte transferred is paid in USDC, including the bytes one node pulls from another on a cache miss. The economic gradient _is_ the replication strategy: popular content propagates because each cache becomes a paying source for the next hop. Operator revenue tracks operator costs in the same currency as the operator's server bill.
 
-**The native token** is for bonding, governance, and value accrual. Operators bond to register, sized to the capacity they declare; the bond is slashable for misbehavior. Voting weight comes from proven delivered bytes, not from locked tokens — the operators actually moving traffic steer protocol parameters. Thirty percent of every settlement is routed to buyback-and-burn, so network usage accrues to holders through deflation rather than a fee-share payout. The native token is never used to pay for bandwidth — the network that tries to do that is the network that loses its supply side the first time the token drops.
+**The native token** is for bonding, governance, and value accrual. Operators bond to register, sized to the capacity they declare. Voting weight comes from proven delivered bytes, not from locked tokens — the operators actually moving traffic steer protocol parameters. Every new operator and every capacity upgrade bonds more of it, so demand for the token grows with the network's capacity rather than with a fee-share payout. The native token is never used to pay for bandwidth — the network that tries to do that is the network that loses its supply side the first time the token drops.
 
 The split is deliberate. Volatility goes in one currency, used for alignment over long horizons. Stability goes in the other, used for payments matched to fiat-denominated server bills.
 

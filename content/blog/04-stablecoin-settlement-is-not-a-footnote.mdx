@@ -2,7 +2,7 @@
 title: "Stablecoin Settlement Is Not a Footnote"
 slug: stablecoin-settlement-is-not-a-footnote
 date: 2026-06-12
-summary: "Every prior decentralized delivery network priced bandwidth in a token whose value could halve overnight. decdn settles delivery in USDC and reserves its native token for alignment — bonding, governance, and buyback-and-burn."
+summary: "Every prior decentralized delivery network priced bandwidth in a token whose value could halve overnight. decdn settles delivery in USDC and reserves its native token for alignment: bonding and governance."
 bucket: pillar
 ---
 
@@ -30,9 +30,9 @@ We do issue a native token. It's called TOKEN. Its job is alignment, not payment
 
 What TOKEN does:
 
-- **Bonding.** A node operator bonds TOKEN to register, sized to the capacity they declare — larger operators bond more, along a super-linear curve. The bond is slashable for the two on-chain offenses: rate manipulation and serving blacklisted content. Skin in the game gives the network a credible enforcement mechanism without inventing a court system.
-- **Governance.** Voting weight comes from _proven delivered bytes_, not from locked or vote-escrowed tokens. Operators who actually move traffic steer protocol parameters — fee bounds, blacklist administration, the channel dispute window — through the on-chain governor. Influence tracks contribution, not balance.
-- **Value accrual through burn.** Thirty percent of every settlement is routed to buyback-and-burn: USDC swapped for TOKEN, the TOKEN burned. Demand is tied to actual network usage, and the deflation benefits every holder uniformly — no yield paid to anyone.
+- **Bonding.** A node operator bonds TOKEN to register, sized to the capacity they declare — larger operators bond more, along a super-linear curve. The bond is the operator's registration and capacity commitment. An operator that keeps serving blacklisted content can be ejected by governance, which deactivates its node: no rebate, no new vote weight, no origin seat. Clients police the rest themselves, because they verify every byte and sign the price into every voucher.
+- **Governance.** Voting weight comes from _proven delivered bytes_, not from locked or vote-escrowed tokens. Operators who actually move traffic steer protocol parameters — the fee split, the bond curve, blacklist administration — through the on-chain governor. Influence tracks contribution, not balance.
+- **Demand that tracks capacity.** Every new operator and every capacity upgrade buys TOKEN to bond. Demand is tied to the network's growth in capacity, not to a promise of yield.
 
 What TOKEN is _not_ for:
 
@@ -59,6 +59,6 @@ If you're a node operator: your earnings track your server bill in the same curr
 
 If you're a content publisher: your delivery cost is denominated in dollars, the same as everything else on your invoice. Your monthly CDN line item is predictable.
 
-If you're a token holder: TOKEN demand comes from bonding, governance, and the buyback-and-burn — not from being forced into the medium-of-exchange role for a workload that needs sub-cent granularity. Token economics get to be about long-term alignment instead of short-term liquidity.
+If you're a token holder: TOKEN demand comes from operators bonding it as the network grows, not from being forced into the medium-of-exchange role for a workload that needs sub-cent granularity. Token economics get to be about long-term alignment instead of short-term liquidity.
 
 This is what we mean by "stablecoin settlement is not a footnote." It's the design choice that makes every other piece of the protocol economically coherent. Pull this thread and the whole network unravels.

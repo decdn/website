@@ -14,7 +14,7 @@ A storage network maximizes durability per dollar — the chance that a given by
 
 Storage networks have to keep proving, continuously, that the bytes they committed to keeping are still there. Filecoin's proof-of-spacetime is the canonical example. Sia challenges hosts. Arweave bakes proofs into block production. These proofs cost something — CPU, storage I/O, or both — and that cost is paid by every byte under management for as long as the network keeps it.
 
-A delivery network proves something different and proves it once: the byte you just sent matches the BLAKE3 hash the client asked for. The verification is at the edge, at receipt time, at line rate. There's no continuous proof obligation. There's no challenge game. If a node lies about having a blob, it gets caught the next time it tries to serve it (and pays a slashing penalty). If a node serves bytes that don't hash to the requested ID, the client throws them away and pays nothing.
+A delivery network proves something different and proves it once: the byte you just sent matches the BLAKE3 hash the client asked for. The verification is at the edge, at receipt time, at line rate. There's no continuous proof obligation. There's no challenge game. If a node lies about having a blob, it gets caught the next time it tries to serve it, earns nothing, and drops in that client's ranking. If a node serves bytes that don't hash to the requested ID, the client throws them away and pays nothing.
 
 This isn't just a pricing difference. It's a different shape of system. Every line of code we don't have to write to maintain a continuous proof economy is a line of code we can write to compete on latency.
 

@@ -5,7 +5,7 @@ description: An accountability-first privacy design — a four-tier adversary mo
 
 ## Decision
 
-Privacy is treated as an **accountability-first** design: probes are public, on-chain settlement is what makes payment auditable, and the registry is what makes nodes discoverable and slashable. Most privacy surfaces are accepted as inherent. Two are mitigated; deeper techniques are assessed and not adopted.
+Privacy is treated as an **accountability-first** design: probes are public, on-chain settlement is what makes payment auditable, and the registry is what makes nodes discoverable and accountable. Most privacy surfaces are accepted as inherent. Two are mitigated; deeper techniques are assessed and not adopted.
 
 ## Adversary model (four tiers)
 
@@ -23,9 +23,9 @@ Each tier subsumes the one above it.
 The protocol inventories its distinct privacy surfaces with explicit dispositions (accept or mitigate). Highlights:
 
 - **On-chain settlement volume leakage.** Anyone can read pool deposits and per-node redemptions on-chain. Accepted: auditable settlement is what makes the payment layer trustless.
-- **Signed protocol messages as a content inventory.** A signed availability response is non-repudiable proof that the node held (or did not hold) a specific hash at a specific time, and accumulated signatures build a verifiable inventory. Accepted: the same signature is what enables on-chain accountability.
+- **Signed protocol messages as a content inventory.** A signed availability response is non-repudiable proof that the node held (or did not hold) a specific hash at a specific time, and accumulated signatures build a verifiable inventory. Accepted: the same signature is what attributes each answer to its operator.
 - **Probe traffic.** Who probes what is visible to every candidate probed, not just the one selected. Accepted: the delivering node must learn the hash regardless, so hiding the request from the others adds bandwidth without changing the underlying property.
-- **Registry enumeration.** Anyone can read the active set and each node's self-reported region and addresses. Accepted: an enumerable, slashable operator set is the point.
+- **Registry enumeration.** Anyone can read the active set and each node's self-reported region and addresses. Accepted: an enumerable, accountable operator set is the point.
 
 ## Mitigations
 

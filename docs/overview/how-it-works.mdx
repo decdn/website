@@ -47,7 +47,7 @@ sequenceDiagram
 
 Paid delivery is one protocol — used both client→node and node→node. Every byte of the node-to-node pull is paid by the serving node, which amortizes that cost across many downstream client deliveries. The pull is **demand-windowed**: the node fills only far enough ahead of what its client has consumed and paid for, so a client that abandons at half leaves the node holding the demanded prefix rather than the whole blob.
 
-A node may also simply decline. Refusing is not a protocol violation and is not slashable: if the upstream price doesn't clear the margin on the resale, serving at a loss is the wrong move for the operator and the client re-routes to another provider, paying only a latency cost. Each node gates its buys on a node-local ceiling (`max_buy`): it buys cold content at the market price while the upstream source still has a bounded **warming allowance**, then demands a proven margin, and answers a below-margin miss with an ordinary `NotFound`.
+A node may also simply decline. Refusing is an ordinary answer within the protocol: if the upstream price doesn't clear the margin on the resale, serving at a loss is the wrong move for the operator and the client re-routes to another provider, paying only a latency cost. Each node gates its buys on a node-local ceiling (`max_buy`): it buys cold content at the market price while the upstream source still has a bounded **warming allowance**, then demands a proven margin, and answers a below-margin miss with an ordinary `NotFound`.
 
 ## Multi-source parallel fetch
 
@@ -57,7 +57,7 @@ Assignment follows **coverage**: probes carry a bitmap of which 64 MiB blocks ea
 
 Assignment is dynamic. When a source finishes its **segment**, it steals the tail of the range whose covered part has the most unfetched bytes, splitting it on a verifiable boundary in proportion to each source's delivery rate (ranges under 16 MiB are not split, and the victim always keeps at least 4 MiB ahead of its frontier). A freed source may also take the tail of an uncovered range from a **slow victim** — one delivering at a quarter of its own rate or less — serving it by pull-through. Every segment is verified as it lands. A source with no verified progress for 10 s, or one that drops or errors, cools (2 s, doubling to 60 s, reset by a verified byte) and rejoins; only its _unfinished remainder_ is reassigned, and the download never restarts. There is deliberately no hedging — racing a segment against idle sources would mean paying for the copies that lose, so the tail is bounded by reassignment and slow-victim steals instead. Aggregate throughput therefore scales with the number of admitted sources rather than any one holder's uplink.
 
-There is no new wire surface — each source is just an ordinary paid stream, so pools, vouchers, and slashing work exactly as in the single-source paths above. Every source draws on the client's one pool, on its own independent lane.
+There is no new wire surface — each source is just an ordinary paid stream, so pools, vouchers, and verification work exactly as in the single-source paths above. Every source draws on the client's one pool, on its own independent lane.
 
 A fetch with no usable source waits for one rather than failing. It stops only on a fault the user must fix (such as an unhealable voucher rejection), a unanimous verdict from the sources, or the stop policy: an interactive session waits indefinitely, while a script gives up after 10 minutes with no verified byte anywhere in the fetch.
 
@@ -66,25 +66,24 @@ A fetch with no usable source waits for one rather than failing. It stops only o
 1. **Open** — the payer escrows one USDC deposit in the `PaymentPool` contract. Once, off the fetch path, reused for every node.
 2. **Delegate** — the owner signs capped, expiring capabilities for whichever keys may spend from the pool. One capability is valid at every node.
 3. **Meter** — a signed cumulative voucher anchors the amount owed, and an optional hash chain advances it by one 1 MiB **payment chunk** per released preimage, with no further signature. A voucher opening no chain is sealed at the amount it signs.
-4. **Redeem** — the node settles its own vouchers on-chain whenever it likes; the owner closes the pool to reclaim the remainder, after a grace window that lets nodes redeem first.
+4. **Redeem** — the node settles its own vouchers on-chain whenever it likes and receives its operator share in the same transaction; the owner closes the pool to reclaim the remainder, after a grace window that lets nodes redeem first.
 
 ## What keeps the network honest
 
 - **Hash verification.** Clients verify every chunk group against the known blob hash as it arrives. A bad byte voids payment for that window.
-- **On-chain evidence.** Probe and stream responses are signed in a form verifiable on-chain, as evidence of rate manipulation or blacklist violations ([slashing](/protocol/slashing)).
-- **Synchronous adjudication.** The on-chain judge verifies revealed evidence and slashes on the spot, with no counter-evidence window. Challenges commit before they reveal, so the challenger reward cannot be front-run.
+- **Signed prices.** Every stream response carries the node's signed quote, and the requester signs that price into each voucher. A node is paid exactly the rate it quoted, and the requester pays only a rate it accepted.
 - **Reputation.** A local 0.0–1.0 score, built from a node's own delivery outcomes and nothing else ([reputation](/protocol/reputation)).
-- **Content blacklist.** Governance-managed on-chain hash blacklist. Serving a blacklisted hash after the compliance window is slashable ([takedown](/protocol/takedown)).
+- **Content blacklist.** Governance-managed on-chain hash blacklist that every node follows. Governance can blacklist and eject an operator that keeps serving listed content after the compliance window ([takedown](/protocol/takedown)).
 
 ## Where the boundary sits
 
-| Layer                      | Trust                                                         |
-| -------------------------- | ------------------------------------------------------------- |
-| Bytes delivered            | **Verified** against known hash                               |
-| Node availability          | Not trusted — a node may decline; the client re-routes        |
-| Node rate honesty          | Trusted — slashed if the charged rate contradicts its quote   |
-| Node region claim          | Self-attested — penalized in selection when latency disagrees |
-| Origin backend correctness | **Assumed** — outside protocol scope (operator concern)       |
-| L2 RPC provider honesty    | **Assumed** — mitigated via multiple independent providers    |
+| Layer                      | Trust                                                                       |
+| -------------------------- | --------------------------------------------------------------------------- |
+| Bytes delivered            | **Verified** against known hash                                             |
+| Node availability          | Not trusted — a node may decline; the client re-routes                      |
+| Node rate honesty          | **Enforced** by the client, which signs the quoted price into every voucher |
+| Node region claim          | Self-attested — penalized in selection when latency disagrees               |
+| Origin backend correctness | **Assumed** — outside protocol scope (operator concern)                     |
+| L2 RPC provider honesty    | **Assumed** — mitigated via multiple independent providers                  |
 
 See [privacy](/protocol/privacy) for the adversary model.

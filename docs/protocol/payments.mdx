@@ -24,13 +24,14 @@ sequenceDiagram
         C->>N: Preimage per 1 MiB chunk delivered
     end
     N->>P: redeem(voucher, preimage)
-    P-->>N: Settle → provider (via FeeRouter)
+    P-->>N: Operator share → provider (same transaction)
+    Note over P: Protocol share swept to FeeRouter<br/>on the governance chain
     C->>P: closePool
     Note over P: Redemption grace window<br/>lets nodes redeem first
     P-->>C: Reclaim unspent remainder
 ```
 
-`openPool` happens **once and off the fetch path**, so it is not latency-critical; `topUp` refills a pool that has been drawn down. A node redeems whenever it likes while the pool is open — redeeming a signed, monotone claim needs no dispute window. The owner closes the pool to reclaim what is left, after a **redemption grace window** (48 hours by default, governable within 48h–72h) during which nodes settle outstanding vouchers.
+`openPool` happens **once and off the fetch path**, so it is not latency-critical; `topUp` refills a pool that has been drawn down. A node redeems whenever it likes while the pool is open — redeeming a signed, monotone claim needs no dispute window. The owner closes the pool to reclaim what is left, after a **redemption grace window** (fixed per deployment, 48 hours in the reference deployment) during which nodes settle outstanding vouchers.
 
 ## Capabilities
 
@@ -75,8 +76,8 @@ The window is per stream and starts at one chunk, so a new payer proves itself o
 
 ## Rate discovery
 
-Each node advertises its own per-MB rate, quoted in every signed probe response. Governance sets a **floor**, not a ceiling: a node advertises its configured rate verbatim and never raises its quote to the floor. A voucher priced under the floor still settles its full amount; redemption clamps only its byte credit toward voting weight, so a below-floor node keeps its revenue and loses only vote weight on those bytes. No governance ceiling caps a node's rate from above: the buyer sees the signed rate before it pays anything, which is what makes a ceiling unnecessary. A requester rejecting an expensive quote is local policy rather than a protocol rule; the only upper bound is the wire constant `MAX_RATE_PER_MB`. A quoted rate is binding for any stream opened inside the [slashing window](/protocol/slashing#the-slashing-window).
+Each node advertises its own per-MB rate, quoted in every signed probe response. Governance sets a **floor**, not a ceiling: a node advertises its configured rate verbatim and never raises its quote to the floor. A voucher priced under the floor still settles its full amount; redemption clamps only its byte credit toward voting weight, so a below-floor node keeps its revenue and loses only vote weight on those bytes. No governance ceiling caps a node's rate from above: the buyer sees the signed rate before it pays anything, which is what makes a ceiling unnecessary. A requester rejecting an expensive quote is local policy rather than a protocol rule; the only upper bound is the wire constant `MAX_RATE_PER_MB`. The requester signs the quoted rate into every voucher as `chunk_price`, so a stream pays exactly the rate the requester saw and accepted.
 
 ## Minimum deposit
 
-`openPool` enforces a governance-set `minDeposit` on the credited deposit. It is a Sybil knob: the per-pool solvency floor bounds loss within one pool, and an attacker escapes it by fanning out across many pools, so the floor taxes the capital locked in simultaneous pools. Deposits stay fully refundable, and the parameter is bounded at **0 to $100** and launches at 0 — zero leaves it dormant, and the ceiling keeps governance from pricing small honest buyers out of opening a pool.
+`openPool` enforces `minDeposit`, fixed when the pool contract is deployed, on the credited deposit. It is a Sybil knob: the per-pool solvency floor bounds loss within one pool, and an attacker escapes it by fanning out across many pools, so the floor taxes the capital locked in simultaneous pools. Deposits stay fully refundable. The reference value is 0, which leaves the floor dormant and keeps small pools open for development and testing; a deployment that needs the Sybil floor sets a non-zero value.

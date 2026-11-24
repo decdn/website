@@ -329,8 +329,8 @@ export const TOPICS: Record<TopicId, Topic> = {
     title: "Staking",
     summary: "Every node posts a TOKEN bond sized to the capacity it declares.",
     body: [
-      "CapacityBond is the node registry. A node registers by bonding bond = k × Mbps^α and proving it controls its NodeId, so every active node is slashable from its first byte.",
-      "Slashing covers provable offenses: charging more than a signed quote, or serving blacklisted content after the compliance window.",
+      "CapacityBond is the node registry. A node registers by bonding bond = k × Mbps^α and proving it controls its NodeId. The bond is its registration and capacity commitment, and unbond returns the TOKEN at once.",
+      "Clients protect themselves: they verify every byte against its hash and sign the agreed price into each voucher, so a node that cheats goes unpaid. Governance can eject an operator that keeps serving blacklisted content.",
     ],
     facts: [
       ["Contract", "CapacityBond"],
@@ -338,7 +338,7 @@ export const TOPICS: Record<TopicId, Topic> = {
       ["Governs", "delivery network"],
     ],
     related: ["cache", "origin", "blacklist", "voting"],
-    source: "ADR 014 · ADR 026",
+    source: "ADR 016 · ADR 026",
   },
   blacklist: {
     hue: "gov",
@@ -347,15 +347,15 @@ export const TOPICS: Record<TopicId, Topic> = {
     summary: "An on-chain list of hashes that nodes must stop serving.",
     body: [
       "Payment never looks at content. Compliance comes from ContentBlacklist instead: governance and regional bodies list hashes, with an emergency fast path for urgent cases.",
-      "After the compliance window, serving a listed hash is slashable. A slashed operator can appeal within 30 days, and a wrongful entry comes off through the ordinary removal path.",
+      "Nodes stop serving a listed hash within its compliance window. Governance can blacklist an operator that keeps serving one, which ejects it from CapacityBond: no rebate, no new vote weight, no origin seat. A wrongful entry comes off through the ordinary removal path.",
     ],
     facts: [
-      ["Contracts", "ContentBlacklist · SlashJudge · SlashAppeal"],
+      ["Contracts", "ContentBlacklist · CapacityBond"],
       ["Scope", "global or regional"],
-      ["Appeal window", "30 days"],
+      ["Compliance window", "24 h, 2 h emergency"],
     ],
     related: ["staking", "cache"],
-    source: "ADR 011 · ADR 028",
+    source: "ADR 011",
   },
   voting: {
     hue: "gov",
@@ -363,13 +363,13 @@ export const TOPICS: Record<TopicId, Topic> = {
     title: "Voting",
     summary: "Operators vote with weight earned by the bytes they served.",
     body: [
-      "DecdnGovernor weighs each operator's vote by the bytes it served over a trailing window, ramped by age and capped at 5% of the total. A slash zeroes that weight for a while.",
+      "DecdnGovernor weighs each operator's vote by the bytes it served over a trailing window, ramped by age and capped at 10% of the total.",
       "Passed changes wait in a 48-hour Timelock before they apply. Control moves from an admin key to a multisig, then to the Governor once the operator set is broad enough.",
     ],
     facts: [
       ["Contracts", "DecdnGovernor · Timelock"],
       ["Weight", "served bytes × age ramp"],
-      ["Cap", "5% per operator"],
+      ["Cap", "10% per operator"],
     ],
     related: ["feerouter", "staking"],
     source: "ADR 009 · ADR 036",
@@ -432,14 +432,14 @@ export const TOPICS: Record<TopicId, Topic> = {
     eyebrow: "Governance · settlement",
     title: "FeeRouter",
     summary:
-      "Splits every redemption between the operator, buyback and the treasury.",
+      "Splits the protocol share of every redemption between the operator and the treasury.",
     body: [
-      "When a node redeems, FeeRouter splits the USDC in the same transaction. At launch 90% goes to the operator and 10% to the treasury. Governance can switch on the buyback bucket, which moves the split to 60% operator, 30% buyback and burn, 10% treasury.",
-      "FeeRouter also counts the bytes each operator served. Those counts are the vote weights in governance.",
+      "A redemption pays the operator 60% at once, on the payment chain. The other 40% is swept to FeeRouter on Ethereum, which returns a governable rebate to an active operator and sends the rest to the treasury. At launch the operator gets 90% end to end and the treasury 10%.",
+      "FeeRouter also counts the bytes each operator served, priced on the treasury share. Those counts are the vote weights in governance.",
     ],
     facts: [
-      ["Launch split", "90 / 0 / 10"],
-      ["Target split", "60 / 30 / 10"],
+      ["At redemption", "60% to the operator"],
+      ["Launch split", "90 / 10 end to end"],
       ["Also counts", "bytes served per operator"],
     ],
     related: ["pool", "voting"],
@@ -700,7 +700,7 @@ export const TOURS: Record<TourId, Tour> = {
       },
       {
         topics: ["cache", "origin", "pool", "feerouter"],
-        text: "Nodes redeem the vouchers, and FeeRouter splits each payment.",
+        text: "Nodes redeem the vouchers, and FeeRouter splits the protocol share.",
       },
     ],
   },
@@ -760,7 +760,7 @@ export const TOURS: Record<TourId, Tour> = {
       },
       {
         topics: ["staking", "blacklist"],
-        text: "Every node is bonded, so breaking the rules costs it stake.",
+        text: "Every node is bonded. Governance can eject one that ignores the blacklist.",
       },
     ],
   },
